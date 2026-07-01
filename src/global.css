@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #111111;
+  --secondary: #666666;
+  --background: #FFFFFF;
+  --surface: #F7F7F7;
+  --accent: #FF4C3B;
+  --border: #EEEEEE;
+  --error: #FF4444;
+
+  --primary-dark: #FFFFFF;
+  --secondary-dark: #666666;
+    --background-dark: #111111;
+    --surface-dark: #F7F7F7;
+    --accent-dark: #FF4C3B;
+    --border-dark: #EEEEEE;
+    --error-dark: #FF4444;
+}
