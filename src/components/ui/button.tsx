@@ -3,7 +3,7 @@ import { ComponentRef, forwardRef } from 'react';
 import { ActivityIndicator, Pressable, PressableProps, Text } from 'react-native';
 
 export interface ButtonProps extends PressableProps {
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?: 'default' | 'error' | 'outline' | 'secondary' | 'ghost' | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   children?: React.ReactNode;
   className?: string;
@@ -14,10 +14,10 @@ export interface ButtonProps extends PressableProps {
 
 const buttonVariants = {
   variant: {
-    default: 'bg-slate-900 dark:bg-slate-50',
-    destructive: 'bg-red-500 dark:bg-red-900',
-    outline: 'border-2 border-slate-200 dark:border-slate-800 bg-transparent',
-    secondary: 'bg-slate-100 dark:bg-slate-800',
+    default: 'bg-primary dark:bg-primary-dark',
+    error: 'bg-error dark:bg-error-dark',
+    outline: 'border-2 border-border dark:border-border-dark bg-transparent',
+    secondary: 'bg-secondary dark:bg-secondary-dark',
     ghost: 'bg-transparent',
     link: 'bg-transparent',
   },
@@ -28,12 +28,12 @@ const buttonVariants = {
     icon: 'h-10 w-10',
   },
   textVariant: {
-    default: 'text-slate-50 dark:text-slate-900',
-    destructive: 'text-white dark:text-white',
-    outline: 'text-slate-900 dark:text-slate-50',
-    secondary: 'text-slate-900 dark:text-slate-50',
-    ghost: 'text-slate-900 dark:text-slate-50',
-    link: 'text-slate-900 dark:text-slate-50 underline',
+    default: 'text-primary-text dark:text-primary-text-dark',
+    error: 'text-white dark:text-white',
+    outline: 'text-primary-text dark:text-primary-text-dark',
+    secondary: 'text-secondary-text dark:text-secondary-text-dark',
+    ghost: 'text-primary-text dark:text-primary-text-dark',
+    link: 'text-primary-text dark:text-primary-text-dark underline',
   },
   textSize: {
     default: 'font-medium',
@@ -58,6 +58,12 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(
     ref
   ) => {
     const isDisabled = disabled || loading;
+    // const color = variant === 'default' 
+    // ? 'rgb(250, 250, 250)' 
+    // : variant === 'error' ? 'rgb(255, 255, 255)' 
+    // : variant === 'outline' ? 'rgb(250, 250, 250)' 
+    // : variant === 'secondary' ? 'rgb(71, 85, 105)' 
+    // : 'rgb(0, 0, 0)';
 
     return (
       <Pressable
@@ -75,7 +81,7 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(
         {loading && (
           <ActivityIndicator
             size="small"
-            color={variant === 'default' || variant === 'destructive' ? '#ffffff' : '#000000'}
+            className={cn(buttonVariants.textVariant[variant])}
             style={{ marginRight: 8 }}
           />
         )}
