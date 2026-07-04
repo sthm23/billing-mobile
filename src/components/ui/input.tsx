@@ -1,5 +1,5 @@
 import { cn } from '@/libs/utils';
-import { ComponentRef, forwardRef } from 'react';
+import { ComponentRef, forwardRef, useState } from 'react';
 import { TextInput, TextInputProps } from 'react-native';
 import { ThemedText } from '../themed-text';
 
@@ -9,6 +9,7 @@ export interface InputProps extends TextInputProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  isRequired?: boolean;
 }
 
 const tokens = {
@@ -26,28 +27,32 @@ export const Input = forwardRef<ComponentRef<typeof TextInput>, InputProps>(
       className,
       children,
       disabled = false,
+      isRequired = false,
       ...props
     },
     ref
   ) => {
-    const isDisabled = disabled;
-
+    const [isFocused, setIsFocused] = useState(false);
 
     return (
         <>
             {label && <ThemedText className="mb-2" type="small">{label}</ThemedText>}
             <TextInput
                 ref={ref}
-                editable={!isDisabled}
+                editable={!disabled}
                 placeholder={placeholder}
                 value={value}
                 className={cn(
                 tokens.root,
                 tokens.base,
                 tokens.size,
-                isDisabled && 'opacity-50',
+                disabled && 'opacity-50',
+                isFocused && 'border-primary dark:border-primary-dark',
+                isRequired && 'border-error dark:border-error-dark',
                 className
                 )}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 {...props}
             />
         </>
