@@ -1,7 +1,7 @@
-import { useTheme } from '@/hooks/use-theme';
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { useTheme } from "@/hooks/use-theme";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 
-export default function AppTabs() {
+const _layout = () => {
   const colors = useTheme();
 
   return (
@@ -17,8 +17,8 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="login">
-        <NativeTabs.Trigger.Label>Login</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="profile">
+        <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={require('@/assets/images/tabIcons/explore.png')}
           renderingMode="template"
@@ -27,3 +27,5 @@ export default function AppTabs() {
     </NativeTabs>
   );
 }
+
+export default _layout

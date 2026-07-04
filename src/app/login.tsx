@@ -4,10 +4,10 @@ import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/provider/AuthProvider'
 import { Link } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
 import { useState } from 'react'
-import { ActivityIndicator, useColorScheme, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const tokens = {
@@ -22,20 +22,19 @@ const tokens = {
 }
 
 export default function login() {
+    const {login} = useAuth();
   const loading = false
-    const scheme = useColorScheme();
-    const theme = scheme === 'unspecified' ? 'light' : scheme;
-    const isDarkMode = theme === 'dark'
+
 
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
 
   const onSignInPress = () => {
     // Handle sign-in logic here
+    login();
   }
   return (
     <ThemedView type='surface' className={tokens.container}>
-        <StatusBar  style={isDarkMode ? 'light' : 'dark'}/>
         <SafeAreaView edges={['top']} className={tokens.container}>
             <ThemedView type='background' className={tokens.wrapper} >
             {/* Header */}
