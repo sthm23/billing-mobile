@@ -3,13 +3,29 @@
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Link } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 import { useState } from 'react'
-import { ActivityIndicator, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, useColorScheme, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+
+const tokens = {
+    container: 'h-full w-full flex items-center justify-center px-4',
+    wrapper: 'w-full bg-background dark:bg-background-dark px-4 py-8 rounded-lg h-content border border-border dark:border-border-dark',
+    header: 'items-center mb-8 mt-0',
+    title: 'text-3xl font-bold text-primary mb-2',
+    email: 'mb-4 w-full',
+    password: 'mb-6 w-full',
+    submit: 'w-full mb-4',
+    footer: 'flex-row justify-center',
+}
 
 export default function login() {
   const loading = false
+    const scheme = useColorScheme();
+    const theme = scheme === 'unspecified' ? 'light' : scheme;
+    const isDarkMode = theme === 'dark'
 
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
@@ -18,42 +34,59 @@ export default function login() {
     // Handle sign-in logic here
   }
   return (
-    <ThemedView type='primary'>
-        <SafeAreaView edges={['top']} className="flex-1 items-center justify-center">
-          
-                              {/* Header */}
-                              <View className="items-center mb-8">
-                                  <Text className="text-3xl font-bold text-primary mb-2">Welcome Back</Text>
-                                  <Text className="text-secondary">Sign in to continue</Text>
-                              </View>
-          
-                              {/* Email */}
-                              <View className="mb-4">
-                                  <Text className="text-primary font-medium mb-2">Email</Text>
-                                  <TextInput className="w-full bg-surface p-4 rounded-xl text-primary" placeholder="user@example.com" placeholderTextColor="#999" autoCapitalize="none" keyboardType="email-address" value={emailAddress} onChangeText={setEmailAddress} />
-                              </View>
-          
-                              {/* Password */}
-                              <View className="mb-6">
-                                  <Text className="text-primary font-medium mb-2">Password</Text>
-                                  <TextInput className="w-full bg-surface p-4 rounded-xl text-primary" placeholder="********" placeholderTextColor="#999" secureTextEntry value={password} onChangeText={setPassword} />
-                              </View>
-          
-                              {/* Submit */}
+    <ThemedView type='surface' className={tokens.container}>
+        <StatusBar  style={isDarkMode ? 'light' : 'dark'}/>
+        <SafeAreaView edges={['top']} className={tokens.container}>
+            <ThemedView type='background' className={tokens.wrapper} >
+            {/* Header */}
+            <View className={tokens.header}>
+                <ThemedText type='title' >Welcome Back</ThemedText>
+                <ThemedText type='subtitle' themeColor="secondaryText">Sign in to continue</ThemedText>
+            </View>
 
-                              <Button className={`w-full py-4 rounded-full items-center mb-10 ${loading ? "bg-gray-300" : "bg-primary"}`} onPress={onSignInPress} disabled={loading}>{loading ? <ActivityIndicator color="#fff" /> : <Text className="text-white font-bold text-lg">Sign In</Text>}</Button>
-                              
-          
-                              {/* Footer */}
-                              <View className="flex-row justify-center">
-                                  <Text className="text-secondary">Don&apos;t have an account? </Text>
-                                  <Link href="/#" className="text-primary font-bold">
-                                      <Text className="text-primary font-bold">Sign up</Text>
-                                  </Link>
-                              </View>
+            {/* Email */}
+            <View className={tokens.email}>
+                <Input  
+                className="w-full"
+                label={'Email'} 
+                placeholder="user@example.com" 
+                autoCapitalize="none" 
+                keyboardType="email-address" 
+                value={emailAddress} 
+                onChangeText={setEmailAddress} 
+                />
+            </View>
 
+            {/* Password */}
+            <View className={tokens.password}>
+                <Input 
+                className="w-full" 
+                label={'Password'} 
+                placeholder="********" 
+                secureTextEntry 
+                value={password} 
+                onChangeText={setPassword}
+                 />
+            </View>
 
-            <ThemedText type='default'>login</ThemedText>
+            {/* Submit */}
+            <View className={tokens.submit}>
+                <Button 
+                className={`w-full mb-4 ${loading ? "bg-gray-300" : "bg-primary"}`} 
+                onPress={onSignInPress} 
+                disabled={loading}>
+                    {loading ? <ActivityIndicator className='text-background' /> : 'Sign In'}
+                </Button>
+            </View>
+
+            {/* Footer */}
+            <View className={tokens.footer}>
+                <ThemedText type='small'>Don&apos;t have an account? </ThemedText>
+                <Link href="/#">
+                    <ThemedText type='small' className="font-bold">Sign up</ThemedText>
+                </Link>
+            </View>
+            </ThemedView>
         </SafeAreaView>
     </ThemedView>
   )

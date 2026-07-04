@@ -58,12 +58,6 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(
     ref
   ) => {
     const isDisabled = disabled || loading;
-    // const color = variant === 'default' 
-    // ? 'rgb(250, 250, 250)' 
-    // : variant === 'error' ? 'rgb(255, 255, 255)' 
-    // : variant === 'outline' ? 'rgb(250, 250, 250)' 
-    // : variant === 'secondary' ? 'rgb(71, 85, 105)' 
-    // : 'rgb(0, 0, 0)';
 
     return (
       <Pressable
