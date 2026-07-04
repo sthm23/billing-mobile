@@ -14,7 +14,7 @@ const Profile = () => {
   return (
     <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
         <ThemedView type='surface' className="items-center justify-center">
-            <ThemedText>profile</ThemedText>
+            <ThemedText type='title'>Profile page</ThemedText>
             <Button onPress={handleLogout}>Logout</Button>
         </ThemedView>
     </SafeAreaView>

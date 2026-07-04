@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-
 interface AuthContextType {
     isAuthenticated: boolean;
     login: () => void;
@@ -28,19 +27,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(()=>{
+        const loadAuthState = async () => {
+            try {
+                const token = await AsyncStorage.getItem(AuthStorageKey.AUTH_TOKEN);
+                setAuthenticated(!!token);
+            } catch (error) {
+                console.error("Failed to load auth state:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         loadAuthState();
     }, [])
 
-    const loadAuthState = async () => {
-        try {
-            const token = await AsyncStorage.getItem(AuthStorageKey.AUTH_TOKEN);
-            setAuthenticated(!!token);
-        } catch (error) {
-            console.error("Failed to load auth state:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const login = async () => {
         try {
