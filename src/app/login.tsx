@@ -4,9 +4,11 @@ import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/libs/utils'
 import { useAuth } from '@/provider/AuthProvider'
 import { Link } from 'expo-router'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -18,10 +20,12 @@ const tokens = {
     email: 'mb-4 w-full',
     password: 'mb-6 w-full',
     submit: 'w-full mb-4',
+    submitBtn: 'w-full mb-4',
     footer: 'flex-row justify-center',
 }
 
 export default function login() {
+    const { t } = useTranslation();
     const {login} = useAuth();
   const loading = false
 
@@ -39,15 +43,15 @@ export default function login() {
             <ThemedView type='background' className={tokens.wrapper} >
             {/* Header */}
             <View className={tokens.header}>
-                <ThemedText type='title' >Welcome Back</ThemedText>
-                <ThemedText type='subtitle' themeColor="secondaryText">Sign in to continue</ThemedText>
+                <ThemedText type='title' >{t('login.title')}</ThemedText>
+                <ThemedText type='subtitle' themeColor="secondaryText">{t('login.subTitle')}</ThemedText>
             </View>
 
             {/* Email */}
             <View className={tokens.email}>
                 <Input  
                 className="w-full"
-                label={'Email'} 
+                label={t('login.email')} 
                 placeholder="user@example.com" 
                 autoCapitalize="none" 
                 keyboardType="email-address" 
@@ -60,7 +64,7 @@ export default function login() {
             <View className={tokens.password}>
                 <Input 
                 className="w-full" 
-                label={'Password'} 
+                label={t('login.password')} 
                 placeholder="********" 
                 secureTextEntry 
                 value={password} 
@@ -71,18 +75,18 @@ export default function login() {
             {/* Submit */}
             <View className={tokens.submit}>
                 <Button 
-                className={`w-full mb-4 ${loading ? "bg-gray-300" : "bg-primary"}`} 
+                className={cn(tokens.submitBtn, loading ? "bg-gray-300" : "bg-primary")} 
                 onPress={onSignInPress} 
                 disabled={loading}>
-                    {loading ? <ActivityIndicator className='text-background' /> : 'Sign In'}
+                    {loading ? <ActivityIndicator className='text-background' /> : t('login.loginButton')}
                 </Button>
             </View>
 
             {/* Footer */}
             <View className={tokens.footer}>
-                <ThemedText type='small'>Don&apos;t have an account? </ThemedText>
-                <Link href="/#">
-                    <ThemedText type='small' className="font-bold">Sign up</ThemedText>
+                <ThemedText type='small'>{t('login.signUptext')} </ThemedText>
+                <Link href="/#" className="ml-1">
+                    <ThemedText type='small' className="font-bold">{t('login.signUp')}</ThemedText>
                 </Link>
             </View>
             </ThemedView>

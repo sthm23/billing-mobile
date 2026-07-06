@@ -30,10 +30,10 @@ const buttonVariants = {
   textVariant: {
     default: 'text-primary-text dark:text-primary-text-dark',
     error: 'text-white dark:text-white',
-    outline: 'text-primary-text dark:text-primary-text-dark',
+    outline: 'text-primary dark:text-primary-dark',
     secondary: 'text-secondary-text dark:text-secondary-text-dark',
-    ghost: 'text-primary-text dark:text-primary-text-dark',
-    link: 'text-primary-text dark:text-primary-text-dark underline',
+    ghost: 'text-primary dark:text-primary-dark',
+    link: 'text-primary dark:text-primary-dark underline',
   },
   textSize: {
     default: 'font-medium',

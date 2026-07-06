@@ -17,6 +17,12 @@ export enum ThemeStorageKey {
     THEME_MODE = 'sthm23-theme-mode',
 }
 
+export type SelectTheme = { 
+  mode: ThemeMode; 
+  label: string; 
+  description: string 
+}
+
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }): React.ReactElement {
