@@ -19,8 +19,7 @@ export enum ThemeStorageKey {
 
 export type SelectTheme = { 
   mode: ThemeMode; 
-  label: string; 
-  description: string 
+  label: string;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);

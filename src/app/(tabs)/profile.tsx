@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Profile = () => {
     const { t } = useTranslation();
-    const [language, setLanguage] = useState<AppLanguage>('auto');
+    const [language, setLanguage] = useState<AppLanguage>(AppLanguage.AUTO);
     const { themeMode, setThemeMode } = useThemeMode();
     const {logout} = useAuth();
 
@@ -42,22 +42,21 @@ const Profile = () => {
 
   const LANGUAGE_OPTIONS = useMemo(()=>{
     return [
-    { value: 'auto', label: 'auto' },
-    { value: 'en', label: 'Eng' },
-    { value: 'ru', label: 'Rus' },
-    { value: 'uz', label: 'Uzb' },
+    { value: AppLanguage.AUTO, label: 'auto' },
+    { value: AppLanguage.EN, label: 'Eng' },
+    { value: AppLanguage.RU, label: 'Rus' },
+    { value: AppLanguage.UZ, label: 'Uzb' },
 ]
   }, []);
 
   const THEME_OPTIONS: SelectTheme[] = useMemo(()=>[
-  { mode: ThemeMode.AUTO, label: 'Автоматически', description: 'Как в системе' },
-  { mode: ThemeMode.LIGHT, label: 'Светлая', description: 'Всегда светлая' },
-  { mode: ThemeMode.DARK, label: 'Тёмная', description: 'Всегда тёмная' },
+  { mode: ThemeMode.AUTO, label: 'Auto'},
+  { mode: ThemeMode.LIGHT, label: 'Light' },
+  { mode: ThemeMode.DARK, label: 'Dark' },
 ], []);
 
 
     const onLanguagePress = async (lang: AppLanguage) => {
-    setLanguage(lang);
     await setAppLanguage(lang);
   };
   
@@ -65,34 +64,18 @@ const Profile = () => {
     <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
         <ThemedView type='surface' className="items-center justify-center">
             <ThemedText type='title'>Profile page</ThemedText>
+            <ThemedText type='subtitle'>Select language</ThemedText>
             <ThemedView type='surface' className="flex-row items-center justify-center gap-2 my-4">
-                {
-                    LANGUAGE_OPTIONS.map(method => (
-                    <Button key={method.value}
-                        variant='outline'    
-                    onPress={
-                            () => void onLanguagePress(method.value as AppLanguage)
-                        }
-                    >{method.label}</Button>
-                    ))
-                }
+                {LANGUAGE_OPTIONS.map(method => (
+                    <Button key={method.value} variant='outline'    
+                    onPress={() => void onLanguagePress(method.value)}>{method.label}</Button>
+                ))}
             </ThemedView>
-            <ThemedView type='surface' className="my-4">
+            <ThemedText type='subtitle'>Select theme</ThemedText>
+            <ThemedView type='surface' className="flex-row items-center justify-center gap-2 my-4">
               {THEME_OPTIONS.map(option => (
-              <Button variant='outline'
-                key={option.mode}
-                                onPress={() => setThemeMode(option.mode)}
-              >
-                <ThemedView >
-                  <ThemedText>{option.label}</ThemedText>
-                  <ThemedText>{option.description}</ThemedText>
-                </ThemedView>
-                {themeMode === option.mode && (
-                  <ThemedView>
-                    {/* <IconSelect name={{ ios: 'checkmark', android: 'check' }} size={24}  /> */}
-                  </ThemedView>
-                )}
-              </Button>
+              <Button variant='outline' key={option.mode}
+              onPress={() => setThemeMode(option.mode)}>{option.label}</Button>
               ))}
             </ThemedView>
             <Button onPress={handleLogout}>Logout</Button>
