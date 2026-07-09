@@ -127,7 +127,7 @@ const ru = {
   },
   "login": {
     "title": "Добро пожаловать",
-    "subTitle": "Войдите с помощью вашей учетной записи Apple или Google",
+    "subTitle": "Зайдите что бы продолжить",
     "withApple": "Войти с Apple",
     "withGoogle": "Войти с Google",
     "withSubTitle": "Или продолжить с",

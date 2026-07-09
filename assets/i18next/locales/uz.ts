@@ -127,7 +127,7 @@ const uz = {
   },
   "login": {
     "title": "Xush kelibsiz",
-    "subTitle": "Apple yoki Google account bilan kiring",
+    "subTitle": "Kirish uchun davom eting",
     "withApple": "Apple account orqali",
     "withGoogle": "Google account orqali",
     "withSubTitle": "Yoki davom eting",
