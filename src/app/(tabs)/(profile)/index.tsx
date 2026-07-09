@@ -5,6 +5,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/provider/AuthProvider';
 import { SelectTheme, ThemeMode, useThemeMode } from '@/provider/ThemeProvider';
+import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ const ProfileScreen = () => {
     const [language, setLanguage] = useState<AppLanguage>(AppLanguage.AUTO);
     const { themeMode, setThemeMode } = useThemeMode();
     const {logout} = useAuth();
+    const router = useRouter();
 
 
 
@@ -56,9 +58,13 @@ const ProfileScreen = () => {
 ], []);
 
 
-    const onLanguagePress = async (lang: AppLanguage) => {
+  const onLanguagePress = async (lang: AppLanguage) => {
     await setAppLanguage(lang);
   };
+
+  const goToCreatePage = () => {
+    router.push('/(tabs)/(profile)/create');
+  }
   
   return (
     <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
@@ -78,6 +84,7 @@ const ProfileScreen = () => {
               onPress={() => setThemeMode(option.mode)}>{option.label}</Button>
               ))}
             </ThemedView>
+            <Button className='mb-4' onPress={goToCreatePage}>Create</Button>
             <Button onPress={handleLogout}>Logout</Button>
         </ThemedView>
     </SafeAreaView>
