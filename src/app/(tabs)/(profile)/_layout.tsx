@@ -6,9 +6,10 @@ export default function TabLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="create" options={{ headerShown: true,  title: 'Profile create', presentation: 'formSheet', sheetCornerRadius: 16 }} />
-      <Stack.Screen name="settings" options={{ headerShown: false, title: 'Profile settings' }} />
+      <Stack.Screen name="index" options={{ headerShown: false, title: 'Profile' }} />
+      <Stack.Screen name="create" options={{ headerShown: true,  title: 'Profile create',  }}>
+        <Stack.Screen.BackButton>Back</Stack.Screen.BackButton>
+      </Stack.Screen>
     </Stack>
     );
 }

@@ -17,7 +17,7 @@ export enum ThemeStorageKey {
     THEME_MODE = 'sthm23-theme-mode',
 }
 
-export type SelectTheme = { 
+export type SelectThemeType = { 
   mode: ThemeMode; 
   label: string;
 }
