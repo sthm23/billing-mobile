@@ -380,7 +380,7 @@ const ru = {
     "detail": "Детали платежа.",
     "closeCashbox": "Закрыть кассу",
     "openCashbox": "Открыть кассу",
-    "createPayment": "Доход",
+    "income": "Доход",
     "createOutgo": "Расход",
     "edit": "Редактировать",
     "amount": "Сумма",

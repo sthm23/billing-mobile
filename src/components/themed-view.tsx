@@ -9,7 +9,7 @@ export type ThemedViewProps = ViewProps & {
   type?: ThemeColor;
 };
 
-export function ThemedView({ style, lightColor, darkColor, type, ...otherProps }: ThemedViewProps) {
+export function ThemedView({ style, lightColor, darkColor, type, className, ...otherProps }: ThemedViewProps) {
   const theme = useTheme();
 
   return <View style={
@@ -20,6 +20,7 @@ export function ThemedView({ style, lightColor, darkColor, type, ...otherProps }
       style
     ]
   } 
+  className={className}
   {...otherProps} 
     />;
 }

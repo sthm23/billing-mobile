@@ -380,7 +380,7 @@ const uz = {
     "detail": "To'lov tafsilotlari.",
     "closeCashbox": "Kassani yopish",
     "openCashbox": "Kassani ochish",
-    "createPayment": "Daromad",
+    "income": "Daromad",
     "createOutgo": "Xarajat",
     "edit": "Tahrirlash",
     "amount": "Summa",

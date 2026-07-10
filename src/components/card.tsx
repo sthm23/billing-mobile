@@ -7,7 +7,7 @@ type CardProps = {
 }
 
 const tokens = {
-    container: 'flex-row items-center justify-between p-4 rounded-lg border border-border dark:border-border-dark',
+    container: 'flex-row items-center justify-between p-4 rounded-2xl border border-border dark:border-border-dark',
 }
 
 export default function Card(props: CardProps) {

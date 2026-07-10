@@ -3,7 +3,7 @@ import { ThemedView } from "@/components/themed-view";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const tokens = {
-  container: "flex-1 items-center justify-center bg-surface dark:bg-surface-dark",
+  container: "flex-1 bg-surface dark:bg-surface-dark",
   text: "text-lg font-bold",
 }
 

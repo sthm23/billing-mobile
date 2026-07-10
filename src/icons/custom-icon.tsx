@@ -6,11 +6,11 @@ import ArrowDown from '@expo/material-symbols/arrow_downward.xml';
 import ArrowLeft from '@expo/material-symbols/arrow_left.xml';
 import ArrowRight from '@expo/material-symbols/arrow_right.xml';
 import ArrowUp from '@expo/material-symbols/arrow_upward.xml';
-import Money from '@expo/material-symbols/attach_money.xml';
 import Box from '@expo/material-symbols/box.xml';
 import Cart from '@expo/material-symbols/card_travel.xml';
 import Success from '@expo/material-symbols/check_circle.xml';
 import Close from '@expo/material-symbols/close.xml';
+import CreditCard from '@expo/material-symbols/credit_card.xml';
 import Trash from '@expo/material-symbols/delete.xml';
 import Pencil from '@expo/material-symbols/edit.xml';
 import Users from '@expo/material-symbols/group.xml';
@@ -19,10 +19,16 @@ import Login from '@expo/material-symbols/login.xml';
 import Logout from '@expo/material-symbols/logout.xml';
 import Phone from '@expo/material-symbols/mobile.xml';
 import Moon from '@expo/material-symbols/moon_stars.xml';
+// import Dollar from '@expo/material-symbols/paid.xml';
+import LockIcon from '@expo/material-symbols/lock.xml';
+import Transfer from '@expo/material-symbols/payment_arrow_down.xml';
+import Money from '@expo/material-symbols/payments.xml';
 import UserMinus from '@expo/material-symbols/person_remove.xml';
+import OnlinePayment from '@expo/material-symbols/price_change.xml';
 import Minus from '@expo/material-symbols/remove.xml';
 import Report from '@expo/material-symbols/report.xml';
 import Sun from '@expo/material-symbols/sunny.xml';
+
 import { Host, Icon } from '@expo/ui';
 import { SFSymbol } from 'expo-symbols';
 import { IconNames, IconProps } from './icon.type';
@@ -63,20 +69,28 @@ function getIconNameIOS(name: IconNames):SFSymbol {
       return 'plus.circle';
     case IconNames.MONEY:
       return 'dollarsign.circle';
-          case IconNames.PENCIL:
+    case IconNames.PENCIL:
       return 'pencil.circle';
-          case IconNames.PHONE:
+    case IconNames.PHONE:
       return 'phone';
-        case IconNames.REPORT:
+    case IconNames.REPORT:
       return 'exclamationmark.bubble.fill';
-          case IconNames.SUCCESS:
+    case IconNames.SUCCESS:
       return 'checkmark.circle.fill';
-          case IconNames.TRASH:
+    case IconNames.TRASH:
       return 'trash.circle.fill';
-          case IconNames.USERS:
+    case IconNames.USERS:
       return 'person.2.fill';
-          case IconNames.USER_MINUS:
+    case IconNames.USER_MINUS:
       return 'person.crop.circle.badge.minus';
+    case IconNames.CREDIT_CARD:
+      return 'creditcard.fill';
+    case IconNames.ONLINE_PAYMENT:
+      return 'creditcard.and.numbers';
+    case IconNames.TRANSFER:
+      return 'arrow.up.arrow.down.circle';
+    case IconNames.LOCK:
+      return 'lock.fill';
     default:
       return '0.circle.fill';
   }
@@ -118,20 +132,28 @@ function getIconNameAndroid(name: IconNames):any {
       return Plus;
     case IconNames.MONEY:
       return Money;
-          case IconNames.PENCIL:
+    case IconNames.PENCIL:
       return Pencil;
-          case IconNames.PHONE:
+    case IconNames.PHONE:
       return Phone;
-        case IconNames.REPORT:
+    case IconNames.REPORT:
       return Report;
-          case IconNames.SUCCESS:
+    case IconNames.SUCCESS:
       return Success;
-          case IconNames.TRASH:
+    case IconNames.TRASH:
       return Trash;
-          case IconNames.USERS:
+    case IconNames.USERS:
       return Users;
-          case IconNames.USER_MINUS:
+    case IconNames.USER_MINUS:
       return UserMinus;
+    case IconNames.CREDIT_CARD:
+      return CreditCard;
+    case IconNames.ONLINE_PAYMENT:
+      return OnlinePayment;
+    case IconNames.TRANSFER:
+      return Transfer;
+    case IconNames.LOCK:
+      return LockIcon;
     default:
       return Default
   }

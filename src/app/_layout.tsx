@@ -1,6 +1,5 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
-
 // import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import '@/assets/i18next/i18next';
 import { AuthProvider, useAuth } from '@/provider/AuthProvider';

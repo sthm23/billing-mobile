@@ -13,10 +13,11 @@ export interface ButtonProps extends PressableProps {
 }
 
 const buttonVariants = {
+  base: 'flex-row items-center justify-center rounded-lg active:opacity-80',
   variant: {
     default: 'bg-primary dark:bg-primary-dark',
     error: 'bg-error dark:bg-error-dark',
-    outline: 'border-2 border-border dark:border-border-dark bg-transparent',
+    outline: 'border border-border dark:border-border-dark bg-transparent',
     secondary: 'bg-secondary dark:bg-secondary-dark',
     ghost: 'bg-transparent',
     link: 'bg-transparent',
@@ -64,7 +65,7 @@ export const Button = forwardRef<ComponentRef<typeof Pressable>, ButtonProps>(
         ref={ref}
         disabled={isDisabled}
         className={cn(
-          'flex-row items-center justify-center rounded-lg active:opacity-80',
+          buttonVariants.base,
           buttonVariants.variant[variant],
           buttonVariants.size[size],
           isDisabled && 'opacity-50',

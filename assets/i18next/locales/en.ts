@@ -380,6 +380,7 @@ const en = {
     "detail": "Payment detail",
     "closeCashbox": "Close cashbox",
     "openCashbox": "Open cashbox",
+    "income": "Income",
     "edit": "Edit",
     "amount": "Amount",
     "comment": "Comment",
