@@ -77,10 +77,6 @@ export default function login() {
     }
   };
 
-  const onSignInPress = () => {
-    // Handle sign-in logic here
-    
-  }
   return (
     <ThemedView type='surface' className={tokens.container}>
         <SafeAreaView edges={['top']} className={tokens.container}>

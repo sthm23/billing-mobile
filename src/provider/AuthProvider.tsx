@@ -1,6 +1,6 @@
 import { LOCALE_STORAGE_KEYS } from "@/models/app.models";
 import { AuthRequest } from "@/models/auth.model";
-import { loginAuth, logoutAuth } from "@/services/auth.sevice";
+import { loginAuth, logoutAuth } from "@/services/auth.service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 interface AuthContextType {
@@ -52,7 +52,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const logout = async () => {
         try {
-            await logoutAuth();
+            await logoutAuth({
+                isAllDevices: true,
+                sessionId: await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN) || ''
+            });
             await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.TOKEN);
             setAuthenticated(false);
         } catch (error) {

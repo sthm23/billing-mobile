@@ -1,10 +1,9 @@
 import { api } from '@/api/axios-instance'
-import { ApiResponse } from '@/models/app.models'
 import { AuthRequest, AuthResponse, CurrentUserType, LogoutRequest } from '@/models/auth.model'
 
 
-const profile = async () => {
-  const response = await api.get<ApiResponse<CurrentUserType>>('/auth/me')
+const profileAuth = async () => {
+  const response = await api.get<CurrentUserType>('/auth/me')
   return response.data
 }
 
@@ -23,5 +22,5 @@ const refreshAuth = async () => {
   return response.data
 }
 
-export { loginAuth, logoutAuth, profile, refreshAuth }
+export { loginAuth, logoutAuth, profileAuth, refreshAuth }
 
