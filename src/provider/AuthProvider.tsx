@@ -1,18 +1,15 @@
+import { LOCALE_STORAGE_KEYS } from "@/models/app.models";
+import { AuthRequest } from "@/models/auth.model";
+import { loginAuth, logoutAuth } from "@/services/auth.sevice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 interface AuthContextType {
     isAuthenticated: boolean;
-    login: () => void;
+    login: (data: AuthRequest) => void;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const FAKE_TOKEN = "fake-auth-token";
-
-export enum AuthStorageKey {
-    AUTH_TOKEN = "sthm23-access-token",
-}
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
@@ -29,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(()=>{
         const loadAuthState = async () => {
             try {
-                const token = await AsyncStorage.getItem(AuthStorageKey.AUTH_TOKEN);
+                const token = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN);
                 setAuthenticated(!!token);
             } catch (error) {
                 console.error("Failed to load auth state:", error);
@@ -42,21 +39,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [])
 
 
-    const login = async () => {
+    const login = async (data: AuthRequest) => {
         try {
-            await AsyncStorage.setItem(AuthStorageKey.AUTH_TOKEN, FAKE_TOKEN);
+            const response = await loginAuth(data)
+            await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.TOKEN, response.accessToken);
             setAuthenticated(true);
         } catch (error) {
             console.error("Failed to login:", error);
+            throw error; // Rethrow the error so that the caller can handle it
         }
     };
 
     const logout = async () => {
         try {
-            await AsyncStorage.removeItem(AuthStorageKey.AUTH_TOKEN);
+            await logoutAuth();
+            await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.TOKEN);
             setAuthenticated(false);
         } catch (error) {
             console.error("Failed to logout:", error);
+            throw error; // Rethrow the error so that the caller can handle it
         }
     };
 

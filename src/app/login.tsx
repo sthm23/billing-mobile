@@ -5,12 +5,22 @@ import { ThemedView } from '@/components/themed-view'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/libs/utils'
+import { AuthRequest } from '@/models/auth.model'
 import { useAuth } from '@/provider/AuthProvider'
+import { zodResolver } from '@hookform/resolvers/zod'
+import axios from 'axios'
 import { Link } from 'expo-router'
 import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, View } from 'react-native'
+import { ActivityIndicator, Alert, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as z from 'zod'
+
+const formSchema = z.object({
+    login: z.string().min(1, 'Login is required'),
+    password: z.string().min(1, 'Password is required'),
+});
 
 const tokens = {
     container: 'h-full w-full flex items-center justify-center px-4',
@@ -27,15 +37,49 @@ const tokens = {
 export default function login() {
     const { t } = useTranslation();
     const {login} = useAuth();
-  const loading = false
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
+    const { control, handleSubmit, formState: { errors } } = useForm<AuthRequest>({
+        resolver: zodResolver(formSchema),
+        defaultValues: { login: '', password: '' }
+    });
+      const getLoginErrorMessage = (error: unknown): string => {
+    if (axios.isAxiosError(error)) {
+      if (!error.response) {
+        return t('errors.networkUnavailable');
+      }
 
-  const [emailAddress, setEmailAddress] = useState('')
-  const [password, setPassword] = useState('')
+      if (error.response.status === 401) {
+        return t('errors.invalidCredentials');
+      }
+
+      const apiMessage = error.response.data?.message;
+      if (typeof apiMessage === 'string' && apiMessage.trim()) {
+        return apiMessage;
+      }
+    }
+
+    return error instanceof Error ? error.message : t('errors.loginFailed');
+  };
+
+  const handleFormSubmit = async (data: AuthRequest) => {
+    setSubmitError(null);
+    setLoading(true);
+    try {
+      login(data);
+    } catch (error) {
+      const message = getLoginErrorMessage(error);
+      setSubmitError(message);
+      Alert.alert(t('errors.loginFailed'), message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onSignInPress = () => {
     // Handle sign-in logic here
-    login();
+    
   }
   return (
     <ThemedView type='surface' className={tokens.container}>
@@ -49,34 +93,53 @@ export default function login() {
 
             {/* Email */}
             <View className={tokens.email}>
-                <Input  
-                className="w-full"
-                label={t('login.email')} 
-                placeholder="user@example.com" 
-                autoCapitalize="none" 
-                keyboardType="email-address" 
-                value={emailAddress} 
-                onChangeText={setEmailAddress} 
-                />
+                <Controller
+                    control={control}
+                    name="login"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                    <Input  
+                        className="w-full"
+                        label={t('login.email')} 
+                        placeholder="user@example.com" 
+                        autoCapitalize="none" 
+                        keyboardType="email-address"
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        />
+                        )}
+                    />
+                    {errors.login && <ThemedText className="text-error dark:text-error-dark">{errors.login.message}</ThemedText>}
+                
             </View>
 
             {/* Password */}
             <View className={tokens.password}>
-                <Input 
-                className="w-full" 
-                label={t('login.password')} 
-                placeholder="********" 
-                secureTextEntry 
-                value={password} 
-                onChangeText={setPassword}
-                 />
+                <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <Input 
+                            className="w-full" 
+                            label={t('login.password')} 
+                            placeholder="********" 
+                            secureTextEntry={true}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            />
+                    )}
+                  />
+                  {errors.password && <ThemedText className="text-error dark:text-error-dark">{errors.password.message}</ThemedText>}
+                
             </View>
 
             {/* Submit */}
             <View className={tokens.submit}>
                 <Button 
                 className={cn(tokens.submitBtn, loading ? "bg-gray-300" : "bg-primary")} 
-                onPress={onSignInPress} 
+                loading={loading}
+                    onPress={handleSubmit(handleFormSubmit)}
                 disabled={loading}>
                     {loading ? <ActivityIndicator className='text-background' /> : t('login.loginButton')}
                 </Button>
