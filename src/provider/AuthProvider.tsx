@@ -3,8 +3,16 @@ import { AuthRequest, CurrentUserType } from "@/models/auth.model";
 import { loginAuth, logoutAuth, profileAuth } from "@/services/auth.service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+
+// type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+export enum AuthStatusEnum {
+    Loading = "loading",
+    Authenticated = "authenticated",
+    Unauthenticated = "unauthenticated"
+}
 interface AuthContextType {
     isAuthenticated: boolean;
+    authStatus: AuthStatusEnum;
     user: CurrentUserType | null;
     login: (data: AuthRequest) => Promise<void>;
     logout: () => Promise<void>;
@@ -22,8 +30,8 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+    const [authStatus, setAuthStatus] = useState<AuthStatusEnum>(AuthStatusEnum.Loading);
     const [user, setUser] = useState<CurrentUserType | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(()=>{
         const loadAuthState = async () => {
@@ -32,14 +40,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 if (!token) {
                     setAuthenticated(false);
+                    setAuthStatus(AuthStatusEnum.Unauthenticated);
                     setUser(null);
                     return;
                 }
 
-                setAuthenticated(true);
-
                 try {
                     const profile = await profileAuth();
+                    setAuthenticated(true);
+                    setAuthStatus(AuthStatusEnum.Authenticated);
                     setUser(profile);
                     await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
                 } catch (profileError) {
@@ -49,13 +58,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         LOCALE_STORAGE_KEYS.USER,
                     ]);
                     setAuthenticated(false);
+                    setAuthStatus(AuthStatusEnum.Unauthenticated);
                     setUser(null);
                     console.error("Failed to bootstrap user profile:", profileError);
                 }
             } catch (error) {
                 console.error("Failed to load auth state:", error);
-            } finally {
-                setLoading(false);
+                setAuthenticated(false);
+                setAuthStatus(AuthStatusEnum.Unauthenticated);
+                setUser(null);
             }
         };
 
@@ -64,21 +75,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
     const login = async (data: AuthRequest) => {
+        setAuthStatus(AuthStatusEnum.Loading);
+
         try {
             const response = await loginAuth(data)
             await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.TOKEN, response.accessToken);
 
             const profile = await profileAuth();
+            setAuthenticated(true);
+            setAuthStatus(AuthStatusEnum.Authenticated);
             setUser(profile);
             await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
-
-            setAuthenticated(true);
         } catch (error) {
             await AsyncStorage.multiRemove([
                 LOCALE_STORAGE_KEYS.TOKEN,
                 LOCALE_STORAGE_KEYS.USER,
             ]);
             setAuthenticated(false);
+            setAuthStatus(AuthStatusEnum.Unauthenticated);
             setUser(null);
             console.error("Failed to login:", error);
             throw error; // Rethrow the error so that the caller can handle it
@@ -101,13 +115,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 LOCALE_STORAGE_KEYS.USER,
             ]);
             setAuthenticated(false);
+            setAuthStatus(AuthStatusEnum.Unauthenticated);
             setUser(null);
         }
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
-            {loading ? null : children}
+        <AuthContext.Provider value={{ isAuthenticated, authStatus, user, login, logout }}>
+            {children}
         </AuthContext.Provider>
     )
 }
