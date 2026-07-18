@@ -11,10 +11,14 @@ const BASE_URL = Platform.select({
   // android: 'http://192.168.18.2:4000/api',
   // default: 'http://localhost:4000/api',
 
+  ios: 'http://192.168.18.5:4000/api',
+  android: 'http://192.168.18.5:4000/api',
+  default: 'http://localhost:4000/api',
 
-  ios: 'https://sthm23.uz/api',
-  android: 'https://sthm23.uz/api',
-  default: 'https://sthm23.uz/api',
+
+  // ios: 'https://sthm23.uz/api',
+  // android: 'https://sthm23.uz/api',
+  // default: 'https://sthm23.uz/api',
 })
 
 const TIMEOUT = 30_000;

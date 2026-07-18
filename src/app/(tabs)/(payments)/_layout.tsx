@@ -9,7 +9,6 @@ export default function TabLayout() {
       <Stack.Screen name="[id]" options={{ 
         headerShown: true, 
         title: t('order.payment'),
-        // headerRight: () => <Button variant='error' onPress={() => {}}>{t('payment.closeCashbox')}</Button>,
         }}
         >
           <Stack.Screen.BackButton>Back</Stack.Screen.BackButton>

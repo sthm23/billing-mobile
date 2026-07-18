@@ -12,6 +12,8 @@ export default function PaymentsScreen() {
   const  {t} = useTranslation();
   const router = useRouter();
 
+  const paymentsList = []
+
   const handleCreatePayment = () => {
     router.push({
     pathname: '/(tabs)/(payments)/[id]',
@@ -19,17 +21,17 @@ export default function PaymentsScreen() {
   });
   }
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-      <ThemedView type="surface" className="h-full flex-col items-center justify-between px-4 py-2">
+    <SafeAreaView className="flex-1 justify-center bg-surface dark:bg-surface-dark">
+      <ThemedView type="surface" className="h-full px-4 py-2">
       <View className="w-full flex-row items-center justify-between px-4 py-2">
-        <ThemedText className="text-lg font-bold">{t('order.payments')}</ThemedText>
+        <ThemedText className="text-lg font-bold">{t('payment.payments')}</ThemedText>
 
         <Button onPress={handleCreatePayment}>
           {t('order.create')}
         </Button>
       </View>
 
-      <View className='flex-1 items-center justify-center'>
+      <View className='flex-1 justify-center'>
         <ThemedText type='title'>Payment page</ThemedText>
       </View>
 

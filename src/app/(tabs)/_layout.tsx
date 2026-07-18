@@ -30,13 +30,6 @@ const _layout = () => {
         />
       </NativeTabs.Trigger>
 
-      <NativeTabs.Trigger name="(search)">
-        <NativeTabs.Trigger.Label>{t('navigation.search')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon
-        sf="magnifyingglass" md="search"
-        />
-      </NativeTabs.Trigger>
-
       <NativeTabs.Trigger name="(payments)" >
         <NativeTabs.Trigger.Label>{t('navigation.payments')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
@@ -48,6 +41,12 @@ const _layout = () => {
         <NativeTabs.Trigger.Label>{t('navigation.profile')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
         sf="person" md="person"
+        />
+      </NativeTabs.Trigger>
+            <NativeTabs.Trigger name="(search)">
+        <NativeTabs.Trigger.Label>{t('navigation.search')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+        sf="magnifyingglass" md="search"
         />
       </NativeTabs.Trigger>
     </NativeTabs>

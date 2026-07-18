@@ -2,11 +2,14 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 
 export default function ProductsScreen() {
   const router = useRouter();
+  const {t} = useTranslation();
 
   const handleProductPress = (product: any) => {
     console.log('Product pressed:', product);
