@@ -1,8 +1,11 @@
 import '@/assets/i18next/i18next';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
 import { ThemeProvider } from '@/provider/ThemeProvider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
 import { Stack } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 import "../global.css";
@@ -31,16 +34,36 @@ const { t } = useTranslation();
 }
 
 export default function RootLayout() {
-      const scheme = useColorScheme();
-    const theme = scheme === 'unspecified' ? 'light' : scheme;
-    const isDarkMode = theme === 'dark'
+  const scheme = useColorScheme();
+  const theme = scheme === 'unspecified' ? 'light' : scheme;
+  const isDarkMode = theme === 'dark'
+
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+            retry: (failureCount, error): boolean => {
+              if (isAxiosError(error) && error.response && error.response.status < 500) {
+                return false
+              }
+
+              return failureCount < 2
+            },
+          },
+        },
+      })
+    );
 
   return (
-        <ThemeProvider>
-          <StatusBar  style={isDarkMode ? 'light' : 'dark'}/>
-          <AuthProvider >
-            <InitiallyLayout />
-          </AuthProvider>
-        </ThemeProvider>
+    <ThemeProvider>
+            <StatusBar  style={isDarkMode ? 'light' : 'dark'}/>
+            <AuthProvider >
+              <QueryClientProvider client={queryClient}>
+                <InitiallyLayout />
+              </QueryClientProvider>
+            </AuthProvider>
+          </ThemeProvider>
     )
 }
