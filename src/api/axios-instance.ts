@@ -30,6 +30,7 @@ const API_CONFIG = {
   PRODUCTS_URL: `${BASE_URL}/products`,
   ORDERS_URL: `${BASE_URL}/orders`,
   PAYMENTS_URL: `${BASE_URL}/payments`,
+  WAREHOUSE_URL: `${BASE_URL}/warehouse`,
 }
 
 const RAW_API = axios.create({
@@ -210,4 +211,6 @@ export const ordersApi = createAxiosInstance(API_CONFIG.ORDERS_URL)
 export const productsApi = createAxiosInstance(API_CONFIG.PRODUCTS_URL)
 
 export const paymentsApi = createAxiosInstance(API_CONFIG.PAYMENTS_URL)
+
+export const warehouseApi = createAxiosInstance(API_CONFIG.WAREHOUSE_URL)
 

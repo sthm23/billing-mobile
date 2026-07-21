@@ -1,26 +1,30 @@
-/**
- * Copyright (c) 2025 SkipQ
- *
- * This source code is considered Developed Content.
- * LICENSE file in the root directory of this source tree.
- */
-
-import { productsApi } from '@/api/axios-instance'
+import { productsApi, warehouseApi } from '@/api/axios-instance'
 import { BaseListResponse } from '@/models/app.models'
-import type { Product, ProductDetail } from './product.type'
+import type {
+  CreateProduct,
+  CreateProductVariantPayload,
+  InventoryMovementPayload,
+  Product,
+  ProductDetail,
+  ProductParams,
+  ProductVariant,
+  UpdateProductVariantPrice
+} from './product.type'
 
 const ENDPOINTS = {
   BASE: '/',
   LIST: '/',
-  SEARCH: '/search',
-  ITEMS: '/items',
   BY_ID: (productId: string) => `/${productId}`,
+  SEARCH: (warehouseId: string) => `/search/${warehouseId}`,
   CANCEL: (productId: string) => `/${productId}/cancel`,
+  VARIANTS: '/variants',
+  VARIANT_BY_ID: (variantId: string) => `/variants/${variantId}`,
+  INVENTORY: (warehouseID: string) => `/${warehouseID}/inventory`,
 
 } as const
 
 
-const createProduct = async (body: CreateProductPayload): Promise<Product> => {
+const createProduct = async (body: CreateProduct): Promise<Product> => {
   const response = await productsApi.post<Product>(ENDPOINTS.BASE, body)
 
   if (!response.data) {
@@ -40,17 +44,14 @@ const getProductById = async (productId: string): Promise<Product> => {
   return response.data;
 }
 
-
 const getProducts = async (params: ProductParams = {}): Promise<BaseListResponse<Product>> => {
 
-  const { currentPage = 1, pageSize = 10, status = [], fromDate, toDate, search } = params;
-  const statusParam = status.join(',');
+  const { currentPage = 1, pageSize = 10, fromDate, toDate, search } = params;
+
   const queryParams = new URLSearchParams();
   queryParams.append('currentPage', currentPage.toString());
   queryParams.append('pageSize', pageSize.toString());
-  if (status.length > 0) {
-    queryParams.append('status', statusParam);
-  }
+
   if (fromDate) {
     queryParams.append('fromDate', fromDate.toISOString());
   }
@@ -72,61 +73,35 @@ const getProducts = async (params: ProductParams = {}): Promise<BaseListResponse
   return response.data
 }
 
-const createProductItems = async (body: CreateProductItemPayload): Promise<{ message: string }> => {
-  const response = await productsApi.post<{ message: string }>(ENDPOINTS.ITEMS, {
-    body,
-  })
+const createProductVariants = async (body: CreateProductVariantPayload): Promise<Product> => {
+  const response = await productsApi.post<Product>(ENDPOINTS.VARIANTS, body)
 
-  if (!response.data || !response.data.message) {
-    throw new Error(response.data?.message || 'Failed to add Product items')
+  if (!response.data) {
+    throw new Error(response.data || 'Failed to add Product items')
   }
 
   return response.data
 }
 
-const searchProducts = (search: string) => {
+const searchProducts = (warehouseId: string, text: string) => {
   const queryParams = new URLSearchParams();
-  queryParams.append('search', search);
+  queryParams.append('text', text);
 
-  return productsApi.get<Product[]>(ENDPOINTS.SEARCH, {
+  return productsApi.get<BaseListResponse<ProductVariant>>(ENDPOINTS.SEARCH(warehouseId), {
     params: queryParams
   })
 }
 
-const createProductPayment = (productId: string, body: CreateProductPaymentPayload) => {
-  return productsApi.post<{ message: string }>(`/api/Products/payment/${productId}`, body, {
-    withCredentials: true
-  })
+const archiveProduct = (productId: string) => {
+  return productsApi.delete<{ message: string }>(ENDPOINTS.BY_ID(productId))
 }
 
-const returnProduct = (returnProductPayload: ReturnProductItemPayload) => {
-  return productsApi.post<{ message: string }>('/api/Products/return', returnProductPayload, {
-    withCredentials: true
-  })
+const addInventory = (warehouseId: string, body: InventoryMovementPayload) => {
+  return warehouseApi.post<{ message: string }>(ENDPOINTS.INVENTORY(warehouseId), body)
 }
 
-const addPaymentToProduct = (productId: string, body: CreateProductPaymentPayload) => {
-  return productsApi.post<{ message: string }>(`/api/payment`, body, {
-    withCredentials: true
-  })
-}
-
-const deleteProduct = (productId: string) => {
-  return productsApi.delete<{ message: string }>(`/api/Products/${productId}`, {
-    withCredentials: true
-  })
-}
-
-const setCustomerToProduct = (body: { productId: string, customerId: string }) => {
-  return productsApi.put<{ message: string }>(`/api/users/customers/set-to-Product`, body, {
-    withCredentials: true
-  })
-}
-
-const clearCustomerFromProduct = (productId: string) => {
-  return productsApi.patch(`/api/Products/${productId}/clear-customer`, {}, {
-    withCredentials: true
-  })
+const updateProductVariant = (productVariantId: string, body: UpdateProductVariantPrice) => {
+  return productsApi.post<ProductVariant>(ENDPOINTS.VARIANT_BY_ID(productVariantId), body)
 }
 
 
@@ -134,12 +109,9 @@ export const productService = {
   createProduct,
   getProductById,
   getProducts,
-  returnProduct,
-  createProductItems,
+  createProductVariants,
   searchProducts,
-  createProductPayment,
-  addPaymentToProduct,
-  deleteProduct,
-  setCustomerToProduct,
-  clearCustomerFromProduct,
+  addInventory,
+  updateProductVariant,
+  archiveProduct,
 }

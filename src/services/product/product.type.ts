@@ -201,3 +201,11 @@ export interface InventoryMovementPayload {
 export interface UpdateProductVariantPrice {
     price: number;
 }
+
+export interface ProductParams {
+    currentPage?: number;
+    pageSize?: number;
+    fromDate?: Date;
+    toDate?: Date;
+    search?: string;
+}
