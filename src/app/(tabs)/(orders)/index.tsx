@@ -1,6 +1,6 @@
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Button } from '@/components/ui/button';
+import { Button, ButtonText } from '@/components/ui/button';
 import { useOrders } from '@/services/order/order.queries';
 import { useMemo, useState } from 'react';
 import {
@@ -26,15 +26,15 @@ export default function OrdersScreen() {
   const debouncedSearch = ''
   const [status, setStatus] = useState<OrderStatusType>('active');
 
-  const tabOptions:{
+  const tabOptions: {
     value: OrderStatusType;
     label: string;
   }[] = [
-    { value: 'active', label: 'Active' },
-    { value: 'completed', label: 'Completed' },
-  ];
+      { value: 'active', label: 'Active' },
+      { value: 'completed', label: 'Completed' },
+    ];
 
-    const listParams = useMemo<OrderParams>(
+  const listParams = useMemo<OrderParams>(
     () => ({
       currentPage: page,
       pageSize,
@@ -50,18 +50,18 @@ export default function OrdersScreen() {
       status,
     ]
   )
-  
+
   const { data, isLoading, isError } = useOrders(listParams);
 
-  if(isError) {
+  if (isError) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
         <ThemedText type='title'>Ошибка загрузки заказов</ThemedText>
       </SafeAreaView>
     )
   }
-  
-  if(isLoading) {
+
+  if (isLoading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
         <ThemedText type='title'>Загрузка...</ThemedText>
@@ -73,12 +73,14 @@ export default function OrdersScreen() {
   console.log(orders);
 
 
-  
+
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
       <ThemedView type='surface' className="flex-row items-center justify-between px-4 py-2">
         <ThemedText type='title'>Заказы</ThemedText>
-          <Button>Создать</Button>
+        <Button>
+          <ButtonText>Создать</ButtonText>
+        </Button>
       </ThemedView>
 
       <ThemedView type='surface' className="flex-1 w-full">
@@ -99,7 +101,7 @@ export default function OrdersScreen() {
             <ThemedText type='title'>Order ID: {order.id}</ThemedText>
             <ThemedText>Status: {order.status}</ThemedText>
           </ThemedView>
-        )) :<ThemedText>Нет заказов</ThemedText>}
+        )) : <ThemedText>Нет заказов</ThemedText>}
       </ThemedView>
     </SafeAreaView>
   );

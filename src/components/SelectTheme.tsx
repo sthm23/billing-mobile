@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button, ButtonText } from '@/components/ui/button';
 import { useTheme } from '@/hooks/use-theme';
 import { SelectThemeType, ThemeMode, useThemeMode } from '@/provider/ThemeProvider';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
@@ -10,22 +10,22 @@ import { ThemedView } from './themed-view';
 export const SelectTheme = () => {
   const color = useTheme()
   const { themeMode, setThemeMode } = useThemeMode();
-    
-  const THEME_OPTIONS: SelectThemeType[] = useMemo(()=>[
-  { mode: ThemeMode.AUTO, label: 'Auto'},
-  { mode: ThemeMode.LIGHT, label: 'Light' },
-  { mode: ThemeMode.DARK, label: 'Dark' },
-], []);
 
-const sheetRef = useRef<BottomSheet>(null);
+  const THEME_OPTIONS: SelectThemeType[] = useMemo(() => [
+    { mode: ThemeMode.AUTO, label: 'Auto' },
+    { mode: ThemeMode.LIGHT, label: 'Light' },
+    { mode: ThemeMode.DARK, label: 'Dark' },
+  ], []);
+
+  const sheetRef = useRef<BottomSheet>(null);
 
   return (
     <ThemedView className='flex-1'>
-      <Button onPress={() => sheetRef.current?.snapToIndex(0)}>Theme</Button>
+      <Button onPress={() => sheetRef.current?.snapToIndex(0)}><ButtonText>Theme</ButtonText></Button>
 
-      <BottomSheet 
-      backgroundStyle={{ backgroundColor: color.background }}
-      ref={sheetRef} snapPoints={['50%', '90%']} index={-1} enablePanDownToClose>
+      <BottomSheet
+        backgroundStyle={{ backgroundColor: color.background }}
+        ref={sheetRef} snapPoints={['50%', '90%']} index={-1} enablePanDownToClose>
         <FlatList
           nestedScrollEnabled
           style={{ flex: 1 }}
@@ -33,17 +33,17 @@ const sheetRef = useRef<BottomSheet>(null);
           keyExtractor={item => item.mode}
           contentContainerStyle={{ padding: 24 }}
           renderItem={({ item }) => {
-              const isSelected = item.mode === themeMode;
-              return (
-                  <Button
-                  className='mb-4'
-                  variant={isSelected ? 'default' : 'outline'}
-                  onPress={() => setThemeMode(item.mode)}
+            const isSelected = item.mode === themeMode;
+            return (
+              <Button
+                className='mb-4'
+                variant={isSelected ? 'default' : 'outline'}
+                onPress={() => setThemeMode(item.mode)}
               >
-                {item.label}
+                <ButtonText>{item.label}</ButtonText>
               </Button>
             );
-        }}
+          }}
         />
       </BottomSheet>
     </ThemedView>

@@ -1,65 +1,77 @@
-
-
-import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/libs/utils'
-import { AuthRequest } from '@/models/auth.model'
-import { useAuth } from '@/provider/AuthProvider'
-import { zodResolver } from '@hookform/resolvers/zod'
-import axios from 'axios'
-import { Link } from 'expo-router'
-import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
-import { ActivityIndicator, Alert, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import * as z from 'zod'
+import { Button, ButtonSpinner, ButtonText } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Center } from '@/components/ui/center';
+import { FormControl, FormControlError, FormControlErrorIcon, FormControlErrorText, FormControlLabel, FormControlLabelText } from '@/components/ui/form-control';
+import { Heading } from '@/components/ui/heading';
+import { AlertCircleIcon, EyeIcon, EyeOffIcon } from '@/components/ui/icon';
+import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
+import { Link } from '@/components/ui/link';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import { AuthRequest } from '@/models/auth.model';
+import { useAuth } from '@/provider/AuthProvider';
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as z from 'zod';
 
 const formSchema = z.object({
-    login: z.string().min(1, 'Login is required'),
-    password: z.string().min(1, 'Password is required'),
+  login: z.string().min(1, 'Login is required'),
+  password: z.string().min(1, 'Password is required')
 });
-
 const tokens = {
-    container: 'h-full w-full flex items-center justify-center px-4',
-    wrapper: 'w-full bg-background dark:bg-background-dark px-4 py-8 rounded-lg h-content border border-border dark:border-border-dark',
-    header: 'items-center mb-8 mt-0',
-    title: 'text-3xl font-bold text-primary mb-2',
-    email: 'mb-4 w-full',
-    password: 'mb-6 w-full',
-    submit: 'w-full mb-4',
-    submitBtn: 'w-full mb-4',
-    footer: 'flex-row justify-center',
-}
+  container: 'h-full w-full px-4',
+  wrapper: 'w-full bg-background dark:bg-background-dark px-4 py-8 rounded-lg h-content border border-border dark:border-border-dark',
+  header: 'items-center mb-8 mt-0',
+  title: 'text-3xl font-bold text-primary mb-2',
+  email: 'mb-4 w-full',
+  password: 'mb-6 w-full',
+  submit: 'w-full mb-4',
+  submitBtn: 'w-full mb-4',
+  footer: 'flex-row justify-center'
+};
+
 
 export default function login() {
-    const { t } = useTranslation();
-    const {login} = useAuth();
-    const [submitError, setSubmitError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
-
-    const { control, handleSubmit, formState: { errors } } = useForm<AuthRequest>({
-        resolver: zodResolver(formSchema),
-        defaultValues: { login: '', password: '' }
+  const { t } = useTranslation();
+  const { login } = useAuth();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const handleState = () => {
+    setShowPassword((showState) => {
+      return !showState;
     });
-      const getLoginErrorMessage = (error: unknown): string => {
+  };
+  const {
+    control,
+    handleSubmit,
+    formState: {
+      errors
+    }
+  } = useForm<AuthRequest>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      login: '',
+      password: ''
+    }
+  });
+  const getLoginErrorMessage = (error: unknown): string => {
     if (axios.isAxiosError(error)) {
       if (!error.response) {
         return t('errors.networkUnavailable');
       }
-
       if (error.response.status === 401) {
         return t('errors.invalidCredentials');
       }
-
       const apiMessage = error.response.data?.message;
       if (typeof apiMessage === 'string' && apiMessage.trim()) {
         return apiMessage;
       }
     }
-
     return error instanceof Error ? error.message : t('errors.loginFailed');
   };
 
@@ -71,85 +83,98 @@ export default function login() {
     } catch (error) {
       const message = getLoginErrorMessage(error);
       setSubmitError(message);
-      Alert.alert(t('errors.loginFailed'), message);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <ThemedView type='surface' className={tokens.container}>
-        <SafeAreaView edges={['top']} className={tokens.container}>
-            <ThemedView type='background' className={tokens.wrapper} >
-            {/* Header */}
-            <View className={tokens.header}>
-                <ThemedText type='title' >{t('login.title')}</ThemedText>
-                <ThemedText type='subtitle' themeColor="secondaryText">{t('login.subTitle')}</ThemedText>
-            </View>
+  return <SafeAreaView edges={['top']} className={tokens.container}>
+    <Center className="w-full h-full p-4">
+      <Card className="w-full" size="default">
+        <VStack className="gap-4">
+          <Center >
+            <Heading size="lg" className="text-foreground">{t('login.title')}</Heading>
+            <Heading size="md" className="text-foreground/60">{t('login.subTitle')}</Heading>
+          </Center>
 
-            {/* Email */}
-            <View className={tokens.email}>
-                <Controller
-                    control={control}
-                    name="login"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                    <Input  
-                        className="w-full"
-                        label={t('login.email')} 
-                        placeholder="user@example.com" 
-                        autoCapitalize="none" 
-                        keyboardType="email-address"
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        />
-                        )}
-                    />
-                    {errors.login && <ThemedText className="text-error dark:text-error-dark">{errors.login.message}</ThemedText>}
-                
-            </View>
+          <FormControl isInvalid={!!errors.login}>
+            <FormControlLabel>
+              <FormControlLabelText className="text-foreground/60">{t('login.email')}</FormControlLabelText>
+            </FormControlLabel>
+            <Controller control={control} name="login" render={({
+              field: {
+                onChange,
+                onBlur,
+                value
+              }
+            }) => {
+              return (
+                <Input >
+                  <InputField keyboardType="email-address"
+                    autoCapitalize="none" value={value} onBlur={onBlur} onChangeText={onChange} type="text" placeholder="login@email.uz" />
+                </Input>
+              )
+            }} />
+            {errors.login &&
+              <FormControlError>
+                <FormControlErrorIcon
+                  as={AlertCircleIcon}
+                  className="text-destructive"
+                />
+                <FormControlErrorText className="text-destructive">
+                  {errors.login.message}
+                </FormControlErrorText>
+              </FormControlError>
+            }
+          </FormControl>
 
-            {/* Password */}
-            <View className={tokens.password}>
-                <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <Input 
-                            className="w-full" 
-                            label={t('login.password')} 
-                            placeholder="********" 
-                            secureTextEntry={true}
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            value={value}
-                            />
-                    )}
-                  />
-                  {errors.password && <ThemedText className="text-error dark:text-error-dark">{errors.password.message}</ThemedText>}
-                
-            </View>
+          <FormControl isInvalid={!!errors.password}>
+            <FormControlLabel>
+              <FormControlLabelText className="text-foreground/60">{t('login.password')}</FormControlLabelText>
+            </FormControlLabel>
+            <Controller control={control} name="password" render={({
+              field: {
+                onChange,
+                onBlur,
+                value
+              }
+            }) => (
+              <Input >
+                <InputField secureTextEntry={true} value={value} onBlur={onBlur} type={showPassword ? 'text' : 'password'} placeholder="********" onChangeText={onChange} />
+                <InputSlot className="pr-3" onPress={handleState}>
+                  <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
+                </InputSlot>
+              </Input>
+            )} />
+            {errors.password &&
+              <FormControlError>
+                <FormControlErrorIcon
+                  as={AlertCircleIcon}
+                  className="text-destructive"
+                />
+                <FormControlErrorText className="text-destructive">
+                  {errors.password.message}
+                </FormControlErrorText>
+              </FormControlError>}
+          </FormControl>
 
-            {/* Submit */}
-            <View className={tokens.submit}>
-                <Button 
-                className={cn(tokens.submitBtn, loading ? "bg-gray-300" : "bg-primary")} 
-                loading={loading}
-                    onPress={handleSubmit(handleFormSubmit)}
-                disabled={loading}>
-                    {loading ? <ActivityIndicator className='text-background' /> : t('login.loginButton')}
-                </Button>
-            </View>
+          <VStack space="xs">
 
-            {/* Footer */}
-            <View className={tokens.footer}>
-                <ThemedText type='small'>{t('login.signUptext')} </ThemedText>
-                <Link href="/#" className="ml-1">
-                    <ThemedText type='small' className="font-bold">{t('login.signUp')}</ThemedText>
-                </Link>
-            </View>
-            </ThemedView>
-        </SafeAreaView>
-    </ThemedView>
-  )
+            <Button size="default" onPress={handleSubmit(handleFormSubmit)} disabled={loading} >
+              {loading && <ButtonSpinner color="gray" />}
+              <ButtonText>{loading ? 'Please wait...' : t('login.loginButton')}</ButtonText>
+            </Button>
+
+            <Center className={tokens.footer}>
+              <Text >{t('login.signUptext')} </Text>
+              <Link className="ml-1">
+                <Text className="font-bold">{t('login.signUp')}</Text>
+              </Link>
+            </Center>
+          </VStack>
+
+        </VStack>
+      </Card>
+    </Center>
+  </SafeAreaView>;
 }
