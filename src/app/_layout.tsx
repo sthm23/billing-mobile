@@ -4,12 +4,20 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Stack } from 'expo-router';
 import { StatusBar } from "expo-status-bar";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import { ThemeProvider } from '@/provider/ThemeProvider';
+import {
+  ThemeControlContext,
+  ThemeMode,
+  loadThemeMode,
+  saveThemeMode,
+  getModeForGlueStack,
+  applyThemeMode,
+  type ModeType
+} from '@/hooks/use-theme-control';
 import "../global.css";
 
 const InitiallyLayout = () => {
@@ -36,9 +44,10 @@ const InitiallyLayout = () => {
 }
 
 export default function RootLayout() {
-  const scheme = useColorScheme();
-  const theme = scheme === 'unspecified' ? 'light' : scheme;
-  const isDarkMode = theme === 'dark'
+  const systemScheme = useColorScheme();
+  const [themeMode, setThemeModeState] = useState<ThemeMode>(ThemeMode.AUTO);
+  const [currentMode, setCurrentMode] = useState<ModeType>('system');
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
 
   const [queryClient] = useState(
     () =>
@@ -58,16 +67,47 @@ export default function RootLayout() {
       })
   );
 
+  // Load saved theme on mount
+  useEffect(() => {
+    async function initTheme() {
+      const savedMode = await loadThemeMode();
+      setThemeModeState(savedMode);
+      const glueStackMode = getModeForGlueStack(savedMode);
+      setCurrentMode(glueStackMode);
+      applyThemeMode(savedMode);
+      setIsThemeLoaded(true);
+    }
+    initTheme();
+  }, []);
+
+  // Apply theme when it changes
+  const setThemeMode = async (mode: ThemeMode) => {
+    setThemeModeState(mode);
+    const glueStackMode = getModeForGlueStack(mode);
+    setCurrentMode(glueStackMode);
+    applyThemeMode(mode);
+    await saveThemeMode(mode);
+  };
+
+  // Determine if dark mode is active for StatusBar
+  const isDarkMode =
+    currentMode === 'dark' ||
+    (currentMode === 'system' && systemScheme === 'dark');
+
+  if (!isThemeLoaded) {
+    return null;
+  }
+
   return (
-    <GluestackUIProvider mode={isDarkMode ? 'dark' : 'light'}>
-      <ThemeProvider>
+    <GluestackUIProvider mode={currentMode}>
+      <ThemeControlContext.Provider value={{ themeMode, setThemeMode, currentMode }}>
         <StatusBar style={isDarkMode ? 'light' : 'dark'} />
         <AuthProvider >
           <QueryClientProvider client={queryClient}>
             <InitiallyLayout />
           </QueryClientProvider>
         </AuthProvider>
-      </ThemeProvider>
+      </ThemeControlContext.Provider>
     </GluestackUIProvider>
   )
 }

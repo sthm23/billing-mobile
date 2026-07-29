@@ -1,15 +1,14 @@
 
 
 import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/assets/i18next/i18next';
-import { useTheme } from '@/hooks/use-theme';
+import { Box } from '@/components/ui/box';
+import { Button, ButtonText } from './ui/button';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList } from 'react-native';
-import { ThemedView } from './themed-view';
-import { Button, ButtonText } from './ui/button';
+import { FlatList, useColorScheme } from 'react-native';
 
 const SelectLanguage = () => {
-  const color = useTheme()
+  const colorScheme = useColorScheme();
   const [language, setLanguage] = useState<AppLanguage>(AppLanguage.AUTO);
 
   useEffect(() => {
@@ -42,14 +41,25 @@ const SelectLanguage = () => {
     await setAppLanguage(lang);
     setLanguage(lang);
   };
+
   const sheetRef = useRef<BottomSheet>(null);
+
+  // Determine background color based on color scheme
+  const backgroundColor = colorScheme === 'dark' ? '#18181b' : '#ffffff';
+
   return (
-    <ThemedView className='flex-1'>
-      <Button onPress={() => sheetRef.current?.snapToIndex(0)}><ButtonText>Language</ButtonText></Button>
+    <Box className='flex-1'>
+      <Button onPress={() => sheetRef.current?.snapToIndex(0)}>
+        <ButtonText>Language</ButtonText>
+      </Button>
 
       <BottomSheet
-        backgroundStyle={{ backgroundColor: color.background }}
-        ref={sheetRef} snapPoints={['50%', '90%']} index={-1} enablePanDownToClose>
+        backgroundStyle={{ backgroundColor }}
+        ref={sheetRef}
+        snapPoints={['50%', '90%']}
+        index={-1}
+        enablePanDownToClose
+      >
         <FlatList
           nestedScrollEnabled
           style={{ flex: 1 }}
@@ -64,13 +74,13 @@ const SelectLanguage = () => {
                 variant={isSelected ? 'default' : 'outline'}
                 onPress={async () => await onLanguagePress(item.value)}
               >
-                {item.label}
+                <ButtonText>{item.label}</ButtonText>
               </Button>
             );
           }}
         />
       </BottomSheet>
-    </ThemedView>
+    </Box>
   )
 }
 

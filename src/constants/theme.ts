@@ -1,41 +1,11 @@
 import '@/global.css';
 import { Platform } from 'react-native';
 
-
-export const Colors = {
-    light: {
-        text: '#161616',
-        background: '#ffffff',
-        primary: "#09090b",
-        "primaryText": "#fafafa",
-        secondary: "#f1f5f9",
-        "secondaryText": "#475569",
-        surface: "#f1f5f9",
-        error: "#ef4444",
-        success: "#22c55e",
-        border: "#e2e8f0",
-        inputBorder: "#cbd5e1",
-        white: "#ffffff",
-        black: "#000000",
-    },
-    dark: {
-        primary: "#ffffff",
-        primaryText: "#18181b",
-        secondary: "#27272a",
-        secondaryText: "#d4d4d8",
-        error: "#f87171",
-        success: "#86efac",
-        border: "#3f3f46",
-        inputBorder: "#52525b",
-        white: "#000000",
-        text: "#ffffff",
-        background: "#18181b",
-        surface: "#09090b",
-        black: "#ffffff",
-    },
-} as const;
-
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+/**
+ * Theme constants for the application.
+ * Colors are now managed through GlueStack UI and NativeWind.
+ * Use Tailwind classes in components instead of these constants.
+ */
 
 export const Fonts = Platform.select({
     ios: {

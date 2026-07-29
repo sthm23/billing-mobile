@@ -1,13 +1,13 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ScanProductScreen() {
   return (
-    <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-        <ThemedView type='surface'>
-            <ThemedText type='title'>Scan page</ThemedText>
-        </ThemedView>
+    <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-background">
+        <Box>
+            <Text size="2xl" bold>Scan page</Text>
+        </Box>
     </SafeAreaView>
   );
 }

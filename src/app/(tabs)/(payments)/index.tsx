@@ -1,6 +1,6 @@
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -21,10 +21,10 @@ export default function PaymentsScreen() {
     });
   }
   return (
-    <SafeAreaView className="flex-1 justify-center bg-surface dark:bg-surface-dark">
-      <ThemedView type="surface" className="h-full px-4 py-2">
+    <SafeAreaView className="flex-1 justify-center bg-background">
+      <Box className="h-full px-4 py-2">
         <View className="w-full flex-row items-center justify-between px-4 py-2">
-          <ThemedText className="text-lg font-bold">{t('payment.payments')}</ThemedText>
+          <Text className="text-lg font-bold">{t('payment.payments')}</Text>
 
           <Button onPress={handleCreatePayment}>
             <ButtonText>{t('order.create')}</ButtonText>
@@ -32,10 +32,10 @@ export default function PaymentsScreen() {
         </View>
 
         <View className='flex-1 justify-center'>
-          <ThemedText type='title'>Payment page</ThemedText>
+          <Text size="2xl" bold>Payment page</Text>
         </View>
 
-      </ThemedView>
+      </Box>
 
     </SafeAreaView>
   );

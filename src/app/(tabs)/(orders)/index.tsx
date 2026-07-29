@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { useOrders } from '@/services/order/order.queries';
 import { useMemo, useState } from 'react';
@@ -55,35 +55,32 @@ export default function OrdersScreen() {
 
   if (isError) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-        <ThemedText type='title'>Ошибка загрузки заказов</ThemedText>
+      <SafeAreaView className="flex-1 items-center justify-center bg-background">
+        <Text size="2xl" bold>Ошибка загрузки заказов</Text>
       </SafeAreaView>
     )
   }
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-        <ThemedText type='title'>Загрузка...</ThemedText>
+      <SafeAreaView className="flex-1 items-center justify-center bg-background">
+        <Text size="2xl" bold>Загрузка...</Text>
       </SafeAreaView>
     )
   }
 
   const orders = data?.data ?? []
-  console.log(orders);
-
-
 
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-      <ThemedView type='surface' className="flex-row items-center justify-between px-4 py-2">
-        <ThemedText type='title'>Заказы</ThemedText>
+    <SafeAreaView className="flex-1 items-center justify-center bg-background">
+      <Box className="flex-row items-center justify-between px-4 py-2">
+        <Text size="2xl" bold>Заказы</Text>
         <Button>
           <ButtonText>Создать</ButtonText>
         </Button>
-      </ThemedView>
+      </Box>
 
-      <ThemedView type='surface' className="flex-1 w-full">
+      <Box className="flex-1 w-full">
 
         <Picker
           selectedValue={status}
@@ -94,15 +91,15 @@ export default function OrdersScreen() {
           <Picker.Item label="Active" value="active" />
           <Picker.Item label="Completed" value="completed" />
         </Picker>
-      </ThemedView>
-      <ThemedView>
+      </Box>
+      <Box>
         {orders.length > 0 ? orders.map((order) => (
-          <ThemedView key={order.id} type='surface' className="p-4 m-2 rounded-lg">
-            <ThemedText type='title'>Order ID: {order.id}</ThemedText>
-            <ThemedText>Status: {order.status}</ThemedText>
-          </ThemedView>
-        )) : <ThemedText>Нет заказов</ThemedText>}
-      </ThemedView>
+          <Box key={order.id} className="p-4 m-2 rounded-lg">
+            <Text size="2xl" bold>Order ID: {order.id}</Text>
+            <Text>Status: {order.status}</Text>
+          </Box>
+        )) : <Text>Нет заказов</Text>}
+      </Box>
     </SafeAreaView>
   );
 }

@@ -1,20 +1,19 @@
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const tokens = {
-  container: "flex-1 bg-surface dark:bg-surface-dark",
-  text: "text-lg font-bold",
+  container: "flex-1 bg-background",
+  text: "text-lg font-bold text-foreground",
 }
 
 export default function Index() {
   return (
-    <ThemedView type="surface" className={tokens.container}>      
+    <Box className={tokens.container}>
       <SafeAreaView edges={['top']} className="flex-1 items-center justify-center">
-        <ThemedText className={tokens.text}>Edit src/app/index.tsx to edit this screen.</ThemedText>
+        <Text className={tokens.text}>Edit src/app/index.tsx to edit this screen.</Text>
       </SafeAreaView>
-    </ThemedView>
+    </Box>
   );
 }
-
 

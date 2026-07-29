@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
 // import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/i18next/i18next';
 // import { useEffect, useState } from 'react';
 import {
@@ -48,10 +48,10 @@ export default function SettingsScreen() {
   
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-        <ThemedView type='surface'>
-            <ThemedText type='title'>Setting page</ThemedText>
-        </ThemedView>
+    <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-background">
+        <Box>
+            <Text size="2xl" bold>Setting page</Text>
+        </Box>
     </SafeAreaView>
   );
 }

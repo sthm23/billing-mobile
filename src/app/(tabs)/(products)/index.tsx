@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -18,13 +18,13 @@ export default function ProductsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-surface dark:bg-surface-dark">
-      <ThemedView type="surface" className="flex-row items-center justify-between px-4 py-2">
-        <ThemedText type="title" className="text-lg font-bold text-center">Продукты</ThemedText>
+    <SafeAreaView className="flex-1 items-center justify-center bg-background">
+      <Box className="flex-row items-center justify-between px-4 py-2">
+        <Text size="2xl" bold className="text-lg font-bold text-center">Продукты</Text>
         <Button onPress={() => console.log('Create button pressed')}>
           <ButtonText>{t('order.create')}</ButtonText>
         </Button>
-      </ThemedView>
+      </Box>
     </SafeAreaView>
   );
 }

@@ -1,15 +1,18 @@
 import { Button, ButtonText } from '@/components/ui/button';
-import { useTheme } from '@/hooks/use-theme';
-import { SelectThemeType, ThemeMode, useThemeMode } from '@/provider/ThemeProvider';
+import { Box } from '@/components/ui/box';
+import { ThemeMode, useThemeControl } from '@/hooks/use-theme-control';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useMemo, useRef } from 'react';
-import { FlatList } from 'react-native';
-import { ThemedView } from './themed-view';
+import { FlatList, useColorScheme } from 'react-native';
 
+export type SelectThemeType = {
+  mode: ThemeMode;
+  label: string;
+}
 
 export const SelectTheme = () => {
-  const color = useTheme()
-  const { themeMode, setThemeMode } = useThemeMode();
+  const colorScheme = useColorScheme();
+  const { themeMode, setThemeMode } = useThemeControl();
 
   const THEME_OPTIONS: SelectThemeType[] = useMemo(() => [
     { mode: ThemeMode.AUTO, label: 'Auto' },
@@ -19,13 +22,22 @@ export const SelectTheme = () => {
 
   const sheetRef = useRef<BottomSheet>(null);
 
+  // Determine background color based on color scheme
+  const backgroundColor = colorScheme === 'dark' ? '#18181b' : '#ffffff';
+
   return (
-    <ThemedView className='flex-1'>
-      <Button onPress={() => sheetRef.current?.snapToIndex(0)}><ButtonText>Theme</ButtonText></Button>
+    <Box className='flex-1'>
+      <Button onPress={() => sheetRef.current?.snapToIndex(0)}>
+        <ButtonText>Theme</ButtonText>
+      </Button>
 
       <BottomSheet
-        backgroundStyle={{ backgroundColor: color.background }}
-        ref={sheetRef} snapPoints={['50%', '90%']} index={-1} enablePanDownToClose>
+        backgroundStyle={{ backgroundColor }}
+        ref={sheetRef}
+        snapPoints={['50%', '90%']}
+        index={-1}
+        enablePanDownToClose
+      >
         <FlatList
           nestedScrollEnabled
           style={{ flex: 1 }}
@@ -46,7 +58,7 @@ export const SelectTheme = () => {
           }}
         />
       </BottomSheet>
-    </ThemedView>
+    </Box>
   );
 }
 

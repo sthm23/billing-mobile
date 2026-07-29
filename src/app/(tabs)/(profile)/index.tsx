@@ -1,8 +1,8 @@
 
 import SelectLanguage from '@/components/SelectLanguage';
 import { SelectTheme } from '@/components/SelectTheme';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/provider/AuthProvider';
@@ -30,9 +30,9 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-surface dark:bg-surface-dark">
-      <ThemedView type='surface' className='p-4'>
-        <ThemedText type='title'>Profile page</ThemedText>
+    <SafeAreaView edges={['top']} className="flex-1 bg-background">
+      <Box className='p-4 bg-background'>
+        <Text size="2xl" bold className="text-foreground">Profile page</Text>
         <View className='flex-row items-center justify-center gap-4'>
           <SelectTheme />
           <SelectLanguage />
@@ -45,7 +45,7 @@ export default function ProfileScreen() {
             <ButtonText>{t('sidebar.logout')}</ButtonText>
           </Button>
         </Card>
-      </ThemedView>
+      </Box>
     </SafeAreaView>
   )
 }
