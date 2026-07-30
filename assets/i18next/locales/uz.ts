@@ -156,6 +156,7 @@ const uz = {
   "product": {
     "noFound": "Tovar topilmadi.",
     "img": "Rasm",
+    "detail": "Mahsulot tafsilotlari",
     "name": "Nomlanish",
     "brand": "Brand",
     "category": "Toifa",

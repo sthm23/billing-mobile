@@ -27,7 +27,7 @@ const WITH_CREDENTIALS = true;
 const API_CONFIG = {
   AUTH_URL: `${BASE_URL}/auth`,
   USERS_URL: `${BASE_URL}/users`,
-  PRODUCTS_URL: `${BASE_URL}/products`,
+  PRODUCTS_URL: `${BASE_URL}/product`,
   ORDERS_URL: `${BASE_URL}/orders`,
   PAYMENTS_URL: `${BASE_URL}/payments`,
   WAREHOUSE_URL: `${BASE_URL}/warehouse`,

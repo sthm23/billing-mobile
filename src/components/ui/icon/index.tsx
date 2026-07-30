@@ -1569,3 +1569,39 @@ const UnlockIcon = createIcon({
 UnlockIcon.displayName = 'UnlockIcon';
 export { UnlockIcon };
 
+const PersonIcon = createIcon({
+  Root: Svg,
+  viewBox: '0 0 24 24',
+  path: (
+    <Path
+      d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  ),
+});
+
+PersonIcon.displayName = 'PersonIcon';
+export { PersonIcon };
+
+const ImageIcon = createIcon({
+  Root: Svg,
+  viewBox: '0 -960 960 960',
+  path: (
+    <>
+      <Path
+        d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"
+        fill="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
+});
+
+ImageIcon.displayName = 'ImageIcon';
+export { ImageIcon };
+

@@ -156,6 +156,7 @@ const en = {
   "product": {
     "noFound": "No product found.",
     "img": "Image",
+    "detail": "Product details",
     "name": "Name",
     "brand": "Brand",
     "category": "Category",
