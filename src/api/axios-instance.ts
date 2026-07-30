@@ -84,8 +84,8 @@ const clearSession = async (): Promise<void> => {
 
 const refreshAccessToken = async (): Promise<string | null> => {
   refreshPromise ??= (async () => {
-    const response = await RAW_API.get<{ data?: { accessToken?: string } }>('/refresh')
-    return response.data?.data?.accessToken ?? null
+    const response = await RAW_API.get<{ accessToken?: string }>('/refresh')
+    return response.data?.accessToken ?? null
   })()
 
   try {

@@ -50,17 +50,17 @@ export async function saveThemeMode(mode: ThemeMode): Promise<void> {
 
 export function getModeForGlueStack(themeMode: ThemeMode): ModeType {
   if (themeMode === ThemeMode.AUTO) {
-    return 'system';
+    return ThemeMode.AUTO;
   }
   return themeMode as ModeType;
 }
 
 export function applyThemeMode(mode: ThemeMode): void {
   const actualMode = getModeForGlueStack(mode);
-  if (actualMode === 'system') {
-    // Reset to system default by setting to null (cast needed for TypeScript)
-    Appearance.setColorScheme('light');
-  } else {
-    Appearance.setColorScheme(actualMode);
+  if (actualMode === ThemeMode.AUTO) {
+    // Reset to system default - GlueStack will handle this automatically
+    // We don't need to call Appearance.setColorScheme when mode is 'system'
+    return;
   }
+  Appearance.setColorScheme(actualMode);
 }
