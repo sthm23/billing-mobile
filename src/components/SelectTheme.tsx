@@ -1,9 +1,16 @@
-import { Button, ButtonText } from '@/components/ui/button';
 import { Box } from '@/components/ui/box';
+import { Button, ButtonText } from '@/components/ui/button';
 import { ThemeMode, useThemeControl } from '@/hooks/use-theme-control';
+import CustomIcon from '@/icons/custom-icon';
+import { IconNames } from '@/icons/icon.type';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList, useColorScheme } from 'react-native';
+import { HStack } from './ui/hstack';
+import { ChevronRightIcon, Icon } from './ui/icon';
+import { Pressable } from './ui/pressable';
+import { Text } from './ui/text';
 
 export type SelectThemeType = {
   mode: ThemeMode;
@@ -13,6 +20,7 @@ export type SelectThemeType = {
 export const SelectTheme = () => {
   const colorScheme = useColorScheme();
   const { themeMode, setThemeMode } = useThemeControl();
+  const { t } = useTranslation();
 
   const THEME_OPTIONS: SelectThemeType[] = useMemo(() => [
     { mode: ThemeMode.AUTO, label: 'Auto' },
@@ -26,10 +34,18 @@ export const SelectTheme = () => {
   const backgroundColor = colorScheme === 'dark' ? '#18181b' : '#ffffff';
 
   return (
-    <Box className='flex-1'>
-      <Button onPress={() => sheetRef.current?.snapToIndex(0)}>
-        <ButtonText>Theme</ButtonText>
-      </Button>
+    <>
+      <Pressable className="flex flex-row justify-between items-center h-12" onPress={() => sheetRef.current?.snapToIndex(0)}>
+        <HStack space="md" className="flex-row items-center">
+          <Box className="w-12 h-12 flex items-center justify-center">
+            <CustomIcon name={IconNames.SUN} />
+          </Box>
+          <Text>Theme</Text>
+        </HStack>
+        <Box>
+          <Icon as={ChevronRightIcon} />
+        </Box>
+      </Pressable>
 
       <BottomSheet
         backgroundStyle={{ backgroundColor }}
@@ -39,7 +55,7 @@ export const SelectTheme = () => {
         enablePanDownToClose
       >
         <FlatList
-          nestedScrollEnabled
+          scrollEnabled={false}
           style={{ flex: 1 }}
           data={THEME_OPTIONS}
           keyExtractor={item => item.mode}
@@ -58,7 +74,7 @@ export const SelectTheme = () => {
           }}
         />
       </BottomSheet>
-    </Box>
+    </>
   );
 }
 

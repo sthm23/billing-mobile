@@ -29,6 +29,8 @@ export enum IconNames {
     MINUS = 'MINUS',
     TRASH = 'TRASH',
     PENCIL = 'PENCIL',
+    PERSON = 'PERSON',
+    SETTING = 'SETTING',
 }
 export interface IconProps {
     size?: number

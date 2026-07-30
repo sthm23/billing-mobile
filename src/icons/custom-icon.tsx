@@ -19,6 +19,8 @@ import Login from '@expo/material-symbols/login.xml';
 import Logout from '@expo/material-symbols/logout.xml';
 import Phone from '@expo/material-symbols/mobile.xml';
 import Moon from '@expo/material-symbols/moon_stars.xml';
+import Person from '@expo/material-symbols/person.xml';
+import Setting from '@expo/material-symbols/settings.xml';
 // import Dollar from '@expo/material-symbols/paid.xml';
 import LockIcon from '@expo/material-symbols/lock.xml';
 import Transfer from '@expo/material-symbols/payment_arrow_down.xml';
@@ -33,7 +35,7 @@ import { Host, Icon } from '@expo/ui';
 import { SFSymbol } from 'expo-symbols';
 import { IconNames, IconProps } from './icon.type';
 
-function getIconNameIOS(name: IconNames):SFSymbol {
+function getIconNameIOS(name: IconNames): SFSymbol {
   switch (name) {
     case IconNames.MOON:
       return 'moon.fill';
@@ -91,12 +93,16 @@ function getIconNameIOS(name: IconNames):SFSymbol {
       return 'arrow.up.arrow.down.circle';
     case IconNames.LOCK:
       return 'lock.fill';
+    case IconNames.PERSON:
+      return 'person.fill';
+    case IconNames.SETTING:
+      return 'gearshape.fill';
     default:
       return '0.circle.fill';
   }
 }
 
-function getIconNameAndroid(name: IconNames):any {
+function getIconNameAndroid(name: IconNames): any {
   switch (name) {
     case IconNames.MOON:
       return Moon;
@@ -154,15 +160,19 @@ function getIconNameAndroid(name: IconNames):any {
       return Transfer;
     case IconNames.LOCK:
       return LockIcon;
+    case IconNames.PERSON:
+      return Person;
+    case IconNames.SETTING:
+      return Setting;
     default:
       return Default
   }
 }
 
-export default function CustomIcon(props:IconProps) {
+export default function CustomIcon(props: IconProps) {
   const colors = useTheme()
   const { size = 24, color = colors.text, name } = props;
-  
+
   const iconName = Icon.select({
     ios: getIconNameIOS(name),
     android: getIconNameAndroid(name),

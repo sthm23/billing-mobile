@@ -1,11 +1,16 @@
-
+import { HStack } from '@/components/ui/hstack';
+import { ChevronRightIcon, Icon } from '@/components/ui/icon';
+import { Pressable } from '@/components/ui/pressable';
+import { Text } from '@/components/ui/text';
+import CustomIcon from '@/icons/custom-icon';
+import { IconNames } from '@/icons/icon.type';
 
 import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/assets/i18next/i18next';
 import { Box } from '@/components/ui/box';
-import { Button, ButtonText } from './ui/button';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, useColorScheme } from 'react-native';
+import { Button, ButtonText } from './ui/button';
 
 const SelectLanguage = () => {
   const colorScheme = useColorScheme();
@@ -48,10 +53,18 @@ const SelectLanguage = () => {
   const backgroundColor = colorScheme === 'dark' ? '#18181b' : '#ffffff';
 
   return (
-    <Box className='flex-1'>
-      <Button onPress={() => sheetRef.current?.snapToIndex(0)}>
-        <ButtonText>Language</ButtonText>
-      </Button>
+    <>
+      <Pressable className="flex flex-row justify-between items-center h-12" onPress={() => sheetRef.current?.snapToIndex(0)}>
+        <HStack space="md" className="flex-row items-center">
+          <Box className="w-12 h-12 flex items-center justify-center">
+            <CustomIcon name={IconNames.LANGUAGE} />
+          </Box>
+          <Text>Language</Text>
+        </HStack>
+        <Box>
+          <Icon as={ChevronRightIcon} />
+        </Box>
+      </Pressable>
 
       <BottomSheet
         backgroundStyle={{ backgroundColor }}
@@ -61,7 +74,7 @@ const SelectLanguage = () => {
         enablePanDownToClose
       >
         <FlatList
-          nestedScrollEnabled
+          scrollEnabled={false}
           style={{ flex: 1 }}
           data={LANGUAGE_OPTIONS}
           keyExtractor={item => item.label}
@@ -80,7 +93,7 @@ const SelectLanguage = () => {
           }}
         />
       </BottomSheet>
-    </Box>
+    </>
   )
 }
 
