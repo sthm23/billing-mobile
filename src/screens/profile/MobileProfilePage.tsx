@@ -32,13 +32,12 @@ const MobileProfilePage = ({ isActive }: any) => {
       style={{ display: isActive ? "flex" : "none", height: '100%', width: '100%' }}
       contentContainerStyle={{ justifyContent: "space-between", height: '100%', width: '100%' }}
     >
-      <Box className="flex h-full px-5 py-4 gap-4">
+      <Box className="flex h-full px-5 py-4">
         <Box className="flex flex-col gap-4">
           <Heading className="mb-1" size="2xl">{t('profile.title')}</Heading>
           <ProfileCard user={user} />
           <Divider className="my-2" />
           <SettingItems />
-          <Divider className="my-2" />
         </Box>
         <Box className="flex-1 flex flex-col items-center justify-center gap-2">
           <LogoutButton

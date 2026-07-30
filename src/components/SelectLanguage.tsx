@@ -54,9 +54,9 @@ const SelectLanguage = () => {
 
   return (
     <>
-      <Pressable className="flex flex-row justify-between items-center h-12" onPress={() => sheetRef.current?.snapToIndex(0)}>
+      <Pressable className="flex flex-row justify-between items-center h-20 border border-gray-300 rounded-xl p-4" onPress={() => sheetRef.current?.snapToIndex(0)}>
         <HStack space="md" className="flex-row items-center">
-          <Box className="w-12 h-12 flex items-center justify-center">
+          <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-300">
             <CustomIcon name={IconNames.LANGUAGE} />
           </Box>
           <Text>Language</Text>

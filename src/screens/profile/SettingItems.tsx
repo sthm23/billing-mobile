@@ -4,7 +4,7 @@ import { VStack } from "@/components/ui/vstack";
 
 const SettingItems = () => {
     return (
-        <VStack space="lg">
+        <VStack space="md">
             <SelectLanguage />
             <SelectTheme />
         </VStack>
