@@ -1,23 +1,38 @@
-import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
-import { ChevronRightIcon, Icon, ImageIcon } from "@/components/ui/icon";
-import { Pressable } from "@/components/ui/pressable";
+import { SearchIcon } from "@/components/ui/icon";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useProducts } from "@/services/product/product.queries";
 import { Product, ProductParams } from "@/services/product/product.type";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList } from "react-native";
+import { ProductCard } from "./ProductCard";
 
 
 export default function ProductPage() {
     const { t } = useTranslation();
     const router = useRouter();
-    const page = 1
+    const [page, setPage] = useState(1)
+    const [products, setProducts] = useState<Product[]>([])
+    const [search, setSearch] = useState<string>('')
+    const [debouncedSearch, setDebouncedSearch] = useState<string>('')
     const pageSize = 10
-    const debouncedSearch = ''
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setDebouncedSearch(search.trim())
+        }, 1000)
+
+        return () => clearTimeout(timeout)
+    }, [search])
+
+    useEffect(() => {
+        setPage(1)
+        setProducts([])
+    }, [debouncedSearch])
 
     const listParams = useMemo<ProductParams>(
         () => ({
@@ -34,7 +49,25 @@ export default function ProductPage() {
         ]
     )
 
-    const { data, isLoading, isError } = useProducts(listParams);
+    const { data, isLoading, isFetching, isError } = useProducts(listParams);
+    const isSearchPending = search.trim() !== debouncedSearch
+
+    useEffect(() => {
+        if (!data?.data) {
+            return
+        }
+
+        if (page === 1) {
+            setProducts(data.data)
+            return
+        }
+
+        setProducts((prev) => {
+            const knownIds = new Set(prev.map((item) => item.id))
+            const nextPageItems = data.data.filter((item) => !knownIds.has(item.id))
+            return [...prev, ...nextPageItems]
+        })
+    }, [data, page])
 
 
     if (isError) {
@@ -49,53 +82,57 @@ export default function ProductPage() {
         )
     }
 
-    const products = data?.data ?? []
+    const hasMore = data ? data.currentPage * data.pageSize < data.total : false
+
+    const handleLoadMore = () => {
+        if (!hasMore || isFetching) {
+            return
+        }
+
+        setPage((prev) => prev + 1)
+    }
 
     const handleProductPress = (product: Product) => {
         router.push(`/(tabs)/(products)/${product.id}`);
     }
 
-    const productCard = ({ item: product }: { item: Product }) => (
-        <Pressable className="flex-row items-center gap-4 p-4 border border-gray-300 rounded-lg bg-card" key={product.id} onPress={() => handleProductPress(product)}>
-            {product.images && product.images.length > 0 ? (
-                <Avatar className="border-2 border-gray-300 rounded-lg h-15 w-15">
-                    <AvatarFallbackText>{product.name}</AvatarFallbackText>
-                    <AvatarImage source={{ uri: product.images[0].url }} />
-                </Avatar>
-            ) : (
-                <Avatar className="border-2 border-gray-300 rounded-lg h-15 w-15">
-                    <Icon as={ImageIcon} size="xl" />
-                </Avatar>
-            )}
-            <Box>
-                <Text size="md">Category: {t(`category.${product.category}`)}</Text>
-                <Text size="lg" bold>{product.name}</Text>
-                <Text size="md">Quantity: {product.variants.reduce((total, variant) => total + variant.quantity, 0)}</Text>
-                <Text size="md">Price: {product.priceRange.min} - {product.priceRange.max}</Text>
-            </Box>
-            <Box className="flex-1 items-end justify-end">
-                <Icon as={ChevronRightIcon} size="xl" />
-            </Box>
-        </Pressable>
-    )
-
     return (
-        <>
+        <Box className="flex-1">
             <Box className="flex-row items-center justify-between px-4 py-2">
                 <Text size="2xl" bold className="text-lg font-bold text-center">Продукты</Text>
                 <Button onPress={() => console.log('Create button pressed')}>
                     <ButtonText>{t('order.create')}</ButtonText>
                 </Button>
             </Box>
+            <Box className="px-4 py-2">
+                <Input>
+                    <InputSlot>
+                        <InputIcon as={SearchIcon} />
+                    </InputSlot>
+                    <InputField placeholder="Search..." value={search} onChangeText={setSearch} />
+                </Input>
+                {isSearchPending && (
+                    <Text className="pt-2 text-sm opacity-70">Идет поиск...</Text>
+                )}
+            </Box>
             <FlatList
+                style={{ flex: 1 }}
                 data={products}
-                renderItem={productCard}
+                renderItem={({ item }) => <ProductCard product={item} onPress={handleProductPress} t={t} />}
                 keyExtractor={item => item.id}
                 contentContainerStyle={{ padding: 16, gap: 8 }}
+                ListFooterComponent={
+                    <Box>
+                        {hasMore ? (
+                            <Button onPress={handleLoadMore} disabled={isFetching}>
+                                <ButtonText>{isFetching ? 'Загрузка...' : 'Выгрузить еще'}</ButtonText>
+                            </Button>
+                        ) : (
+                            <Text className="text-center opacity-70">Больше продуктов нет</Text>
+                        )}
+                    </Box>
+                }
             />
-            <Box className="mb-10">
-                <Text className="mb-5 flex">Some thing should be here</Text>
-            </Box>
-        </>
+        </Box>
     )
 }
