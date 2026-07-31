@@ -1,6 +1,6 @@
-import SelectLanguage from "@/components/SelectLanguage";
-import { SelectTheme } from "@/components/SelectTheme";
 import { VStack } from "@/components/ui/vstack";
+import { SelectLanguage } from "./SelectLanguage";
+import { SelectTheme } from "./SelectTheme";
 
 const SettingItems = () => {
     return (

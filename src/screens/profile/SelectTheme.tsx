@@ -7,10 +7,10 @@ import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, useColorScheme } from 'react-native';
-import { HStack } from './ui/hstack';
-import { ChevronRightIcon, Icon } from './ui/icon';
-import { Pressable } from './ui/pressable';
-import { Text } from './ui/text';
+import { HStack } from '../../components/ui/hstack';
+import { ChevronRightIcon, Icon } from '../../components/ui/icon';
+import { Pressable } from '../../components/ui/pressable';
+import { Text } from '../../components/ui/text';
 
 export type SelectThemeType = {
   mode: ThemeMode;

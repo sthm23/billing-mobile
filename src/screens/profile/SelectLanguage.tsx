@@ -10,9 +10,9 @@ import { Box } from '@/components/ui/box';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, useColorScheme } from 'react-native';
-import { Button, ButtonText } from './ui/button';
+import { Button, ButtonText } from '../../components/ui/button';
 
-const SelectLanguage = () => {
+export const SelectLanguage = () => {
   const colorScheme = useColorScheme();
   const [language, setLanguage] = useState<AppLanguage>(AppLanguage.AUTO);
 
@@ -97,4 +97,4 @@ const SelectLanguage = () => {
   )
 }
 
-export default SelectLanguage
+SelectLanguage.displayName = 'SelectLanguage'
