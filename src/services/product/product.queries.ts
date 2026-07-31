@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2025 SkipQ
- *
- * This source code is considered Developed Content.
- * LICENSE file in the root directory of this source tree.
- */
-
 import { BaseListResponse } from '@/models/app.models'
 import {
   useMutation,
@@ -20,6 +13,7 @@ import type {
   CreateProduct,
   Product,
   ProductParams,
+  ProductSearchParams,
 } from './product.type'
 
 export const productQueryKeys = {
@@ -40,6 +34,7 @@ export const productQueryKeys = {
 }
 
 export const POLL_INTERVAL_MS = 2000
+export const DEBOUNCE_TIME_MS = 600
 
 /** ~4 minutes at 2s cadence. Caller treats `isCapped` as a soft failure. */
 export const POLL_SAFETY_CAP = 120
@@ -121,4 +116,19 @@ export const useProducts = (params: ProductParams = {}): UseQueryResult<BaseList
   }
 
   return useQuery(queryOptions)
+}
+
+
+export const useProductSearch = (params: ProductSearchParams) => {
+  const { text, warehouseId } = params
+  const isSearchActive = text.length > 0
+
+  const searchQuery = useQuery({
+    queryKey: ['product-search', warehouseId, text],
+    queryFn: () => productService.searchProducts(warehouseId, text),
+    enabled: Boolean(isSearchActive && warehouseId),
+    refetchOnWindowFocus: false,
+  })
+
+  return searchQuery
 }

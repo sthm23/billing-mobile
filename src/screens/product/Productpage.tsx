@@ -1,7 +1,5 @@
 import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
-import { SearchIcon } from "@/components/ui/icon";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { useProducts } from "@/services/product/product.queries";
 import { Product, ProductParams } from "@/services/product/product.type";
@@ -17,40 +15,23 @@ export default function ProductPage() {
     const router = useRouter();
     const [page, setPage] = useState(1)
     const [products, setProducts] = useState<Product[]>([])
-    const [search, setSearch] = useState<string>('')
-    const [debouncedSearch, setDebouncedSearch] = useState<string>('')
     const pageSize = 10
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setDebouncedSearch(search.trim())
-        }, 1000)
-
-        return () => clearTimeout(timeout)
-    }, [search])
-
-    useEffect(() => {
-        setPage(1)
-        setProducts([])
-    }, [debouncedSearch])
 
     const listParams = useMemo<ProductParams>(
         () => ({
             currentPage: page,
-            pageSize,
-            search: debouncedSearch || undefined,
+            pageSize: pageSize,
+            search: undefined,
             fromDate: undefined,
             toDate: undefined,
         }),
         [
             page,
             pageSize,
-            debouncedSearch,
         ]
     )
 
     const { data, isLoading, isFetching, isError } = useProducts(listParams);
-    const isSearchPending = search.trim() !== debouncedSearch
 
     useEffect(() => {
         if (!data?.data) {
@@ -103,17 +84,6 @@ export default function ProductPage() {
                 <Button onPress={() => console.log('Create button pressed')}>
                     <ButtonText>{t('order.create')}</ButtonText>
                 </Button>
-            </Box>
-            <Box className="px-4 py-2">
-                <Input>
-                    <InputSlot>
-                        <InputIcon as={SearchIcon} />
-                    </InputSlot>
-                    <InputField placeholder="Search..." value={search} onChangeText={setSearch} />
-                </Input>
-                {isSearchPending && (
-                    <Text className="pt-2 text-sm opacity-70">Идет поиск...</Text>
-                )}
             </Box>
             <FlatList
                 style={{ flex: 1 }}

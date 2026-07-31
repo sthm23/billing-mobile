@@ -209,3 +209,8 @@ export interface ProductParams {
     toDate?: Date;
     search?: string;
 }
+
+export interface ProductSearchParams {
+    text: string;
+    warehouseId: string;
+};
