@@ -210,7 +210,7 @@ export interface ProductParams {
     search?: string;
 }
 
-export interface ProductSearchParams {
+export interface ProductVariantSearchParams {
     text: string;
     warehouseId: string;
 };

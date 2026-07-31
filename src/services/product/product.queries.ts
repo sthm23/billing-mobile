@@ -13,7 +13,7 @@ import type {
   CreateProduct,
   Product,
   ProductParams,
-  ProductSearchParams,
+  ProductVariantSearchParams,
 } from './product.type'
 
 export const productQueryKeys = {
@@ -119,7 +119,7 @@ export const useProducts = (params: ProductParams = {}): UseQueryResult<BaseList
 }
 
 
-export const useProductSearch = (params: ProductSearchParams) => {
+export const useProductVariantSearch = (params: ProductVariantSearchParams) => {
   const { text, warehouseId } = params
   const isSearchActive = text.length > 0
 

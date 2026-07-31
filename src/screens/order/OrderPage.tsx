@@ -1,7 +1,5 @@
+import { SearchableHeader } from '@/components/SearchableHeader';
 import { Box } from '@/components/ui/box';
-import { Button, ButtonText } from '@/components/ui/button';
-import { SearchIcon } from '@/components/ui/icon';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import {
     Tabs,
     TabsIndicator,
@@ -12,6 +10,7 @@ import {
 import { Text } from '@/components/ui/text';
 import { useOrders } from '@/services/order/order.queries';
 import { OrderParams, OrderStatus } from '@/services/order/order.type';
+import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 
 type OrderStatusType = 'active' | 'completed';
@@ -26,7 +25,7 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
 export default function OrderPage() {
     const page = 1
     const pageSize = 10
-    const debouncedSearch = ''
+    const [searchText, setSearchText] = useState('');
     const [status, setStatus] = useState<OrderStatusType>('active');
 
     const tabOptions: {
@@ -41,7 +40,7 @@ export default function OrderPage() {
         () => ({
             currentPage: page,
             pageSize,
-            search: debouncedSearch || undefined,
+            search: searchText || undefined,
             fromDate: undefined,
             toDate: undefined,
             status: getStatus(status),
@@ -49,7 +48,7 @@ export default function OrderPage() {
         [
             page,
             pageSize,
-            debouncedSearch,
+            searchText,
             status,
         ]
     )
@@ -72,15 +71,14 @@ export default function OrderPage() {
 
     return (
         <>
-            <Box className="flex-row items-center justify-between px-4 py-2">
-                <Text size="2xl" bold>Заказы</Text>
-                <Button>
-                    <ButtonText>Создать</ButtonText>
-                </Button>
-            </Box>
+            <SearchableHeader
+                title="Заказы"
+                onSearchChange={setSearchText}
+                actionLabel="Создать"
+                onAction={() => router.push('/(tabs)/(orders)/create')}
+            />
 
             <Box className="w-full p-2 gap-4">
-
                 <Tabs defaultValue={status} variant="filled" onValueChange={(value: OrderStatusType) => setStatus(value)}>
                     <TabsList>
                         {tabOptions.map((option) => {
@@ -93,12 +91,6 @@ export default function OrderPage() {
                         <TabsIndicator />
                     </TabsList>
                 </Tabs>
-                <Input>
-                    <InputSlot>
-                        <InputIcon as={SearchIcon} />
-                    </InputSlot>
-                    <InputField placeholder="Search..." />
-                </Input>
             </Box>
             <Box>
                 {orders.length > 0 ? orders.map((order) => (
