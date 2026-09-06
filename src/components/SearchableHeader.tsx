@@ -24,15 +24,23 @@ export function SearchableHeader({
     const inputRef = useRef<TextInput>(null);
     const colors = useTheme();
 
+    const handleFocus = () => {
+        inputRef.current?.focus();
+    };
+
+    const handleBlur = () => {
+        inputRef.current?.blur();
+    };
+
     const openSearch = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setIsSearching(true);
         // focus после того как layout обновится
-        setTimeout(() => inputRef.current?.focus(), 50);
+        setTimeout(() => handleFocus(), 50);
     };
 
     const closeSearch = () => {
-        inputRef.current?.blur();
+        handleBlur();
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setIsSearching(false);
         setSearchText('');
@@ -71,7 +79,7 @@ export function SearchableHeader({
                         />
                     </Input>
                 </View>
-                <Button variant="link" onPress={closeSearch} style={{ paddingHorizontal: 4 }}>
+                <Button variant="link" onPress={closeSearch} className="px-4" >
                     <ButtonIcon as={CloseIcon} size='lg' />
                 </Button>
             </View>
@@ -91,8 +99,8 @@ export function SearchableHeader({
         >
             <Text size="2xl" bold>{title}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Button variant="link" onPress={openSearch} style={{ paddingHorizontal: 4 }}>
-                    <ButtonIcon as={SearchIcon} />
+                <Button variant="link" onPress={openSearch} className="px-4" >
+                    <ButtonIcon as={SearchIcon} size='lg' />
                 </Button>
                 {actionLabel && onAction && (
                     <Button onPress={onAction}>
