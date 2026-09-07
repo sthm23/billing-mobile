@@ -12,7 +12,7 @@
         "@modelcontextprotocol/server-figma"
       ],
       "env": {
-        "FIGMA_PERSONAL_ACCESS_TOKEN": "токен_здесь"
+        "FIGMA_PERSONAL_ACCESS_TOKEN": "token"
       }
     }
   }
