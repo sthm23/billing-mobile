@@ -1,0 +1,17 @@
+{
+	"servers": {
+		"mcpServers": {
+			"figma": {
+				"command": "npx",
+				"args": [
+					"-y",
+					"@modelcontextprotocol/server-figma"
+				],
+				"env": {
+					"FIGMA_PERSONAL_ACCESS_TOKEN": "токен_здесь"
+				}
+			}
+		}
+	},
+	"inputs": []
+}

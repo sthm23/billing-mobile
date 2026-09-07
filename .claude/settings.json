@@ -3,5 +3,17 @@
     "expo@claude-plugins-official": true,
     "ui-ux-pro-max@nextlevelbuilder/ui-ux-pro-max-skill": true,
     "expo-data-fetching@expo@claude-plugins-official": true
+  },
+  "mcpServers": {
+    "figma": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-figma"
+      ],
+      "env": {
+        "FIGMA_PERSONAL_ACCESS_TOKEN": "токен_здесь"
+      }
+    }
   }
 }

@@ -3,10 +3,10 @@ import { Staff, User, UserRole } from "./user.model"
 
 
 export interface Payment {
-
   id: string
   sellerId: string
   seller: {
+    id: string
     role: UserRole
     user: User
   }
@@ -14,8 +14,16 @@ export interface Payment {
   storeId: string
   transactions: CashboxTransaction[]
   warehouseId: string
-  balance: number;
-  createdAt: string;
+  warehouse: {
+    id: string
+    name: string
+  }
+  balance: number
+  totalIncome?: number
+  totalExpense?: number
+  createdAt: string
+  updatedAt?: string
+  closedAt?: string
 }
 
 export enum CashboxStatus {
