@@ -1,28 +1,32 @@
 import { Box } from "@/components/ui/box";
 import { Button, ButtonText } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
 import { Card } from "@/components/ui/card";
-import { useCashboxById, useCloseCashbox } from "@/services/cashbox";
+import { HStack } from "@/components/ui/hstack";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
 import { CashTransactionType } from "@/models/payment.model";
+import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
+import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, ActivityIndicator, Alert } from "react-native";
+import { ActivityIndicator, Alert, ScrollView } from "react-native";
+import { AddTransactionSheet } from "./AddTransactionSheet";
 import { TransactionCard } from "./TransactionCard";
 
 export default function CashboxDetailsPage() {
   const { t } = useTranslation();
-  const router = useRouter();
+  const router = useRouter(); // Keep for back navigation on cashbox close
   const { id } = useLocalSearchParams<{ id: string }>();
   const [sheetVisible, setSheetVisible] = useState(false);
-  const [transactionType, setTransactionType] = useState<CashTransactionType | null>(null);
+  const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
 
   const { data: cashbox, isLoading, isError, refetch } = useCashboxById(id, {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
   const closeCashboxMutation = useCloseCashbox();
+  const createTransactionMutation = useCreateTransaction();
 
   const handleCloseCashbox = () => {
     Alert.alert(
@@ -57,8 +61,9 @@ export default function CashboxDetailsPage() {
     setSheetVisible(true);
   };
 
-  const handleViewAll = () => {
-    router.push(`/(tabs)/(payments)/${id}/transactions`);
+  const handleCreateTransaction = async (payload: CreateTransactionPayload) => {
+    await createTransactionMutation.mutateAsync(payload);
+    setSheetVisible(false);
   };
 
   if (isLoading) {
@@ -79,18 +84,28 @@ export default function CashboxDetailsPage() {
     );
   }
 
-  const totalIncome = cashbox.totalIncome || 0;
-  const totalExpense = cashbox.totalExpense || 0;
-  const todayTransactions = cashbox.transactions.filter((transaction) => {
-    const transactionDate = new Date(transaction.createdAt).toDateString();
-    const today = new Date().toDateString();
-    return transactionDate === today;
-  });
+  const totalIncome = cashbox.transactions
+    .filter(t => t.type === CashTransactionType.INCOME)
+    .reduce((sum, t) => +sum + +t.amount, 0);
+  const totalExpense = cashbox.transactions
+    .filter(t => t.type === CashTransactionType.EXPENSE)
+    .reduce((sum, t) => +sum + +t.amount, 0);
+
+  // Sort all transactions by date (newest first)
+  const sortedTransactions = [...cashbox.transactions]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  // Show either first 5 or all transactions based on state
+  const displayedTransactions = showAllTransactions
+    ? sortedTransactions
+    : sortedTransactions.slice(0, 5);
+
+  const hasMoreTransactions = sortedTransactions.length > 5;
 
   return (
-    <ScrollView className="flex-1 bg-background">
+    <ScrollView className="bg-background p-0 mt-0">
       {/* Header */}
-      <HStack className="items-center justify-between px-4 py-3 border-b border-border">
+      <HStack className="items-center justify-between px-4 py-3 border-b border-border mt-0">
         <Text size="2xl" bold>
           {t('payment.cashbox')}
         </Text>
@@ -161,14 +176,18 @@ export default function CashboxDetailsPage() {
         </Card>
       </Box>
 
-      {/* Transactions Today */}
+      {/* Recent Transactions */}
       <Box className="px-4 pb-4">
         <HStack className="items-center justify-between mb-3">
           <Text size="xl" bold>
-            {t('payment.paymentsToday')}
+            {t('payment.transactions')}
           </Text>
-          {todayTransactions.length > 0 && (
-            <Button size="sm" variant="link" onPress={handleViewAll}>
+          {hasMoreTransactions && !showAllTransactions && (
+            <Button
+              size="sm"
+              variant="link"
+              onPress={() => setShowAllTransactions(true)}
+            >
               <ButtonText className="text-primary-600">
                 {t('payment.all')}
               </ButtonText>
@@ -176,7 +195,7 @@ export default function CashboxDetailsPage() {
           )}
         </HStack>
 
-        {todayTransactions.length === 0 ? (
+        {displayedTransactions.length === 0 ? (
           <Box className="py-8 items-center">
             <Text className="text-typography-500">
               {t('payment.noFound')}
@@ -184,7 +203,7 @@ export default function CashboxDetailsPage() {
           </Box>
         ) : (
           <Card className="rounded-xl bg-surface overflow-hidden">
-            {todayTransactions.map((transaction) => (
+            {displayedTransactions.map((transaction) => (
               <TransactionCard
                 key={transaction.id}
                 transaction={transaction}
@@ -193,9 +212,28 @@ export default function CashboxDetailsPage() {
             ))}
           </Card>
         )}
+
+        {showAllTransactions && hasMoreTransactions && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="mt-3"
+            onPress={() => setShowAllTransactions(false)}
+          >
+            <ButtonText>{t('order.cancel')}</ButtonText>
+          </Button>
+        )}
       </Box>
 
-      {/* TODO: Add AddTransactionSheet component */}
+      {/* Add Transaction Sheet */}
+      <AddTransactionSheet
+        isOpen={sheetVisible}
+        onClose={() => setSheetVisible(false)}
+        cashboxId={id}
+        transactionType={transactionType}
+        onSubmit={handleCreateTransaction}
+        isLoading={createTransactionMutation.isPending}
+      />
     </ScrollView>
   );
 }

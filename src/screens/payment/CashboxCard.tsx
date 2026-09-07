@@ -1,11 +1,11 @@
-import { Box } from "@/components/ui/box";
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Box } from "@/components/ui/box";
+import { HStack } from "@/components/ui/hstack";
 import { ChevronRightIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
-import { Payment, CashboxStatus } from "@/models/payment.model";
+import { CashboxStatus, Payment } from "@/models/payment.model";
 import { TFunction } from "i18next";
 
 type CashboxCardProps = {
@@ -17,7 +17,7 @@ type CashboxCardProps = {
 export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
   const isOpen = cashbox.status === CashboxStatus.OPEN;
   const formattedDate = new Date(cashbox.createdAt).toLocaleString();
-  const cashierName = `${cashbox.seller.user.name} ${cashbox.seller.user.lastname}`;
+  const cashierName = `${cashbox.seller.user.fullName}`;
 
   return (
     <Pressable

@@ -1,4 +1,5 @@
-import { Payment, CashboxTransaction, CashboxStatus, TransactionPayload } from '@/models/payment.model';
+import { CashboxStatus, CashboxTransaction, Payment, TransactionPayload } from '@/models/payment.model';
+import { User, UserRole } from '@/models/user.model';
 
 export interface CashboxParams {
   currentPage: number;
@@ -17,30 +18,18 @@ export interface CashboxListResponse {
 }
 
 export interface CashboxDetailResponse {
-  id: string;
-  sellerId: string;
+  id: string
+  sellerId: string
   seller: {
-    id: string;
-    role: string;
-    user: {
-      id: string;
-      name: string;
-      lastname: string;
-    };
-  };
-  status: CashboxStatus;
-  storeId: string;
-  warehouseId: string;
-  warehouse: {
-    id: string;
-    name: string;
-  };
+    role: UserRole
+    user: User
+  }
+  status: CashboxStatus
+  storeId: string
+  transactions: CashboxTransaction[]
+  warehouseId: string
   balance: number;
-  totalIncome: number;
-  totalExpense: number;
-  transactions: CashboxTransaction[];
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface CreateTransactionPayload extends TransactionPayload {
