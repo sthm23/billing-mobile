@@ -31,6 +31,9 @@ export enum IconNames {
     PENCIL = 'PENCIL',
     PERSON = 'PERSON',
     SETTING = 'SETTING',
+    SEARCH = 'SEARCH',
+    BARCODE_SCANNER = 'BARCODE_SCANNER',
+    FILTER = 'FILTER',
 }
 export interface IconProps {
     size?: number

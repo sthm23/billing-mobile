@@ -13,6 +13,7 @@ import Close from '@expo/material-symbols/close.xml';
 import CreditCard from '@expo/material-symbols/credit_card.xml';
 import Trash from '@expo/material-symbols/delete.xml';
 import Pencil from '@expo/material-symbols/edit.xml';
+import Filter from '@expo/material-symbols/filter_list.xml';
 import Users from '@expo/material-symbols/group.xml';
 import Language from '@expo/material-symbols/language.xml';
 import Login from '@expo/material-symbols/login.xml';
@@ -20,6 +21,8 @@ import Logout from '@expo/material-symbols/logout.xml';
 import Phone from '@expo/material-symbols/mobile.xml';
 import Moon from '@expo/material-symbols/moon_stars.xml';
 import Person from '@expo/material-symbols/person.xml';
+import BarcodeScanner from '@expo/material-symbols/qr_code_scanner.xml';
+import Search from '@expo/material-symbols/search.xml';
 import Setting from '@expo/material-symbols/settings.xml';
 // import Dollar from '@expo/material-symbols/paid.xml';
 import LockIcon from '@expo/material-symbols/lock.xml';
@@ -97,6 +100,12 @@ function getIconNameIOS(name: IconNames): SFSymbol {
       return 'person.fill';
     case IconNames.SETTING:
       return 'gearshape.fill';
+    case IconNames.SEARCH:
+      return 'magnifyingglass';
+    case IconNames.BARCODE_SCANNER:
+      return 'barcode.viewfinder';
+    case IconNames.FILTER:
+      return 'line.horizontal.3.decrease.circle';
     default:
       return '0.circle.fill';
   }
@@ -164,6 +173,12 @@ function getIconNameAndroid(name: IconNames): any {
       return Person;
     case IconNames.SETTING:
       return Setting;
+    case IconNames.SEARCH:
+      return Search;
+    case IconNames.BARCODE_SCANNER:
+      return BarcodeScanner;
+    case IconNames.FILTER:
+      return Filter;
     default:
       return Default
   }
