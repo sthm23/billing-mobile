@@ -2,14 +2,8 @@
 	"servers": {
 		"mcpServers": {
 			"figma": {
-				"command": "npx",
-				"args": [
-					"-y",
-					"@modelcontextprotocol/server-figma"
-				],
-				"env": {
-					"FIGMA_PERSONAL_ACCESS_TOKEN": "token"
-				}
+				"url": "https://mcp.figma.com/mcp",
+				"type": "http"
 			}
 		}
 	},

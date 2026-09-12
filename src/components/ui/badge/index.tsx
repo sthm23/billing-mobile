@@ -1,99 +1,158 @@
+'use client';
+import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { tva, useStyleContext, withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
+import { styled } from 'nativewind';
 import React from 'react';
-import { View, Text, ViewProps, TextProps } from 'react-native';
-import { cn } from '@/libs/utils';
+import { Text, View } from 'react-native';
+import { Svg } from 'react-native-svg';
 
-type BadgeVariant = 'solid' | 'outline';
-type BadgeAction = 'primary' | 'success' | 'error' | 'warning' | 'muted';
-type BadgeSize = 'sm' | 'md' | 'lg';
+const SCOPE = 'BADGE';
 
-interface BadgeProps extends ViewProps {
-  variant?: BadgeVariant;
-  action?: BadgeAction;
-  size?: BadgeSize;
-  children: React.ReactNode;
+const badgeStyle = tva({
+  base: 'flex-row items-center justify-center rounded-sm px-2 py-0.5',
+  variants: {
+    variant: {
+      default: 'bg-primary',
+      secondary: 'bg-secondary',
+      destructive:
+        'bg-destructive dark:bg-destructive/60',
+      outline: 'border border-border dark:border-border/90 bg-transparent',
+    },
+  },
+});
+
+const badgeTextStyle = tva({
+  base: 'text-xs font-medium tracking-normal uppercase',
+  parentVariants: {
+    variant: {
+      default: 'text-primary-foreground',
+      secondary: 'text-secondary-foreground',
+      destructive: 'text-white',
+      outline: 'text-foreground',
+    },
+  },
+});
+
+const badgeIconStyle = tva({
+  base: 'fill-none h-3 w-3 pointer-events-none',
+  parentVariants: {
+    variant: {
+      default: 'text-primary-foreground',
+      secondary: 'text-secondary-foreground',
+      destructive: 'text-white',
+      outline: 'text-foreground',
+    },
+  },
+});
+
+const ContextView = withStyleContext(View, SCOPE);
+
+type IBadgeProps = React.ComponentPropsWithoutRef<typeof ContextView> &
+  VariantProps<typeof badgeStyle>;
+function Badge({
+  children,
+  variant = 'default',
+  className,
+  ...props
+}: { className?: string } & IBadgeProps) {
+  return (
+    <ContextView
+      className={badgeStyle({ variant, class: className })}
+      {...props}
+      context={{ variant }}
+    >
+      {children}
+    </ContextView>
+  );
 }
 
-interface BadgeTextProps extends TextProps {
-  children: React.ReactNode;
-}
+type IBadgeTextProps = React.ComponentPropsWithoutRef<typeof Text> &
+  VariantProps<typeof badgeTextStyle>;
 
-const badgeVariants = {
-  solid: {
-    primary: 'bg-primary',
-    success: 'bg-success-600',
-    error: 'bg-error-600',
-    warning: 'bg-warning-600',
-    muted: 'bg-gray-400',
-  },
-  outline: {
-    primary: 'border border-primary bg-transparent',
-    success: 'border border-success-600 bg-transparent',
-    error: 'border border-error-600 bg-transparent',
-    warning: 'border border-warning-600 bg-transparent',
-    muted: 'border border-gray-400 bg-transparent',
-  },
+const BadgeText = React.forwardRef<
+  React.ComponentRef<typeof Text>,
+  IBadgeTextProps
+>(function BadgeText({ children, className, ...props }, ref) {
+  const { variant: parentVariant } = useStyleContext(SCOPE);
+  return (
+    <Text
+      ref={ref}
+      className={badgeTextStyle({
+        parentVariants: {
+          variant: parentVariant,
+        },
+        class: className,
+      })}
+      {...props}
+    >
+      {children}
+    </Text>
+  );
+});
+
+type IBadgeIconProps = React.ComponentPropsWithoutRef<typeof PrimitiveIcon> &
+  VariantProps<typeof badgeIconStyle> & {
+    size?: number;
 };
-
-const badgeTextVariants = {
-  solid: {
-    primary: 'text-white',
-    success: 'text-white',
-    error: 'text-white',
-    warning: 'text-white',
-    muted: 'text-white',
+  
+const StyledUIIcon = styled(UIIcon, {
+  className: {
+    target: 'style',
+    nativeStyleToProp: {
+      height: true,
+      width: true,
+      fill: true,
+      color: 'classNameColor',
+      stroke: true,
+    },
   },
-  outline: {
-    primary: 'text-primary',
-    success: 'text-success-600',
-    error: 'text-error-600',
-    warning: 'text-warning-600',
-    muted: 'text-gray-600',
-  },
-};
+});
 
-const badgeSizes = {
-  sm: 'px-2 py-0.5',
-  md: 'px-3 py-1',
-  lg: 'px-4 py-1.5',
-};
 
-const badgeTextSizes = {
-  sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-base',
-};
+const BadgeIcon = React.forwardRef<
+  React.ComponentRef<typeof Svg>,
+  IBadgeIconProps
+>(function BadgeIcon({ className, size, ...props }, ref) {
+  const { variant: parentVariant } = useStyleContext(SCOPE);
 
-export const Badge = React.forwardRef<View, BadgeProps>(
-  ({ variant = 'solid', action = 'primary', size = 'md', className, children, ...props }, ref) => {
-    const variantClass = badgeVariants[variant][action];
-    const sizeClass = badgeSizes[size];
-
+  if (typeof size === 'number') {
     return (
-      <View
+      <StyledUIIcon
         ref={ref}
-        className={cn('inline-flex items-center justify-center rounded-md', variantClass, sizeClass, className)}
         {...props}
-      >
-        {children}
-      </View>
+        className={badgeIconStyle({ class: className })}
+        size={size}
+      />
+    );
+  } else if (
+    (props?.height !== undefined || props?.width !== undefined) &&
+    size === undefined
+  ) {
+    return (
+      <StyledUIIcon
+        ref={ref}
+        {...props}
+        className={badgeIconStyle({ class: className })}
+      />
     );
   }
-);
+  return (
+    <StyledUIIcon
+      className={badgeIconStyle({
+        parentVariants: {
+          variant: parentVariant,
+        },
+        class: className,
+      })}
+      {...props}
+      ref={ref}
+    />
+  );
+});
 
 Badge.displayName = 'Badge';
-
-export const BadgeText = React.forwardRef<Text, BadgeTextProps>(
-  ({ className, children, ...props }, ref) => {
-    return (
-      <Text
-        ref={ref}
-        className={cn('font-medium', className)}
-        {...props}
-      >
-        {children}
-      </Text>
-    );
-  }
-);
-
 BadgeText.displayName = 'BadgeText';
+BadgeIcon.displayName = 'BadgeIcon';
+
+export { Badge, BadgeIcon, BadgeText };
