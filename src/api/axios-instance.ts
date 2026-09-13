@@ -49,13 +49,6 @@ const PUBLIC_ENDPOINTS = [
   '/logout',
 ]
 
-const UNAUTHORIZED_ENDPOINTS = [
-  '/login',
-  '/signup',
-  '/refresh',
-  '/logout',
-]
-
 type RetryableConfig = InternalAxiosRequestConfig & { _retry?: boolean }
 
 let isRefreshing = false
@@ -74,7 +67,7 @@ const shouldSkipUnauthorizedHandling = (url?: string): boolean => {
     return false
   }
 
-  return UNAUTHORIZED_ENDPOINTS.some((endpoint) => url.includes(endpoint))
+  return PUBLIC_ENDPOINTS.some((endpoint) => url.includes(endpoint))
 }
 
 const clearSession = async (): Promise<void> => {
@@ -95,12 +88,12 @@ const refreshAccessToken = async (): Promise<string | null> => {
   }
 }
 
-const handleUnauthorizedExit = async (sessionId: string | null): Promise<void> => {
+const handleUnauthorizedExit = async (accessToken: string | null): Promise<void> => {
   try {
-    if (sessionId) {
+    if (accessToken) {
       const body: LogoutRequest = {
-        isAllDevices: true,
-        sessionId,
+        allDevices: true,
+        sessionId: accessToken, // Backend expects access token as sessionId to decode sid
       }
       await RAW_API.post('/logout', body)
     }
@@ -137,7 +130,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
     async (error: AxiosError) => {
       const originalConfig = error.config as RetryableConfig | undefined
 
-      if (originalConfig?.url?.includes('/auth/logout')) {
+      if (originalConfig?.url?.includes('/logout')) {
         await clearSession()
         return Promise.reject(error)
       }
@@ -163,7 +156,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
       }
 
       isRefreshing = true
-      const sessionId = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN)
+      const accessToken = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN)
 
       try {
         const newToken = await refreshAccessToken()
@@ -177,7 +170,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
 
         return instance.request(originalConfig)
       } catch (refreshError) {
-        await handleUnauthorizedExit(sessionId)
+        await handleUnauthorizedExit(accessToken)
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false

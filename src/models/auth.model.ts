@@ -11,7 +11,7 @@ export interface AuthResponse {
 }
 
 export interface LogoutRequest {
-  isAllDevices: boolean;
+  allDevices: boolean;
   sessionId: string;
 }
 

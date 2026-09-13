@@ -100,13 +100,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = async () => {
-        const sessionId = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN);
+        const accessToken = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN);
 
         try {
-            await logoutAuth({
-                isAllDevices: true,
-                sessionId: sessionId || ''
-            });
+            if (accessToken) {
+                await logoutAuth({
+                    allDevices: true,
+                    sessionId: accessToken, // Backend expects access token as sessionId to decode sid
+                });
+            }
         } catch (error) {
             console.error("Failed to logout API call:", error);
         } finally {

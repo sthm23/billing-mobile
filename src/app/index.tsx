@@ -1,19 +1,17 @@
-import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-const tokens = {
-  container: "flex-1 bg-background",
-  text: "text-lg font-bold text-foreground",
-}
+import { AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
+import { Redirect } from 'expo-router';
 
 export default function Index() {
-  return (
-    <Box className={tokens.container}>
-      <SafeAreaView edges={['top']} className="flex-1 items-center justify-center">
-        <Text className={tokens.text}>Edit src/app/index.tsx to edit this screen.</Text>
-      </SafeAreaView>
-    </Box>
-  );
+  const { authStatus, isAuthenticated } = useAuth();
+
+  if (authStatus === AuthStatusEnum.Loading) {
+    return null;
+  }
+
+  if (authStatus === AuthStatusEnum.Authenticated && isAuthenticated) {
+    return <Redirect href="/(tabs)/(products)" />;
+  }
+
+  return <Redirect href="/login" />;
 }
 

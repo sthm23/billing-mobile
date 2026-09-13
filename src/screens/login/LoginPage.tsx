@@ -77,7 +77,7 @@ export function LoginPage() {
         setSubmitError(null);
         setLoading(true);
         try {
-            login(data);
+            await login(data);
         } catch (error) {
             const message = getLoginErrorMessage(error);
             setSubmitError(message);
@@ -154,6 +154,20 @@ export function LoginPage() {
                                 </FormControlErrorText>
                             </FormControlError>}
                     </FormControl>
+
+                    {submitError && (
+                        <FormControl isInvalid={true}>
+                            <FormControlError>
+                                <FormControlErrorIcon
+                                    as={AlertCircleIcon}
+                                    className="text-destructive"
+                                />
+                                <FormControlErrorText className="text-destructive">
+                                    {submitError}
+                                </FormControlErrorText>
+                            </FormControlError>
+                        </FormControl>
+                    )}
 
                     <VStack space="xs">
 
