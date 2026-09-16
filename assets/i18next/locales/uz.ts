@@ -1,4 +1,9 @@
 const uz = {
+  "common": {
+    "loading": "Yuklanmoqda...",
+    "loadMore": "Yana yuklash",
+    "noMoreData": "Boshqa ma'lumot yo'q"
+  },
   "tag": {
     "Material": "Material",
     "Style": "Uslub",

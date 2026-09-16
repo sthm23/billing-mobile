@@ -1,4 +1,9 @@
 const ru = {
+  "common": {
+    "loading": "Загрузка...",
+    "loadMore": "Загрузить ещё",
+    "noMoreData": "Больше нет данных"
+  },
   "tag": {
     "Material": "Материал",
     "Style": "Стиль",

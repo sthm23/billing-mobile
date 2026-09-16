@@ -1,4 +1,9 @@
 const en = {
+  "common": {
+    "loading": "Loading...",
+    "loadMore": "Load more",
+    "noMoreData": "No more data"
+  },
   "tag": {
     "Material": "Material",
     "Style": "Style",

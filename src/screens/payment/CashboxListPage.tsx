@@ -76,7 +76,7 @@ export default function CashboxListPage() {
       <Box className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
         <Text size="lg" className="mt-4">
-          {t('order.search')}...
+          {t('common.loading')}
         </Text>
       </Box>
     );
@@ -175,12 +175,12 @@ export default function CashboxListPage() {
           hasMore ? (
             <Button onPress={handleLoadMore} disabled={isFetching} variant="outline">
               <ButtonText>
-                {isFetching ? t('order.search') + '...' : t('order.loadMore')}
+                {isFetching ? t('common.loading') : t('common.loadMore')}
               </ButtonText>
             </Button>
           ) : filteredCashboxes.length > 0 ? (
             <Text className="py-4 text-center text-typography-500">
-              {t('product.noMore')}
+              {t('common.noMoreData')}
             </Text>
           ) : null
         }
