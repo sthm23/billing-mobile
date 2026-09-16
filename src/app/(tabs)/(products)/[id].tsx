@@ -1,9 +1,9 @@
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AddIcon } from '@/components/ui/icon';
 import { Text } from "@/components/ui/text";
 import { useProductById } from "@/services/product/product.queries";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import { Plus } from 'lucide-react-native';
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -27,7 +27,7 @@ export default function ProductGetByIdLayout() {
                             handleCloseCashbox()
                         }}
                     >
-                        <ButtonIcon as={AddIcon} />
+                        <ButtonIcon as={Plus} />
                         <ButtonText>{t('product.create')}</ButtonText>
                     </Button>
                 )

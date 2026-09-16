@@ -2,7 +2,7 @@ import { Warehouse } from "./store.model"
 
 export interface BaseProduct {
   id: string
-  storeId: string
+  storeId?: string
   warehouseId: string
   warehouse: Warehouse
   name: string

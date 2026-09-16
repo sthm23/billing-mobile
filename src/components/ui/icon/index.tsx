@@ -1605,3 +1605,27 @@ const ImageIcon = createIcon({
 ImageIcon.displayName = 'ImageIcon';
 export { ImageIcon };
 
+const ScanIcon = createIcon({
+  Root: Svg,
+  viewBox: '0 -960 960 960',
+  path: (
+    <>
+      <Path d="M3 7V5a2 2 0 0 1 2-2h2" />
+      <Path d="M17 3h2a2 2 0 0 1 2 2v2" />
+      <Path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+      <Path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+      {/* <Path
+        d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"
+        fill="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      /> */}
+    </>
+  ),
+});
+
+ScanIcon.displayName = 'ScanIcon';
+export { ScanIcon };
+
+{/* <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-square"><rect width="8" height="8" x="8" y="8" rx="1" /></svg> */ }

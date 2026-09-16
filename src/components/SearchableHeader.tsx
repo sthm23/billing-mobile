@@ -1,10 +1,11 @@
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
-import { CloseIcon, SearchIcon } from '@/components/ui/icon';
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useTheme } from '@/hooks/use-theme';
+import { Search, X } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { LayoutAnimation, TextInput, View } from 'react-native';
+
 
 interface SearchableHeaderProps {
     title: string;
@@ -67,7 +68,7 @@ export function SearchableHeader({
                 <View style={{ flex: 1 }}>
                     <Input>
                         <InputSlot>
-                            <InputIcon as={SearchIcon} />
+                            <InputIcon as={Search} />
                         </InputSlot>
                         <InputField
                             ref={inputRef as any}
@@ -80,7 +81,7 @@ export function SearchableHeader({
                     </Input>
                 </View>
                 <Button variant="link" onPress={closeSearch} className="px-4" >
-                    <ButtonIcon as={CloseIcon} size='lg' />
+                    <ButtonIcon as={X} size='lg' />
                 </Button>
             </View>
         );
@@ -100,7 +101,7 @@ export function SearchableHeader({
             <Text size="2xl" bold>{title}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Button variant="link" onPress={openSearch} className="px-4" >
-                    <ButtonIcon as={SearchIcon} size='lg' />
+                    <ButtonIcon as={Search} size='lg' />
                 </Button>
                 {actionLabel && onAction && (
                     <Button onPress={onAction}>

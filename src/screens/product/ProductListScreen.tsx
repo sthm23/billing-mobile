@@ -1,13 +1,13 @@
-import { Divider } from '@/components/ui/divider';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
 import { ActionButtons } from '@/components/product/ActionButtons';
 import { EmptyProductList } from '@/components/product/EmptyProductList';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { ProductListHeader } from '@/components/product/ProductListHeader';
 import { SearchBar } from '@/components/product/SearchBar';
-import { mockProducts } from '@/mocks/products.mock';
+import { Box } from '@/components/ui/box';
+import { Divider } from '@/components/ui/divider';
+import { VStack } from '@/components/ui/vstack';
+import { mockProductResponse } from '@/mocks/products.mock';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
@@ -15,10 +15,14 @@ import { FlatList } from 'react-native';
 export default function ProductListScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Mock: Using static data for now
-  const products = mockProducts;
+  setTimeout(() => {
+    setIsLoading(false);
+  }, 2000);
+  const products = mockProductResponse.data;
+
 
   const handleProductPress = (productId: string) => {
     router.push(`/(tabs)/(products)/${productId}`);
@@ -45,13 +49,13 @@ export default function ProductListScreen() {
       <ProductListHeader onCreatePress={handleCreatePress} />
 
       {/* Search Bar & Action Buttons */}
-      <HStack className="px-4 pb-3 gap-2">
+      <Box className="w-full flex flex-row items-center justify-between px-4 pb-3 gap-2">
         <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
         <ActionButtons
           onScanPress={handleScanPress}
           onFilterPress={handleFilterPress}
         />
-      </HStack>
+      </Box>
 
       {/* Product List */}
       {isLoading ? (

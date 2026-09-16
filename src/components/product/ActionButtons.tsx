@@ -1,8 +1,7 @@
 import { Button, ButtonIcon } from '@/components/ui/button';
-import { HStack } from '@/components/ui/hstack';
-import CustomIcon from '@/icons/custom-icon';
-import { IconNames } from '@/icons/icon.type';
 import { useTheme } from '@/hooks/use-theme';
+import { Funnel, ScanSquare } from 'lucide-react-native';
+import { Box } from '../ui/box';
 
 interface ActionButtonsProps {
   onScanPress: () => void;
@@ -11,9 +10,8 @@ interface ActionButtonsProps {
 
 export function ActionButtons({ onScanPress, onFilterPress }: ActionButtonsProps) {
   const colors = useTheme();
-
   return (
-    <HStack className="gap-2 ml-2">
+    <Box className="flex flex-row items-center gap-2 ml-2">
       {/* Scan Button */}
       <Button
         size="icon"
@@ -21,13 +19,7 @@ export function ActionButtons({ onScanPress, onFilterPress }: ActionButtonsProps
         onPress={onScanPress}
         disabled
       >
-        <ButtonIcon>
-          <CustomIcon
-            name={IconNames.BARCODE_SCANNER}
-            size={24}
-            color={colors.background}
-          />
-        </ButtonIcon>
+        <ButtonIcon as={ScanSquare} />
       </Button>
 
       {/* Filter Button */}
@@ -38,14 +30,8 @@ export function ActionButtons({ onScanPress, onFilterPress }: ActionButtonsProps
         onPress={onFilterPress}
         disabled
       >
-        <ButtonIcon>
-          <CustomIcon
-            name={IconNames.FILTER}
-            size={24}
-            color={colors.text}
-          />
-        </ButtonIcon>
+        <ButtonIcon as={Funnel} />
       </Button>
-    </HStack>
+    </Box>
   );
 }

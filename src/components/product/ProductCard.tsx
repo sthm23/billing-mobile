@@ -1,4 +1,3 @@
-import { Box } from '@/components/ui/box';
 import { HStack } from '@/components/ui/hstack';
 import { Pressable } from '@/components/ui/pressable';
 import { Text } from '@/components/ui/text';
@@ -6,6 +5,7 @@ import { VStack } from '@/components/ui/vstack';
 import { formatPrice, getTotalQuantity } from '@/libs/product-utils';
 import { Product } from '@/models/product.model';
 import { useTranslation } from 'react-i18next';
+import { Box } from '../ui/box';
 import { ProductImage } from './ProductImage';
 import { QuantityBadge } from './QuantityBadge';
 
@@ -49,25 +49,30 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
           {category}
         </Text>
 
-        {/* Description (if available) */}
-        {product.description && (
+        {/* Brand (if available) */}
+        {product.brand && (
           <Text className="text-sm text-typography-400 mt-1" numberOfLines={1}>
-            {product.description}
+            {product.brand}
           </Text>
         )}
 
-        {/* Warehouse Name */}
-        <HStack className="mt-2 gap-2 items-center">
-          <Text className="text-sm text-typography-400">
-            {warehouseName}
-          </Text>
-        </HStack>
+
       </VStack>
 
       {/* Right Section (Quantity & Price) */}
       <VStack className="items-end justify-between ml-2">
-        {/* Quantity Badge */}
-        <QuantityBadge quantity={totalQuantity} />
+
+        <Box className="flex flex-row items-center gap-3">
+
+          {/* Warehouse Name */}
+          <HStack className="mt-2 gap-2 items-center">
+            <Text className="text-sm text-typography-400">
+              {warehouseName}
+            </Text>
+          </HStack>
+          {/* Quantity Badge */}
+          <QuantityBadge quantity={totalQuantity} variant={totalQuantity === 0 ? 'destructive' : totalQuantity < 9 ? 'secondary' : 'secondary'} />
+        </Box>
 
         {/* Price */}
         <Text className="text-lg font-bold text-foreground mt-auto">

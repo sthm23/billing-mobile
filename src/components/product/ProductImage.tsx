@@ -1,7 +1,9 @@
 import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar';
 import { Icon } from '@/components/ui/icon';
-import { ImageIcon } from '@/components/ui/icon';
 import { getMainImageUrl } from '@/libs/product-utils';
+
+import { Image } from 'lucide-react-native';
+import { Box } from '../ui/box';
 
 interface ProductImageProps {
   images?: { url: string; id: string; isMain: boolean }[];
@@ -30,7 +32,9 @@ export function ProductImage({ images, productName, size = 'md' }: ProductImageP
           />
         </>
       ) : (
-        <Icon as={ImageIcon} size="xl" className="text-typography-400" />
+        <Box className="flex items-center justify-center h-full w-full border border-gray-300 rounded-lg">
+          <Icon as={Image} size="xl" className="text-typography-400" />
+        </Box>
       )}
     </Avatar>
   );
