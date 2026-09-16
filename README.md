@@ -1,57 +1,183 @@
-# Welcome to your Expo app 👋
+# Billing Mobile — Expo + React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile application for **my-billing** retail POS system.
 
-## Get started
+---
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## 🚀 Quick Start
 
 ```bash
-npm run reset-project
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Or run directly on platform
+npm run android         # Android emulator
+npm run ios             # iOS simulator
+npm run web             # Web browser
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## ⚠️ CRITICAL: Expo SDK Version
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+**This project uses Expo SDK 56**
 
-## Learn more
+Always use versioned documentation:
+👉 https://docs.expo.dev/versions/v56.0.0/
 
-To learn more about developing your project with Expo, look at the following resources:
+**Do NOT use**:
+- ❌ Unversioned docs
+- ❌ Patterns from other Expo versions (v54, v55)
+- ❌ Latest docs (may be for v57+)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 📚 Documentation
 
-Join our community of developers creating universal apps.
+### For AI / Developers
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**Start here**: [`AGENTS.md`](./AGENTS.md) — Mobile development guide
 
+**Root documentation**:
+- [`../AGENTS.md`](../AGENTS.md) — Project overview
+- [`../docs/INDEX.md`](../docs/INDEX.md) — Documentation index
+- [`../docs/business-domain.md`](../docs/business-domain.md) — Business concepts
+- [`../docs/api-map.md`](../docs/api-map.md) — API endpoints
+- [`../docs/workflows/`](../docs/workflows/) — Business workflows
+
+---
+
+## 🛠️ Development Commands
+
+```bash
+# Development
+npm start                      # Start Expo dev server
+npm run android                # Run on Android emulator
+npm run ios                    # Run on iOS simulator
+npm run web                    # Run in web browser
+
+# Project Management
+npx expo install <package>     # Install Expo-compatible package
+npx expo prebuild              # Generate native projects (iOS/Android)
+npx expo prebuild --clean      # Clean prebuild
+
+# Code Quality
+npm run lint                   # ESLint check
+```
+
+---
+
+## 🏗️ Project Structure
+
+```
+src/
+├── api/                       # Axios configuration
+│   └── axios-instance.ts      # Auth interceptors
+├── app/                       # Expo Router screens (file-based routing)
+│   ├── _layout.tsx            # Root layout
+│   ├── login.tsx              # Login screen
+│   └── (tabs)/                # Main authenticated app
+│       ├── (products)/        # Product management
+│       ├── (orders)/          # Order creation/viewing
+│       ├── (search)/          # Search & barcode scan
+│       ├── (payments)/        # Payment/cashbox
+│       └── (profile)/         # User settings
+├── assets/                    # Static assets
+│   └── i18next/               # Translation files (en, ru, uz)
+├── components/                # Reusable UI components
+│   └── ui/                    # Base UI (button, input, etc.)
+├── constants/                 # App constants (theme, colors)
+├── hooks/                     # Custom React hooks
+├── models/                    # TypeScript interfaces
+├── provider/                  # React Context providers
+└── services/                  # API service layer
+```
+
+---
+
+## 🔑 API Configuration
+
+Edit `src/api/axios-instance.ts`:
+
+```typescript
+const BASE_URL = Platform.select({
+  ios: 'https://sthm23.uz/api',
+  android: 'https://sthm23.uz/api',
+  default: 'https://sthm23.uz/api',
+});
+```
+
+---
+
+## 📦 Tech Stack
+
+- **Expo SDK** 56 — Managed React Native
+- **React Native** 0.85.3 — Mobile framework
+- **React** 19.2.3 — UI library
+- **Expo Router** v56 — File-based routing
+- **NativeWind** v4 — Tailwind CSS for RN
+- **React Query** — Data fetching
+- **React Hook Form** — Form validation
+- **i18next** — i18n (en, ru, uz)
+- **Axios** — HTTP client
+
+---
+
+## 🎨 Key Features
+
+- ✅ **File-based Routing** — Expo Router v56
+- ✅ **NativeWind** — Tailwind CSS styling
+- ✅ **Dual Theme** — Light/dark mode
+- ✅ **i18n** — English, Russian, Uzbek
+- ✅ **Barcode Scanning** — Expo Camera
+- ✅ **JWT Auth** — Auto token refresh
+- ✅ **Native UI** — @expo/ui components
+
+---
+
+## 🐛 Troubleshooting
+
+### Cannot find module 'expo-camera'
+
+```bash
+npx expo prebuild --clean
+npx expo run:android  # or run:ios
+```
+
+### Navigation type errors
+
+```bash
+rm -rf .expo
+npx expo start
+```
+
+### Styling not working
+
+```bash
+npx expo start --clear
+```
+
+---
+
+## 🔗 Related Projects
+
+- **Backend API**: [`../billing/`](../billing/)
+- **Web Frontend**: [`../billing_ui/`](../billing_ui/)
+
+---
+
+## 📖 Learn More
+
+- [Expo Documentation (v56)](https://docs.expo.dev/versions/v56.0.0/)
+- [React Native Documentation](https://reactnative.dev/)
+- [Expo Router Documentation](https://docs.expo.dev/router/introduction/)
+- [NativeWind Documentation](https://www.nativewind.dev/)
+
+---
+
+## 📄 License
+
+MIT
