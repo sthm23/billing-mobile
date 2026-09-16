@@ -1,10 +1,10 @@
-import { Badge, BadgeText } from "@/components/ui/badge";
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { CashboxStatus, Payment } from "@/models/payment.model";
-import { TFunction } from "i18next";
+import { StatusBadge } from '@/components/cashbox';
+import { HStack } from '@/components/ui/hstack';
+import { Pressable } from '@/components/ui/pressable';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import { CashboxStatus, Payment } from '@/models/payment.model';
+import { TFunction } from 'i18next';
 
 type CashboxCardProps = {
   cashbox: Payment;
@@ -22,6 +22,10 @@ export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
   const cashierName = cashbox.seller.user.fullName;
   const warehouseName = cashbox.warehouse.name;
   const balance = Number(cashbox.balance);
+
+  const statusLabel = isOpen
+    ? t('payment.cashboxStatus.OPEN')
+    : t('payment.cashboxStatus.CLOSED');
 
   return (
     <Pressable
@@ -50,16 +54,10 @@ export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
         {/* Right side - Status and Balance */}
         <VStack className="items-end gap-2">
           {/* Status Badge */}
-          <Badge
-            size="sm"
-            variant="solid"
-            action={isOpen ? "success" : "error"}
-            className="rounded-md"
-          >
-            <BadgeText className="text-xs">
-              {isOpen ? t('payment.cashboxStatus.OPEN') : t('payment.cashboxStatus.CLOSED')}
-            </BadgeText>
-          </Badge>
+          <StatusBadge
+            label={statusLabel}
+            variant={isOpen ? 'success' : 'default'}
+          />
 
           {/* Balance */}
           <Text size="lg" bold className="text-typography-900">

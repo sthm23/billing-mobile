@@ -71,7 +71,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
             </Text>
           </HStack>
           {/* Quantity Badge */}
-          <QuantityBadge quantity={totalQuantity} variant={totalQuantity === 0 ? 'destructive' : totalQuantity < 9 ? 'secondary' : 'secondary'} />
+          <QuantityBadge quantity={totalQuantity} variant={totalQuantity === 0 ? 'destructive' : totalQuantity < 9 ? 'warn' : 'success'} />
         </Box>
 
         {/* Price */}
