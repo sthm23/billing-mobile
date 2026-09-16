@@ -398,7 +398,7 @@ const ru = {
     "transactions": "Транзакции",
     "info": "Информация о платеже",
     "cashbox": "Касса",
-    "cashboxList": "Список касс",
+    "cashboxList": "Кассы",
     "addIncome": "Добавить приход",
     "addExpense": "Добавить расход",
     "totalIncome": "Общий приход",
@@ -412,6 +412,11 @@ const ru = {
     "warehouse": "Склад",
     "total": "Итого",
     "payments": "Платежи",
+    "filter": {
+      "all": "Все",
+      "open": "Открыто",
+      "closed": "Закрыто"
+    },
     "type": {
       "name": "Тип",
       "INCOME": "Приход",

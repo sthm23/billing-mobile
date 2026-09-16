@@ -1,7 +1,5 @@
 import { Badge, BadgeText } from "@/components/ui/badge";
-import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
-import { ChevronRightIcon, Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -16,68 +14,58 @@ type CashboxCardProps = {
 
 export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
   const isOpen = cashbox.status === CashboxStatus.OPEN;
-  const formattedDate = new Date(cashbox.createdAt).toLocaleString();
-  const cashierName = `${cashbox.seller.user.fullName}`;
+  const formattedDate = new Date(cashbox.createdAt).toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  const cashierName = cashbox.seller.user.fullName;
+  const warehouseName = cashbox.warehouse.name;
+  const balance = Number(cashbox.balance);
 
   return (
     <Pressable
-      className="mb-3 rounded-lg border border-border bg-surface p-4"
+      className="mb-2 rounded-xl border border-border bg-surface p-4"
       onPress={() => onPress(cashbox)}
     >
-      <HStack className="items-center justify-between">
-        <VStack className="flex-1 gap-2">
-          {/* Status Badge */}
-          <HStack className="items-center gap-2">
-            <Badge
-              size="sm"
-              variant="solid"
-              action={isOpen ? "success" : "muted"}
-              className="rounded-md"
-            >
-              <BadgeText>
-                {t(`payment.cashboxStatus.${cashbox.status}`)}
-              </BadgeText>
-            </Badge>
-            <Text size="sm" className="text-typography-500">
-              {formattedDate}
-            </Text>
-          </HStack>
-
-          {/* Cashier */}
-          <HStack className="items-center gap-1">
-            <Text size="sm" className="text-typography-600">
-              {t('payment.cashier')}:
-            </Text>
-            <Text size="sm" bold>
-              {cashierName}
-            </Text>
-          </HStack>
+      <HStack className="items-start justify-between">
+        {/* Left side - Info */}
+        <VStack className="flex-1 gap-1">
+          {/* Cashier Name */}
+          <Text size="lg" bold className="text-typography-900">
+            {cashierName}
+          </Text>
 
           {/* Warehouse */}
-          <HStack className="items-center gap-1">
-            <Text size="sm" className="text-typography-600">
-              {t('payment.warehouse')}:
-            </Text>
-            <Text size="sm" bold>
-              {cashbox.warehouse.name}
-            </Text>
-          </HStack>
+          <Text size="sm" className="text-typography-500">
+            {warehouseName}
+          </Text>
 
-          {/* Balance */}
-          <HStack className="items-center gap-1">
-            <Text size="sm" className="text-typography-600">
-              {t('payment.total')}:
-            </Text>
-            <Text size="lg" bold className="text-success-600">
-              {cashbox.balance.toLocaleString()} UZS
-            </Text>
-          </HStack>
+          {/* Date */}
+          <Text size="sm" className="text-typography-500">
+            {formattedDate}
+          </Text>
         </VStack>
 
-        {/* Chevron Icon */}
-        <Box className="ml-2">
-          <Icon as={ChevronRightIcon} size="xl" className="text-typography-400" />
-        </Box>
+        {/* Right side - Status and Balance */}
+        <VStack className="items-end gap-2">
+          {/* Status Badge */}
+          <Badge
+            size="sm"
+            variant="solid"
+            action={isOpen ? "success" : "error"}
+            className="rounded-md"
+          >
+            <BadgeText className="text-xs">
+              {isOpen ? t('payment.cashboxStatus.OPEN') : t('payment.cashboxStatus.CLOSED')}
+            </BadgeText>
+          </Badge>
+
+          {/* Balance */}
+          <Text size="lg" bold className="text-typography-900">
+            {balance.toLocaleString()} UZS
+          </Text>
+        </VStack>
       </HStack>
     </Pressable>
   );

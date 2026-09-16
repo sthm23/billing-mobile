@@ -397,7 +397,7 @@ const en = {
     "transactions": "Transactions",
     "info": "Payment information",
     "cashbox": "Cashbox",
-    "cashboxList": "Cashbox list",
+    "cashboxList": "Cashboxes",
     "addIncome": "Add income",
     "addExpense": "Add expense",
     "totalIncome": "Total income",
@@ -411,6 +411,11 @@ const en = {
     "warehouse": "Warehouse",
     "total": "Total",
     "payments": "Payments",
+    "filter": {
+      "all": "All",
+      "open": "Open",
+      "closed": "Closed"
+    },
     "type": {
       "name": "Type",
       "INCOME": "Income",

@@ -398,7 +398,7 @@ const uz = {
     "transactions": "Tranzaksiyalar",
     "info": "To'lov haqida ma'lumot",
     "cashbox": "Kassa",
-    "cashboxList": "Kassa ro'yxati",
+    "cashboxList": "Kassalar",
     "addIncome": "Kirim qo'shish",
     "addExpense": "Xarajat qo'shish",
     "totalIncome": "Umumiy kirim",
@@ -412,6 +412,11 @@ const uz = {
     "warehouse": "Ombor",
     "total": "Jami",
     "payments": "To'lovlar",
+    "filter": {
+      "all": "Barchasi",
+      "open": "Ochiq",
+      "closed": "Yopiq"
+    },
     "type": {
       "name": "To'lov turi",
       "INCOME": "Kirim",
