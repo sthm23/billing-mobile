@@ -1,7 +1,7 @@
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { HStack } from "@/components/ui/hstack";
-import { Badge, BadgeText } from "@/components/ui/badge";
+import { Divider } from "@/components/ui/divider";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -9,12 +9,14 @@ import {
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
 } from "@/components/ui/actionsheet";
+import CustomIcon from "@/icons/custom-icon";
+import { IconNames } from "@/icons/icon.type";
 import { CashTransactionType } from "@/models/payment.model";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { useTranslation } from "react-i18next";
 import { TransactionForm } from "./TransactionForm";
 
-type AddTransactionSheetProps = {
+type Props = {
   isOpen: boolean;
   onClose: () => void;
   cashboxId: string;
@@ -30,33 +32,35 @@ export const AddTransactionSheet = ({
   transactionType,
   onSubmit,
   isLoading = false,
-}: AddTransactionSheetProps) => {
+}: Props) => {
   const { t } = useTranslation();
 
   const isIncome = transactionType === CashTransactionType.INCOME;
-  const badgeAction = isIncome ? "success" : "error";
-  const badgeText = isIncome ? t('payment.type.INCOME') : t('payment.type.EXPENSE');
+  const iconName = isIncome ? IconNames.ARROW_UP : IconNames.ARROW_DOWN;
+  const iconBgColor = isIncome ? 'bg-success-100' : 'bg-error-100';
+  const iconColor = isIncome ? '#16a34a' : '#dc2626';
+  const typeLabel = isIncome ? t('payment.type.INCOME') : t('payment.type.EXPENSE');
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
       <ActionsheetBackdrop />
-      <ActionsheetContent className="max-h-[85vh]">
+      <ActionsheetContent className="max-h-[90vh]">
         <ActionsheetDragIndicatorWrapper>
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
 
-        <Box className="w-full px-4 py-5">
+        <Box className="w-full px-4 pt-4 pb-6">
           {/* Header */}
-          <HStack className="items-center justify-between mb-6">
-            <Text size="2xl" bold>
-              {t('payment.paymentDetails')}
-            </Text>
-            <Badge action={badgeAction} variant="solid" size="md">
-              <BadgeText>{badgeText}</BadgeText>
-            </Badge>
+          <HStack className="items-center gap-3 mb-4">
+            <Box className={`h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}>
+              <CustomIcon name={iconName} size={18} color={iconColor} />
+            </Box>
+            <Text size="2xl" bold>{typeLabel}</Text>
           </HStack>
 
-          {/* Transaction Form */}
+          <Divider className="mb-5" />
+
+          {/* Form */}
           <TransactionForm
             cashboxId={cashboxId}
             transactionType={transactionType}

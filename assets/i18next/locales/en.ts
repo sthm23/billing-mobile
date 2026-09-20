@@ -442,6 +442,8 @@ const en = {
       "OPEN": "Open",
       "CLOSED": "Closed"
     },
+    "paymentBreakdown": "Payment breakdown",
+    "close": "Close",
     "closeCashboxConfirmation": {
       "title": "Close cashbox",
       "message": "Are you sure you want to close the cashbox? This action cannot be undone.",

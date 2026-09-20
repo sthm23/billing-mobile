@@ -443,6 +443,8 @@ const ru = {
       "OPEN": "Открыта",
       "CLOSED": "Закрыта"
     },
+    "paymentBreakdown": "Детали оплаты",
+    "close": "Закрыть",
     "closeCashboxConfirmation": {
       "title": "Закрыть кассу",
       "message": "Вы уверены, что хотите закрыть кассу? Это действие нельзя отменить.",

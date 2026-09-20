@@ -96,7 +96,9 @@ export const TransactionForm = ({
           render={({ field: { onChange, value } }) => (
             <Select onValueChange={onChange} selectedValue={value}>
               <SelectTrigger variant="outline" size="md">
-                <SelectInput placeholder={t('payment.category.name')} />
+                <SelectInput
+                  placeholder={t('payment.category.name')}
+                />
                 <SelectIcon as={ChevronDownIcon} className="mr-3" />
               </SelectTrigger>
               <SelectPortal>
@@ -135,7 +137,9 @@ export const TransactionForm = ({
           render={({ field: { onChange, value } }) => (
             <Select onValueChange={onChange} selectedValue={value}>
               <SelectTrigger variant="outline" size="md">
-                <SelectInput placeholder={t('order.paymentMethod.name')} />
+                <SelectInput
+                  placeholder={t('order.paymentMethod.name')}
+                />
                 <SelectIcon as={ChevronDownIcon} className="mr-3" />
               </SelectTrigger>
               <SelectPortal>

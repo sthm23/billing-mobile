@@ -443,6 +443,8 @@ const uz = {
       "OPEN": "Ochiq",
       "CLOSED": "Yopiq"
     },
+    "paymentBreakdown": "To'lov tafsilotlari",
+    "close": "Yopish",
     "closeCashboxConfirmation": {
       "title": "Kassani yopish",
       "message": "Siz kassani yopishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.",

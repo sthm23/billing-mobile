@@ -1,192 +1,264 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, ScrollView, ViewProps, TextProps } from 'react-native';
-import { cn } from '@/libs/utils';
+'use client';
 
-interface SelectProps {
-  children: React.ReactNode;
-  onValueChange?: (value: string) => void;
-  selectedValue?: string;
-}
+import React from 'react';
+import { tva } from '@gluestack-ui/utils/nativewind-utils';
+import { UIIcon } from '@gluestack-ui/core/icon/creator';
+import {
+  withStyleContext,
+  useStyleContext,
+} from '@gluestack-ui/utils/nativewind-utils';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { createSelect } from '@gluestack-ui/core/select/creator';
+import { styled } from 'nativewind';
+import {
+  Actionsheet,
+  ActionsheetContent,
+  ActionsheetItem,
+  ActionsheetItemText,
+  ActionsheetDragIndicator,
+  ActionsheetDragIndicatorWrapper,
+  ActionsheetBackdrop,
+  ActionsheetScrollView,
+  ActionsheetVirtualizedList,
+  ActionsheetFlatList,
+  ActionsheetSectionList,
+  ActionsheetSectionHeaderText,
+} from './select-actionsheet';
+import { Pressable, View, TextInput } from 'react-native';
 
-interface SelectTriggerProps extends ViewProps {
-  variant?: 'outline' | 'solid';
-  size?: 'sm' | 'md' | 'lg';
-  children: React.ReactNode;
-}
+const SelectTriggerWrapper = React.forwardRef<
+  React.ComponentRef<typeof Pressable>,
+  React.ComponentProps<typeof Pressable>
+>(function SelectTriggerWrapper({ ...props }, ref) {
+  return <Pressable {...props} ref={ref} />;
+});
 
-interface SelectInputProps extends TextProps {
-  placeholder?: string;
-}
+const selectIconStyle = tva({
+  base: 'text-foreground/50 fill-none',
+  parentVariants: {
+    size: {
+      '2xs': 'h-3 w-3',
+      'xs': 'h-3.5 w-3.5',
+      'sm': 'h-4 w-4',
+      'md': 'h-[18px] w-[18px]',
+      'lg': 'h-5 w-5',
+      'xl': 'h-6 w-6',
+    },
+  },
+});
 
-interface SelectIconProps {
-  as: React.ComponentType<any>;
-  className?: string;
-}
+const selectStyle = tva({
+  base: '',
+});
 
-interface SelectItemProps {
-  label: string;
-  value: string;
-}
+const selectTriggerStyle = tva({
+  base: 'border border-border rounded flex-row items-center overflow-hidden data-[hover=true]:border-primary/80 data-[focus=true]:border-primary/80 data-[disabled=true]:opacity-40 data-[disabled=true]:data-[hover=true]:border-border/80',
+  variants: {
+    size: {
+      xl: 'min-h-12',
+      lg: 'min-h-11',
+      md: 'min-h-10',
+      sm: 'min-h-9',
+    },
+    variant: {
+      underlined:
+        'border-0 border-b rounded-none data-[hover=true]:border-primary/80 data-[focus=true]:border-primary/80 data-[focus=true]:web:shadow-[inset_0_-1px_0_0] data-[focus=true]:web:shadow-primary/80 data-[invalid=true]:border-destructive data-[invalid=true]:web:shadow-destructive',
+      outline:
+        'data-[focus=true]:border-primary/80 data-[focus=true]:web:shadow-[inset_0_0_0_1px] data-[focus=true]:data-[hover=true]:web:shadow-primary/80 data-[invalid=true]:web:shadow-[inset_0_0_0_1px] data-[invalid=true]:border-destructive data-[invalid=true]:web:shadow-destructive data-[invalid=true]:data-[hover=true]:border-destructive',
+      rounded:
+        'rounded-full data-[focus=true]:border-primary/80 data-[focus=true]:web:shadow-[inset_0_0_0_1px] data-[focus=true]:web:shadow-primary/80 data-[invalid=true]:border-destructive data-[invalid=true]:web:shadow-destructive',
+    },
+  },
+});
 
-interface SelectContextType {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-  selectedValue?: string;
-  onValueChange?: (value: string) => void;
-  placeholder?: string;
-}
+const selectInputStyle = tva({
+  base: 'px-3 placeholder:text-foreground/50 web:w-full h-full text-foreground/90 pointer-events-none web:outline-none ios:leading-[0px] py-0',
+  parentVariants: {
+    size: {
+      xl: 'text-xl',
+      lg: 'text-lg',
+      md: 'text-base',
+      sm: 'text-sm',
+    },
+    variant: {
+      underlined: 'px-0',
+      outline: '',
+      rounded: 'px-4',
+    },
+  },
+});
 
-const SelectContext = React.createContext<SelectContextType | undefined>(undefined);
+const StyledIcon = styled(UIIcon, {
+  className: {
+    target: 'style',
+  },
+});
 
-const useSelectContext = () => {
-  const context = React.useContext(SelectContext);
-  if (!context) {
-    throw new Error('Select components must be used within a Select');
+const UISelect = createSelect(
+  {
+    Root: View,
+    Trigger: withStyleContext(SelectTriggerWrapper),
+    Input: TextInput,
+    Icon: StyledIcon,
+  },
+  {
+    Portal: Actionsheet,
+    Backdrop: ActionsheetBackdrop,
+    Content: ActionsheetContent,
+    DragIndicator: ActionsheetDragIndicator,
+    DragIndicatorWrapper: ActionsheetDragIndicatorWrapper,
+    Item: ActionsheetItem,
+    ItemText: ActionsheetItemText,
+    ScrollView: ActionsheetScrollView,
+    VirtualizedList: ActionsheetVirtualizedList,
+    FlatList: ActionsheetFlatList,
+    SectionList: ActionsheetSectionList,
+    SectionHeaderText: ActionsheetSectionHeaderText,
   }
-  return context;
-};
+);
 
-export const Select: React.FC<SelectProps> = ({ children, onValueChange, selectedValue }) => {
-  const [isOpen, setIsOpen] = useState(false);
+type ISelectProps = VariantProps<typeof selectStyle> &
+  React.ComponentProps<typeof UISelect> & { className?: string };
 
+const Select = React.forwardRef<
+  React.ComponentRef<typeof UISelect>,
+  ISelectProps
+>(function Select({ className, ...props }, ref) {
   return (
-    <SelectContext.Provider value={{ isOpen, setIsOpen, selectedValue, onValueChange, placeholder: '' }}>
-      {children}
-    </SelectContext.Provider>
-  );
-};
-
-export const SelectTrigger: React.FC<SelectTriggerProps> = ({
-  variant = 'outline',
-  size = 'md',
-  className,
-  children,
-  ...props
-}) => {
-  const { setIsOpen } = useSelectContext();
-
-  const variantClass = variant === 'outline' ? 'border border-input-border' : 'bg-surface';
-  const sizeClass = size === 'md' ? 'h-12 px-4' : size === 'lg' ? 'h-14 px-5' : 'h-10 px-3';
-
-  return (
-    <TouchableOpacity
-      onPress={() => setIsOpen(true)}
-      className={cn(
-        'flex-row items-center justify-between rounded-lg',
-        variantClass,
-        sizeClass,
-        className
-      )}
+    <UISelect
+      className={selectStyle({
+        class: className,
+      })}
+      ref={ref}
       {...props}
-    >
-      {children}
-    </TouchableOpacity>
+    />
   );
-};
+});
 
-export const SelectInput: React.FC<SelectInputProps> = ({ placeholder, className, ...props }) => {
-  const { selectedValue } = useSelectContext();
-  const context = React.useContext(SelectContext);
+type ISelectTriggerProps = VariantProps<typeof selectTriggerStyle> &
+  React.ComponentProps<typeof UISelect.Trigger> & { className?: string };
 
-  if (context) {
-    context.placeholder = placeholder || '';
-  }
-
+const SelectTrigger = React.forwardRef<
+  React.ComponentRef<typeof UISelect.Trigger>,
+  ISelectTriggerProps
+>(function SelectTrigger(
+  { className, size = 'md', variant = 'outline', ...props },
+  ref
+) {
   return (
-    <Text
-      className={cn('flex-1 text-typography-900', !selectedValue && 'text-typography-400', className)}
+    <UISelect.Trigger
+      className={selectTriggerStyle({
+        class: className,
+        size,
+        variant,
+      })}
+      ref={ref}
+      context={{ size, variant }}
       {...props}
-    >
-      {selectedValue || placeholder}
-    </Text>
+    />
   );
-};
+});
 
-export const SelectIcon: React.FC<SelectIconProps> = ({ as: IconComponent, className }) => {
-  return <IconComponent className={cn('text-typography-500', className)} />;
-};
+type ISelectInputProps = VariantProps<typeof selectInputStyle> &
+  React.ComponentProps<typeof UISelect.Input> & { className?: string };
 
-export const SelectPortal: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isOpen } = useSelectContext();
-
-  if (!isOpen) return null;
-
-  return <>{children}</>;
-};
-
-export const SelectBackdrop: React.FC = () => {
-  const { isOpen, setIsOpen } = useSelectContext();
-
-  if (!isOpen) return null;
-
+const SelectInput = React.forwardRef<
+  React.ComponentRef<typeof UISelect.Input>,
+  ISelectInputProps
+>(function SelectInput({ className, ...props }, ref) {
+  const { size: parentSize, variant: parentVariant } = useStyleContext();
   return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setIsOpen(false)}
-    >
-      <TouchableOpacity
-        className="flex-1 bg-black/50"
-        activeOpacity={1}
-        onPress={() => setIsOpen(false)}
+    <UISelect.Input
+      className={selectInputStyle({
+        class: className,
+        parentVariants: {
+          size: parentSize,
+          variant: parentVariant,
+        },
+      })}
+      ref={ref}
+      {...props}
+    />
+  );
+});
+
+type ISelectIcon = VariantProps<typeof selectIconStyle> &
+  React.ComponentProps<typeof UISelect.Icon> & { className?: string };
+
+const SelectIcon = React.forwardRef<
+  React.ComponentRef<typeof UISelect.Icon>,
+  ISelectIcon
+>(function SelectIcon({ className, size, ...props }, ref) {
+  const { size: parentSize } = useStyleContext();
+  if (typeof size === 'number') {
+    return (
+      <UISelect.Icon
+        ref={ref}
+        {...props}
+        className={selectIconStyle({ class: className })}
+        size={size}
       />
-    </Modal>
-  );
-};
-
-export const SelectContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isOpen, setIsOpen } = useSelectContext();
-
-  if (!isOpen) return null;
-
+    );
+  } else if (
+    //@ts-expect-error : web only
+    (props?.height !== undefined || props?.width !== undefined) &&
+    size === undefined
+  ) {
+    return (
+      <UISelect.Icon
+        ref={ref}
+        {...props}
+        className={selectIconStyle({ class: className })}
+      />
+    );
+  }
   return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setIsOpen(false)}
-    >
-      <View className="flex-1 justify-end">
-        <TouchableOpacity
-          className="flex-1"
-          activeOpacity={1}
-          onPress={() => setIsOpen(false)}
-        />
-        <View className="bg-background rounded-t-3xl max-h-96 border-t border-border">
-          {children}
-        </View>
-      </View>
-    </Modal>
+    <UISelect.Icon
+      className={selectIconStyle({
+        class: className,
+        size,
+        parentVariants: {
+          size: parentSize,
+        },
+      })}
+      ref={ref}
+      {...props}
+    />
   );
-};
+});
 
-export const SelectDragIndicatorWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <View className="w-full py-2 items-center">{children}</View>;
-};
+Select.displayName = 'Select';
+SelectTrigger.displayName = 'SelectTrigger';
+SelectInput.displayName = 'SelectInput';
+SelectIcon.displayName = 'SelectIcon';
 
-export const SelectDragIndicator: React.FC = () => {
-  return <View className="w-12 h-1 bg-border rounded-full" />;
-};
+// Actionsheet Components
+const SelectPortal = UISelect.Portal;
+const SelectBackdrop = UISelect.Backdrop;
+const SelectContent = UISelect.Content;
+const SelectDragIndicator = UISelect.DragIndicator;
+const SelectDragIndicatorWrapper = UISelect.DragIndicatorWrapper;
+const SelectItem = UISelect.Item;
+const SelectScrollView = UISelect.ScrollView;
+const SelectVirtualizedList = UISelect.VirtualizedList;
+const SelectFlatList = UISelect.FlatList;
+const SelectSectionList = UISelect.SectionList;
+const SelectSectionHeaderText = UISelect.SectionHeaderText;
 
-export const SelectItem: React.FC<SelectItemProps> = ({ label, value }) => {
-  const { selectedValue, onValueChange, setIsOpen } = useSelectContext();
-  const isSelected = selectedValue === value;
-
-  return (
-    <TouchableOpacity
-      className={cn(
-        'px-5 py-4 border-b border-border',
-        isSelected && 'bg-primary/10'
-      )}
-      onPress={() => {
-        onValueChange?.(value);
-        setIsOpen(false);
-      }}
-    >
-      <Text className={cn('text-base', isSelected && 'font-bold text-primary')}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
+export {
+  Select,
+  SelectTrigger,
+  SelectInput,
+  SelectIcon,
+  SelectPortal,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectItem,
+  SelectScrollView,
+  SelectVirtualizedList,
+  SelectFlatList,
+  SelectSectionList,
+  SelectSectionHeaderText,
 };
