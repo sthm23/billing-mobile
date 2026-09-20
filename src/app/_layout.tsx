@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import {
@@ -99,15 +100,17 @@ export default function RootLayout() {
   }
 
   return (
-    <GluestackUIProvider mode={currentMode}>
-      <ThemeControlContext.Provider value={{ themeMode, setThemeMode, currentMode }}>
-        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-        <AuthProvider >
-          <QueryClientProvider client={queryClient}>
-            <InitiallyLayout />
-          </QueryClientProvider>
-        </AuthProvider>
-      </ThemeControlContext.Provider>
-    </GluestackUIProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <GluestackUIProvider mode={currentMode}>
+        <ThemeControlContext.Provider value={{ themeMode, setThemeMode, currentMode }}>
+          <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+          <AuthProvider >
+            <QueryClientProvider client={queryClient}>
+              <InitiallyLayout />
+            </QueryClientProvider>
+          </AuthProvider>
+        </ThemeControlContext.Provider>
+      </GluestackUIProvider>
+    </GestureHandlerRootView>
   )
 }
