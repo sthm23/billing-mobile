@@ -17,7 +17,6 @@ export function SearchBar({ value, onChangeText }: SearchBarProps) {
         placeholder={t('product.search')}
         value={value}
         onChangeText={onChangeText}
-        editable={false}
       />
       <InputSlot>
         <InputIcon as={SearchIcon} />
