@@ -12,6 +12,7 @@ import { productService } from './product.service'
 import type {
   CreateProduct,
   Product,
+  ProductDetail,
   ProductParams,
   ProductVariantSearchParams,
 } from './product.type'
@@ -82,12 +83,12 @@ export const useCreateProduct = (): UseMutationResult<
 export const useProductById = (
   productId: string,
   opts?: { polling?: boolean; enabled?: boolean }
-): UseQueryResult<Product> => {
+): UseQueryResult<ProductDetail> => {
   const refetchInterval = opts?.polling ? POLL_INTERVAL_MS : false
 
-  const queryOptions: UseQueryOptions<Product> = {
+  const queryOptions: UseQueryOptions<ProductDetail> = {
     queryKey: productQueryKeys.byId(productId),
-    queryFn: () => productService.getProductById(productId),
+    queryFn: () => productService.getProductById(productId) as Promise<ProductDetail>,
     enabled: Boolean(productId) && (opts?.enabled ?? true),
     refetchInterval,
     refetchOnWindowFocus: false,

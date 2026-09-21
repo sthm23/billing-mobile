@@ -12,7 +12,7 @@ export interface BaseProduct {
     isArchived: boolean
     description: string | null
     createdAt: string
-    priceRange: {
+    priceRange?: {
         min: string
         max: string
     }
@@ -32,13 +32,12 @@ export interface ProductDetail extends BaseProduct {
 export interface ProductVariant {
     id: string
     productId: string
-    sku: string // ску будет уникален в пределах магазина
+    sku: string
     barCode: string
-    price: number
-    storeId: string // это для быстрого поиска уникального SKU в пределах магазина
-    product: Product
+    price: number | string
+    storeId?: string
+    product?: Product
     quantity: number
-    // orderItems:     OrderItem[]
     stockMovements: StockMovement[]
     attributes: AttributeItem[]
 }
@@ -132,7 +131,7 @@ export interface AttributeDetail extends Attribute {
 export interface AttributeItem {
     id: string,
     attributeId: string,
-    attributeName: string,
+    attributeName?: string,
     value: string | number | boolean
 }
 

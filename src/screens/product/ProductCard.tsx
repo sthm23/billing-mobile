@@ -27,7 +27,7 @@ export const ProductCard = ({ product, onPress, t }: ProductCardProps) => (
             <Text size="md">Category: {t(`category.${product.category}`)}</Text>
             <Text size="lg" bold>{product.name}</Text>
             <Text size="md">Quantity: {product.variants.reduce((total, variant) => total + variant.quantity, 0)}</Text>
-            <Text size="md">Price: {product.priceRange.min} - {product.priceRange.max}</Text>
+            <Text size="md">Price: {product.priceRange?.min ?? 0} - {product.priceRange?.max ?? 0}</Text>
         </Box>
         <Box className="flex-1 items-end justify-end">
             <Icon as={ChevronRightIcon} size="xl" />

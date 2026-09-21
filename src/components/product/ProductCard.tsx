@@ -76,7 +76,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
 
         {/* Price */}
         <Text className="text-lg font-bold text-foreground mt-auto">
-          {t('product.from')} {formatPrice(product.priceRange.min)} UZS
+          {t('product.from')} {formatPrice(product.priceRange?.min ?? 0)} UZS
         </Text>
       </VStack>
     </Pressable>
