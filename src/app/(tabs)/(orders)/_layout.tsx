@@ -7,6 +7,7 @@ export default function TabLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="create" options={{ headerShown: false }} />
-      </Stack>
-    );
+      <Stack.Screen name="[id]" options={{ headerShown: false }} />
+    </Stack>
+  );
 }

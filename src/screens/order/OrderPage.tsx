@@ -80,8 +80,7 @@ export default function OrderPage() {
     };
 
     const handleOrderPress = (orderId: string) => {
-        console.log('Order pressed:', orderId);
-        // TODO: Navigate to order details
+        router.push(`/(tabs)/(orders)/${orderId}`);
     };
 
     return (
