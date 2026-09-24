@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
@@ -86,13 +87,19 @@ export function LoginPage() {
         }
     };
     return (
-        <Center className="w-full h-full p-4">
-            <Card className="w-full" size="default">
-                <VStack className="gap-4">
-                    <Center >
-                        <Heading size="lg" className="text-foreground">{t('login.title')}</Heading>
-                        <Heading size="md" className="text-foreground/60">{t('login.subTitle')}</Heading>
-                    </Center>
+        // <ScrollView
+        //     className="flex-1"
+        //     contentContainerClassName="flex-grow justify-center"
+        //     keyboardShouldPersistTaps="handled"
+        //     showsVerticalScrollIndicator={false}
+        // >
+            <Center className="w-full p-4">
+                <Card className="w-full" size="default">
+                    <VStack className="gap-4">
+                        <Center >
+                            <Heading size="lg" className="text-foreground">{t('login.title')}</Heading>
+                            <Heading size="md" className="text-foreground/60">{t('login.subTitle')}</Heading>
+                        </Center>
 
                     <FormControl isInvalid={!!errors.login}>
                         <FormControlLabel>
@@ -187,5 +194,6 @@ export function LoginPage() {
                 </VStack>
             </Card>
         </Center>
+        // </ScrollView>
     )
 }
