@@ -11,10 +11,11 @@ import {
 } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
 import { useOrders } from '@/services/order/order.queries';
-import { OrderParams, OrderStatus } from '@/services/order/order.type';
+import { OrderParams, OrderStatus, Order } from '@/services/order/order.type';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { OrderCardMenu } from './OrderCardMenu';
+import { FlatList } from 'react-native';
+import { SwipeableOrderCard } from '@/components/order';
 
 
 type OrderStatusType = 'active' | 'completed';
@@ -72,7 +73,16 @@ export default function OrderPage() {
     }
 
     const orders = data?.data ?? []
-    
+
+    const handleDeleteOrder = (orderId: string) => {
+        console.log('Delete order:', orderId);
+        // TODO: Implement API integration
+    };
+
+    const handleOrderPress = (orderId: string) => {
+        router.push(`/(tabs)/(orders)/${orderId}`);
+    };
+
     return (
         <>
             <SearchableHeader
@@ -99,23 +109,23 @@ export default function OrderPage() {
                     <ButtonIcon as={UnlockIcon} />
                 </Button>
             </Box>
-            <Box>
-                {orders.length > 0 ? orders.map((order) => (
-                    <Box key={order.id} className="relative p-4 m-2 border border-gray-300 rounded-xl bg-card flex-row justify-between items-center gap-4">
-                        <Box className="absolute top-0 right-0 bg-blue-500 text-white px-2 py-1 rounded-tr-xl rounded-bl-xl">
-                            <Text>{order.status}</Text>
-                        </Box>
-                        <Box>
-                            <Text bold>{order.createdAt}</Text>
-                            <Text>{order.cashier.fullName}</Text>
-                            <Text>{order.totalAmount}</Text>
-                        </Box>
-                        <Box>
-                            <OrderCardMenu />
-                        </Box>
+            <FlatList
+                data={orders}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <SwipeableOrderCard
+                        order={item}
+                        onDelete={handleDeleteOrder}
+                        onPress={() => handleOrderPress(item.id)}
+                    />
+                )}
+                ListEmptyComponent={() => (
+                    <Box className="flex items-center justify-center p-8">
+                        <Text className="text-typography-400 text-base">Нет заказов</Text>
                     </Box>
-                )) : <Text>Нет заказов</Text>}
-            </Box>
+                )}
+                contentContainerStyle={{ flexGrow: 1 }}
+            />
         </>
     )
 }

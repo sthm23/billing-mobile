@@ -7,13 +7,13 @@ import { Platform } from 'react-native';
 
 
 const BASE_URL = Platform.select({
-  // ios: 'http://192.168.18.2:4000/api',
-  // android: 'http://192.168.18.2:4000/api',
-  // default: 'http://localhost:4000/api',
-
-  ios: 'http://192.168.18.5:4000/api',
-  android: 'http://192.168.18.5:4000/api',
+  ios: 'http://192.168.18.2:4000/api',
+  android: 'http://192.168.18.2:4000/api',
   default: 'http://localhost:4000/api',
+
+  // ios: 'http://192.168.18.5:4000/api',
+  // android: 'http://192.168.18.5:4000/api',
+  // default: 'http://localhost:4000/api',
 
 
   // ios: 'https://sthm23.uz/api',
