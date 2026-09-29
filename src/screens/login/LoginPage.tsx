@@ -14,7 +14,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
@@ -87,13 +86,8 @@ export function LoginPage() {
         }
     };
     return (
-        // <ScrollView
-        //     className="flex-1"
-        //     contentContainerClassName="flex-grow justify-center"
-        //     keyboardShouldPersistTaps="handled"
-        //     showsVerticalScrollIndicator={false}
-        // >
-        <Center className="w-full p-4">
+
+        <Center className="w-full h-full p-4">
             <Card className="w-full" size="default">
                 <VStack className="gap-4">
                     <Center >
@@ -115,7 +109,7 @@ export function LoginPage() {
                             return (
                                 <Input >
                                     <InputField keyboardType="email-address"
-                                        autoCapitalize="none" value={value} onBlur={onBlur} onChangeText={onChange} type="text" placeholder="login@email.uz" />
+                                        autoCapitalize="none" value={value} onBlur={onBlur} onChangeText={onChange} type="text" />
                                 </Input>
                             )
                         }} />
@@ -144,7 +138,7 @@ export function LoginPage() {
                             }
                         }) => (
                             <Input >
-                                <InputField secureTextEntry={true} value={value} onBlur={onBlur} type={showPassword ? 'text' : 'password'} placeholder="********" onChangeText={onChange} />
+                                <InputField secureTextEntry={!showPassword} value={value} onBlur={onBlur} type={showPassword ? 'text' : 'password'} onChangeText={onChange} />
                                 <InputSlot className="pr-3" onPress={handleState}>
                                     <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} />
                                 </InputSlot>
@@ -194,6 +188,6 @@ export function LoginPage() {
                 </VStack>
             </Card>
         </Center>
-        // </ScrollView>
+
     )
 }
