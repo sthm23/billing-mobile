@@ -19,6 +19,7 @@ import { orderService } from './order.service'
 import type {
   CreateOrderPayload,
   Order,
+  OrderDetail,
   OrderParams,
 } from './order.type'
 
@@ -87,10 +88,10 @@ export const useCreateOrder = (): UseMutationResult<
 export const useOrderById = (
   orderId: string,
   opts?: { polling?: boolean; enabled?: boolean }
-): UseQueryResult<Order> => {
+): UseQueryResult<OrderDetail> => {
   const refetchInterval = opts?.polling ? POLL_INTERVAL_MS : false
 
-  const queryOptions: UseQueryOptions<Order> = {
+  const queryOptions: UseQueryOptions<OrderDetail> = {
     queryKey: orderQueryKeys.byId(orderId),
     queryFn: () => orderService.getOrderById(orderId),
     enabled: Boolean(orderId) && (opts?.enabled ?? true),

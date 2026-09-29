@@ -1,4 +1,3 @@
-import { SearchableHeader } from '@/components/SearchableHeader';
 import { Box } from '@/components/ui/box';
 import { Button, ButtonIcon } from '@/components/ui/button';
 import { UnlockIcon } from '@/components/ui/icon';
@@ -11,11 +10,12 @@ import {
 } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
 import { useOrders } from '@/services/order/order.queries';
-import { OrderParams, OrderStatus, Order } from '@/services/order/order.type';
+import { OrderParams, OrderStatus } from '@/services/order/order.type';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList } from 'react-native';
-import { SwipeableOrderCard } from '@/components/order';
+import { OrderCard } from './OrderCard';
 
 
 type OrderStatusType = 'active' | 'completed';
@@ -28,6 +28,7 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
     }
 };
 export default function OrderPage() {
+    const { t } = useTranslation();
     const page = 1
     const pageSize = 10
     const [searchText, setSearchText] = useState('');
@@ -37,8 +38,8 @@ export default function OrderPage() {
         value: OrderStatusType;
         label: string;
     }[] = [
-            { value: 'active', label: 'Active' },
-            { value: 'completed', label: 'Completed' },
+            { value: 'active', label: t('Active') },
+            { value: 'completed', label: t('Completed') },
         ];
 
     const listParams = useMemo<OrderParams>(
@@ -85,13 +86,6 @@ export default function OrderPage() {
 
     return (
         <>
-            <SearchableHeader
-                title="Заказы"
-                onSearchChange={setSearchText}
-                actionLabel="Создать"
-                onAction={() => router.push('/(tabs)/(orders)/create')}
-            />
-
             <Box className="w-full flex-row justify-between p-2 gap-4">
                 <Tabs className="w-fit" defaultValue={status} variant="filled" onValueChange={(value: OrderStatusType) => setStatus(value)}>
                     <TabsList>
@@ -113,10 +107,10 @@ export default function OrderPage() {
                 data={orders}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <SwipeableOrderCard
+                    <OrderCard
                         order={item}
-                        onDelete={handleDeleteOrder}
-                        onPress={() => handleOrderPress(item.id)}
+                        onPress={handleOrderPress}
+                        t={t}
                     />
                 )}
                 ListEmptyComponent={() => (

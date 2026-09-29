@@ -8,7 +8,7 @@ export default function login() {
     <SafeAreaView edges={['top']} className='h-full w-full bg-background'>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className='flex-1'
+
       >
         <LoginPage />
       </KeyboardAvoidingView>

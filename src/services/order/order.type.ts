@@ -1,6 +1,6 @@
 import { TransactionPayload } from "@/models/payment.model"
 import { Store } from "@/models/store.model"
-import { Customer, Staff, UserRole, UserType } from "@/models/user.model"
+import { Customer, Staff, User, UserRole, UserType } from "@/models/user.model"
 
 
 export enum PaymentType {
@@ -55,6 +55,11 @@ export interface Order {
         role: UserRole,
         type: UserType,
         createdAt: string
+
+        isActive: boolean
+        storeId: string
+        user: User
+        userId: string
     },
     customer: {
         id: string
@@ -80,6 +85,8 @@ export interface OrderDetail extends Order {
     payments: OrderPayment[]
     items: OrderDetailItem[]
     services: OrderAdditionalService[]
+
+
 }
 
 export interface OrderPayment {

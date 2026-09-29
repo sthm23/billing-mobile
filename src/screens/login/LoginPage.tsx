@@ -93,13 +93,13 @@ export function LoginPage() {
         //     keyboardShouldPersistTaps="handled"
         //     showsVerticalScrollIndicator={false}
         // >
-            <Center className="w-full p-4">
-                <Card className="w-full" size="default">
-                    <VStack className="gap-4">
-                        <Center >
-                            <Heading size="lg" className="text-foreground">{t('login.title')}</Heading>
-                            <Heading size="md" className="text-foreground/60">{t('login.subTitle')}</Heading>
-                        </Center>
+        <Center className="w-full p-4">
+            <Card className="w-full" size="default">
+                <VStack className="gap-4">
+                    <Center >
+                        <Heading size="lg" className="text-foreground">{t('login.title')}</Heading>
+                        <Heading size="md" className="text-foreground/60">{t('login.subTitle')}</Heading>
+                    </Center>
 
                     <FormControl isInvalid={!!errors.login}>
                         <FormControlLabel>
