@@ -1,3 +1,4 @@
+import { OrderInfoCard, OrderItemCard, OrderPaymentCard } from '@/components/order';
 import { Box } from '@/components/ui/box';
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
 import { Divider } from '@/components/ui/divider';
@@ -5,7 +6,6 @@ import { HStack } from '@/components/ui/hstack';
 import { ArrowLeftIcon, EditIcon, TrashIcon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
-import { OrderInfoCard, OrderItemCard, OrderPaymentCard } from '@/components/order';
 import { useOrderById } from '@/services/order/order.queries';
 import { OrderChannel, OrderStatus } from '@/services/order/order.type';
 import { router } from 'expo-router';
@@ -153,11 +153,11 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           title="Информация о заказе"
           items={[
             { label: 'Дата создания', value: formatDate(order.createdAt) },
-            { label: 'Кассир', value: order.cashier.fullName },
+            // { label: 'Кассир', value: order.cashier.fullName },
             ...(order.customer
-              ? [{ label: 'Клиент', value: order.customer.user.fullName }]
+              ? [{ label: 'Клиент', value: order.customer.user.fullName ?? 'N/A' }]
               : []),
-            { label: 'Склад', value: order.warehouse.name },
+            { label: 'Склад', value: order.warehouseId },
           ]}
         />
 

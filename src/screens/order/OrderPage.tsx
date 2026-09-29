@@ -106,6 +106,9 @@ export default function OrderPage() {
             <FlatList
                 data={orders}
                 keyExtractor={(item) => item.id}
+                style={{
+                    padding: 6
+                }}
                 renderItem={({ item }) => (
                     <OrderCard
                         order={item}

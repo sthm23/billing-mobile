@@ -13,7 +13,7 @@ export default function OrderDetailPage() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: color.background }}>
-      {/* <OrderDetailScreen orderId={id} /> */}
+      <OrderDetailScreen orderId={id} />
     </SafeAreaView>
   );
 }
