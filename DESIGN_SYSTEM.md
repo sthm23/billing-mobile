@@ -315,9 +315,9 @@ export interface ButtonProps extends VariantProps<typeof buttonVariants> {
 
 ```tsx
 // Было (GlueStack)
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { Button, ButtonText } from '@/components/ui/button';
+import { Box } from '@/components/base/box';
+import { Text } from '@/components/base/text';
+import { Button, ButtonText } from '@/components/base/button';
 
 <Box className="p-4">
   <Text>Hello</Text>

@@ -40,7 +40,7 @@ Benefits:
 Dialogs trap focus automatically via Radix Dialog primitive:
 
 ```tsx
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/base/dialog"
 
 <Dialog>
   <DialogTrigger>Open</DialogTrigger>
@@ -62,7 +62,7 @@ Features:
 ### Dropdown/Menu Navigation
 
 ```tsx
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/base/dropdown-menu"
 
 <DropdownMenu>
   <DropdownMenuTrigger>Open</DropdownMenuTrigger>
@@ -83,7 +83,7 @@ Keyboard shortcuts:
 ### Command Palette Navigation
 
 ```tsx
-import { Command } from "@/components/ui/command"
+import { Command } from "@/components/base/command"
 
 <Command>
   <CommandInput placeholder="Search..." />
@@ -194,8 +194,8 @@ toast({
 
 **Always label inputs:**
 ```tsx
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import { Label } from "@/components/base/label"
+import { Input } from "@/components/base/input"
 
 <div>
   <Label htmlFor="email">Email</Label>
@@ -205,7 +205,7 @@ import { Input } from "@/components/ui/input"
 
 **Add descriptions:**
 ```tsx
-import { FormDescription, FormMessage } from "@/components/ui/form"
+import { FormDescription, FormMessage } from "@/components/base/form"
 
 <FormItem>
   <FormLabel>Username</FormLabel>
@@ -276,7 +276,7 @@ Group related fields:
 ### Accordion
 
 ```tsx
-import { Accordion } from "@/components/ui/accordion"
+import { Accordion } from "@/components/base/accordion"
 
 <Accordion type="single" collapsible>
   <AccordionItem value="item-1">
@@ -295,7 +295,7 @@ import { Accordion } from "@/components/ui/accordion"
 ### Tabs
 
 ```tsx
-import { Tabs } from "@/components/ui/tabs"
+import { Tabs } from "@/components/base/tabs"
 
 <Tabs defaultValue="account">
   <TabsList role="tablist">
@@ -313,7 +313,7 @@ import { Tabs } from "@/components/ui/tabs"
 ### Select
 
 ```tsx
-import { Select } from "@/components/ui/select"
+import { Select } from "@/components/base/select"
 
 <Select>
   <SelectTrigger aria-label="Choose theme">
@@ -330,8 +330,8 @@ import { Select } from "@/components/ui/select"
 ### Checkbox and Radio
 
 ```tsx
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/base/checkbox"
+import { Label } from "@/components/base/label"
 
 <div className="flex items-center space-x-2">
   <Checkbox id="terms" aria-describedby="terms-description" />
@@ -345,7 +345,7 @@ import { Label } from "@/components/ui/label"
 ### Alert
 
 ```tsx
-import { Alert } from "@/components/ui/alert"
+import { Alert } from "@/components/base/alert"
 
 <Alert role="alert">
   {/* Announced immediately to screen readers */}

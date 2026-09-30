@@ -1,23 +1,23 @@
-import React, { useRef, useState } from 'react';
-import { ScrollView } from 'react-native';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
-  Box,
-  VStack,
-  HStack,
-  Center,
-  Text,
-  Heading,
-  Button,
-  Pressable,
-  Input,
-  TextArea,
-  Card,
-  Divider,
-  Spinner,
-  Modal,
   BottomSheet,
+  Box,
+  Button,
+  Card,
+  Center,
+  Divider,
+  Heading,
+  HStack,
+  Input,
+  Modal,
+  Pressable,
+  Spinner,
+  Text,
+  TextArea,
+  VStack,
 } from '@/components/base';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useRef, useState } from 'react';
+import { ScrollView } from 'react-native';
 
 /**
  * Component Demo Screen — демонстрация всех базовых компонентов
@@ -126,7 +126,7 @@ export default function ComponentDemoScreen() {
                   size="sm"
                   placeholder="Small input"
                   value=""
-                  onChangeText={() => {}}
+                  onChangeText={() => { }}
                 />
               </VStack>
 
@@ -136,7 +136,7 @@ export default function ComponentDemoScreen() {
                   size="lg"
                   placeholder="Large input"
                   value=""
-                  onChangeText={() => {}}
+                  onChangeText={() => { }}
                 />
               </VStack>
 
@@ -146,13 +146,13 @@ export default function ComponentDemoScreen() {
                   error
                   placeholder="Error state"
                   value=""
-                  onChangeText={() => {}}
+                  onChangeText={() => { }}
                 />
               </VStack>
 
               <VStack gap={1}>
                 <Text variant="bold">Input (disabled)</Text>
-                <Input disabled placeholder="Disabled input" value="" />
+                <Input editable={false} placeholder="Disabled input" value="" />
               </VStack>
 
               <Divider />

@@ -54,7 +54,7 @@ export default function RootLayout({ children }) {
 ```tsx
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/base/button"
 
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme()
@@ -251,7 +251,7 @@ Components live in your codebase - modify directly.
 ### Customize Variants
 
 ```tsx
-// components/ui/button.tsx
+// components/base/button.tsx
 const buttonVariants = cva(
   "inline-flex items-center justify-center rounded-md text-sm font-medium",
   {
@@ -289,7 +289,7 @@ Usage:
 Modify base styles in component:
 
 ```tsx
-// components/ui/card.tsx
+// components/base/card.tsx
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>

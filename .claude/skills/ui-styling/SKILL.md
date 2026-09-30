@@ -71,8 +71,8 @@ npx shadcn@latest add button card dialog form
 
 **Use components with utility styling:**
 ```tsx
-import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/base/button"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/base/card"
 
 export function Dashboard() {
   return (
@@ -263,9 +263,9 @@ python scripts/tailwind_config_gen.py --colors brand:blue --fonts display:Inter
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/base/form"
+import { Input } from "@/components/base/input"
+import { Button } from "@/components/base/button"
 
 const schema = z.object({
   email: z.string().email(),

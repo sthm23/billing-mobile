@@ -161,7 +161,7 @@ Configured in `tsconfig.json`:
 
 **Always use path aliases**:
 ```typescript
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/base/button';
 import { useAuth } from '@/provider/AuthProvider';
 import { api } from '@/api/axios-instance';
 ```
@@ -290,11 +290,11 @@ import { cn } from '@/libs/utils';
 
 ## UI Components
 
-### Base Components (`components/ui/`)
+### Base Components (`components/base/`)
 
 **Button**:
 ```tsx
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/base/button';
 
 <Button
   variant="default" | "error" | "outline" | "secondary" | "ghost" | "link"
@@ -309,7 +309,7 @@ import { Button } from '@/components/ui/button';
 
 **Input**:
 ```tsx
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/base/input';
 
 <Input
   placeholder="Enter text"
