@@ -1,9 +1,12 @@
-import { Avatar, AvatarFallbackText } from "@/components/ui/avatar";
-import { Box } from "@/components/ui/box";
-import { Heading } from "@/components/ui/heading";
-import { HStack } from "@/components/ui/hstack";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
+import {
+  Avatar,
+  AvatarFallbackText,
+  Box,
+  Heading,
+  HStack,
+  Text,
+  VStack,
+} from "@/components/base";
 import { CurrentUserType } from "@/models/auth.model";
 import { useTranslation } from "react-i18next";
 

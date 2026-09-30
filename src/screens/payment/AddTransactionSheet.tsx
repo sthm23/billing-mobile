@@ -1,20 +1,21 @@
-import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
-import { HStack } from "@/components/ui/hstack";
-import { Divider } from "@/components/ui/divider";
 import {
-  BottomSheet,
-  BottomSheetPortal,
-  BottomSheetBackdrop,
   BottomSheetScrollView,
-  type BottomSheetRef,
-} from "@/components/ui/bottomsheet";
+  BottomSheetRef,
+  Box,
+  Divider,
+  HStack,
+  Text,
+} from "@/components/base";
+import {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import CustomIcon from "@/icons/custom-icon";
 import { IconNames } from "@/icons/icon.type";
 import { CashTransactionType } from "@/models/payment.model";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
-import { useTranslation } from "react-i18next";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { TransactionForm } from "./TransactionForm";
 
 type Props = {
@@ -39,9 +40,9 @@ export const AddTransactionSheet = ({
 
   useEffect(() => {
     if (isOpen) {
-      sheetRef.current?.open();
+      sheetRef.current?.present();
     } else {
-      sheetRef.current?.close();
+      sheetRef.current?.dismiss();
     }
   }, [isOpen]);
 
@@ -52,32 +53,33 @@ export const AddTransactionSheet = ({
   const typeLabel = isIncome ? t('payment.type.INCOME') : t('payment.type.EXPENSE');
 
   return (
-    <BottomSheet ref={sheetRef} onClose={onClose}>
-      <BottomSheetPortal
-        snapPoints={['85%']}
-        backdropComponent={(props) => <BottomSheetBackdrop {...props} />}
-      >
-        <BottomSheetScrollView>
-          <Box className="px-4 pt-2 pb-6">
-            <HStack className="items-center gap-3 mb-4">
-              <Box className={`h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}>
-                <CustomIcon name={iconName} size={18} color={iconColor} />
-              </Box>
-              <Text size="2xl" bold>{typeLabel}</Text>
-            </HStack>
+    <BottomSheetModal
+      ref={sheetRef}
+      snapPoints={['85%']}
+      enablePanDownToClose
+      onDismiss={onClose}
+      backdropComponent={(props) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />}
+    >
+      <BottomSheetScrollView>
+        <Box className="px-4 pt-2 pb-6">
+          <HStack className="items-center gap-3 mb-4">
+            <Box className={`h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}>
+              <CustomIcon name={iconName} size={18} color={iconColor} />
+            </Box>
+            <Text size="2xl" bold>{typeLabel}</Text>
+          </HStack>
 
-            <Divider className="mb-5" />
+          <Divider className="mb-5" />
 
-            <TransactionForm
-              cashboxId={cashboxId}
-              transactionType={transactionType}
-              onSubmit={onSubmit}
-              onCancel={onClose}
-              isLoading={isLoading}
-            />
-          </Box>
-        </BottomSheetScrollView>
-      </BottomSheetPortal>
-    </BottomSheet>
+          <TransactionForm
+            cashboxId={cashboxId}
+            transactionType={transactionType}
+            onSubmit={onSubmit}
+            onCancel={onClose}
+            isLoading={isLoading}
+          />
+        </Box>
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   );
 };

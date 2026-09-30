@@ -1,10 +1,10 @@
-import { VStack } from "@/components/ui/vstack";
+import { VStack } from "@/components/base";
 import { SelectLanguage } from "./SelectLanguage";
 import { SelectTheme } from "./SelectTheme";
 
 const SettingItems = () => {
     return (
-        <VStack space="md">
+        <VStack className="gap-4">
             <SelectLanguage />
             <SelectTheme />
         </VStack>

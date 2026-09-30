@@ -1,4 +1,4 @@
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/base";
 import { useTheme } from "@/hooks/use-theme";
 import CustomIcon from "@/icons/custom-icon";
 import { IconNames } from "@/icons/icon.type";

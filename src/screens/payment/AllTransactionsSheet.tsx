@@ -1,15 +1,16 @@
-import { Box } from "@/components/ui/box";
-import { Button, ButtonText } from "@/components/ui/button";
-import { HStack } from "@/components/ui/hstack";
-import { Text } from "@/components/ui/text";
 import {
   Actionsheet,
   ActionsheetBackdrop,
   ActionsheetContent,
   ActionsheetDragIndicator,
   ActionsheetDragIndicatorWrapper,
-} from "@/components/ui/actionsheet";
-import { Card } from "@/components/ui/card";
+  Box,
+  Button,
+  ButtonText,
+  Card,
+  HStack,
+  Text,
+} from "@/components/base";
 import { CashboxTransaction } from "@/models/payment.model";
 import { useTranslation } from "react-i18next";
 import { ScrollView } from "react-native";

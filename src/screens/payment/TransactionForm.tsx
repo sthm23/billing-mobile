@@ -1,13 +1,29 @@
-import { Box } from "@/components/ui/box";
-import { Button, ButtonText } from "@/components/ui/button";
-import { FormControl, FormControlError, FormControlErrorText, FormControlLabel, FormControlLabelText } from "@/components/ui/form-control";
-import { Input, InputField } from "@/components/ui/input";
-import { VStack } from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
-import { Select, SelectTrigger, SelectInput, SelectIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem } from "@/components/ui/select";
-import { ChevronDownIcon } from "@/components/ui/icon";
-import { CashTransactionCategory, CashTransactionType } from "@/models/payment.model";
+import {
+  Button,
+  ButtonText,
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+  FormControlLabel,
+  FormControlLabelText,
+  HStack,
+  ChevronDownIcon,
+  Input,
+  InputField,
+  Select,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectIcon,
+  SelectInput,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
+  VStack,
+} from "@/components/base";
 import { PaymentType } from "@/models/order.model";
+import { CashTransactionCategory, CashTransactionType } from "@/models/payment.model";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";

@@ -1,97 +1,77 @@
 import React from 'react';
-import { TextInput, type TextInputProps } from 'react-native';
+import { View, TextInput, type TextInputProps, type ViewProps } from 'react-native';
 import { cn } from '@/libs/utils';
 
-export interface InputProps extends TextInputProps {
-  /**
-   * Additional className for styling
-   */
-  className?: string;
-  /**
-   * Input size variant
-   */
+export interface InputProps extends ViewProps {
+  variant?: 'outline' | 'underlined' | 'rounded';
   size?: 'sm' | 'md' | 'lg';
-  /**
-   * Error state (shows red border)
-   */
-  error?: boolean;
+  className?: string;
+  children?: React.ReactNode;
+}
+
+export interface InputFieldProps extends TextInputProps {
+  className?: string;
+}
+
+const variantClasses = {
+  outline: 'border border-border rounded-lg',
+  underlined: 'border-b border-border',
+  rounded: 'border border-border rounded-full',
+};
+
+const sizeClasses = {
+  sm: 'h-10',
+  md: 'h-12',
+  lg: 'h-14',
+};
+
+/**
+ * Input — контейнер для поля ввода
+ *
+ * @example
+ * <Input variant="outline" size="md">
+ *   <InputField placeholder="Enter text" />
+ * </Input>
+ */
+export function Input({
+  variant = 'outline',
+  size = 'md',
+  className,
+  children,
+  ...props
+}: InputProps) {
+  return (
+    <View
+      className={cn(
+        'flex-row items-center bg-background px-4',
+        variantClasses[variant],
+        sizeClasses[size],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </View>
+  );
 }
 
 /**
- * Input — текстовый инпут
- *
- * Обертка над React Native TextInput с поддержкой размеров, состояния ошибки
- * и semantic colors из дизайн-системы.
+ * InputField — текстовое поле ввода
  *
  * @example
- * <Input placeholder="Enter text" />
- *
- * @example
- * // С размерами
- * <Input size="sm" placeholder="Small input" />
- * <Input size="lg" placeholder="Large input" />
- *
- * @example
- * // Состояние ошибки
- * <Input error placeholder="Invalid value" />
- *
- * @example
- * // С контролируемым значением
- * <Input
- *   value={email}
- *   onChangeText={setEmail}
- *   placeholder="Email"
- *   keyboardType="email-address"
- * />
- *
- * @example
- * // Disabled state
- * <Input
- *   editable={false}
- *   placeholder="Disabled input"
- * />
+ * <Input>
+ *   <InputField placeholder="Email" keyboardType="email-address" />
+ * </Input>
  */
-export function Input({
+export function InputField({
   className,
-  size = 'md',
-  error = false,
-  editable = true,
-  placeholderTextColor,
+  placeholderTextColor = '#737373',
   ...props
-}: InputProps) {
-  // Base styles
-  const baseStyles =
-    'rounded-lg border bg-background text-foreground';
-
-  // Border styles
-  const borderStyles = error
-    ? 'border-destructive'
-    : 'border-input focus:border-primary';
-
-  // Size styles
-  const sizeStyles = {
-    sm: 'px-3 py-1.5 text-sm min-h-8',
-    md: 'px-4 py-2 text-base min-h-10',
-    lg: 'px-6 py-3 text-lg min-h-12',
-  };
-
-  // Disabled styles
-  const disabledStyles = 'opacity-50 bg-muted';
-
-  // Default placeholder color (muted-foreground)
-  const defaultPlaceholderColor = '#737373'; // muted-foreground from design system
-
+}: InputFieldProps) {
   return (
     <TextInput
-      className={cn(
-        baseStyles,
-        borderStyles,
-        sizeStyles[size],
-        !editable && disabledStyles,
-        className,
-      )}
-      editable={editable}
-      placeholderTextColor={placeholderTextColor ?? defaultPlaceholderColor}
+      className={cn('flex-1 text-base text-foreground', className)}
+      placeholderTextColor={placeholderTextColor}
       {...props}
     />
   );

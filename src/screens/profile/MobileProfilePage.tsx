@@ -1,7 +1,9 @@
-import { Box } from "@/components/ui/box";
-import { Divider } from "@/components/ui/divider";
-import { Heading } from "@/components/ui/heading";
-import { Text } from "@/components/ui/text";
+import {
+  Box,
+  Divider,
+  Heading,
+  Text,
+} from "@/components/base";
 import { useAuth } from "@/provider/AuthProvider";
 import { useTranslation } from "react-i18next";
 import { ScrollView } from "react-native";

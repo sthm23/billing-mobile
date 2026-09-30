@@ -2,10 +2,12 @@ import React from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  Text,
+  View,
   type PressableProps,
+  type ViewProps,
 } from 'react-native';
 import { cn } from '@/libs/utils';
+import { Text, type TextProps } from './Text';
 
 export interface ButtonProps extends Omit<PressableProps, 'children'> {
   /**
@@ -175,5 +177,38 @@ export function Button({
     >
       {renderContent()}
     </Pressable>
+  );
+}
+
+// Sub-components for compound button pattern
+
+export interface ButtonTextProps extends TextProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+export function ButtonText({ className, children, ...props }: ButtonTextProps) {
+  return (
+    <Text
+      className={cn('text-base font-medium', className)}
+      {...props}
+    >
+      {children}
+    </Text>
+  );
+}
+
+export interface ButtonIconProps extends ViewProps {
+  as: React.ComponentType<any>;
+  className?: string;
+  size?: number;
+  color?: string;
+}
+
+export function ButtonIcon({ as: IconComponent, className, size = 20, color, ...props }: ButtonIconProps) {
+  return (
+    <View className={cn(className)} {...props}>
+      <IconComponent size={size} color={color} />
+    </View>
   );
 }

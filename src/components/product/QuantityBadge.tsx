@@ -1,4 +1,5 @@
-import { Badge, BadgeText } from '../ui/badge';
+import { Badge, BadgeText } from "../base/badge";
+
 
 interface QuantityBadgeProps {
   quantity: number;
@@ -16,7 +17,7 @@ const variants = {
 
 export function QuantityBadge({ quantity, variant }: QuantityBadgeProps) {
   return (
-    <Badge variant='default' className={variants[variant]}>
+    <Badge variant='outline' className={variants[variant]}>
       <BadgeText>{quantity}</BadgeText>
     </Badge>
   );

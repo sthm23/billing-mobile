@@ -1,5 +1,4 @@
-import { Box } from "@/components/ui/box";
-import { Text } from "@/components/ui/text";
+import { Box, Text } from "@/components/base";
 import { SafeAreaView, } from "react-native-safe-area-context";
 
 export default function CreateProfileLayout() {

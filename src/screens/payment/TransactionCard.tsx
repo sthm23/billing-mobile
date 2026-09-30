@@ -1,7 +1,9 @@
-import { Box } from "@/components/ui/box";
-import { HStack } from "@/components/ui/hstack";
-import { VStack } from "@/components/ui/vstack";
-import { Text } from "@/components/ui/text";
+import {
+  Box,
+  HStack,
+  Text,
+  VStack,
+} from "@/components/base";
 import CustomIcon from "@/icons/custom-icon";
 import { IconNames } from "@/icons/icon.type";
 import { CashboxTransaction, CashTransactionType } from "@/models/payment.model";

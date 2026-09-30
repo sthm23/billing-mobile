@@ -1,13 +1,19 @@
-import { Badge, BadgeText } from "@/components/ui/badge";
-import { Box } from "@/components/ui/box";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Divider } from "@/components/ui/divider";
-import { ArrowDownIcon, ArrowUpIcon } from "@/components/ui/icon";
-import { HStack } from "@/components/ui/hstack";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
+import {
+  Badge,
+  BadgeText,
+  Box,
+  Button,
+  ButtonIcon,
+  ButtonText,
+  Card,
+  Divider,
+  HStack,
+  ArrowDownIcon,
+  ArrowUpIcon,
+  Pressable,
+  Text,
+  VStack,
+} from "@/components/base";
 import CustomIcon from "@/icons/custom-icon";
 import { IconNames } from "@/icons/icon.type";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
@@ -77,10 +83,10 @@ export default function CashboxDetailsPage() {
 
   const createdDate = cashbox
     ? new Date(cashbox.createdAt).toLocaleDateString('ru-RU', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      })
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
     : '';
 
   if (isLoading) {

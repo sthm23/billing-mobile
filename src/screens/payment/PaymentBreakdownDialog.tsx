@@ -5,12 +5,13 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Divider } from "@/components/ui/divider";
-import { HStack } from "@/components/ui/hstack";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
+  Button,
+  ButtonText,
+  Divider,
+  HStack,
+  Text,
+  VStack,
+} from "@/components/base";
 import CustomIcon from "@/icons/custom-icon";
 import { IconNames } from "@/icons/icon.type";
 import { PaymentType } from "@/models/order.model";
