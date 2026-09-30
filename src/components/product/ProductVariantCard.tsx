@@ -1,11 +1,7 @@
-import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Divider } from '@/components/ui/divider';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { Button, Card, Divider, HStack, Text, VStack } from '@/components/base';
 import { ProductVariant, StockMovementType } from '@/services/product/product.type';
 import { Clock, Plus } from 'lucide-react-native';
+import { useTheme } from '@/hooks/use-theme';
 import { PricePair } from './PricePair';
 import { QuantityBadge } from './QuantityBadge';
 
@@ -41,6 +37,7 @@ export function ProductVariantCard({
   onHistory,
   onMovement,
 }: ProductVariantCardProps) {
+  const colors = useTheme();
   const label = getVariantLabel(variant, nameById);
   const costPrice = getLatestCostPrice(variant);
   const retailPrice = parseFloat(String(variant.price));
@@ -69,8 +66,8 @@ export function ProductVariantCard({
           className="flex-1"
           onPress={() => onHistory?.(variant.id)}
         >
-          <ButtonIcon as={Clock} />
-          <ButtonText>История</ButtonText>
+          <Clock size={16} color={colors.text} />
+          История
         </Button>
         <Button
           variant="outline"
@@ -78,8 +75,8 @@ export function ProductVariantCard({
           className="flex-1"
           onPress={() => onMovement?.(variant.id)}
         >
-          <ButtonIcon as={Plus} />
-          <ButtonText>Приход / Списание</ButtonText>
+          <Plus size={16} color={colors.text} />
+          Приход / Списание
         </Button>
       </HStack>
     </Card>

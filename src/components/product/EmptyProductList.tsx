@@ -1,7 +1,4 @@
-import { Button, ButtonText } from '@/components/ui/button';
-import { Center } from '@/components/ui/center';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { Button, Center, Text, VStack } from '@/components/base';
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
 import { useTheme } from '@/hooks/use-theme';
@@ -17,7 +14,7 @@ export function EmptyProductList({ onCreatePress }: EmptyProductListProps) {
 
   return (
     <Center className="flex-1 py-16">
-      <VStack className="items-center gap-4">
+      <VStack gap={4} className="items-center">
         {/* Icon */}
         <CustomIcon
           name={IconNames.BOX}
@@ -26,18 +23,18 @@ export function EmptyProductList({ onCreatePress }: EmptyProductListProps) {
         />
 
         {/* Empty Message */}
-        <Text className="text-lg text-typography-500 text-center">
+        <Text variant="large" className="text-muted-foreground text-center">
           {t('product.empty')}
         </Text>
 
         {/* Create Button */}
         <Button
-          size="default"
+          size="md"
           className="mt-4"
           onPress={onCreatePress}
           disabled
         >
-          <ButtonText>{t('product.create')}</ButtonText>
+          {t('product.create')}
         </Button>
       </VStack>
     </Center>

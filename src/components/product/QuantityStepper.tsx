@@ -1,7 +1,6 @@
-import { Button, ButtonIcon } from '@/components/ui/button';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
+import { Button, HStack, Text } from '@/components/base';
 import { Minus, Plus } from 'lucide-react-native';
+import { useTheme } from '@/hooks/use-theme';
 
 interface QuantityStepperProps {
   value: number;
@@ -10,15 +9,18 @@ interface QuantityStepperProps {
 }
 
 export function QuantityStepper({ value, max, onChange }: QuantityStepperProps) {
+  const colors = useTheme();
+
   return (
-    <HStack className="items-center gap-3">
+    <HStack className="items-center" gap={3}>
       <Button
         variant="outline"
-        size="icon"
+        size="sm"
         onPress={() => onChange(value - 1)}
         disabled={value <= 1}
+        className="w-10 h-10"
       >
-        <ButtonIcon as={Minus} />
+        <Minus size={16} color={colors.text} />
       </Button>
 
       <Text className="text-base font-semibold text-foreground text-center min-w-16">
@@ -27,11 +29,12 @@ export function QuantityStepper({ value, max, onChange }: QuantityStepperProps) 
 
       <Button
         variant="outline"
-        size="icon"
+        size="sm"
         onPress={() => onChange(value + 1)}
         disabled={value >= max}
+        className="w-10 h-10"
       >
-        <ButtonIcon as={Plus} />
+        <Plus size={16} color={colors.text} />
       </Button>
     </HStack>
   );

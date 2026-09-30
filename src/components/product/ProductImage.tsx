@@ -1,14 +1,14 @@
-import { Avatar, AvatarFallbackText, AvatarImage } from '@/components/ui/avatar';
-import { Icon } from '@/components/ui/icon';
+import { Box } from '@/components/base';
 import { getMainImageUrl } from '@/libs/product-utils';
-
-import { Image } from 'lucide-react-native';
-import { Box } from '../ui/box';
+import { Image } from 'expo-image';
+import { ImageIcon } from 'lucide-react-native';
+import { useState } from 'react';
 
 interface ProductImageProps {
   images?: { url: string; id: string; isMain: boolean }[];
   productName: string;
   size?: 'sm' | 'md' | 'lg';
+  onPress?: () => void;
 }
 
 const sizeClasses = {
@@ -17,25 +17,39 @@ const sizeClasses = {
   lg: 'h-24 w-24',
 };
 
-export function ProductImage({ images, productName, size = 'md' }: ProductImageProps) {
+const iconSizes = {
+  sm: 24,
+  md: 32,
+  lg: 40,
+};
+
+export function ProductImage({ images, productName, size = 'md', onPress }: ProductImageProps) {
   const imageUrl = getMainImageUrl(images);
+  const [hasError, setHasError] = useState(false);
+
+  if (!imageUrl || hasError) {
+    return (
+      <Box
+        className={`${sizeClasses[size]} rounded-lg overflow-hidden bg-background-50 border border-border items-center justify-center`}
+      >
+        <ImageIcon size={iconSizes[size]} color="#9CA3AF" />
+      </Box>
+    );
+  }
 
   return (
-    <Avatar className={`${sizeClasses[size]} rounded-lg overflow-hidden bg-background-50`}>
-      {imageUrl ? (
-        <>
-          <AvatarFallbackText>{productName}</AvatarFallbackText>
-          <AvatarImage
-            source={{ uri: imageUrl }}
-            alt={productName}
-            className="object-cover"
-          />
-        </>
-      ) : (
-        <Box className="flex items-center justify-center h-full w-full border border-gray-300 rounded-lg">
-          <Icon as={Image} size="xl" className="text-typography-400" />
-        </Box>
-      )}
-    </Avatar>
+    <Box
+      className={`${sizeClasses[size]} rounded-lg overflow-hidden bg-background-50`}
+      onTouchEnd={onPress}
+    >
+      <Image
+        source={{ uri: imageUrl }}
+        style={{ width: '100%', height: '100%' }}
+        contentFit="cover"
+        alt={productName}
+        onError={() => setHasError(true)}
+        transition={200}
+      />
+    </Box>
   );
 }

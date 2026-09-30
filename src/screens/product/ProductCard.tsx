@@ -1,8 +1,5 @@
-import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
-import { Box } from "@/components/ui/box";
-import { ChevronRightIcon, Icon, ImageIcon } from "@/components/ui/icon";
-import { Pressable } from "@/components/ui/pressable";
-import { Text } from "@/components/ui/text";
+import { Box, Pressable, Text } from "@/components/base";
+import { Image } from "react-native";
 import { Product } from "@/models/product.model";
 
 type ProductCardProps = {
@@ -12,25 +9,23 @@ type ProductCardProps = {
 };
 
 export const ProductCard = ({ product, onPress, t }: ProductCardProps) => (
-    <Pressable className="flex-row items-center gap-4 p-4 border border-gray-300 rounded-lg bg-card" key={product.id} onPress={() => onPress(product)}>
+    <Pressable className="flex-row items-center p-4 border border-border rounded-lg bg-card" key={product.id} onPress={() => onPress(product)}>
         {product.images && product.images.length > 0 ? (
-            <Avatar className="border-2 border-gray-300 rounded-lg h-15 w-15">
-                <AvatarFallbackText>{product.name}</AvatarFallbackText>
-                <AvatarImage source={{ uri: product.images[0].url }} />
-            </Avatar>
+            <Image
+                source={{ uri: product.images[0].url }}
+                className="w-15 h-15 rounded-lg border-2 border-border"
+            />
         ) : (
-            <Avatar className="border-2 border-gray-300 rounded-lg h-15 w-15">
-                <Icon as={ImageIcon} size="xl" />
-            </Avatar>
+            <Box className="w-15 h-15 rounded-lg border-2 border-border bg-muted items-center justify-center">
+                <Text className="text-muted-foreground">📷</Text>
+            </Box>
         )}
-        <Box>
-            <Text size="md">Category: {t(`category.${product.category}`)}</Text>
-            <Text size="lg" bold>{product.name}</Text>
-            <Text size="md">Quantity: {product.variants.reduce((total, variant) => total + variant.quantity, 0)}</Text>
-            <Text size="md">Price: {product.priceRange?.min ?? 0} - {product.priceRange?.max ?? 0}</Text>
+        <Box className="flex-1 ml-4">
+            <Text className="text-sm text-muted-foreground">Category: {t(`category.${product.category}`)}</Text>
+            <Text className="text-lg font-bold text-foreground">{product.name}</Text>
+            <Text className="text-sm text-foreground">Quantity: {product.variants.reduce((total, variant) => total + variant.quantity, 0)}</Text>
+            <Text className="text-sm text-foreground">Price: {product.priceRange?.min ?? 0} - {product.priceRange?.max ?? 0}</Text>
         </Box>
-        <Box className="flex-1 items-end justify-end">
-            <Icon as={ChevronRightIcon} size="xl" />
-        </Box>
+        <Text className="text-muted-foreground text-xl">›</Text>
     </Pressable>
 )

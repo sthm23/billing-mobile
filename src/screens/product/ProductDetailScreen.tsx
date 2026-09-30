@@ -5,11 +5,7 @@ import { ImageCarousel } from '@/components/product/ImageCarousel';
 import { PriceLabel } from '@/components/product/PriceLabel';
 import { ProductVariantCard } from '@/components/product/ProductVariantCard';
 import { QuantityStepper } from '@/components/product/QuantityStepper';
-import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
-import { Divider } from '@/components/ui/divider';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { Button, Divider, HStack, Text, VStack } from '@/components/base';
 import {
   Attribute,
   ProductDetail,
@@ -17,6 +13,7 @@ import {
   StockMovementType,
 } from '@/services/product/product.type';
 import { Plus } from 'lucide-react-native';
+import { useTheme } from '@/hooks/use-theme';
 import { useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 
@@ -68,6 +65,7 @@ export function getLatestCostPrice(variant: ProductVariant): number {
 }
 
 export default function ProductDetailScreen({ product }: ProductDetailScreenProps) {
+  const colors = useTheme();
   const nameById = useMemo(() => buildNameById(product.attributes ?? []), [product.attributes]);
 
   const attributeMap = useMemo(
@@ -196,12 +194,13 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
 
             <Button
               variant="default"
+              size="md"
               className="w-full"
               onPress={handleBuy}
               disabled={stockForSelected === 0}
             >
-              <ButtonIcon as={Plus} />
-              <ButtonText>Купить</ButtonText>
+              <Plus size={20} color={colors.background} />
+              <Text className="ml-2 text-primary-foreground font-semibold">Купить</Text>
             </Button>
           </VStack>
         )}

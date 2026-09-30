@@ -1,6 +1,4 @@
-import { Box } from '@/components/ui/box';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
+import { Box, VStack } from '@/components/base';
 
 export function ProductCardSkeleton() {
   return (

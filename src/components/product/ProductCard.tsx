@@ -1,11 +1,7 @@
-import { HStack } from '@/components/ui/hstack';
-import { Pressable } from '@/components/ui/pressable';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { Box, HStack, Pressable, Text, VStack } from '@/components/base';
 import { formatPrice, getTotalQuantity } from '@/libs/product-utils';
 import { Product } from '@/models/product.model';
 import { useTranslation } from 'react-i18next';
-import { Box } from '../ui/box';
 import { ProductImage } from './ProductImage';
 import { QuantityBadge } from './QuantityBadge';
 

@@ -1,7 +1,6 @@
-import { Button, ButtonIcon } from '@/components/ui/button';
+import { Button, Box } from '@/components/base';
 import { useTheme } from '@/hooks/use-theme';
 import { Funnel, ScanSquare } from 'lucide-react-native';
-import { Box } from '../ui/box';
 
 interface ActionButtonsProps {
   onScanPress: () => void;
@@ -11,26 +10,26 @@ interface ActionButtonsProps {
 export function ActionButtons({ onScanPress, onFilterPress }: ActionButtonsProps) {
   const colors = useTheme();
   return (
-    <Box className="flex flex-row items-center gap-2 ml-2">
+    <Box className="flex-row items-center gap-2 ml-2">
       {/* Scan Button */}
       <Button
-        size="icon"
-        className="bg-foreground min-w-12 min-h-12"
+        size="md"
+        className="bg-foreground min-w-12 min-h-12 w-12 h-12"
         onPress={onScanPress}
         disabled
       >
-        <ButtonIcon as={ScanSquare} />
+        <ScanSquare size={20} color={colors.background} />
       </Button>
 
       {/* Filter Button */}
       <Button
-        size="icon"
+        size="md"
         variant="outline"
-        className="min-w-12 min-h-12"
+        className="min-w-12 min-h-12 w-12 h-12"
         onPress={onFilterPress}
         disabled
       >
-        <ButtonIcon as={Funnel} />
+        <Funnel size={20} color={colors.text} />
       </Button>
     </Box>
   );

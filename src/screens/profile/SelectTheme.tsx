@@ -1,16 +1,12 @@
-import { Box } from '@/components/ui/box';
-import { Button, ButtonText } from '@/components/ui/button';
+import { Box, Button, HStack, Pressable, Text } from '@/components/base';
 import { ThemeMode, useThemeControl } from '@/hooks/use-theme-control';
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
+import { ChevronRight } from 'lucide-react-native';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, useColorScheme } from 'react-native';
-import { HStack } from '../../components/ui/hstack';
-import { ChevronRightIcon, Icon } from '../../components/ui/icon';
-import { Pressable } from '../../components/ui/pressable';
-import { Text } from '../../components/ui/text';
 
 export type SelectThemeType = {
   mode: ThemeMode;
@@ -35,16 +31,14 @@ export const SelectTheme = () => {
 
   return (
     <>
-      <Pressable className="flex flex-row justify-between items-center h-20 border border-gray-300 rounded-xl p-4" onPress={() => sheetRef.current?.snapToIndex(0)}>
-        <HStack space="md" className="flex-row items-center">
-          <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-300">
+      <Pressable className="flex flex-row justify-between items-center h-20 border border-border dark:border-border-dark rounded-xl p-4" onPress={() => sheetRef.current?.snapToIndex(0)}>
+        <HStack gap={3} className="items-center">
+          <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-border dark:border-border-dark">
             <CustomIcon name={IconNames.SUN} />
           </Box>
           <Text>Theme</Text>
         </HStack>
-        <Box>
-          <Icon as={ChevronRightIcon} />
-        </Box>
+        <ChevronRight size={20} className="text-text dark:text-text-dark" />
       </Pressable>
 
       <BottomSheet
@@ -68,7 +62,7 @@ export const SelectTheme = () => {
                 variant={isSelected ? 'default' : 'outline'}
                 onPress={() => setThemeMode(item.mode)}
               >
-                <ButtonText>{item.label}</ButtonText>
+                {item.label}
               </Button>
             );
           }}

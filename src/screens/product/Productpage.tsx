@@ -1,6 +1,4 @@
-import { Box } from "@/components/ui/box";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
+import { Box, Button, Text } from "@/components/base";
 import { useProducts } from "@/services/product/product.queries";
 import { Product, ProductParams } from "@/services/product/product.type";
 import { useRouter } from "expo-router";
@@ -53,13 +51,13 @@ export default function ProductPage() {
 
     if (isError) {
         return (
-            <Text size="2xl" bold>Ошибка загрузки продуктов</Text>
+            <Text className="text-2xl font-bold">Ошибка загрузки продуктов</Text>
         )
     }
 
     if (isLoading) {
         return (
-            <Text size="2xl" bold>Загрузка...</Text>
+            <Text className="text-2xl font-bold">Загрузка...</Text>
         )
     }
 
@@ -80,9 +78,9 @@ export default function ProductPage() {
     return (
         <Box className="flex-1">
             <Box className="flex-row items-center justify-between px-4 py-2">
-                <Text size="2xl" bold className="text-lg font-bold text-center">Продукты</Text>
-                <Button onPress={() => console.log('Create button pressed')}>
-                    <ButtonText>{t('order.create')}</ButtonText>
+                <Text className="text-2xl font-bold text-center">Продукты</Text>
+                <Button size="md" onPress={() => console.log('Create button pressed')}>
+                    {t('order.create')}
                 </Button>
             </Box>
             <FlatList
@@ -94,8 +92,8 @@ export default function ProductPage() {
                 ListFooterComponent={
                     <Box>
                         {hasMore ? (
-                            <Button onPress={handleLoadMore} disabled={isFetching}>
-                                <ButtonText>{isFetching ? 'Загрузка...' : 'Выгрузить еще'}</ButtonText>
+                            <Button size="md" onPress={handleLoadMore} disabled={isFetching}>
+                                {isFetching ? 'Загрузка...' : 'Выгрузить еще'}
                             </Button>
                         ) : (
                             <Text className="text-center opacity-70">Больше продуктов нет</Text>

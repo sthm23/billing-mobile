@@ -1,7 +1,8 @@
-import { SearchIcon } from '@/components/ui/icon';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { useTheme } from '@/hooks/use-theme';
+import { View } from 'react-native';
+import { Search } from 'lucide-react-native';
+import { Input } from '@/components/base';
 import { useTranslation } from 'react-i18next';
+
 interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
@@ -9,18 +10,18 @@ interface SearchBarProps {
 
 export function SearchBar({ value, onChangeText }: SearchBarProps) {
   const { t } = useTranslation();
-  const colors = useTheme();
 
   return (
-    <Input className="flex-1">
-      <InputField
+    <View className="flex-1 relative">
+      <Input
         placeholder={t('product.search')}
         value={value}
         onChangeText={onChangeText}
+        className="flex-1 pr-10"
       />
-      <InputSlot>
-        <InputIcon as={SearchIcon} />
-      </InputSlot>
-    </Input>
+      <View className="absolute right-3 top-0 bottom-0 justify-center">
+        <Search size={20} color="#737373" />
+      </View>
+    </View>
   );
 }

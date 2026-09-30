@@ -1,6 +1,4 @@
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { HStack, VStack, Text } from '@/components/base';
 import { formatPrice } from '@/libs/product-utils';
 
 interface PricePairProps {

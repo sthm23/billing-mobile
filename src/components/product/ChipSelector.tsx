@@ -1,5 +1,4 @@
-import { Pressable } from '@/components/ui/pressable';
-import { Text } from '@/components/ui/text';
+import { Pressable, Text } from '@/components/base';
 import { ScrollView } from 'react-native';
 
 interface ChipSelectorProps {

@@ -1,16 +1,11 @@
-import { HStack } from '@/components/ui/hstack';
-import { ChevronRightIcon, Icon } from '@/components/ui/icon';
-import { Pressable } from '@/components/ui/pressable';
-import { Text } from '@/components/ui/text';
+import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/assets/i18next/i18next';
+import { Box, Button, HStack, Pressable, Text } from '@/components/base';
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
-
-import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/assets/i18next/i18next';
-import { Box } from '@/components/ui/box';
 import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, useColorScheme } from 'react-native';
-import { Button, ButtonText } from '../../components/ui/button';
+import { ChevronRight } from 'lucide-react-native';
 
 export const SelectLanguage = () => {
   const colorScheme = useColorScheme();
@@ -54,16 +49,14 @@ export const SelectLanguage = () => {
 
   return (
     <>
-      <Pressable className="flex flex-row justify-between items-center h-20 border border-gray-300 rounded-xl p-4" onPress={() => sheetRef.current?.snapToIndex(0)}>
-        <HStack space="md" className="flex-row items-center">
-          <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-300">
+      <Pressable className="flex flex-row justify-between items-center h-20 border border-border dark:border-border-dark rounded-xl p-4" onPress={() => sheetRef.current?.snapToIndex(0)}>
+        <HStack gap={3} className="items-center">
+          <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-border dark:border-border-dark">
             <CustomIcon name={IconNames.LANGUAGE} />
           </Box>
           <Text>Language</Text>
         </HStack>
-        <Box>
-          <Icon as={ChevronRightIcon} />
-        </Box>
+        <ChevronRight size={20} className="text-text dark:text-text-dark" />
       </Pressable>
 
       <BottomSheet
@@ -87,7 +80,7 @@ export const SelectLanguage = () => {
                 variant={isSelected ? 'default' : 'outline'}
                 onPress={async () => await onLanguagePress(item.value)}
               >
-                <ButtonText>{item.label}</ButtonText>
+                {item.label}
               </Button>
             );
           }}

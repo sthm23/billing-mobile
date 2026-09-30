@@ -1,5 +1,4 @@
-import { Box } from '@/components/ui/box';
-import { Icon } from '@/components/ui/icon';
+import { Box } from '@/components/base';
 import { Image } from 'expo-image';
 import { ImageIcon } from 'lucide-react-native';
 import { useRef, useState } from 'react';
@@ -30,7 +29,7 @@ export function ImageCarousel({ images, productName }: ImageCarouselProps) {
         className="bg-background-50 border-b border-border items-center justify-center"
         style={{ width: SCREEN_WIDTH, height: IMAGE_HEIGHT }}
       >
-        <Icon as={ImageIcon} size="xl" className="text-typography-300" />
+        <ImageIcon size={48} color="#9CA3AF" />
       </Box>
     );
   }

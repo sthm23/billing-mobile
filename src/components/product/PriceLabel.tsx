@@ -1,5 +1,4 @@
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
+import { HStack, Text } from '@/components/base';
 import { formatPrice } from '@/libs/product-utils';
 
 interface PriceLabelProps {
