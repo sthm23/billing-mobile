@@ -1,5 +1,4 @@
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
+import { Box, Heading } from '@/components/base';
 // import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/i18next/i18next';
 // import { useEffect, useState } from 'react';
 import {
@@ -50,7 +49,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-background">
         <Box>
-            <Text size="2xl" bold>Setting page</Text>
+            <Heading level={1}>Setting page</Heading>
         </Box>
     </SafeAreaView>
   );

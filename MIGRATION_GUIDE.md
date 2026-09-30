@@ -318,20 +318,23 @@ npm start
 ## 📈 Прогресс миграции
 
 **Компоненты:** ✅ 17/17 (100%)  
-**Экраны:** ⏳ 1/10 (10%)
+**Экраны:** ✅ 7/12 (58%)
 
 ### Чек-лист экранов
 
 - [ ] Login экран
-- [ ] Order Card
+- [x] Order Card (components/order/OrderCard.tsx)
+- [x] Order Card Menu (screens/order/OrderCardMenu.tsx)
 - [x] Order List (OrderPage)
-- [ ] Order Detail
+- [x] Order Detail (OrderDetailScreen.tsx) - Icon imports fixed
 - [ ] Cashbox List
 - [ ] Cashbox Details
 - [ ] Payment screens
-- [ ] Product Search Sheet
+- [x] Product Search Sheet - Icon imports fixed
 - [ ] Swipeable Order Card
 - [ ] Order Info Card
+- [x] Search Screen (search.tsx)
+- [x] Scan Screen (scan.tsx)
 
 ---
 

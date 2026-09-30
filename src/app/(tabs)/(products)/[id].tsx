@@ -1,5 +1,4 @@
-import { Button, ButtonText } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
+import { Button, Text } from '@/components/base';
 import ProductDetailScreen from '@/screens/product/ProductDetailScreen';
 import { useProductById } from '@/services/product/product.queries';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
@@ -19,7 +18,7 @@ export default function ProductDetailRoute() {
       title: product?.name ?? t('product.details', 'Детали'),
       headerRight: () => (
         <Button variant="ghost" size="sm" onPress={() => console.log('Edit')}>
-          <ButtonText>{t('common.edit', 'Изменить')}</ButtonText>
+          {t('common.edit', 'Изменить')}
         </Button>
       ),
     });
@@ -36,7 +35,7 @@ export default function ProductDetailRoute() {
   if (isError || !product) {
     return (
       <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-typography-500 text-center">
+        <Text variant="muted" className="text-center">
           {isError ? 'Ошибка загрузки продукта' : 'Продукт не найден'}
         </Text>
       </View>

@@ -10,15 +10,12 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import {
   ThemeControlContext,
   ThemeMode,
   loadThemeMode,
   saveThemeMode,
-  getModeForGlueStack,
   applyThemeMode,
-  type ModeType
 } from '@/hooks/use-theme-control';
 import "../global.css";
 
@@ -48,7 +45,6 @@ const InitiallyLayout = () => {
 export default function RootLayout() {
   const systemScheme = useColorScheme();
   const [themeMode, setThemeModeState] = useState<ThemeMode>(ThemeMode.AUTO);
-  const [currentMode, setCurrentMode] = useState<ModeType>('system');
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
 
   const [queryClient] = useState(
@@ -74,8 +70,6 @@ export default function RootLayout() {
     async function initTheme() {
       const savedMode = await loadThemeMode();
       setThemeModeState(savedMode);
-      const glueStackMode = getModeForGlueStack(savedMode);
-      setCurrentMode(glueStackMode);
       applyThemeMode(savedMode);
       setIsThemeLoaded(true);
     }
@@ -85,16 +79,14 @@ export default function RootLayout() {
   // Apply theme when it changes
   const setThemeMode = async (mode: ThemeMode) => {
     setThemeModeState(mode);
-    const glueStackMode = getModeForGlueStack(mode);
-    setCurrentMode(glueStackMode);
     applyThemeMode(mode);
     await saveThemeMode(mode);
   };
 
   // Determine if dark mode is active for StatusBar
   const isDarkMode =
-    currentMode === 'dark' ||
-    (currentMode === 'system' && systemScheme === 'dark');
+    themeMode === ThemeMode.DARK ||
+    (themeMode === ThemeMode.AUTO && systemScheme === 'dark');
 
   if (!isThemeLoaded) {
     return null;
@@ -102,18 +94,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <GluestackUIProvider mode={currentMode}>
-        <ThemeControlContext.Provider value={{ themeMode, setThemeMode, currentMode }}>
-          <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-          <AuthProvider >
-            <QueryClientProvider client={queryClient}>
-              <BottomSheetModalProvider>
-                <InitiallyLayout />
-              </BottomSheetModalProvider>
-            </QueryClientProvider>
-          </AuthProvider>
-        </ThemeControlContext.Provider>
-      </GluestackUIProvider>
+      <ThemeControlContext.Provider value={{ themeMode, setThemeMode }}>
+        <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+        <AuthProvider >
+          <QueryClientProvider client={queryClient}>
+            <BottomSheetModalProvider>
+              <InitiallyLayout />
+            </BottomSheetModalProvider>
+          </QueryClientProvider>
+        </AuthProvider>
+      </ThemeControlContext.Provider>
     </GestureHandlerRootView>
   )
 }

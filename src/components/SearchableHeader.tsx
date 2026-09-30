@@ -1,11 +1,8 @@
-import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
+import { Box, Button, HStack, Input, Pressable, Text } from '@/components/base';
 import { useTheme } from '@/hooks/use-theme';
 import { Search, X } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { LayoutAnimation, TextInput, View } from 'react-native';
-
 
 interface SearchableHeaderProps {
     title: string;
@@ -55,60 +52,41 @@ export function SearchableHeader({
 
     if (isSearching) {
         return (
-            <View
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    gap: 8,
-                    backgroundColor: colors.background,
-                }}
-            >
-                <View style={{ flex: 1 }}>
-                    <Input>
-                        <InputSlot>
-                            <InputIcon as={Search} />
-                        </InputSlot>
-                        <InputField
-                            ref={inputRef as any}
-                            placeholder="Поиск..."
-                            value={searchText}
-                            onChangeText={handleTextChange}
-                            returnKeyType="search"
-                            clearButtonMode="while-editing"
-                        />
-                    </Input>
-                </View>
-                <Button variant="link" onPress={closeSearch} className="px-4" >
-                    <ButtonIcon as={X} size='lg' />
-                </Button>
-            </View>
+            <HStack className="items-center px-3 py-2 gap-2 bg-background">
+                <Box className="flex-1 relative">
+                    <View className="absolute left-3 top-0 bottom-0 justify-center z-10">
+                        <Search size={20} color={colors.mutedForeground} />
+                    </View>
+                    <Input
+                        ref={inputRef}
+                        placeholder="Поиск..."
+                        value={searchText}
+                        onChangeText={handleTextChange}
+                        returnKeyType="search"
+                        clearButtonMode="while-editing"
+                        className="pl-10"
+                    />
+                </Box>
+                <Pressable onPress={closeSearch} className="p-2">
+                    <X size={24} color={colors.foreground} />
+                </Pressable>
+            </HStack>
         );
     }
 
     return (
-        <View
-            style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                backgroundColor: colors.background,
-            }}
-        >
-            <Text size="2xl" bold>{title}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Button variant="link" onPress={openSearch} className="px-4" >
-                    <ButtonIcon as={Search} size='lg' />
-                </Button>
+        <HStack className="items-center justify-between px-4 py-2 bg-background">
+            <Text className="text-2xl font-bold">{title}</Text>
+            <HStack className="items-center gap-2">
+                <Pressable onPress={openSearch} className="p-2">
+                    <Search size={24} color={colors.foreground} />
+                </Pressable>
                 {actionLabel && onAction && (
                     <Button onPress={onAction}>
-                        <ButtonText>{actionLabel}</ButtonText>
+                        {actionLabel}
                     </Button>
                 )}
-            </View>
-        </View>
+            </HStack>
+        </HStack>
     );
 }

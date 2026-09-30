@@ -2,13 +2,13 @@ import { ProductSearchSheet, type ProductSearchSheetRef } from '@/components/ord
 import { SwipeableOrderItemCard } from '@/components/order/SwipeableOrderItemCard';
 import { Box, Button, HStack, Text, VStack } from '@/components/base';
 import {
-  ArrowLeftIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ExternalLinkIcon,
-  SearchIcon,
-  TrashIcon,
-} from '@/components/ui/icon';
+  ArrowLeft,
+  CheckCircle,
+  Clock,
+  ExternalLink,
+  Search,
+  Trash2,
+} from 'lucide-react-native';
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
 import { useOrderById } from '@/services/order/order.queries';
@@ -79,7 +79,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
         {/* Header */}
         <HStack className="px-2 py-2 items-center border-b border-border bg-background" gap={1}>
           <Button variant="ghost" size="sm" onPress={() => router.back()}>
-            <ArrowLeftIcon />
+            <ArrowLeft size={20} />
           </Button>
           <Text className="text-lg font-semibold text-foreground">Заказ</Text>
         </HStack>
@@ -91,7 +91,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
             className="flex-1 h-10 rounded-xl justify-start px-3"
             onPress={() => searchSheetRef.current?.open()}
           >
-            <SearchIcon className="text-muted-foreground" />
+            <Search size={18} className="text-muted-foreground" />
             <Text className="text-muted-foreground font-normal">Поиск</Text>
           </Button>
           <Button
@@ -145,7 +145,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
                   -{formatAmount(totalDiscount)} UZS
                 </Text>
                 <Button variant="outline" size="sm" className="h-7 w-7 rounded-lg">
-                  <TrashIcon className="text-destructive" size="sm" />
+                  <Trash2 size={16} className="text-destructive" />
                 </Button>
               </HStack>
             </HStack>
@@ -157,7 +157,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
                   {formatAmount(order.totalAmount)} UZS
                 </Text>
                 <Button variant="outline" size="sm" className="h-7 w-7 rounded-lg">
-                  <ExternalLinkIcon size="sm" />
+                  <ExternalLink size={16} />
                 </Button>
               </HStack>
             </HStack>
@@ -170,7 +170,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
               className="flex-1 h-12 rounded-xl"
               onPress={() => {}}
             >
-              <ClockIcon className="w-5 h-5" />
+              <Clock size={20} />
               <Text className="text-foreground font-medium">Бронь</Text>
             </Button>
             <Button
@@ -178,7 +178,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
               className="flex-1 h-12 rounded-xl"
               onPress={() => {}}
             >
-              <CheckCircleIcon className="w-5 h-5" />
+              <CheckCircle size={20} />
               <Text className="text-primary-foreground font-semibold">Заказать</Text>
             </Button>
           </HStack>

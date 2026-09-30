@@ -1,9 +1,7 @@
-import { Button, ButtonText } from '@/components/ui/button';
-import { HStack } from '@/components/ui/hstack';
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
+import { Button, HStack, Text } from '@/components/base';
 import { Receipt } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@/hooks/use-theme';
 
 interface CashboxHeaderProps {
   onOpenCashbox?: () => void;
@@ -11,12 +9,13 @@ interface CashboxHeaderProps {
 
 export function CashboxHeader({ onOpenCashbox }: CashboxHeaderProps) {
   const { t } = useTranslation();
+  const colors = useTheme();
 
   return (
     <HStack className="items-center justify-between mb-3">
       <HStack className="items-center gap-2">
-        <Icon as={Receipt} size="xl" className="text-typography-900" />
-        <Text size="2xl" bold>
+        <Receipt size={28} color={colors.foreground} />
+        <Text className="text-2xl font-bold">
           {t('payment.cashboxList')}
         </Text>
       </HStack>
@@ -25,7 +24,7 @@ export function CashboxHeader({ onOpenCashbox }: CashboxHeaderProps) {
         onPress={onOpenCashbox}
         disabled
       >
-        <ButtonText>+ {t('payment.openCashbox')}</ButtonText>
+        + {t('payment.openCashbox')}
       </Button>
     </HStack>
   );

@@ -1,6 +1,4 @@
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { Badge, BadgeText } from '@/components/ui/badge';
+import { Box, Text } from '@/components/base';
 import { Order, OrderStatus, OrderChannel } from '@/services/order/order.type';
 import { useTranslation } from 'react-i18next';
 
@@ -86,9 +84,9 @@ export function OrderCard({ order, onPress }: OrderCardProps) {
           <Text className="text-sm text-typography-500">
             {t('order.id', { defaultValue: 'Заказ' })} #{order.id.slice(0, 8)}
           </Text>
-          <Badge variant="outline" className="ml-2">
-            <BadgeText>{channelLabel}</BadgeText>
-          </Badge>
+          <Box className="ml-2 px-2 py-0.5 rounded-md border border-border bg-background">
+            <Text className="text-xs font-medium text-foreground">{channelLabel}</Text>
+          </Box>
         </Box>
 
         {/* Date */}

@@ -1,6 +1,6 @@
 import { BottomSheet, Box, Button, HStack, Text, VStack } from '@/components/base';
 import { BottomSheetFlatList, BottomSheetModal, BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { AddIcon, SearchIcon } from '@/components/ui/icon';
+import { Plus, Search } from 'lucide-react-native';
 import { useDebounce } from '@/hooks/use-debounce';
 import { OrderProductVariant } from '@/services/order/order.type';
 import { useOrderProductSearch } from '@/services/product/product.queries';
@@ -70,7 +70,7 @@ function SearchResultItem({
         onPress={() => onAdd(item)}
         disabled={item.quantity === 0}
       >
-        <AddIcon />
+        <Plus size={20} />
       </Button>
     </HStack>
   );
@@ -106,7 +106,7 @@ function SheetContent({
         className="mx-4 mb-3 mt-1 rounded-xl items-center px-3 gap-2"
         style={{ height: 44, backgroundColor: surface, borderWidth: 1, borderColor, borderRadius: 12 }}
       >
-        <SearchIcon size="sm" className="text-muted-foreground shrink-0" />
+        <Search size={18} className="text-muted-foreground shrink-0" />
         <BottomSheetTextInput
           value={searchText}
           onChangeText={onSearchChange}
