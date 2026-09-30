@@ -239,3 +239,22 @@ export interface DebtParams {
     status?: DebtStatus[]
     customerId?: string
 }
+
+export interface OrderProductStockMovement {
+    createdAt: string
+    id: string
+    quantity: number
+    reason: string
+    type: 'OUT' | 'IN'
+    unitCost: number
+    warehouseId: string
+}
+
+export interface OrderProductVariant {
+    barCode: number
+    id: string
+    price: number
+    quantity: number
+    sku: string
+    stockMovements: OrderProductStockMovement[]
+}

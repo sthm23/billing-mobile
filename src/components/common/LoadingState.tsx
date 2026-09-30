@@ -1,6 +1,4 @@
-import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { ActivityIndicator } from 'react-native';
+import { Box, Text, Spinner } from '@/components/base';
 
 interface LoadingStateProps {
   message?: string;
@@ -9,9 +7,9 @@ interface LoadingStateProps {
 export function LoadingState({ message }: LoadingStateProps) {
   return (
     <Box className="flex-1 items-center justify-center">
-      <ActivityIndicator size="large" />
+      <Spinner size="large" />
       {message && (
-        <Text size="lg" className="mt-4">
+        <Text variant="large" className="mt-4">
           {message}
         </Text>
       )}

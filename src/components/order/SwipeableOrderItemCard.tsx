@@ -1,30 +1,34 @@
-import { Box, Pressable } from '@/components/base';
+import { Box } from '@/components/base';
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
-import { Order } from '@/services/order/order.type';
+import { OrderDetailItem } from '@/services/order/order.type';
 import { useRef } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
-import { OrderCard } from './OrderCard';
+import { OrderItemCard } from './OrderItemCard';
 
-interface SwipeableOrderCardProps {
-  order: Order;
-  onDelete?: (orderId: string) => void;
-  onPress?: () => void;
+interface SwipeableOrderItemCardProps {
+  item: OrderDetailItem;
+  index: number;
+  onDelete?: (itemId: string) => void;
+  onQuantityChange?: (itemId: string, delta: number) => void;
 }
 
-export function SwipeableOrderCard({ order, onDelete, onPress }: SwipeableOrderCardProps) {
+export function SwipeableOrderItemCard({
+  item,
+  index,
+  onDelete,
+  onQuantityChange,
+}: SwipeableOrderItemCardProps) {
   const swipeableRef = useRef<Swipeable>(null);
 
   const handleDelete = () => {
     swipeableRef.current?.close();
-    if (onDelete) {
-      onDelete(order.id);
-    }
+    onDelete?.(item.id);
   };
 
   const renderRightActions = (
-    progress: Animated.AnimatedInterpolation<number>,
+    _progress: Animated.AnimatedInterpolation<number>,
     dragX: Animated.AnimatedInterpolation<number>
   ) => {
     const scale = dragX.interpolate({
@@ -34,14 +38,7 @@ export function SwipeableOrderCard({ order, onDelete, onPress }: SwipeableOrderC
     });
 
     return (
-      <Animated.View
-        style={[
-          styles.deleteAction,
-          {
-            transform: [{ scale }],
-          },
-        ]}
-      >
+      <Animated.View style={[styles.deleteAction, { transform: [{ scale }] }]}>
         <RectButton style={styles.deleteButton} onPress={handleDelete}>
           <Box className="items-center justify-center w-full h-full">
             <CustomIcon name={IconNames.TRASH} size={24} color="#FFFFFF" />
@@ -59,20 +56,23 @@ export function SwipeableOrderCard({ order, onDelete, onPress }: SwipeableOrderC
       renderRightActions={renderRightActions}
       overshootRight={false}
     >
-      <Pressable onPress={onPress} className="active:opacity-90">
-        <OrderCard order={order} />
-      </Pressable>
+      <OrderItemCard
+        item={item}
+        index={index}
+        showDivider={index > 0}
+        onQuantityChange={onQuantityChange}
+      />
     </Swipeable>
   );
 }
 
 const styles = StyleSheet.create({
   deleteAction: {
-    width: 80,
+    width: 72,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 8,
-    marginRight: 8,
+    marginVertical: 4,
+    marginRight: 4,
   },
   deleteButton: {
     backgroundColor: '#EF4444',

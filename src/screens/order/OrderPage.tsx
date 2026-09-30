@@ -1,20 +1,12 @@
-import { Box } from '@/components/ui/box';
-import { Button, ButtonIcon } from '@/components/ui/button';
-import { UnlockIcon } from '@/components/ui/icon';
-import {
-    Tabs,
-    TabsIndicator,
-    TabsList,
-    TabsTrigger,
-    TabsTriggerText
-} from '@/components/ui/tabs';
-import { Text } from '@/components/ui/text';
+import { Box, Button, HStack, Pressable, Spinner, Text } from '@/components/base';
 import { useOrders } from '@/services/order/order.queries';
 import { OrderParams, OrderStatus } from '@/services/order/order.type';
+import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList } from 'react-native';
+import { Unlock } from 'lucide-react-native';
 import { OrderCard } from './OrderCard';
 
 
@@ -29,6 +21,7 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
 };
 export default function OrderPage() {
     const { t } = useTranslation();
+    const colors = useTheme();
     const page = 1
     const pageSize = 10
     const [searchText, setSearchText] = useState('');
@@ -63,13 +56,19 @@ export default function OrderPage() {
 
     if (isError) {
         return (
-            <Text size="2xl" bold>Ошибка загрузки заказов</Text>
+            <Box className="flex-1 items-center justify-center p-4">
+                <Text variant="large" className="text-error">
+                    Ошибка загрузки заказов
+                </Text>
+            </Box>
         )
     }
 
     if (isLoading) {
         return (
-            <Text size="2xl" bold>Загрузка...</Text>
+            <Box className="flex-1 items-center justify-center">
+                <Spinner size="large" />
+            </Box>
         )
     }
 
@@ -86,23 +85,46 @@ export default function OrderPage() {
 
     return (
         <>
-            <Box className="w-full flex-row justify-between p-2 gap-4">
-                <Tabs className="w-fit" defaultValue={status} variant="filled" onValueChange={(value: OrderStatusType) => setStatus(value)}>
-                    <TabsList>
+            <Box className="w-full p-2">
+                <HStack gap={4} className="justify-between items-center">
+                    {/* Custom Tab Switcher */}
+                    <HStack gap={2} className="flex-1">
                         {tabOptions.map((option) => {
+                            const isActive = status === option.value;
                             return (
-                                <TabsTrigger value={option.value} key={option.value} >
-                                    <TabsTriggerText>{option.label}</TabsTriggerText>
-                                </TabsTrigger>
+                                <Pressable
+                                    key={option.value}
+                                    onPress={() => setStatus(option.value)}
+                                    className={`
+                                        px-4 py-2 rounded-lg
+                                        ${isActive
+                                            ? 'bg-primary'
+                                            : 'bg-surface'
+                                        }
+                                    `}
+                                >
+                                    <Text
+                                        variant={isActive ? 'default' : 'muted'}
+                                        className={isActive ? 'text-white' : ''}
+                                    >
+                                        {option.label}
+                                    </Text>
+                                </Pressable>
                             )
                         })}
-                        <TabsIndicator />
-                    </TabsList>
-                </Tabs>
-                <Button variant='ghost' size="lg" className="rounded-full p-3.5">
-                    <ButtonIcon as={UnlockIcon} />
-                </Button>
+                    </HStack>
+
+                    {/* Unlock Button */}
+                    <Button
+                        variant="ghost"
+                        size="lg"
+                        className="rounded-full p-3"
+                    >
+                        <Unlock size={20} color={colors.textMuted} />
+                    </Button>
+                </HStack>
             </Box>
+
             <FlatList
                 data={orders}
                 keyExtractor={(item) => item.id}
@@ -117,8 +139,8 @@ export default function OrderPage() {
                     />
                 )}
                 ListEmptyComponent={() => (
-                    <Box className="flex items-center justify-center p-8">
-                        <Text className="text-typography-400 text-base">Нет заказов</Text>
+                    <Box className="flex-1 items-center justify-center p-8">
+                        <Text variant="muted">Нет заказов</Text>
                     </Box>
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}

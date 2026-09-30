@@ -1,8 +1,5 @@
+import { HStack, Pressable, Text, VStack } from '@/components/base';
 import { StatusBadge } from '@/components/cashbox';
-import { HStack } from '@/components/ui/hstack';
-import { Pressable } from '@/components/ui/pressable';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
 import { Order, OrderStatus } from '@/services/order/order.type';
 import { TFunction } from 'i18next';
 
@@ -26,24 +23,24 @@ export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
     });
     return (
         <Pressable
-            className="mb-2 rounded-xl border border-border bg-surface p-4"
+            className="mb-2 rounded-xl border border-border bg-card p-4 shadow-sm"
             onPress={() => onPress(order.id)}
         >
             <HStack className="items-start justify-between">
                 {/* Left side - Info */}
                 <VStack className="flex-1 gap-1">
                     {/* Cashier Name */}
-                    <Text size="lg" bold className="text-typography-900">
+                    <Text variant="large" className="font-bold text-foreground">
                         {cashierName}
                     </Text>
 
                     {/* Warehouse */}
-                    <Text size="sm" className="text-typography-500">
+                    <Text variant="muted">
                         {warehouseName}
                     </Text>
 
                     {/* Date */}
-                    <Text size="sm" className="text-typography-500">
+                    <Text variant="muted">
                         {formattedDate}
                     </Text>
                 </VStack>
@@ -57,7 +54,7 @@ export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
                     />
 
                     {/* total */}
-                    <Text size="lg" bold className="text-typography-900">
+                    <Text variant="large" className="font-bold text-foreground">
                         {total.toLocaleString()} UZS
                     </Text>
                 </VStack>

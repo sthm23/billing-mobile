@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import {
@@ -106,7 +107,9 @@ export default function RootLayout() {
           <StatusBar style={isDarkMode ? 'light' : 'dark'} />
           <AuthProvider >
             <QueryClientProvider client={queryClient}>
-              <InitiallyLayout />
+              <BottomSheetModalProvider>
+                <InitiallyLayout />
+              </BottomSheetModalProvider>
             </QueryClientProvider>
           </AuthProvider>
         </ThemeControlContext.Provider>

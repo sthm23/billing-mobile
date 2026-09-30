@@ -1,8 +1,5 @@
 import { StatusBadge } from '@/components/cashbox';
-import { HStack } from '@/components/ui/hstack';
-import { Pressable } from '@/components/ui/pressable';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { HStack, Pressable, Text, VStack } from '@/components/base';
 import { CashboxStatus, Payment } from '@/models/payment.model';
 import { TFunction } from 'i18next';
 
@@ -34,7 +31,7 @@ export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
     >
       <HStack className="items-start justify-between">
         {/* Left side - Info */}
-        <VStack className="flex-1 gap-1">
+        <VStack className="flex-1" gap={1}>
           {/* Cashier Name */}
           <Text size="lg" bold className="text-typography-900">
             {cashierName}
@@ -52,7 +49,7 @@ export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
         </VStack>
 
         {/* Right side - Status and Balance */}
-        <VStack className="items-end gap-2">
+        <VStack className="items-end" gap={2}>
           {/* Status Badge */}
           <StatusBadge
             label={statusLabel}

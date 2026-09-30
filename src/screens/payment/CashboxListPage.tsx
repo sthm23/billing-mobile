@@ -1,8 +1,6 @@
 import { CashboxFilters, CashboxHeader, CashboxStatusFilter } from '@/components/cashbox';
 import { EmptyState, LoadingState } from '@/components/common';
-import { Box } from '@/components/ui/box';
-import { Button, ButtonText } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
+import { Box, Button, Text } from '@/components/base';
 import { Payment } from '@/models/payment.model';
 import { useCashboxList } from '@/services/cashbox';
 import { CashboxParams } from '@/services/cashbox/cashbox.types';
@@ -110,9 +108,7 @@ export default function CashboxListPage() {
         ListFooterComponent={
           hasMore ? (
             <Button onPress={handleLoadMore} disabled={isFetching} variant="outline">
-              <ButtonText>
-                {isFetching ? t('common.loading') : t('common.loadMore')}
-              </ButtonText>
+              {isFetching ? t('common.loading') : t('common.loadMore')}
             </Button>
           ) : filteredCashboxes.length > 0 ? (
             <Text className="py-4 text-center text-typography-500">

@@ -1,80 +1,89 @@
-import { Box } from '@/components/ui/box';
-import { Divider } from '@/components/ui/divider';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { Box, Divider, HStack, Pressable, Text, VStack } from '@/components/base';
+import CustomIcon from '@/icons/custom-icon';
+import { IconNames } from '@/icons/icon.type';
 import { OrderDetailItem } from '@/services/order/order.type';
 
 interface OrderItemCardProps {
   item: OrderDetailItem;
   index: number;
   showDivider: boolean;
+  onQuantityChange?: (itemId: string, delta: number) => void;
 }
 
-const formatAmount = (amount: number) => {
-  return new Intl.NumberFormat('ru-RU', {
+const formatAmount = (amount: number) =>
+  new Intl.NumberFormat('ru-RU', {
     style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
-};
 
-export function OrderItemCard({ item, index, showDivider }: OrderItemCardProps) {
+const BG_COLORS = ['#3B82F6', '#22C55E', '#A855F7', '#F97316', '#EC4899'];
+
+export function OrderItemCard({ item, index, showDivider, onQuantityChange }: OrderItemCardProps) {
+  const discountAmount = Math.round(item.retailPrice * (item.sale / 100));
+  const hasDiscount = item.sale > 0;
+  const maxStock = item.variant.quantity;
+  const bgColor = BG_COLORS[index % BG_COLORS.length];
+  const initial = item.variant.sku?.charAt(0)?.toUpperCase() ?? '?';
+
   return (
-    <Box>
-      {showDivider && <Divider className="my-3" />}
-      <HStack className="justify-between items-start">
-        <VStack className="flex-1">
-          <HStack className="items-center gap-2 mb-1">
-            <Box className="bg-primary/10 px-2 py-0.5 rounded">
-              <Text className="text-xs font-medium text-primary">
-                #{index + 1}
-              </Text>
-            </Box>
-            <Text className="text-sm font-semibold text-foreground flex-1">
-              {item.variant.sku}
-            </Text>
-          </HStack>
+    <Box className="bg-background">
+      {showDivider && <Divider className="mx-4" />}
+      <HStack className="px-4 py-3 gap-3 items-center">
+        {/* Product image placeholder */}
+        <Box
+          style={{ backgroundColor: bgColor, width: 64, height: 64, borderRadius: 12 }}
+          className="items-center justify-center shrink-0 overflow-hidden"
+        >
+          <Text className="text-white text-2xl font-bold">{initial}</Text>
+        </Box>
 
-          <Text className="text-xs text-typography-500 mb-1">
-            Код: {item.variant.barCode}
+        {/* Product info */}
+        <VStack className="flex-1 gap-0.5">
+          <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+            {item.variant.sku}
+          </Text>
+          <Text className="text-xs text-muted-foreground" numberOfLines={1}>
+            {item.variant.barCode}
           </Text>
 
-          <HStack className="gap-4 mt-1">
-            <HStack className="items-center gap-1">
-              <Text className="text-xs text-typography-400">Кол-во:</Text>
-              <Text className="text-xs font-medium text-foreground">
-                {item.quantity} шт
+          {/* Prices row */}
+          <HStack className="gap-2 items-center mt-0.5 flex-wrap">
+            {hasDiscount && (
+              <Text className="text-xs text-muted-foreground line-through">
+                {formatAmount(item.retailPrice)} UZS
               </Text>
-            </HStack>
-
-            <HStack className="items-center gap-1">
-              <Text className="text-xs text-typography-400">Цена:</Text>
-              <Text className="text-xs font-medium text-foreground">
-                {formatAmount(item.costAtSale)} UZS
-              </Text>
-            </HStack>
-
-            {item.sale > 0 && (
-              <HStack className="items-center gap-1 bg-red-50 dark:bg-red-950 px-2 py-0.5 rounded">
-                <Text className="text-xs font-medium text-red-600 dark:text-red-400">
-                  -{item.sale}%
-                </Text>
-              </HStack>
             )}
-          </HStack>
-        </VStack>
-
-        <VStack className="items-end ml-3">
-          <Text className="text-base font-bold text-foreground">
-            {formatAmount(item.costAtSale * item.quantity)}
-          </Text>
-          <Text className="text-xs text-typography-400">UZS</Text>
-          {item.sale > 0 && (
-            <Text className="text-xs text-typography-400 line-through mt-0.5">
-              {formatAmount(item.retailPrice * item.quantity)}
+            {hasDiscount && (
+              <Text className="text-xs font-medium text-red-500">
+                -{formatAmount(discountAmount)} UZS
+              </Text>
+            )}
+            <Text className="text-sm font-bold text-foreground">
+              {formatAmount(item.costAtSale)} UZS
             </Text>
-          )}
+          </HStack>
+
+          {/* Quantity stepper */}
+          <HStack className="items-center gap-2 mt-1">
+            <Pressable
+              className="w-7 h-7 rounded-full border border-border items-center justify-center active:opacity-70"
+              onPress={() => onQuantityChange?.(item.id, -1)}
+            >
+              <CustomIcon name={IconNames.MINUS} size={16} />
+            </Pressable>
+
+            <Text className="text-sm font-medium text-foreground min-w-12 text-center">
+              {item.quantity}/{maxStock}
+            </Text>
+
+            <Pressable
+              className="w-7 h-7 rounded-full border border-border items-center justify-center active:opacity-70"
+              onPress={() => onQuantityChange?.(item.id, 1)}
+            >
+              <CustomIcon name={IconNames.PLUS} size={16} />
+            </Pressable>
+          </HStack>
         </VStack>
       </HStack>
     </Box>

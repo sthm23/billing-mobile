@@ -1,4 +1,5 @@
 import { BaseListResponse } from '@/models/app.models'
+import { OrderProductVariant } from '@/services/order/order.type'
 import {
   useMutation,
   useQuery,
@@ -132,4 +133,20 @@ export const useProductVariantSearch = (params: ProductVariantSearchParams) => {
   })
 
   return searchQuery
+}
+
+export const useOrderProductSearch = (
+  orderId: string,
+  text: string
+): UseQueryResult<BaseListResponse<OrderProductVariant>> => {
+  return useQuery({
+    queryKey: ['order-product-search', orderId, text],
+    queryFn: async () => {
+      const response = await productService.searchProductsForOrder(orderId, text)
+      return response.data
+    },
+    enabled: Boolean(orderId) && text.length >= 2,
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  })
 }

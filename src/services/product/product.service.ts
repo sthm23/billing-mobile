@@ -1,5 +1,6 @@
 import { productsApi, warehouseApi } from '@/api/axios-instance'
 import { BaseListResponse } from '@/models/app.models'
+import { OrderProductVariant } from '@/services/order/order.type'
 import type {
   CreateProduct,
   CreateProductVariantPayload,
@@ -16,6 +17,7 @@ const ENDPOINTS = {
   LIST: '/',
   BY_ID: (productId: string) => `/${productId}`,
   SEARCH: (warehouseId: string) => `/search/${warehouseId}`,
+  SEARCH_FOR_ORDER: (orderId: string) => `/search/${orderId}`,
   CANCEL: (productId: string) => `/${productId}/cancel`,
   VARIANTS: '/variants',
   VARIANT_BY_ID: (variantId: string) => `/variants/${variantId}`,
@@ -92,6 +94,13 @@ const searchProducts = (warehouseId: string, text: string) => {
   })
 }
 
+const searchProductsForOrder = (orderId: string, text: string) => {
+  return productsApi.get<BaseListResponse<OrderProductVariant>>(
+    ENDPOINTS.SEARCH_FOR_ORDER(orderId),
+    { params: { text } }
+  )
+}
+
 const archiveProduct = (productId: string) => {
   return productsApi.delete<{ message: string }>(ENDPOINTS.BY_ID(productId))
 }
@@ -111,6 +120,7 @@ export const productService = {
   getProducts,
   createProductVariants,
   searchProducts,
+  searchProductsForOrder,
   addInventory,
   updateProductVariant,
   archiveProduct,

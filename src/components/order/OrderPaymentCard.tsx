@@ -1,7 +1,4 @@
-import { Box } from '@/components/ui/box';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { VStack } from '@/components/ui/vstack';
+import { Box, HStack, Text, VStack } from '@/components/base';
 import { OrderPayment, PaymentType } from '@/services/order/order.type';
 
 interface OrderPaymentCardProps {
@@ -68,7 +65,7 @@ export function OrderPaymentCard({ payment }: OrderPaymentCardProps) {
           <Text className="text-sm font-medium text-foreground">
             {getPaymentTypeText(payment.type)}
           </Text>
-          <Text className="text-xs text-typography-500 mt-0.5">
+          <Text className="text-xs text-muted-foreground mt-0.5">
             {formatDate(payment.createdAt)}
           </Text>
         </VStack>
