@@ -34,7 +34,7 @@ export function ProductListHeader({ onCreatePress }: ProductListHeaderProps) {
         onPress={onCreatePress}
         disabled
       >
-        + {t('product.create')}
+        {`+ ${t('product.create')}`}
       </Button>
     </HStack>
   );

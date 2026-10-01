@@ -24,7 +24,7 @@ export function CashboxHeader({ onOpenCashbox }: CashboxHeaderProps) {
         onPress={onOpenCashbox}
         disabled
       >
-        + {t('payment.openCashbox')}
+        {`+ ${t('payment.openCashbox')}`}
       </Button>
     </HStack>
   );

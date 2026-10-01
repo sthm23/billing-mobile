@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import {
   BottomSheetModal,
-  BottomSheetBackdrop as GorhomBackdrop,
+  BottomSheetBackdrop,
   BottomSheetScrollView,
   BottomSheetView,
   type BottomSheetModalProps,
@@ -10,7 +10,7 @@ import {
 import { useColorScheme } from 'react-native';
 
 // Re-export gorhom components for compatibility
-export { BottomSheetScrollView, BottomSheetView };
+export { BottomSheetScrollView, BottomSheetView, BottomSheetBackdrop };
 export type BottomSheetRef = BottomSheetModal;
 
 export interface BottomSheetProps extends Omit<BottomSheetModalProps, 'snapPoints'> {
