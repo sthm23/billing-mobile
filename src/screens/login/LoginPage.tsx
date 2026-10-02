@@ -9,13 +9,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as z from 'zod';
 
-const formSchema = z.object({
-    login: z.string().min(1, 'Login is required'),
-    password: z.string().min(1, 'Password is required')
-});
-
 export function LoginPage() {
     const { t } = useTranslation();
+
+    const formSchema = z.object({
+        login: z.string().min(1, t('login.loginRequired')),
+        password: z.string().min(1, t('login.passwordRequired'))
+    });
     const { login } = useAuth();
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -166,7 +166,7 @@ export function LoginPage() {
                             disabled={loading}
                             className="w-full"
                         >
-                            {loading ? 'Please wait...' : t('login.loginButton')}
+                            {loading ? t('login.pleaseWait') : t('login.loginButton')}
                         </Button>
 
                         {/* Sign Up Link */}

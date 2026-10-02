@@ -1,25 +1,11 @@
-import { Box, Heading } from '@/components/base';
-// import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/i18next/i18next';
-// import { useEffect, useState } from 'react';
+import { Box, Heading } from ‘@/components/base’;
+import { useTranslation } from ‘react-i18next’;
 import {
   SafeAreaView
-} from 'react-native-safe-area-context';
-type ThemeMode = 'light' | 'dark' | 'auto';
-
-const THEME_OPTIONS: { mode: ThemeMode; label: string; description: string }[] = [
-  { mode: 'auto', label: 'Автоматически', description: 'Как в системе' },
-  { mode: 'light', label: 'Светлая', description: 'Всегда светлая' },
-  { mode: 'dark', label: 'Тёмная', description: 'Всегда тёмная' },
-];
-
-const LANGUAGE_OPTIONS = [
-  { value: 'auto', label: 'Автоматически' },
-  { value: 'en', label: 'English' },
-  { value: 'ru', label: 'Русский' },
-  { value: 'uz', label: 'O‘zbekcha' },
-];
+} from ‘react-native-safe-area-context’;
 
 export default function SettingsScreen() {
+  const { t } = useTranslation();
   // const [language, setLanguage] = useState<AppLanguage>('auto');
 
   // useEffect(() => {
@@ -49,7 +35,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-background">
         <Box>
-            <Heading level={1}>Setting page</Heading>
+            <Heading level={1}>{t('profile.settings')}</Heading>
         </Box>
     </SafeAreaView>
   );

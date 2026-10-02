@@ -2,7 +2,9 @@ const en = {
   "common": {
     "loading": "Loading...",
     "loadMore": "Load more",
-    "noMoreData": "No more data"
+    "noMoreData": "No more data",
+    "edit": "Edit",
+    "currency": "UZS"
   },
   "tag": {
     "Material": "Material",
@@ -144,7 +146,10 @@ const en = {
     "signUptext": "Don't have an account?",
     "termsAgreement": "By clicking continue, you agree to our {{termsOfService}} and {{privacyPolicy}}.",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "loginRequired": "Login is required",
+    "passwordRequired": "Password is required",
+    "pleaseWait": "Please wait..."
   },
   "signUp": {
     "title": "Create your account",
@@ -219,7 +224,20 @@ const en = {
     "stockMovementType": {
       "IN": "Input",
       "OUT": "Output"
-    }
+    },
+    "details": "Details",
+    "errorLoading": "Error loading product",
+    "notFound": "Product not found",
+    "categoryLabel": "Category:",
+    "priceUnit": "/ pcs",
+    "parametersSelection": "Parameter selection for sale",
+    "stockRemaining": "Stock remaining:",
+    "unit": "pcs",
+    "buy": "Buy",
+    "staffPanel": "Staff panel",
+    "adminAccess": "Admin access",
+    "history": "History",
+    "stockMovementButton": "Stock In / Write Off"
   },
   "organization": {
     "noFound": "No organization found.",
@@ -247,6 +265,20 @@ const en = {
     "cancel": "Cancel"
   },
   "order": {
+    "activeTab": "Active",
+    "completedTab": "Completed",
+    "errorLoading": "Error loading orders",
+    "noOrders": "No orders",
+    "orderTitle": "Order",
+    "back": "Back",
+    "scan": "Scan",
+    "noItems": "No items",
+    "subtotal": "Subtotal:",
+    "discount": "Discount:",
+    "total": "Total:",
+    "hold": "Hold",
+    "placeOrder": "Place Order",
+    "errorLoadingOrder": "Error loading order",
     "status": {
       "name": "Status",
       "HOLD": "Holding",
@@ -352,6 +384,18 @@ const en = {
   "profile": {
     "title": "Profile",
     "notFound": "No user data available.",
+    "noUser": "No user data",
+    "version": "V 1.0.0",
+    "settings": "Settings",
+    "theme": "Theme",
+    "language": "Language",
+    "themeAuto": "Auto",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "langAuto": "Auto",
+    "langEn": "Eng",
+    "langRu": "Rus",
+    "langUz": "Uzb",
     "type": {
       "name": "Type",
       "OWNER": "Owner",
@@ -487,7 +531,10 @@ const en = {
     "attribute": "Attribute",
     "more": "More",
     "search": "Search"
-
+  },
+  "search": {
+    "title": "Search",
+    "scanTitle": "Scan"
   },
   "notification": {
     "success": "Success",

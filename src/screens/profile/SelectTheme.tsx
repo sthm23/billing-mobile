@@ -19,10 +19,10 @@ export const SelectTheme = () => {
   const { t } = useTranslation();
 
   const THEME_OPTIONS: SelectThemeType[] = useMemo(() => [
-    { mode: ThemeMode.AUTO, label: 'Auto' },
-    { mode: ThemeMode.LIGHT, label: 'Light' },
-    { mode: ThemeMode.DARK, label: 'Dark' },
-  ], []);
+    { mode: ThemeMode.AUTO, label: t('profile.themeAuto') },
+    { mode: ThemeMode.LIGHT, label: t('profile.themeLight') },
+    { mode: ThemeMode.DARK, label: t('profile.themeDark') },
+  ], [t]);
 
   const sheetRef = useRef<BottomSheet>(null);
 
@@ -36,7 +36,7 @@ export const SelectTheme = () => {
           <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-border dark:border-border-dark">
             <CustomIcon name={IconNames.SUN} />
           </Box>
-          <Text>Theme</Text>
+          <Text>{t('profile.theme')}</Text>
         </HStack>
         <ChevronRight size={20} className="text-text dark:text-text-dark" />
       </Pressable>

@@ -15,6 +15,7 @@ import {
 import { Plus } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface ProductDetailScreenProps {
   product: ProductDetail;
@@ -64,6 +65,7 @@ export function getLatestCostPrice(variant: ProductVariant): number {
 }
 
 export default function ProductDetailScreen({ product }: ProductDetailScreenProps) {
+  const { t } = useTranslation();
   const nameById = useMemo(() => buildNameById(product.attributes ?? []), [product.attributes]);
 
   const attributeMap = useMemo(
@@ -134,7 +136,7 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
 
           {(product.category || product.brand) && (
             <Text className="text-sm text-typography-500">
-              {['Категория:', product.category, product.brand ? `(${product.brand})` : '']
+              {[t('product.categoryLabel'), product.category, product.brand ? `(${product.brand})` : '']
                 .filter(Boolean)
                 .join(' ')}
             </Text>
@@ -142,8 +144,8 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
 
           <PriceLabel
             price={displayPrice}
-            prefix={selectedVariant ? undefined : 'от'}
-            unit="/ шт"
+            prefix={selectedVariant ? undefined : t('product.from')}
+            unit={t('product.priceUnit')}
             size="lg"
           />
         </VStack>
@@ -154,7 +156,7 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
         {attributeNames.length > 0 && (
           <VStack className="gap-4">
             <Text className="text-xs font-semibold text-typography-500 uppercase tracking-wider">
-              Выбор параметров для продажи
+              {t('product.parametersSelection')}
             </Text>
 
             {attributeNames.map((attrName) => {
@@ -178,9 +180,9 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
 
             <VStack className="gap-1.5">
               <HStack className="justify-between items-center">
-                <Text className="text-sm font-medium text-foreground">Количество</Text>
+                <Text className="text-sm font-medium text-foreground">{t('product.quantity')}</Text>
                 <Text className="text-xs text-typography-400">
-                  Остаток на складе: {stockForSelected} шт.
+                  {t('product.stockRemaining')} {stockForSelected} {t('product.unit')}
                 </Text>
               </HStack>
               <QuantityStepper
@@ -198,7 +200,7 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
               disabled={stockForSelected === 0}
             >
               <Plus size={20} color="#ffffff" />
-              <Text className="ml-2 text-white font-semibold">Купить</Text>
+              <Text className="ml-2 text-white font-semibold">{t('product.buy')}</Text>
             </Button>
           </VStack>
         )}
@@ -208,8 +210,8 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
         {/* Admin Panel */}
         <VStack className="gap-3">
           <AdminSectionHeader
-            title="Панель сотрудника"
-            subtitle="Админ-доступ"
+            title={t('product.staffPanel')}
+            subtitle={t('product.adminAccess')}
             onDelete={handleDelete}
           />
 

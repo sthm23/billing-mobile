@@ -45,7 +45,7 @@ export const PaymentBreakdownDialog = ({ isOpen, onClose, transactions, balance 
       <AlertDialogBackdrop />
       <AlertDialogContent>
         <AlertDialogHeader>
-          <Text size="xl" bold>{t('payment.paymentBreakdown')}</Text>
+          <Text size="xl" variant='bold'>{t('payment.paymentBreakdown')}</Text>
         </AlertDialogHeader>
 
         <AlertDialogBody>
@@ -56,8 +56,8 @@ export const PaymentBreakdownDialog = ({ isOpen, onClose, transactions, balance 
                   <CustomIcon name={PAYMENT_TYPE_ICON[type]} size={20} />
                   <Text size="md">{t(`order.paymentMethod.${type}`)}</Text>
                 </HStack>
-                <Text size="md" bold>
-                  {totalByType(type).toLocaleString()} UZS
+                <Text size="md" variant='bold'>
+                  {totalByType(type).toLocaleString()} {t('common.currency')}
                 </Text>
               </HStack>
             ))}
@@ -65,9 +65,9 @@ export const PaymentBreakdownDialog = ({ isOpen, onClose, transactions, balance 
             <Divider />
 
             <HStack className="items-center justify-between">
-              <Text size="md" bold>{t('payment.total')}</Text>
-              <Text size="lg" bold className="text-primary-600">
-                {balance.toLocaleString()} UZS
+              <Text size="md" variant='bold'>{t('payment.total')}</Text>
+              <Text size="lg" variant='bold' className="text-primary-600">
+                {balance.toLocaleString()} {t('common.currency')}
               </Text>
             </HStack>
           </VStack>

@@ -1,5 +1,6 @@
 import { HStack, Text } from '@/components/base';
 import { formatPrice } from '@/libs/product-utils';
+import { useTranslation } from 'react-i18next';
 
 interface PriceLabelProps {
   price: number | string;
@@ -15,6 +16,7 @@ const sizeMap = {
 };
 
 export function PriceLabel({ price, prefix, unit, size = 'md' }: PriceLabelProps) {
+  const { t } = useTranslation();
   const textSize = sizeMap[size];
 
   return (
@@ -23,7 +25,7 @@ export function PriceLabel({ price, prefix, unit, size = 'md' }: PriceLabelProps
         <Text className={`${textSize} text-foreground`}>{prefix}</Text>
       )}
       <Text className={`${textSize} font-bold text-foreground`}>
-        {formatPrice(price)} UZS
+        {formatPrice(price)} {t('common.currency')}
       </Text>
       {unit && (
         <Text className="text-sm text-typography-500">{unit}</Text>

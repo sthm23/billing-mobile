@@ -2,7 +2,9 @@ const ru = {
   "common": {
     "loading": "Загрузка...",
     "loadMore": "Загрузить ещё",
-    "noMoreData": "Больше нет данных"
+    "noMoreData": "Больше нет данных",
+    "edit": "Изменить",
+    "currency": "UZS"
   },
   "tag": {
     "Material": "Материал",
@@ -144,7 +146,10 @@ const ru = {
     "signUptext": "Нет аккаунта?",
     "termsAgreement": "Нажимая продолжить, вы соглашаетесь с нашими {{termsOfService}} и {{privacyPolicy}}.",
     "privacyPolicy": "Политика конфиденциальности",
-    "termsOfService": "Условия использования"
+    "termsOfService": "Условия использования",
+    "loginRequired": "Логин обязателен",
+    "passwordRequired": "Пароль обязателен",
+    "pleaseWait": "Пожалуйста, подождите..."
   },
   "signUp": {
     "title": "Создайте аккаунт",
@@ -219,7 +224,20 @@ const ru = {
     "stockMovementType": {
       "IN": "Приход",
       "OUT": "Уход"
-    }
+    },
+    "details": "Детали",
+    "errorLoading": "Ошибка загрузки продукта",
+    "notFound": "Продукт не найден",
+    "categoryLabel": "Категория:",
+    "priceUnit": "/ шт",
+    "parametersSelection": "Выбор параметров для продажи",
+    "stockRemaining": "Остаток на складе:",
+    "unit": "шт.",
+    "buy": "Купить",
+    "staffPanel": "Панель сотрудника",
+    "adminAccess": "Админ-доступ",
+    "history": "История",
+    "stockMovementButton": "Приход / Списание"
   },
   "organization": {
     "noFound": "Магазин не найден.",
@@ -247,6 +265,20 @@ const ru = {
     "cancel": "Отмена"
   },
   "order": {
+    "activeTab": "Активные",
+    "completedTab": "Завершённые",
+    "errorLoading": "Ошибка загрузки заказов",
+    "noOrders": "Нет заказов",
+    "orderTitle": "Заказ",
+    "back": "Назад",
+    "scan": "Scan",
+    "noItems": "Нет товаров",
+    "subtotal": "Общая сумма:",
+    "discount": "Скидка:",
+    "total": "Итого:",
+    "hold": "Бронь",
+    "placeOrder": "Заказать",
+    "errorLoadingOrder": "Ошибка загрузки заказа",
     "status": {
       "name": "Статус",
       "HOLD": "Ожидание",
@@ -352,6 +384,18 @@ const ru = {
   "profile": {
     "title": "Профиль",
     "notFound": "Данные пользователя недоступны.",
+    "noUser": "Нет данных пользователя",
+    "version": "V 1.0.0",
+    "settings": "Настройки",
+    "theme": "Тема",
+    "language": "Язык",
+    "themeAuto": "Авто",
+    "themeLight": "Светлая",
+    "themeDark": "Тёмная",
+    "langAuto": "Авто",
+    "langEn": "Англ",
+    "langRu": "Рус",
+    "langUz": "Узб",
     "type": {
       "name": "Тип",
       "OWNER": "Владелец",
@@ -488,6 +532,10 @@ const ru = {
     "attribute": "Атрибут",
     "more": "Еще",
     "search": "Поиск"
+  },
+  "search": {
+    "title": "Поиск",
+    "scanTitle": "Сканировать"
   },
   "notification": {
     "success": "Успех",

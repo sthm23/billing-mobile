@@ -31,8 +31,8 @@ export default function OrderPage() {
         value: OrderStatusType;
         label: string;
     }[] = [
-            { value: 'active', label: t('Active') },
-            { value: 'completed', label: t('Completed') },
+            { value: 'active', label: t('order.activeTab') },
+            { value: 'completed', label: t('order.completedTab') },
         ];
 
     const listParams = useMemo<OrderParams>(
@@ -58,7 +58,7 @@ export default function OrderPage() {
         return (
             <Box className="flex-1 items-center justify-center p-4">
                 <Text variant="large" className="text-error">
-                    Ошибка загрузки заказов
+                    {t('order.errorLoading')}
                 </Text>
             </Box>
         )
@@ -140,7 +140,7 @@ export default function OrderPage() {
                 )}
                 ListEmptyComponent={() => (
                     <Box className="flex-1 items-center justify-center p-8">
-                        <Text variant="muted">Нет заказов</Text>
+                        <Text variant="muted">{t('order.noOrders')}</Text>
                     </Box>
                 )}
                 contentContainerStyle={{ flexGrow: 1 }}

@@ -4,6 +4,7 @@ import { ProductVariant, StockMovementType } from '@/services/product/product.ty
 import { Clock, Plus } from 'lucide-react-native';
 import { PricePair } from './PricePair';
 import { QuantityBadge } from './QuantityBadge';
+import { useTranslation } from 'react-i18next';
 
 interface ProductVariantCardProps {
   variant: ProductVariant;
@@ -37,6 +38,7 @@ export function ProductVariantCard({
   onHistory,
   onMovement,
 }: ProductVariantCardProps) {
+  const { t } = useTranslation();
   const colors = useTheme();
   const label = getVariantLabel(variant, nameById);
   const costPrice = getLatestCostPrice(variant);
@@ -67,7 +69,7 @@ export function ProductVariantCard({
           onPress={() => onHistory?.(variant.id)}
         >
           <Clock size={16} color={colors.text} />
-          <Text className="ml-2 ">История</Text>
+          <Text className="ml-2 ">{t('product.history')}</Text>
         </Button>
         <Button
           variant="outline"
@@ -76,7 +78,7 @@ export function ProductVariantCard({
           onPress={() => onMovement?.(variant.id)}
         >
           <Plus size={16} color={colors.text} />
-          <Text className="ml-2 ">Приход / Списание</Text>
+          <Text className="ml-2 ">{t('product.stockMovementButton')}</Text>
         </Button>
       </HStack>
     </Card>

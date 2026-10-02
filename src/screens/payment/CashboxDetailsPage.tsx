@@ -191,7 +191,7 @@ export default function CashboxDetailsPage() {
                   </Text>
                   <HStack className="items-center gap-2 mt-1">
                     <Text size="3xl" variant={'bold'}>
-                      {cashbox.balance.toLocaleString()} UZS
+                      {cashbox.balance.toLocaleString()} {t('common.currency')}
                     </Text>
                     <CustomIcon name={IconNames.ARROW_RIGHT} size={18} />
                   </HStack>
@@ -207,7 +207,7 @@ export default function CashboxDetailsPage() {
                     {t('payment.totalIncome')}
                   </Text>
                   <Text size="lg" variant={'bold'} className="text-success-600 mt-1">
-                    + {totalIncome.toLocaleString()} UZS
+                    + {totalIncome.toLocaleString()} {t('common.currency')}
                   </Text>
                 </VStack>
                 <VStack className="items-end">
@@ -215,7 +215,7 @@ export default function CashboxDetailsPage() {
                     {t('payment.totalExpense')}
                   </Text>
                   <Text size="lg" variant={'bold'} className="text-error-600 mt-1">
-                    - {totalExpense.toLocaleString()} UZS
+                    - {totalExpense.toLocaleString()} {t('common.currency')}
                   </Text>
                 </VStack>
               </HStack>

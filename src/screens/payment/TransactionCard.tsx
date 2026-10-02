@@ -43,7 +43,7 @@ export const TransactionCard = ({ transaction, showDivider = true, t }: Props) =
 
         {/* Info */}
         <VStack className="flex-1 gap-0.5">
-          <Text size="sm" bold numberOfLines={1}>
+          <Text size="sm" variant='bold' numberOfLines={1}>
             {t(`payment.category.${transaction.category}`)}
           </Text>
           <HStack className="items-center gap-2">
@@ -56,8 +56,8 @@ export const TransactionCard = ({ transaction, showDivider = true, t }: Props) =
         </VStack>
 
         {/* Amount */}
-        <Text size="md" bold className={amountColor}>
-          {amountSign} {(+transaction.amount).toLocaleString()} UZS
+        <Text size="md" variant='bold' className={amountColor}>
+          {amountSign} {(+transaction.amount).toLocaleString()} {t('common.currency')}
         </Text>
       </HStack>
     </Box>

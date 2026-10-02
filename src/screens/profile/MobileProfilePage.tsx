@@ -45,7 +45,7 @@ const MobileProfilePage = ({ isActive }: any) => {
           <LogoutButton
             onLogOutPress={handleLogout}
           />
-          <Text>V 1.0.0</Text>
+          <Text>{t('profile.version')}</Text>
         </Box>
       </Box>
     </ScrollView>

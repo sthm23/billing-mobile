@@ -28,7 +28,7 @@ Expo changes significantly between versions. Do NOT use:
 - **React**: 19.2.3
 - **Expo Router**: v56 (file-based routing with typed routes)
 - **Styling**: NativeWind v4 (Tailwind CSS for React Native)
-- **UI**: @expo/ui (native components), custom components
+- **UI**: @expo/ui (icons), custom base components, @react-native-picker/picker
 - **Data Fetching**: React Query
 - **Forms**: React Hook Form + Zod validation
 - **i18n**: i18next (en, ru, uz)
@@ -316,6 +316,44 @@ import { Input } from '@/components/base/input';
   value={text}
   onChangeText={setText}
 />
+```
+
+**Select** (Native Picker):
+```tsx
+import { Select } from '@/components/base';
+
+<Select
+  variant="outline" | "underlined" | "rounded"
+  size="sm" | "md" | "lg"
+  selectedValue={value}
+  onValueChange={setValue}
+  disabled={false}
+>
+  <Select.Item label="Option 1" value="opt1" />
+  <Select.Item label="Option 2" value="opt2" />
+</Select>
+```
+
+**IMPORTANT**: Select uses native `@react-native-picker/picker`:
+- **Android**: Shows dropdown menu
+- **iOS**: Shows wheel picker at bottom
+
+**Example with dynamic options**:
+```tsx
+<Select
+  variant="outline"
+  size="md"
+  selectedValue={selectedCategory}
+  onValueChange={setSelectedCategory}
+>
+  {categories.map((cat) => (
+    <Select.Item
+      key={cat.id}
+      label={cat.name}
+      value={cat.id}
+    />
+  ))}
+</Select>
 ```
 
 ### Themed Components
@@ -769,6 +807,52 @@ npx expo start
 1. Check `metro.config.js` has `withNativeWind`
 2. Check `babel.config.js` has `nativewind/babel`
 3. Clear cache: `npx expo start --clear`
+
+### "Text strings must be rendered within a <Text> component"
+
+**Cause**: Using `text-primary-foreground` class with NativeWind
+
+**Why it fails**: NativeWind doesn't correctly process complex CSS variables like `text-primary-foreground` defined in `global.css`, causing text to render outside `<Text>` components.
+
+**Solution**: Replace `text-primary-foreground` with `text-white`:
+```tsx
+// ❌ Wrong
+<Text className="text-primary-foreground">Button Text</Text>
+
+// ✅ Correct
+<Text className="text-white">Button Text</Text>
+```
+
+### "A Jetpack Compose view must be rendered as a direct child of <Host>"
+
+**Cause**: Using `@expo/ui` Compose components (Icon, Picker, Column, Text) without proper `<Host>` wrapper
+
+**Solution**: Wrap Compose components directly with `<Host>`:
+```tsx
+// ❌ Wrong
+<BottomSheet>
+  <Host>
+    <BottomSheetView>
+      <Box>Compose components</Box>
+    </BottomSheetView>
+  </Host>
+</BottomSheet>
+
+// ✅ Correct
+<BottomSheet>
+  <BottomSheetView>
+    <Host>
+      <Box>Compose components</Box>
+    </Host>
+  </BottomSheetView>
+</BottomSheet>
+```
+
+**Better solution**: Use native React Native components instead of `@expo/ui` Compose components:
+- For Picker: Use `<Select>` from `@/components/base` (wraps `@react-native-picker/picker`)
+- For Icons: Use `CustomIcon` (properly wrapped with `<Host>`)
+
+**Note**: `<Host>` is only needed when using `@expo/ui` Jetpack Compose components (Icon, Column, Picker, Text). Regular React Native components don't need it.
 
 ---
 

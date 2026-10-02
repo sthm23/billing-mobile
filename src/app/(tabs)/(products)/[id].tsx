@@ -15,14 +15,14 @@ export default function ProductDetailRoute() {
 
   useEffect(() => {
     navigation.setOptions({
-      title: product?.name ?? t('product.details', 'Детали'),
+      title: product?.name ?? t('product.details'),
       headerRight: () => (
         <Button variant="ghost" size="sm" onPress={() => console.log('Edit')}>
-          {t('common.edit', 'Изменить')}
+          {t('common.edit')}
         </Button>
       ),
     });
-  }, [navigation, product?.name]);
+  }, [navigation, product?.name, t]);
 
   if (isLoading) {
     return (
@@ -36,7 +36,7 @@ export default function ProductDetailRoute() {
     return (
       <View className="flex-1 items-center justify-center px-6">
         <Text variant="muted" className="text-center">
-          {isError ? 'Ошибка загрузки продукта' : 'Продукт не найден'}
+          {isError ? t('product.errorLoading') : t('product.notFound')}
         </Text>
       </View>
     );

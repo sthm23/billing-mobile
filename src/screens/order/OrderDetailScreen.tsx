@@ -16,6 +16,7 @@ import { OrderProductVariant } from '@/services/order/order.type';
 import { router } from 'expo-router';
 import { useRef } from 'react';
 import { FlatList } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface OrderDetailScreenProps {
   orderId: string;
@@ -29,6 +30,7 @@ const formatAmount = (amount: number) =>
   }).format(amount);
 
 export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
+  const { t } = useTranslation();
   const { data: order, isLoading, isError } = useOrderById(orderId);
   const searchSheetRef = useRef<ProductSearchSheetRef>(null);
 
@@ -40,7 +42,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   if (isLoading) {
     return (
       <Box className="flex-1 items-center justify-center">
-        <Text className="text-base text-typography-500">Загрузка...</Text>
+        <Text className="text-base text-typography-500">{t('common.loading')}</Text>
       </Box>
     );
   }
@@ -49,9 +51,9 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
     return (
       <Box className="flex-1 items-center justify-center p-4">
         <VStack gap={4} className="items-center">
-          <Text className="text-base text-destructive">Ошибка загрузки заказа</Text>
+          <Text className="text-base text-destructive">{t('order.errorLoadingOrder')}</Text>
           <Button onPress={() => router.back()} variant="outline">
-            Назад
+            {t('order.back')}
           </Button>
         </VStack>
       </Box>
@@ -81,7 +83,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           <Button variant="ghost" size="sm" onPress={() => router.back()}>
             <ArrowLeft size={20} />
           </Button>
-          <Text className="text-lg font-semibold text-foreground">Заказ</Text>
+          <Text className="text-lg font-semibold text-foreground">{t('order.orderTitle')}</Text>
         </HStack>
 
         {/* Search + Scan + Customer */}
@@ -92,7 +94,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
             onPress={() => searchSheetRef.current?.open()}
           >
             <Search size={18} className="text-muted-foreground" />
-            <Text className="text-muted-foreground font-normal">Поиск</Text>
+            <Text className="text-muted-foreground font-normal">{t('navigation.search')}</Text>
           </Button>
           <Button
             variant="default"
@@ -101,7 +103,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
             onPress={() => searchSheetRef.current?.open()}
           >
             <CustomIcon name={IconNames.BARCODE_SCANNER} size={18} color="#fff" />
-            <Text className="text-background text-sm font-medium">Scan</Text>
+            <Text className="text-background text-sm font-medium">{t('order.scan')}</Text>
           </Button>
           <Button variant="outline" size="sm" className="h-10 w-10 rounded-xl">
             <CustomIcon name={IconNames.PERSON} size={20} />
@@ -122,7 +124,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           )}
           ListEmptyComponent={() => (
             <Box className="flex-1 items-center justify-center p-12">
-              <Text className="text-typography-400 text-base">Нет товаров</Text>
+              <Text className="text-typography-400 text-base">{t('order.noItems')}</Text>
             </Box>
           )}
           contentContainerStyle={{ flexGrow: 1 }}
@@ -132,17 +134,17 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
         <Box className="bg-background border-t border-border px-4 pt-3 pb-4">
           <VStack gap={2}>
             <HStack className="justify-between items-center">
-              <Text className="text-sm text-typography-500">Общая сумма:</Text>
+              <Text className="text-sm text-typography-500">{t('order.subtotal')}</Text>
               <Text className="text-sm font-medium text-foreground">
-                {formatAmount(subtotal)} UZS
+                {formatAmount(subtotal)} {t('common.currency')}
               </Text>
             </HStack>
 
             <HStack className="justify-between items-center">
-              <Text className="text-sm text-typography-500">Скидка:</Text>
+              <Text className="text-sm text-typography-500">{t('order.discount')}</Text>
               <HStack className="items-center" gap={2}>
                 <Text className="text-sm font-semibold text-destructive">
-                  -{formatAmount(totalDiscount)} UZS
+                  -{formatAmount(totalDiscount)} {t('common.currency')}
                 </Text>
                 <Button variant="outline" size="sm" className="h-7 w-7 rounded-lg">
                   <Trash2 size={16} className="text-destructive" />
@@ -151,10 +153,10 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
             </HStack>
 
             <HStack className="justify-between items-center">
-              <Text className="text-sm font-semibold text-foreground">Итого:</Text>
+              <Text className="text-sm font-semibold text-foreground">{t('order.total')}</Text>
               <HStack className="items-center" gap={2}>
                 <Text className="text-base font-bold text-foreground">
-                  {formatAmount(order.totalAmount)} UZS
+                  {formatAmount(order.totalAmount)} {t('common.currency')}
                 </Text>
                 <Button variant="outline" size="sm" className="h-7 w-7 rounded-lg">
                   <ExternalLink size={16} />
@@ -171,7 +173,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
               onPress={() => {}}
             >
               <Clock size={20} />
-              <Text className="text-foreground font-medium">Бронь</Text>
+              <Text className="text-foreground font-medium">{t('order.hold')}</Text>
             </Button>
             <Button
               variant="default"
@@ -179,7 +181,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
               onPress={() => {}}
             >
               <CheckCircle size={20} color="#ffffff" />
-              <Text className="text-white font-semibold">Заказать</Text>
+              <Text className="text-white font-semibold">{t('order.placeOrder')}</Text>
             </Button>
           </HStack>
         </Box>

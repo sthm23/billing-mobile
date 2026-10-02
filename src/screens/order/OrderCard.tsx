@@ -55,7 +55,7 @@ export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
 
                     {/* total */}
                     <Text variant="large" className="font-bold text-foreground">
-                        {total.toLocaleString()} UZS
+                        {total.toLocaleString()} {t('common.currency')}
                     </Text>
                 </VStack>
             </HStack>

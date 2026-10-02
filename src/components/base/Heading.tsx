@@ -1,6 +1,5 @@
-import React from 'react';
-import { Text, type TextProps } from 'react-native';
 import { cn } from '@/libs/utils';
+import { Text, type TextProps } from 'react-native';
 
 export interface HeadingProps extends TextProps {
   /**
@@ -17,7 +16,7 @@ export interface HeadingProps extends TextProps {
  * Heading — компонент заголовков
  *
  * Используется для заголовков разных уровней.
- * По умолчанию bold и использует semantic color.
+ * По умолчанию variant='bold' и использует semantic color.
  *
  * @example
  * <Heading level={1}>Main Title</Heading>

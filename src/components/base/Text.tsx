@@ -46,7 +46,7 @@ export function Text({
     muted: 'text-sm text-muted-foreground',
     small: 'text-xs text-foreground',
     large: 'text-lg text-foreground',
-    bold: 'text-base font-bold text-foreground',
+    variant='bold': 'text-base font-bold text-foreground',
   };
 
   return (

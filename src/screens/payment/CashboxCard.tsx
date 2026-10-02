@@ -1,5 +1,5 @@
-import { StatusBadge } from '@/components/cashbox';
 import { HStack, Pressable, Text, VStack } from '@/components/base';
+import { StatusBadge } from '@/components/cashbox';
 import { CashboxStatus, Payment } from '@/models/payment.model';
 import { TFunction } from 'i18next';
 
@@ -33,7 +33,7 @@ export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
         {/* Left side - Info */}
         <VStack className="flex-1" gap={1}>
           {/* Cashier Name */}
-          <Text size="lg" bold className="text-typography-900">
+          <Text size="lg" variant='bold' className="text-typography-900">
             {cashierName}
           </Text>
 
@@ -57,8 +57,8 @@ export const CashboxCard = ({ cashbox, onPress, t }: CashboxCardProps) => {
           />
 
           {/* Balance */}
-          <Text size="lg" bold className="text-typography-900">
-            {balance.toLocaleString()} UZS
+          <Text size="lg" variant='bold' className="text-typography-900">
+            {balance.toLocaleString()} {t('common.currency')}
           </Text>
         </VStack>
       </HStack>

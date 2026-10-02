@@ -2,7 +2,9 @@ const uz = {
   "common": {
     "loading": "Yuklanmoqda...",
     "loadMore": "Yana yuklash",
-    "noMoreData": "Boshqa ma'lumot yo'q"
+    "noMoreData": "Boshqa ma'lumot yo'q",
+    "edit": "O'zgartirish",
+    "currency": "UZS"
   },
   "tag": {
     "Material": "Material",
@@ -144,7 +146,10 @@ const uz = {
     "signUptext": "Hisobingiz yo'qmi?",
     "termsAgreement": "Davom etish tugmasini bosish orqali siz bizning {{termsOfService}} va {{privacyPolicy}} bilan rozilik bildirasiz.",
     "privacyPolicy": "Maxfiylik siyosati",
-    "termsOfService": "Xizmat ko'rsatish shartlari"
+    "termsOfService": "Xizmat ko'rsatish shartlari",
+    "loginRequired": "Login majburiy",
+    "passwordRequired": "Parol majburiy",
+    "pleaseWait": "Iltimos kuting..."
   },
   "signUp": {
     "title": "Ro'yxatdan o'tish",
@@ -219,7 +224,20 @@ const uz = {
     "stockMovementType": {
       "IN": "Kirim",
       "OUT": "Chiqim"
-    }
+    },
+    "details": "Tafsilotlar",
+    "errorLoading": "Mahsulotni yuklashda xato",
+    "notFound": "Mahsulot topilmadi",
+    "categoryLabel": "Toifa:",
+    "priceUnit": "/ dona",
+    "parametersSelection": "Sotuv uchun parametrlarni tanlash",
+    "stockRemaining": "Omborda qoldiq:",
+    "unit": "dona",
+    "buy": "Sotib olish",
+    "staffPanel": "Xodimlar paneli",
+    "adminAccess": "Admin kirish",
+    "history": "Tarix",
+    "stockMovementButton": "Kirim / Chiqim"
   },
   "organization": {
     "noFound": "Do'kon topilmadi.",
@@ -247,6 +265,20 @@ const uz = {
     "cancel": "Bekor qilmoq"
   },
   "order": {
+    "activeTab": "Faol",
+    "completedTab": "Tugallangan",
+    "errorLoading": "Zakazlarni yuklashda xato",
+    "noOrders": "Zakazlar yo'q",
+    "orderTitle": "Zakaz",
+    "back": "Orqaga",
+    "scan": "Scan",
+    "noItems": "Tovarlar yo'q",
+    "subtotal": "Umumiy summa:",
+    "discount": "Chegirma:",
+    "total": "Jami:",
+    "hold": "Bronlash",
+    "placeOrder": "Zakaz berish",
+    "errorLoadingOrder": "Zakazni yuklashda xato",
     "status": {
       "name": "Status",
       "HOLD": "Kutilmoqda",
@@ -352,6 +384,18 @@ const uz = {
   "profile": {
     "title": "Profil",
     "notFound": "Foydalanuvchi ma'lumotlari mavjud emas.",
+    "noUser": "Foydalanuvchi ma'lumotlari yo'q",
+    "version": "V 1.0.0",
+    "settings": "Sozlamalar",
+    "theme": "Mavzu",
+    "language": "Til",
+    "themeAuto": "Avto",
+    "themeLight": "Yorug'",
+    "themeDark": "Qorong'i",
+    "langAuto": "Avto",
+    "langEn": "Ingl",
+    "langRu": "Rus",
+    "langUz": "O'zb",
     "type": {
       "name": "Tur",
       "OWNER": "Egasi",
@@ -488,6 +532,10 @@ const uz = {
     "attribute": "Atribut",
     "more": "Boshqa",
     "search": "Qidirish"
+  },
+  "search": {
+    "title": "Qidirish",
+    "scanTitle": "Skanerlash"
   },
   "notification": {
     "success": "Muvaffaqiyat",

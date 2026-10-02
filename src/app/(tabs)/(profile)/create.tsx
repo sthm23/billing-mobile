@@ -6,7 +6,7 @@ export default function CreateProfileLayout() {
     return (
         <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-background">
             <Box>
-                <Text size="2xl" bold>Create Profile page</Text>
+                <Text size="2xl" variant='bold'>Create Profile page</Text>
             </Box>
         </SafeAreaView>
     )

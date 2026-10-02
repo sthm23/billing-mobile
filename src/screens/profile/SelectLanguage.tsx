@@ -6,8 +6,10 @@ import BottomSheet from '@expo/ui/community/bottom-sheet';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, useColorScheme } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 export const SelectLanguage = () => {
+  const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const [language, setLanguage] = useState<AppLanguage>(AppLanguage.AUTO);
 
@@ -30,12 +32,12 @@ export const SelectLanguage = () => {
 
   const LANGUAGE_OPTIONS = useMemo(() => {
     return [
-      { value: AppLanguage.AUTO, label: 'auto' },
-      { value: AppLanguage.EN, label: 'Eng' },
-      { value: AppLanguage.RU, label: 'Rus' },
-      { value: AppLanguage.UZ, label: 'Uzb' },
+      { value: AppLanguage.AUTO, label: t('profile.langAuto') },
+      { value: AppLanguage.EN, label: t('profile.langEn') },
+      { value: AppLanguage.RU, label: t('profile.langRu') },
+      { value: AppLanguage.UZ, label: t('profile.langUz') },
     ]
-  }, []);
+  }, [t]);
 
   const onLanguagePress = async (lang: AppLanguage) => {
     await setAppLanguage(lang);
@@ -54,7 +56,7 @@ export const SelectLanguage = () => {
           <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-border dark:border-border-dark">
             <CustomIcon name={IconNames.LANGUAGE} />
           </Box>
-          <Text>Language</Text>
+          <Text>{t('profile.language')}</Text>
         </HStack>
         <ChevronRight size={20} className="text-text dark:text-text-dark" />
       </Pressable>
