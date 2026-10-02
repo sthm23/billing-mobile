@@ -1,49 +1,46 @@
 import {
-  Actionsheet,
-  ActionsheetBackdrop,
-  ActionsheetContent,
-  ActionsheetDragIndicator,
-  ActionsheetDragIndicatorWrapper,
   Box,
-  Button,
-  ButtonText,
   Card,
   HStack,
-  Text,
+  Text
 } from "@/components/base";
 import { CashboxTransaction } from "@/models/payment.model";
+import BottomSheet, { BottomSheetMethods, BottomSheetScrollView, BottomSheetView } from '@expo/ui/community/bottom-sheet';
+import { RefObject } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView } from "react-native";
+import { useColorScheme } from "react-native";
 import { TransactionCard } from "./TransactionCard";
 
 type Props = {
-  isOpen: boolean;
-  onClose: () => void;
+  sheetRef: RefObject<BottomSheetMethods | null>;
   transactions: CashboxTransaction[];
 };
 
-export const AllTransactionsSheet = ({ isOpen, onClose, transactions }: Props) => {
+export const AllTransactionsSheet = ({ sheetRef, transactions }: Props) => {
   const { t } = useTranslation();
-
+  const colorScheme = useColorScheme();
+  const backgroundColor = colorScheme === 'dark' ? '#18181b' : '#ffffff';
   return (
-    <Actionsheet isOpen={isOpen} onClose={onClose}>
-      <ActionsheetBackdrop />
-      <ActionsheetContent className="max-h-[85vh]">
-        <ActionsheetDragIndicatorWrapper>
-          <ActionsheetDragIndicator />
-        </ActionsheetDragIndicatorWrapper>
 
+    <BottomSheet
+      backgroundStyle={{ backgroundColor }}
+      ref={sheetRef}
+      snapPoints={['50%', '90%']}
+      index={-1}
+      enablePanDownToClose
+    >
+      <BottomSheetView>
         <Box className="w-full px-4 pt-3 pb-6">
           {/* Header */}
           <HStack className="items-center justify-between mb-4">
-            <Text size="xl" bold>{t('payment.transactions')}</Text>
+            <Text size="xl" variant='bold'>{t('payment.transactions')}</Text>
             <Text size="sm" className="text-typography-500">
               {transactions.length} {t('payment.payments')}
             </Text>
           </HStack>
 
           {/* Transactions list */}
-          <ScrollView showsVerticalScrollIndicator={false} className="max-h-[65vh]">
+          <BottomSheetScrollView  >
             {transactions.length === 0 ? (
               <Box className="py-10 items-center">
                 <Text className="text-typography-500">{t('payment.noFound')}</Text>
@@ -60,13 +57,9 @@ export const AllTransactionsSheet = ({ isOpen, onClose, transactions }: Props) =
                 ))}
               </Card>
             )}
-          </ScrollView>
-
-          <Button variant="outline" onPress={onClose} className="mt-4">
-            <ButtonText>{t('payment.close')}</ButtonText>
-          </Button>
+          </BottomSheetScrollView>
         </Box>
-      </ActionsheetContent>
-    </Actionsheet>
+      </BottomSheetView>
+    </BottomSheet>
   );
 };

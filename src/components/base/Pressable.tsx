@@ -45,7 +45,7 @@ export interface PressableProps extends RNPressableProps {
  *   onPress={handleAction}
  *   className="p-4 bg-primary rounded-lg disabled:opacity-50"
  * >
- *   <Text className="text-primary-foreground">Submit</Text>
+ *   <Text className="text-white">Submit</Text>
  * </Pressable>
  *
  * @example

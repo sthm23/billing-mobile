@@ -103,7 +103,7 @@ export function Button({
 
   // Text styles by variant
   const textVariantStyles = {
-    default: 'text-primary-foreground font-semibold',
+    default: 'text-white font-semibold',
     outline: 'text-foreground font-medium',
     ghost: 'text-foreground font-medium',
     destructive: 'text-white font-semibold',

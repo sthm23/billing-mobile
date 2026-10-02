@@ -7,20 +7,10 @@ import {
   FormControlLabel,
   FormControlLabelText,
   HStack,
-  ChevronDownIcon,
   Input,
   InputField,
   Select,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicator,
-  SelectDragIndicatorWrapper,
-  SelectIcon,
-  SelectInput,
-  SelectItem,
-  SelectPortal,
-  SelectTrigger,
-  VStack,
+  VStack
 } from "@/components/base";
 import { PaymentType } from "@/models/order.model";
 import { CashTransactionCategory, CashTransactionType } from "@/models/payment.model";
@@ -32,10 +22,10 @@ import { z } from "zod";
 
 const transactionSchema = z.object({
   category: z.nativeEnum(CashTransactionCategory, {
-    required_error: "Category is required",
+    message: "Category is required",
   }),
   paymentType: z.nativeEnum(PaymentType, {
-    required_error: "Payment type is required",
+    message: "Payment type is required",
   }),
   amount: z.string().min(1, "Amount is required").refine(
     (val) => !isNaN(Number(val)) && Number(val) > 0,
@@ -110,28 +100,19 @@ export const TransactionForm = ({
           control={control}
           name="category"
           render={({ field: { onChange, value } }) => (
-            <Select onValueChange={onChange} selectedValue={value}>
-              <SelectTrigger variant="outline" size="md">
-                <SelectInput
-                  placeholder={t('payment.category.name')}
+            <Select
+              variant="outline"
+              size="md"
+              selectedValue={value}
+              onValueChange={onChange}
+            >
+              {categoryOptions.map((category) => (
+                <Select.Item
+                  key={category}
+                  label={t(`payment.category.${category}`)}
+                  value={category}
                 />
-                <SelectIcon as={ChevronDownIcon} className="mr-3" />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
-                  {categoryOptions.map((category) => (
-                    <SelectItem
-                      key={category}
-                      label={t(`payment.category.${category}`)}
-                      value={category}
-                    />
-                  ))}
-                </SelectContent>
-              </SelectPortal>
+              ))}
             </Select>
           )}
         />
@@ -151,28 +132,19 @@ export const TransactionForm = ({
           control={control}
           name="paymentType"
           render={({ field: { onChange, value } }) => (
-            <Select onValueChange={onChange} selectedValue={value}>
-              <SelectTrigger variant="outline" size="md">
-                <SelectInput
-                  placeholder={t('order.paymentMethod.name')}
+            <Select
+              variant="outline"
+              size="md"
+              selectedValue={value}
+              onValueChange={onChange}
+            >
+              {paymentTypeOptions.map((type) => (
+                <Select.Item
+                  key={type}
+                  label={t(`order.paymentMethod.${type}`)}
+                  value={type}
                 />
-                <SelectIcon as={ChevronDownIcon} className="mr-3" />
-              </SelectTrigger>
-              <SelectPortal>
-                <SelectBackdrop />
-                <SelectContent>
-                  <SelectDragIndicatorWrapper>
-                    <SelectDragIndicator />
-                  </SelectDragIndicatorWrapper>
-                  {paymentTypeOptions.map((type) => (
-                    <SelectItem
-                      key={type}
-                      label={t(`order.paymentMethod.${type}`)}
-                      value={type}
-                    />
-                  ))}
-                </SelectContent>
-              </SelectPortal>
+              ))}
             </Select>
           )}
         />

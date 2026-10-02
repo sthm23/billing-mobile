@@ -15,7 +15,7 @@ import {
   TextArea,
   VStack,
 } from '@/components/base';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+// import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useRef, useState } from 'react';
 import { ScrollView } from 'react-native';
 

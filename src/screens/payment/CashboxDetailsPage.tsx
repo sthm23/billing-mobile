@@ -1,4 +1,6 @@
 import {
+  ArrowDownIcon,
+  ArrowUpIcon,
   Badge,
   BadgeText,
   Box,
@@ -8,8 +10,6 @@ import {
   Card,
   Divider,
   HStack,
-  ArrowDownIcon,
-  ArrowUpIcon,
   Pressable,
   Text,
   VStack,
@@ -19,8 +19,9 @@ import { IconNames } from "@/icons/icon.type";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
+import { BottomSheet } from "@expo/ui/community/bottom-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, ScrollView } from "react-native";
 import { AddTransactionSheet } from "./AddTransactionSheet";
@@ -37,7 +38,7 @@ export default function CashboxDetailsPage() {
 
   const [sheetVisible, setSheetVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
-  const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
+  // const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
   const [breakdownVisible, setBreakdownVisible] = useState(false);
 
   const { data: cashbox, isLoading, isError } = useCashboxById(id, {
@@ -47,7 +48,7 @@ export default function CashboxDetailsPage() {
   const createTransactionMutation = useCreateTransaction();
 
   const isOpen = cashbox?.status === CashboxStatus.OPEN;
-
+  const sheetRef = useRef<BottomSheet>(null);
   const handleCloseCashbox = () => {
     Alert.alert(
       t('payment.closeCashboxConfirmation.title'),
@@ -105,7 +106,7 @@ export default function CashboxDetailsPage() {
       <>
         <Stack.Screen options={{ title: t('payment.cashbox') }} />
         <Box className="flex-1 items-center justify-center p-4">
-          <Text size="xl" bold className="text-error-600">
+          <Text size="xl" variant={'bold'} className="text-error-600">
             {t('payment.noFound')}
           </Text>
         </Box>
@@ -134,7 +135,7 @@ export default function CashboxDetailsPage() {
         options={{
           headerTitle: () => (
             <VStack className="gap-0">
-              <Text bold size="lg">{t('payment.cashbox')}</Text>
+              <Text variant={'bold'} size="lg">{t('payment.cashbox')}</Text>
               <Text size="xs" className="text-typography-500">{createdDate}</Text>
             </VStack>
           ),
@@ -189,7 +190,7 @@ export default function CashboxDetailsPage() {
                     {t('payment.balanceInCashbox')}
                   </Text>
                   <HStack className="items-center gap-2 mt-1">
-                    <Text size="3xl" bold>
+                    <Text size="3xl" variant={'bold'}>
                       {cashbox.balance.toLocaleString()} UZS
                     </Text>
                     <CustomIcon name={IconNames.ARROW_RIGHT} size={18} />
@@ -205,7 +206,7 @@ export default function CashboxDetailsPage() {
                   <Text size="sm" className="text-typography-500">
                     {t('payment.totalIncome')}
                   </Text>
-                  <Text size="lg" bold className="text-success-600 mt-1">
+                  <Text size="lg" variant={'bold'} className="text-success-600 mt-1">
                     + {totalIncome.toLocaleString()} UZS
                   </Text>
                 </VStack>
@@ -213,7 +214,7 @@ export default function CashboxDetailsPage() {
                   <Text size="sm" className="text-typography-500">
                     {t('payment.totalExpense')}
                   </Text>
-                  <Text size="lg" bold className="text-error-600 mt-1">
+                  <Text size="lg" variant={'bold'} className="text-error-600 mt-1">
                     - {totalExpense.toLocaleString()} UZS
                   </Text>
                 </VStack>
@@ -246,9 +247,9 @@ export default function CashboxDetailsPage() {
         {/* Transactions */}
         <Box className="px-4">
           <HStack className="items-center justify-between mb-3">
-            <Text size="xl" bold>{t('payment.transactions')}</Text>
+            <Text size="xl" variant={'bold'}>{t('payment.transactions')}</Text>
             {hasMoreTransactions && (
-              <Button size="sm" variant="outline" onPress={() => setAllTransactionsVisible(true)}>
+              <Button size="sm" variant="outline" onPress={() => sheetRef.current?.snapToIndex(0)}>
                 <ButtonText>{t('payment.all')}</ButtonText>
               </Button>
             )}
@@ -283,8 +284,7 @@ export default function CashboxDetailsPage() {
 
       {/* All Transactions Sheet */}
       <AllTransactionsSheet
-        isOpen={allTransactionsVisible}
-        onClose={() => setAllTransactionsVisible(false)}
+        sheetRef={sheetRef}
         transactions={sortedTransactions}
       />
 

@@ -1,7 +1,7 @@
 import { Button, Card, Divider, HStack, Text, VStack } from '@/components/base';
+import { useTheme } from '@/hooks/use-theme';
 import { ProductVariant, StockMovementType } from '@/services/product/product.type';
 import { Clock, Plus } from 'lucide-react-native';
-import { useTheme } from '@/hooks/use-theme';
 import { PricePair } from './PricePair';
 import { QuantityBadge } from './QuantityBadge';
 
@@ -67,7 +67,7 @@ export function ProductVariantCard({
           onPress={() => onHistory?.(variant.id)}
         >
           <Clock size={16} color={colors.text} />
-          История
+          <Text className="ml-2 ">История</Text>
         </Button>
         <Button
           variant="outline"
@@ -76,7 +76,7 @@ export function ProductVariantCard({
           onPress={() => onMovement?.(variant.id)}
         >
           <Plus size={16} color={colors.text} />
-          Приход / Списание
+          <Text className="ml-2 ">Приход / Списание</Text>
         </Button>
       </HStack>
     </Card>

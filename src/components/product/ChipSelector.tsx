@@ -28,7 +28,7 @@ export function ChipSelector({ values, selected, onSelect }: ChipSelectorProps) 
           >
             <Text
               className={`text-sm font-medium ${
-                isActive ? 'text-primary-foreground' : 'text-foreground'
+                isActive ? 'text-white' : 'text-foreground'
               }`}
             >
               {value}

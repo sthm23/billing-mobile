@@ -178,8 +178,8 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
               className="flex-1 h-12 rounded-xl"
               onPress={() => {}}
             >
-              <CheckCircle size={20} />
-              <Text className="text-primary-foreground font-semibold">Заказать</Text>
+              <CheckCircle size={20} color="#ffffff" />
+              <Text className="text-white font-semibold">Заказать</Text>
             </Button>
           </HStack>
         </Box>

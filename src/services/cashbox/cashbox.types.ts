@@ -30,6 +30,10 @@ export interface CashboxDetailResponse {
   warehouseId: string
   balance: number;
   createdAt: string;
+  warehouse: {
+    id: string;
+    name: string;
+  }
 }
 
 export interface CreateTransactionPayload extends TransactionPayload {

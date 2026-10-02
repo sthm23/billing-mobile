@@ -106,7 +106,7 @@ export function AvatarFallbackText({ children, className }: AvatarFallbackTextPr
   return (
     <Text
       className={cn(
-        'font-semibold text-primary-foreground',
+        'font-semibold text-white',
         className
       )}
     >

@@ -25,7 +25,7 @@ export const OrderCardMenu = () => {
         delayLongPress={500}
         className="rounded-xl bg-primary p-4"
       >
-        <Text className="text-primary-foreground">Hold Me for Context Menu</Text>
+        <Text className="text-white">Hold Me for Context Menu</Text>
       </Pressable>
 
       <Modal visible={isMenuOpen} onClose={handleClose} title="Actions">

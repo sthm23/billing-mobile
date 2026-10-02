@@ -1,6 +1,5 @@
-import React from 'react';
-import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
 import { cn } from '@/libs/utils';
+import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
 
 export interface TextProps extends RNTextProps {
   /**
@@ -11,6 +10,8 @@ export interface TextProps extends RNTextProps {
    * Text variant for quick styling
    */
   variant?: 'default' | 'muted' | 'small' | 'large' | 'bold';
+
+  size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl';
 }
 
 /**
@@ -36,6 +37,7 @@ export interface TextProps extends RNTextProps {
  */
 export function Text({
   className,
+  size,
   variant = 'default',
   ...props
 }: TextProps) {
@@ -49,7 +51,7 @@ export function Text({
 
   return (
     <RNText
-      className={cn(variantStyles[variant], className)}
+      className={cn(variantStyles[variant], size && `text-${size}`, className)}
       {...props}
     />
   );

@@ -1,5 +1,6 @@
 import '@/assets/i18next/i18next';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
+// import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Stack } from 'expo-router';
@@ -8,14 +9,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import {
   ThemeControlContext,
   ThemeMode,
+  applyThemeMode,
   loadThemeMode,
   saveThemeMode,
-  applyThemeMode,
 } from '@/hooks/use-theme-control';
 import "../global.css";
 
@@ -98,9 +98,9 @@ export default function RootLayout() {
         <StatusBar style={isDarkMode ? 'light' : 'dark'} />
         <AuthProvider >
           <QueryClientProvider client={queryClient}>
-            <BottomSheetModalProvider>
-              <InitiallyLayout />
-            </BottomSheetModalProvider>
+            {/* <BottomSheetModalProvider> */}
+            <InitiallyLayout />
+            {/* </BottomSheetModalProvider> */}
           </QueryClientProvider>
         </AuthProvider>
       </ThemeControlContext.Provider>

@@ -1,75 +1,56 @@
-import React, { createContext, useContext, useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  type ViewProps,
-  type TextProps,
-} from 'react-native';
 import { cn } from '@/libs/utils';
+import { Picker } from '@react-native-picker/picker';
+import React from 'react';
+import { Platform, View } from 'react-native';
 
-interface SelectContextValue {
-  selectedValue?: string;
-  onValueChange?: (value: string) => void;
-  isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  placeholder?: string;
-  selectedLabel?: string;
-}
-
-const SelectContext = createContext<SelectContextValue>({
-  isOpen: false,
-  setIsOpen: () => {},
-});
-
-export interface SelectProps {
-  children: React.ReactNode;
-  selectedValue?: string;
-  onValueChange?: (value: string) => void;
-}
-
-export interface SelectTriggerProps extends ViewProps {
-  className?: string;
-  children: React.ReactNode;
+export interface SelectProps<T = string> {
+  /**
+   * Currently selected value
+   */
+  selectedValue?: T;
+  /**
+   * Callback when value changes
+   */
+  onValueChange?: (value: T) => void;
+  /**
+   * Style variant
+   */
   variant?: 'outline' | 'underlined' | 'rounded';
+  /**
+   * Size variant
+   */
   size?: 'sm' | 'md' | 'lg';
-}
-
-export interface SelectInputProps extends TextProps {
-  placeholder?: string;
+  /**
+   * Additional className for styling
+   */
   className?: string;
-}
-
-export interface SelectIconProps {
-  as: React.ComponentType<any>;
-  className?: string;
-  size?: number;
-  color?: string;
-}
-
-export interface SelectPortalProps {
+  /**
+   * Select items as children
+   */
   children: React.ReactNode;
+  /**
+   * Whether the select is disabled
+   */
+  disabled?: boolean;
 }
 
-export interface SelectBackdropProps extends ViewProps {}
-
-export interface SelectContentProps extends ViewProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-export interface SelectDragIndicatorWrapperProps extends ViewProps {
-  children: React.ReactNode;
-}
-
-export interface SelectDragIndicatorProps extends ViewProps {}
-
-export interface SelectItemProps extends ViewProps {
+export interface SelectItemProps {
+  /**
+   * Display label
+   */
   label: string;
-  value: string;
-  className?: string;
+  /**
+   * Value to be selected
+   */
+  value: string | number;
+  /**
+   * Text color (platform-specific)
+   */
+  color?: string;
+  /**
+   * Font family (iOS only)
+   */
+  fontFamily?: string;
 }
 
 const variantClasses = {
@@ -79,223 +60,88 @@ const variantClasses = {
 };
 
 const sizeClasses = {
-  sm: 'h-10 px-3',
-  md: 'h-12 px-4',
-  lg: 'h-14 px-5',
+  sm: 'h-12',
+  md: 'h-14',
+  lg: 'h-16',
 };
 
 /**
- * Select — выпадающий список
+ * Select — нативный выпадающий список
  *
- * Компонент выбора значения из списка опций.
- * Реализован на базе Modal для кроссплатформенности.
+ * Обертка над нативным Picker (@react-native-picker/picker).
+ * Показывает нативный UI для каждой платформы:
+ * - Android: dropdown меню
+ * - iOS: wheel picker
  *
  * @example
  * <Select selectedValue={value} onValueChange={setValue}>
- *   <SelectTrigger>
- *     <SelectInput placeholder="Select option" />
- *     <SelectIcon as={ChevronDownIcon} />
- *   </SelectTrigger>
- *   <SelectPortal>
- *     <SelectBackdrop />
- *     <SelectContent>
- *       <SelectItem label="Option 1" value="opt1" />
- *       <SelectItem label="Option 2" value="opt2" />
- *     </SelectContent>
- *   </SelectPortal>
+ *   <Select.Item label="Option 1" value="opt1" />
+ *   <Select.Item label="Option 2" value="opt2" />
+ * </Select>
+ *
+ * @example
+ * // С вариантами стиля
+ * <Select
+ *   variant="outline"
+ *   size="md"
+ *   selectedValue={category}
+ *   onValueChange={setCategory}
+ * >
+ *   {categories.map((cat) => (
+ *     <Select.Item key={cat.id} label={cat.name} value={cat.id} />
+ *   ))}
  * </Select>
  */
-export function Select({ children, selectedValue, onValueChange }: SelectProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedLabel, setSelectedLabel] = useState<string>();
-
-  const handleValueChange = (value: string, label: string) => {
-    setSelectedLabel(label);
-    onValueChange?.(value);
-    setIsOpen(false);
-  };
-
-  return (
-    <SelectContext.Provider
-      value={{
-        selectedValue,
-        onValueChange: (value: string) => handleValueChange(value, ''),
-        isOpen,
-        setIsOpen,
-        selectedLabel,
-      }}
-    >
-      {children}
-    </SelectContext.Provider>
-  );
-}
-
-/**
- * SelectTrigger — кнопка для открытия списка
- */
-export function SelectTrigger({
-  className,
-  children,
+export function Select<T = string>({
+  selectedValue,
+  onValueChange,
   variant = 'outline',
   size = 'md',
-  ...props
-}: SelectTriggerProps) {
-  const { setIsOpen } = useContext(SelectContext);
+  className,
+  children,
+  disabled = false,
+}: SelectProps<T>) {
+  const pickerStyle = Platform.select({
+    ios: {},
+    android: {
+      marginLeft: -8, // Compensate for Android padding
+    },
+  });
 
-  return (
-    <Pressable
-      className={cn(
-        'flex-row items-center justify-between bg-background',
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
-      onPress={() => setIsOpen(true)}
-      {...props}
-    >
-      {children}
-    </Pressable>
-  );
-}
+  const pickerItemStyle = Platform.select({
+    ios: {
+      fontSize: 16,
+      height: 120,
+    },
+    android: undefined,
+  });
 
-/**
- * SelectInput — отображение выбранного значения
- */
-export function SelectInput({ placeholder, className, ...props }: SelectInputProps) {
-  const { selectedValue, selectedLabel } = useContext(SelectContext);
-
-  return (
-    <Text
-      className={cn(
-        'flex-1 text-base',
-        !selectedValue && 'text-muted-foreground',
-        className
-      )}
-      {...props}
-    >
-      {selectedLabel || selectedValue || placeholder}
-    </Text>
-  );
-}
-
-/**
- * SelectIcon — иконка (обычно стрелка вниз)
- */
-export function SelectIcon({ as: IconComponent, className, size = 20, color, ...props }: SelectIconProps) {
-  return (
-    <View className={cn('ml-2', className)}>
-      <IconComponent size={size} color={color} {...props} />
-    </View>
-  );
-}
-
-/**
- * SelectPortal — портал для модального окна
- */
-export function SelectPortal({ children }: SelectPortalProps) {
-  const { isOpen } = useContext(SelectContext);
-
-  if (!isOpen) return null;
-
-  return <>{children}</>;
-}
-
-/**
- * SelectBackdrop — затемненный фон
- */
-export function SelectBackdrop({ ...props }: SelectBackdropProps) {
-  return null; // Handled by SelectContent
-}
-
-/**
- * SelectContent — контейнер списка опций
- */
-export function SelectContent({ className, children, ...props }: SelectContentProps) {
-  const { setIsOpen } = useContext(SelectContext);
-
-  return (
-    <Modal
-      visible={true}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setIsOpen(false)}
-      statusBarTranslucent
-    >
-      <Pressable
-        className="flex-1 justify-end bg-black/50"
-        onPress={() => setIsOpen(false)}
-      >
-        <Pressable
-          className={cn(
-            'bg-background rounded-t-3xl pb-6 max-h-96',
-            className
-          )}
-          onPress={(e) => e.stopPropagation()}
-          {...props}
-        >
-          {children}
-        </Pressable>
-      </Pressable>
-    </Modal>
-  );
-}
-
-/**
- * SelectDragIndicatorWrapper — обертка для индикатора перетаскивания
- */
-export function SelectDragIndicatorWrapper({ children, ...props }: SelectDragIndicatorWrapperProps) {
-  return (
-    <View className="items-center py-3" {...props}>
-      {children}
-    </View>
-  );
-}
-
-/**
- * SelectDragIndicator — индикатор перетаскивания
- */
-export function SelectDragIndicator({ ...props }: SelectDragIndicatorProps) {
   return (
     <View
-      className="w-12 h-1 bg-border rounded-full"
-      {...props}
-    />
+      className={cn(
+        'overflow-hidden justify-center bg-background',
+        variantClasses[variant],
+        sizeClasses[size],
+        disabled && 'opacity-50',
+        className
+      )}
+    >
+      <Picker
+        selectedValue={selectedValue}
+        onValueChange={(itemValue) => onValueChange?.(itemValue as T)}
+        enabled={!disabled}
+        style={pickerStyle}
+        itemStyle={pickerItemStyle}
+      >
+        {children}
+      </Picker>
+    </View>
   );
 }
 
 /**
  * SelectItem — элемент списка
  */
-export function SelectItem({ label, value, className, ...props }: SelectItemProps) {
-  const { selectedValue, onValueChange, setIsOpen } = useContext(SelectContext);
-  const isSelected = selectedValue === value;
-
-  const handlePress = () => {
-    onValueChange?.(value);
-    // Update context with label
-    const context = useContext(SelectContext);
-    (context as any).selectedLabel = label;
-    setIsOpen(false);
-  };
-
-  return (
-    <Pressable
-      className={cn(
-        'px-6 py-4 active:bg-accent',
-        isSelected && 'bg-accent',
-        className
-      )}
-      onPress={handlePress}
-      {...props}
-    >
-      <Text
-        className={cn(
-          'text-base',
-          isSelected ? 'font-semibold text-primary' : 'text-foreground'
-        )}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
-}
+Select.Item = function SelectItem({ label, value, color, fontFamily }: SelectItemProps) {
+  return <Picker.Item label={label} value={value} color={color} fontFamily={fontFamily} />;
+};

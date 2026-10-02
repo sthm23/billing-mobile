@@ -13,7 +13,6 @@ import {
   StockMovementType,
 } from '@/services/product/product.type';
 import { Plus } from 'lucide-react-native';
-import { useTheme } from '@/hooks/use-theme';
 import { useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
 
@@ -65,7 +64,6 @@ export function getLatestCostPrice(variant: ProductVariant): number {
 }
 
 export default function ProductDetailScreen({ product }: ProductDetailScreenProps) {
-  const colors = useTheme();
   const nameById = useMemo(() => buildNameById(product.attributes ?? []), [product.attributes]);
 
   const attributeMap = useMemo(
@@ -199,8 +197,8 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
               onPress={handleBuy}
               disabled={stockForSelected === 0}
             >
-              <Plus size={20} color={colors.background} />
-              <Text className="ml-2 text-primary-foreground font-semibold">Купить</Text>
+              <Plus size={20} color="#ffffff" />
+              <Text className="ml-2 text-white font-semibold">Купить</Text>
             </Button>
           </VStack>
         )}
