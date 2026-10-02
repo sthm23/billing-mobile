@@ -4,7 +4,8 @@ const uz = {
     "loadMore": "Yana yuklash",
     "noMoreData": "Boshqa ma'lumot yo'q",
     "edit": "O'zgartirish",
-    "currency": "UZS"
+    "currency": "UZS",
+    "searchPlaceholder": "Qidirish..."
   },
   "tag": {
     "Material": "Material",
@@ -237,7 +238,14 @@ const uz = {
     "staffPanel": "Xodimlar paneli",
     "adminAccess": "Admin kirish",
     "history": "Tarix",
-    "stockMovementButton": "Kirim / Chiqim"
+    "stockMovementButton": "Kirim / Chiqim",
+    "costPrice": "Sotib olish narxi",
+    "retailPriceLabel": "Sotish narxi",
+    "inStockLabel": "Omborda",
+    "notFoundProducts": "Tovarlar topilmadi",
+    "errorLoadingProducts": "Tovarlarni yuklashda xato",
+    "available": "Omborda bor",
+    "notAvailable": "Omborda yo'q"
   },
   "organization": {
     "noFound": "Do'kon topilmadi.",
@@ -349,7 +357,10 @@ const uz = {
     "serviceDescription": "Xizmat tavsifi",
     "add": "Qo'shish",
     "updatePrice": "Narxni yangilash",
-    "newPrice": "Yangi narx"
+    "newPrice": "Yangi narx",
+    "id": "Zakaz",
+    "cashier": "Kassir",
+    "paidAmount": "To'langan"
   },
   "user": {
     "name": "To'liq ism",
@@ -535,7 +546,11 @@ const uz = {
   },
   "search": {
     "title": "Qidirish",
-    "scanTitle": "Skanerlash"
+    "scanTitle": "Skanerlash",
+    "searchPlaceholder": "SKU yoki shtrih-kod bo'yicha qidirish...",
+    "minCharacters": "Qidiruv uchun kamida 2 ta belgi kiriting",
+    "searching": "Qidirilmoqda...",
+    "noProductsFound": "Tovarlar topilmadi"
   },
   "notification": {
     "success": "Muvaffaqiyat",

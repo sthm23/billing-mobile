@@ -4,7 +4,8 @@ const en = {
     "loadMore": "Load more",
     "noMoreData": "No more data",
     "edit": "Edit",
-    "currency": "UZS"
+    "currency": "UZS",
+    "searchPlaceholder": "Search..."
   },
   "tag": {
     "Material": "Material",
@@ -237,7 +238,14 @@ const en = {
     "staffPanel": "Staff panel",
     "adminAccess": "Admin access",
     "history": "History",
-    "stockMovementButton": "Stock In / Write Off"
+    "stockMovementButton": "Stock In / Write Off",
+    "costPrice": "Purchase price",
+    "retailPriceLabel": "Retail price",
+    "inStockLabel": "In stock",
+    "notFoundProducts": "No products found",
+    "errorLoadingProducts": "Error loading products",
+    "available": "Available",
+    "notAvailable": "Out of stock"
   },
   "organization": {
     "noFound": "No organization found.",
@@ -349,7 +357,10 @@ const en = {
     "serviceDescription": "Service description",
     "add": "Add",
     "updatePrice": "Update price",
-    "newPrice": "New price"
+    "newPrice": "New price",
+    "id": "Order",
+    "cashier": "Cashier",
+    "paidAmount": "Paid"
   },
   "user": {
     "name": "Full name",
@@ -534,7 +545,11 @@ const en = {
   },
   "search": {
     "title": "Search",
-    "scanTitle": "Scan"
+    "scanTitle": "Scan",
+    "searchPlaceholder": "Search by SKU or barcode...",
+    "minCharacters": "Enter at least 2 characters to search",
+    "searching": "Searching...",
+    "noProductsFound": "No products found"
   },
   "notification": {
     "success": "Success",

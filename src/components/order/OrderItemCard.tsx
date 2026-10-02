@@ -2,6 +2,7 @@ import { Box, Divider, HStack, Pressable, Text, VStack } from '@/components/base
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
 import { OrderDetailItem } from '@/services/order/order.type';
+import { useTranslation } from 'react-i18next';
 
 interface OrderItemCardProps {
   item: OrderDetailItem;
@@ -20,6 +21,7 @@ const formatAmount = (amount: number) =>
 const BG_COLORS = ['#3B82F6', '#22C55E', '#A855F7', '#F97316', '#EC4899'];
 
 export function OrderItemCard({ item, index, showDivider, onQuantityChange }: OrderItemCardProps) {
+  const { t } = useTranslation();
   const discountAmount = Math.round(item.retailPrice * (item.sale / 100));
   const hasDiscount = item.sale > 0;
   const maxStock = item.variant.quantity;
@@ -51,16 +53,16 @@ export function OrderItemCard({ item, index, showDivider, onQuantityChange }: Or
           <HStack className="gap-2 items-center mt-0.5 flex-wrap">
             {hasDiscount && (
               <Text className="text-xs text-muted-foreground line-through">
-                {formatAmount(item.retailPrice)} UZS
+                {formatAmount(item.retailPrice)} {t('common.currency')}
               </Text>
             )}
             {hasDiscount && (
               <Text className="text-xs font-medium text-red-500">
-                -{formatAmount(discountAmount)} UZS
+                -{formatAmount(discountAmount)} {t('common.currency')}
               </Text>
             )}
             <Text className="text-sm font-bold text-foreground">
-              {formatAmount(item.costAtSale)} UZS
+              {formatAmount(item.costAtSale)} {t('common.currency')}
             </Text>
           </HStack>
 

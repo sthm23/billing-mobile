@@ -4,7 +4,8 @@ const ru = {
     "loadMore": "Загрузить ещё",
     "noMoreData": "Больше нет данных",
     "edit": "Изменить",
-    "currency": "UZS"
+    "currency": "UZS",
+    "searchPlaceholder": "Поиск..."
   },
   "tag": {
     "Material": "Материал",
@@ -237,7 +238,14 @@ const ru = {
     "staffPanel": "Панель сотрудника",
     "adminAccess": "Админ-доступ",
     "history": "История",
-    "stockMovementButton": "Приход / Списание"
+    "stockMovementButton": "Приход / Списание",
+    "costPrice": "Закупочная цена",
+    "retailPriceLabel": "Продажная цена",
+    "inStockLabel": "В наличии",
+    "notFoundProducts": "Товары не найдены",
+    "errorLoadingProducts": "Ошибка загрузки продуктов",
+    "available": "В наличии",
+    "notAvailable": "Нет в наличии"
   },
   "organization": {
     "noFound": "Магазин не найден.",
@@ -349,7 +357,10 @@ const ru = {
     "serviceDescription": "Описание услуги",
     "add": "Добавить",
     "updatePrice": "Обновить цену",
-    "newPrice": "Новая цена"
+    "newPrice": "Новая цена",
+    "id": "Заказ",
+    "cashier": "Кассир",
+    "paidAmount": "Оплачено"
   },
   "user": {
     "name": "Польная имя",
@@ -535,7 +546,11 @@ const ru = {
   },
   "search": {
     "title": "Поиск",
-    "scanTitle": "Сканировать"
+    "scanTitle": "Сканировать",
+    "searchPlaceholder": "Поиск по SKU или штрих-коду...",
+    "minCharacters": "Введите минимум 2 символа для поиска",
+    "searching": "Поиск...",
+    "noProductsFound": "Товары не найдены"
   },
   "notification": {
     "success": "Успех",

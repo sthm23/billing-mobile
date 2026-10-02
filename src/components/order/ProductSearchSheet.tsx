@@ -6,6 +6,7 @@ import { OrderProductVariant } from '@/services/order/order.type';
 import { useOrderProductSearch } from '@/services/product/product.queries';
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export interface ProductSearchSheetRef {
   open: () => void;
@@ -36,6 +37,7 @@ function SearchResultItem({
   index: number;
   onAdd: (item: OrderProductVariant) => void;
 }) {
+  const { t } = useTranslation();
   const bgColor = BG_COLORS[index % BG_COLORS.length];
   const initial = item.sku?.charAt(0)?.toUpperCase() ?? '?';
 
@@ -55,10 +57,10 @@ function SearchResultItem({
         <Text className="text-xs text-typography-500">{item.barCode}</Text>
         <HStack className="gap-3 mt-0.5">
           <Text className="text-sm font-bold text-foreground">
-            {formatAmount(item.price)} UZS
+            {formatAmount(item.price)} {t('common.currency')}
           </Text>
           <Text className="text-xs text-typography-500 self-center">
-            В наличии: {item.quantity} шт
+            {t('product.inStockLabel')}: {item.quantity} {t('product.unit')}
           </Text>
         </HStack>
       </VStack>
@@ -93,6 +95,7 @@ function SheetContent({
   hasMinLength,
   onSelect,
 }: SheetContentProps) {
+  const { t } = useTranslation();
   // useColorScheme is a built-in RN hook — works without any provider, safe inside portal
   const isDark = useColorScheme() === 'dark';
   const surface = isDark ? '#171717' : '#f5f5f5';
@@ -110,7 +113,7 @@ function SheetContent({
         <BottomSheetTextInput
           value={searchText}
           onChangeText={onSearchChange}
-          placeholder="Поиск по SKU или штрих-коду..."
+          placeholder={t('search.searchPlaceholder')}
           placeholderTextColor={textMuted}
           autoFocus
           clearButtonMode="while-editing"
@@ -121,16 +124,16 @@ function SheetContent({
       {!hasMinLength ? (
         <Box className="flex-1 items-center justify-center p-8">
           <Text className="text-typography-400 text-sm text-center">
-            Введите минимум 2 символа для поиска
+            {t('search.minCharacters')}
           </Text>
         </Box>
       ) : isSearching ? (
         <Box className="flex-1 items-center justify-center p-8">
-          <Text className="text-typography-400 text-sm">Поиск...</Text>
+          <Text className="text-typography-400 text-sm">{t('search.searching')}</Text>
         </Box>
       ) : results.length === 0 ? (
         <Box className="flex-1 items-center justify-center p-8">
-          <Text className="text-typography-400 text-sm">Товары не найдены</Text>
+          <Text className="text-typography-400 text-sm">{t('search.noProductsFound')}</Text>
         </Box>
       ) : (
         <BottomSheetFlatList

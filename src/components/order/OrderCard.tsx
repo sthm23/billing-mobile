@@ -26,24 +26,6 @@ const getStatusColor = (status: OrderStatus) => {
   }
 };
 
-const getStatusText = (status: OrderStatus) => {
-  switch (status) {
-    case OrderStatus.COMPLETED:
-      return 'Завершен';
-    case OrderStatus.CREATED:
-      return 'Создан';
-    case OrderStatus.HOLD:
-      return 'В ожидании';
-    case OrderStatus.CANCELLED:
-      return 'Отменен';
-    case OrderStatus.DEBT:
-      return 'Долг';
-    case OrderStatus.REFUNDED:
-      return 'Возврат';
-    default:
-      return status;
-  }
-};
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -67,6 +49,26 @@ const formatAmount = (amount: number) => {
 export function OrderCard({ order, onPress }: OrderCardProps) {
   const { t } = useTranslation();
   const statusColor = getStatusColor(order.status);
+
+  const getStatusText = (status: OrderStatus) => {
+    switch (status) {
+      case OrderStatus.COMPLETED:
+        return t('order.status.COMPLETED');
+      case OrderStatus.CREATED:
+        return t('order.status.CREATED');
+      case OrderStatus.HOLD:
+        return t('order.status.HOLD');
+      case OrderStatus.CANCELLED:
+        return t('order.status.CANCELLED');
+      case OrderStatus.DEBT:
+        return t('order.status.DEBT');
+      case OrderStatus.REFUNDED:
+        return t('order.status.REFUNDED');
+      default:
+        return status;
+    }
+  };
+
   const statusText = getStatusText(order.status);
   const channelLabel = order.channel === OrderChannel.POS ? 'POS' : 'Online';
 
@@ -82,7 +84,7 @@ export function OrderCard({ order, onPress }: OrderCardProps) {
         {/* Order ID and Channel */}
         <Box className="flex-row items-center gap-2 mb-1">
           <Text className="text-sm text-typography-500">
-            {t('order.id', { defaultValue: 'Заказ' })} #{order.id.slice(0, 8)}
+            {t('order.id')} #{order.id.slice(0, 8)}
           </Text>
           <Box className="ml-2 px-2 py-0.5 rounded-md border border-border bg-background">
             <Text className="text-xs font-medium text-foreground">{channelLabel}</Text>
@@ -96,13 +98,13 @@ export function OrderCard({ order, onPress }: OrderCardProps) {
 
         {/* Cashier */}
         <Text className="text-sm text-typography-600 mb-1">
-          {t('order.cashier', { defaultValue: 'Кассир' })}: {order.cashier.fullName}
+          {t('order.cashier')}: {order.cashier.fullName}
         </Text>
 
         {/* Customer (if exists) */}
         {order.customer && (
           <Text className="text-sm text-typography-600 mb-2">
-            {t('order.customer', { defaultValue: 'Клиент' })}: {order.customer.user.fullName}
+            {t('order.customer')}: {order.customer.user.fullName}
           </Text>
         )}
 
@@ -110,20 +112,20 @@ export function OrderCard({ order, onPress }: OrderCardProps) {
         <Box className="mt-3 pt-3 border-t border-outline-100">
           <Box className="flex-row justify-between items-center">
             <Text className="text-sm text-typography-500">
-              {t('order.totalAmount', { defaultValue: 'Сумма' })}:
+              {t('order.totalAmount')}:
             </Text>
             <Text className="text-xl font-bold text-foreground">
-              {formatAmount(order.totalAmount)} {t('currency.uzs', { defaultValue: 'UZS' })}
+              {formatAmount(order.totalAmount)} {t('common.currency')}
             </Text>
           </Box>
 
           {order.paidAmount > 0 && order.paidAmount !== order.totalAmount && (
             <Box className="flex-row justify-between items-center mt-1">
               <Text className="text-sm text-typography-500">
-                {t('order.paidAmount', { defaultValue: 'Оплачено' })}:
+                {t('order.paidAmount')}:
               </Text>
               <Text className="text-sm font-medium text-green-600">
-                {formatAmount(order.paidAmount)} {t('currency.uzs', { defaultValue: 'UZS' })}
+                {formatAmount(order.paidAmount)} {t('common.currency')}
               </Text>
             </Box>
           )}

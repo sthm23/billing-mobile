@@ -51,13 +51,13 @@ export default function ProductPage() {
 
     if (isError) {
         return (
-            <Text className="text-2xl font-bold">Ошибка загрузки продуктов</Text>
+            <Text className="text-2xl font-bold">{t('product.errorLoadingProducts')}</Text>
         )
     }
 
     if (isLoading) {
         return (
-            <Text className="text-2xl font-bold">Загрузка...</Text>
+            <Text className="text-2xl font-bold">{t('common.loading')}</Text>
         )
     }
 
@@ -78,7 +78,7 @@ export default function ProductPage() {
     return (
         <Box className="flex-1">
             <Box className="flex-row items-center justify-between px-4 py-2">
-                <Text className="text-2xl font-bold text-center">Продукты</Text>
+                <Text className="text-2xl font-bold text-center">{t('product.title')}</Text>
                 <Button size="md" onPress={() => console.log('Create button pressed')}>
                     {t('order.create')}
                 </Button>
@@ -93,10 +93,10 @@ export default function ProductPage() {
                     <Box>
                         {hasMore ? (
                             <Button size="md" onPress={handleLoadMore} disabled={isFetching}>
-                                {isFetching ? 'Загрузка...' : 'Выгрузить еще'}
+                                {isFetching ? t('common.loading') : t('common.loadMore')}
                             </Button>
                         ) : (
-                            <Text className="text-center opacity-70">Больше продуктов нет</Text>
+                            <Text className="text-center opacity-70">{t('common.noMoreData')}</Text>
                         )}
                     </Box>
                 }

@@ -1,24 +1,11 @@
 import { Box, HStack, Text, VStack } from '@/components/base';
 import { OrderPayment, PaymentType } from '@/services/order/order.type';
+import { useTranslation } from 'react-i18next';
 
 interface OrderPaymentCardProps {
   payment: OrderPayment;
 }
 
-const getPaymentTypeText = (type: PaymentType) => {
-  switch (type) {
-    case PaymentType.CASH:
-      return 'Наличные';
-    case PaymentType.CARD:
-      return 'Карта';
-    case PaymentType.ONLINE:
-      return 'Онлайн';
-    case PaymentType.TRANSFER:
-      return 'Перевод';
-    default:
-      return type;
-  }
-};
 
 const getPaymentTypeIcon = (type: PaymentType) => {
   switch (type) {
@@ -55,6 +42,23 @@ const formatAmount = (amount: number) => {
 };
 
 export function OrderPaymentCard({ payment }: OrderPaymentCardProps) {
+  const { t } = useTranslation();
+
+  const getPaymentTypeText = (type: PaymentType) => {
+    switch (type) {
+      case PaymentType.CASH:
+        return t('order.paymentMethod.CASH');
+      case PaymentType.CARD:
+        return t('order.paymentMethod.CARD');
+      case PaymentType.ONLINE:
+        return t('order.paymentMethod.ONLINE');
+      case PaymentType.TRANSFER:
+        return t('order.paymentMethod.TRANSFER');
+      default:
+        return type;
+    }
+  };
+
   return (
     <HStack className="justify-between items-center py-2">
       <HStack className="items-center gap-3 flex-1">
@@ -71,7 +75,7 @@ export function OrderPaymentCard({ payment }: OrderPaymentCardProps) {
         </VStack>
       </HStack>
       <Text className="text-base font-bold text-green-600">
-        +{formatAmount(payment.amount)} UZS
+        +{formatAmount(payment.amount)} {t('common.currency')}
       </Text>
     </HStack>
   );

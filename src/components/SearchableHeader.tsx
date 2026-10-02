@@ -3,6 +3,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { Search, X } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { LayoutAnimation, TextInput, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface SearchableHeaderProps {
     title: string;
@@ -17,6 +18,7 @@ export function SearchableHeader({
     actionLabel,
     onAction,
 }: SearchableHeaderProps) {
+    const { t } = useTranslation();
     const [isSearching, setIsSearching] = useState(false);
     const [searchText, setSearchText] = useState('');
     const inputRef = useRef<TextInput>(null);
@@ -59,7 +61,7 @@ export function SearchableHeader({
                     </View>
                     <Input
                         ref={inputRef}
-                        placeholder="Поиск..."
+                        placeholder={t('common.searchPlaceholder')}
                         value={searchText}
                         onChangeText={handleTextChange}
                         returnKeyType="search"

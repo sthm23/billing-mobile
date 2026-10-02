@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { cn } from '@/libs/utils';
+import { useTranslation } from 'react-i18next';
 
 interface AvailabilityBadgeProps {
   isAvailable: boolean;
@@ -17,6 +18,7 @@ interface AvailabilityBadgeProps {
  * <AvailabilityBadge isAvailable={false} />
  */
 export function AvailabilityBadge({ isAvailable, className }: AvailabilityBadgeProps) {
+  const { t } = useTranslation();
   const variant = isAvailable ? 'success' : 'error';
 
   // Variant styles — используем семантические и Tailwind цвета
@@ -45,7 +47,7 @@ export function AvailabilityBadge({ isAvailable, className }: AvailabilityBadgeP
           textVariantStyles[variant],
         )}
       >
-        {isAvailable ? 'В наличии' : 'Нет в наличии'}
+        {isAvailable ? t('product.available') : t('product.notAvailable')}
       </Text>
     </View>
   );
