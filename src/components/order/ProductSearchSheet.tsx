@@ -1,12 +1,12 @@
-import { BottomSheet, Box, Button, HStack, Text, VStack } from '@/components/base';
-import { BottomSheetFlatList, BottomSheetModal, BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { Plus, Search } from 'lucide-react-native';
+import { Box, Button, HStack, Text, VStack } from '@/components/base';
 import { useDebounce } from '@/hooks/use-debounce';
 import { OrderProductVariant } from '@/services/order/order.type';
 import { useOrderProductSearch } from '@/services/product/product.queries';
-import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { StyleSheet, useColorScheme } from 'react-native';
+import { BottomSheet } from '@expo/ui';
+import { Plus, Search } from 'lucide-react-native';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FlatList, ScrollView, StyleSheet, TextInput, useColorScheme } from 'react-native';
 
 export interface ProductSearchSheetRef {
   open: () => void;
@@ -104,13 +104,13 @@ function SheetContent({
   const borderColor = isDark ? '#2e2e2e' : '#e5e5e5';
   return (
     <Box className="flex-1">
-      {/* Search input — no BottomSheetDragIndicator here, portal adds its own handle */}
+      {/* Search input */}
       <HStack
         className="mx-4 mb-3 mt-1 rounded-xl items-center px-3 gap-2"
         style={{ height: 44, backgroundColor: surface, borderWidth: 1, borderColor, borderRadius: 12 }}
       >
         <Search size={18} className="text-muted-foreground shrink-0" />
-        <BottomSheetTextInput
+        <TextInput
           value={searchText}
           onChangeText={onSearchChange}
           placeholder={t('search.searchPlaceholder')}
@@ -136,7 +136,7 @@ function SheetContent({
           <Text className="text-typography-400 text-sm">{t('search.noProductsFound')}</Text>
         </Box>
       ) : (
-        <BottomSheetFlatList
+        <FlatList
           data={results}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
 
 export const ProductSearchSheet = forwardRef<ProductSearchSheetRef, ProductSearchSheetProps>(
   function ProductSearchSheet({ orderId, onSelect, children }, ref) {
-    const sheetRef = useRef<BottomSheetModal>(null);
+    const [isPresented, setIsPresented] = useState(false);
     const [searchText, setSearchText] = useState('');
     const debouncedText = useDebounce(searchText, 500);
     // Runs in normal React tree — has access to QueryClientProvider
@@ -167,12 +167,17 @@ export const ProductSearchSheet = forwardRef<ProductSearchSheetRef, ProductSearc
     const results = data?.data ?? [];
 
     useImperativeHandle(ref, () => ({
-      open: () => sheetRef.current?.present(),
-      close: () => sheetRef.current?.dismiss(),
+      open: () => setIsPresented(true),
+      close: () => setIsPresented(false),
     }));
 
+    const handleDismiss = () => {
+      setIsPresented(false);
+      setSearchText('');
+    };
+
     const handleSelect = (item: OrderProductVariant) => {
-      sheetRef.current?.dismiss();
+      setIsPresented(false);
       setSearchText('');
       onSelect(item);
     };
@@ -180,15 +185,21 @@ export const ProductSearchSheet = forwardRef<ProductSearchSheetRef, ProductSearc
     return (
       <>
         {children}
-        <BottomSheet ref={sheetRef} snapPoints={['60%', '90%']}>
-          <SheetContent
-            searchText={searchText}
-            onSearchChange={setSearchText}
-            results={results}
-            isSearching={isLoading || isFetching}
-            hasMinLength={debouncedText.length >= 2}
-            onSelect={handleSelect}
-          />
+        <BottomSheet
+          isPresented={isPresented}
+          onDismiss={handleDismiss}
+          snapPoints={[{ fraction: 0.6 }, { fraction: 0.9 }]}
+        >
+          <ScrollView style={{ flex: 1 }}>
+            <SheetContent
+              searchText={searchText}
+              onSearchChange={setSearchText}
+              results={results}
+              isSearching={isLoading || isFetching}
+              hasMinLength={debouncedText.length >= 2}
+              onSelect={handleSelect}
+            />
+          </ScrollView>
         </BottomSheet>
       </>
     );

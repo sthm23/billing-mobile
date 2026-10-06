@@ -49,13 +49,7 @@ export {
   AlertDialog,
   AlertDialogBackdrop, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, type AlertDialogBackdropProps, type AlertDialogBodyProps, type AlertDialogContentProps, type AlertDialogFooterProps, type AlertDialogHeaderProps, type AlertDialogProps
 } from './alert-dialog';
-export {
-  BottomSheet,
-  BottomSheetScrollView,
-  BottomSheetView,
-  type BottomSheetProps,
-  type BottomSheetRef
-} from './BottomSheet';
+
 export { Modal, type ModalProps } from './Modal';
 
 // Feedback

@@ -1,6 +1,5 @@
 import '@/assets/i18next/i18next';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
-// import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Stack } from 'expo-router';
@@ -98,9 +97,7 @@ export default function RootLayout() {
         <StatusBar style={isDarkMode ? 'light' : 'dark'} />
         <AuthProvider >
           <QueryClientProvider client={queryClient}>
-            {/* <BottomSheetModalProvider> */}
             <InitiallyLayout />
-            {/* </BottomSheetModalProvider> */}
           </QueryClientProvider>
         </AuthProvider>
       </ThemeControlContext.Provider>

@@ -574,6 +574,96 @@ function OrderDetailScreen() {
 
 ---
 
+### BottomSheet
+
+**Official `@expo/ui` BottomSheet** with **controlled pattern**.
+
+**Import**:
+```tsx
+import { BottomSheet } from '@expo/ui';
+```
+
+**Basic Usage**:
+```tsx
+import { BottomSheet } from '@expo/ui';
+import { useState } from 'react';
+import { ScrollView, Text } from 'react-native';
+
+function MyScreen() {
+  const [isPresented, setIsPresented] = useState(false);
+
+  return (
+    <>
+      <Button onPress={() => setIsPresented(true)}>
+        Open Sheet
+      </Button>
+
+      <BottomSheet
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+      >
+        <ScrollView style={{ flex: 1 }}>
+          <Text>Sheet Content</Text>
+        </ScrollView>
+      </BottomSheet>
+    </>
+  );
+}
+```
+
+**Key Props**:
+- `isPresented` (boolean) — Controls sheet visibility
+- `onDismiss` (() => void) — Called when user dismisses sheet
+- `snapPoints` (SnapPoint[]) — Heights where sheet can rest
+- `showDragIndicator` (boolean) — Shows/hides drag handle (default: true)
+
+**Snap Points**:
+- `'half'` — Approximately half-screen
+- `'full'` — Fully expanded
+- `{ fraction: number }` — Screen height fraction (0-1)
+- `{ height: number }` — Fixed pixel height
+
+**Important Notes**:
+- Always wrap content in `<ScrollView>` for proper overflow handling
+- Sheet visibility is **controlled** via `isPresented` state
+- No ref-based methods (present/dismiss) — use state instead
+- Versioned docs: https://docs.expo.dev/versions/v56.0.0/sdk/ui/universal/bottomsheet/
+
+**Example with forwardRef** (for imperative control):
+```tsx
+import { BottomSheet } from '@expo/ui';
+import { forwardRef, useImperativeHandle, useState } from 'react';
+
+interface SheetRef {
+  open: () => void;
+  close: () => void;
+}
+
+export const MySheet = forwardRef<SheetRef, Props>(
+  function MySheet({ children }, ref) {
+    const [isPresented, setIsPresented] = useState(false);
+
+    useImperativeHandle(ref, () => ({
+      open: () => setIsPresented(true),
+      close: () => setIsPresented(false),
+    }));
+
+    return (
+      <BottomSheet
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        snapPoints={[{ fraction: 0.6 }]}
+      >
+        {children}
+      </BottomSheet>
+    );
+  }
+);
+```
+
+---
+
 ## AsyncStorage Keys
 
 Defined in `src/models/app.models.ts`:
@@ -827,32 +917,12 @@ npx expo start
 
 **Cause**: Using `@expo/ui` Compose components (Icon, Picker, Column, Text) without proper `<Host>` wrapper
 
-**Solution**: Wrap Compose components directly with `<Host>`:
-```tsx
-// ❌ Wrong
-<BottomSheet>
-  <Host>
-    <BottomSheetView>
-      <Box>Compose components</Box>
-    </BottomSheetView>
-  </Host>
-</BottomSheet>
-
-// ✅ Correct
-<BottomSheet>
-  <BottomSheetView>
-    <Host>
-      <Box>Compose components</Box>
-    </Host>
-  </BottomSheetView>
-</BottomSheet>
-```
+**Note**: `<Host>` is only needed when using `@expo/ui` Jetpack Compose components (Icon, Column, Picker, Text). Regular React Native components don't need it.
 
 **Better solution**: Use native React Native components instead of `@expo/ui` Compose components:
 - For Picker: Use `<Select>` from `@/components/base` (wraps `@react-native-picker/picker`)
 - For Icons: Use `CustomIcon` (properly wrapped with `<Host>`)
-
-**Note**: `<Host>` is only needed when using `@expo/ui` Jetpack Compose components (Icon, Column, Picker, Text). Regular React Native components don't need it.
+- For BottomSheet: Use `BottomSheet` from `@expo/ui` (controlled pattern with `isPresented`/`onDismiss`)
 
 ---
 

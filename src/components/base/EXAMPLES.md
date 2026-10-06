@@ -69,110 +69,166 @@ function MyScreen() {
 
 ## BottomSheet
 
+**Official `@expo/ui` BottomSheet with controlled pattern.**
+
 ### Basic Usage
 
 ```tsx
-import { BottomSheet, Button, Text } from '@/components/base';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useRef } from 'react';
+import { BottomSheet } from '@expo/ui';
+import { Box, Button, Text } from '@/components/base';
+import { useState } from 'react';
+import { ScrollView } from 'react-native';
 
 function MyScreen() {
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-
+  const [isPresented, setIsPresented] = useState(false);
+  
   return (
     <>
-      <Button onPress={() => bottomSheetRef.current?.present()}>
-        Open Bottom Sheet
+      <Button onPress={() => setIsPresented(true)}>
+        Open Sheet
       </Button>
 
-      <BottomSheet ref={bottomSheetRef} snapPoints={['50%', '90%']}>
-        <Box className="p-4">
-          <Text className="text-xl font-bold mb-4">Bottom Sheet Title</Text>
-          <Text>Bottom sheet content goes here.</Text>
-        </Box>
+      <BottomSheet
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        snapPoints={['half', 'full']}
+      >
+        <ScrollView style={{ flex: 1 }}>
+          <Box className="p-4">
+            <Text className="text-xl font-bold mb-4">Bottom Sheet Title</Text>
+            <Text>Bottom sheet content goes here.</Text>
+          </Box>
+        </ScrollView>
       </BottomSheet>
     </>
   );
 }
 ```
 
-### With Custom Snap Points
+### With Custom Snap Points (fraction/height)
 
 ```tsx
 <BottomSheet
-  ref={bottomSheetRef}
-  snapPoints={['40%', '60%', '90%']}
-  enablePanDownToClose
+  isPresented={isPresented}
+  onDismiss={() => setIsPresented(false)}
+  snapPoints={[
+    { fraction: 0.4 },
+    { fraction: 0.6 },
+    { fraction: 0.9 }
+  ]}
 >
-  <ScrollView className="p-4">
-    <Text>Scrollable content</Text>
+  <ScrollView style={{ flex: 1 }}>
+    <Box className="p-4">
+      <Text>Scrollable content</Text>
+    </Box>
   </ScrollView>
 </BottomSheet>
 ```
 
-### Without Backdrop
+### Without Drag Indicator
 
 ```tsx
 <BottomSheet
-  ref={bottomSheetRef}
-  snapPoints={['30%']}
-  showBackdrop={false}
+  isPresented={isPresented}
+  onDismiss={() => setIsPresented(false)}
+  snapPoints={[{ fraction: 0.3 }]}
+  showDragIndicator={false}
 >
-  <Box className="p-4">
-    <Text>Bottom sheet without backdrop</Text>
-  </Box>
-</BottomSheet>
-```
-
-### With Custom Backdrop Opacity
-
-```tsx
-import { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-
-<BottomSheet
-  ref={bottomSheetRef}
-  snapPoints={['70%']}
-  renderBackdrop={(props) => (
-    <BottomSheetBackdrop {...props} opacity={0.8} />
-  )}
->
-  <Box className="p-4">
-    <Text>Content</Text>
-  </Box>
+  <ScrollView style={{ flex: 1 }}>
+    <Box className="p-4">
+      <Text>Bottom sheet without drag indicator</Text>
+    </Box>
+  </ScrollView>
 </BottomSheet>
 ```
 
 ### Product Search Example (Real Usage)
 
 ```tsx
-import { BottomSheet } from '@/components/base';
-import { BottomSheetModal, BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { useRef } from 'react';
+import { BottomSheet } from '@expo/ui';
+import { Box, Button, Input } from '@/components/base';
+import { useState } from 'react';
+import { FlatList, ScrollView } from 'react-native';
 
 function ProductSearchExample() {
-  const sheetRef = useRef<BottomSheetModal>(null);
+  const [isPresented, setIsPresented] = useState(false);
   const [products, setProducts] = useState([]);
 
   return (
     <>
-      <Button onPress={() => sheetRef.current?.present()}>
+      <Button onPress={() => setIsPresented(true)}>
         Search Products
       </Button>
 
-      <BottomSheet ref={sheetRef} snapPoints={['60%', '90%']}>
-        <Box className="p-4">
-          <Input placeholder="Search..." className="mb-4" />
-          <BottomSheetFlatList
-            data={products}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Box className="p-3 border-b border-border">
-                <Text>{item.name}</Text>
-              </Box>
-            )}
-          />
-        </Box>
+      <BottomSheet
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        snapPoints={[{ fraction: 0.6 }, { fraction: 0.9 }]}
+      >
+        <ScrollView style={{ flex: 1 }}>
+          <Box className="p-4">
+            <Input placeholder="Search..." className="mb-4" />
+            <FlatList
+              data={products}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Box className="p-3 border-b border-border">
+                  <Text>{item.name}</Text>
+                </Box>
+              )}
+            />
+          </Box>
+        </ScrollView>
       </BottomSheet>
+    </>
+  );
+}
+```
+
+### With forwardRef (Imperative Control)
+
+```tsx
+import { BottomSheet } from '@expo/ui';
+import { forwardRef, useImperativeHandle, useState } from 'react';
+
+interface SheetRef {
+  open: () => void;
+  close: () => void;
+}
+
+export const MySheet = forwardRef<SheetRef, { children: React.ReactNode }>(
+  function MySheet({ children }, ref) {
+    const [isPresented, setIsPresented] = useState(false);
+
+    useImperativeHandle(ref, () => ({
+      open: () => setIsPresented(true),
+      close: () => setIsPresented(false),
+    }));
+
+    return (
+      <BottomSheet
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        snapPoints={[{ fraction: 0.7 }]}
+      >
+        <ScrollView style={{ flex: 1 }}>
+          {children}
+        </ScrollView>
+      </BottomSheet>
+    );
+  }
+);
+
+// Usage
+function ParentComponent() {
+  const sheetRef = useRef<SheetRef>(null);
+  
+  return (
+    <>
+      <Button onPress={() => sheetRef.current?.open()}>Open</Button>
+      <MySheet ref={sheetRef}>
+        <Text>Content</Text>
+      </MySheet>
     </>
   );
 }
@@ -190,12 +246,16 @@ function ProductSearchExample() {
 - Content is centered with max-width for better UX on tablets
 
 ### BottomSheet
-- Uses `@gorhom/bottom-sheet` (BottomSheetModal) for imperative control
-- Requires `BottomSheetModalProvider` in app root (already configured)
+- Uses official `@expo/ui` BottomSheet with **controlled pattern**
+- Visibility managed via `isPresented` prop (boolean state)
+- Dismissal handled through `onDismiss` callback
 - Automatically adapts to light/dark theme
-- Default backdrop with 50% opacity
-- Supports pan-down to close gesture
-- Handle indicator included by default
+- Default backdrop (dismissible by tapping)
+- Supports swipe-down to dismiss gesture
+- Drag indicator included by default (`showDragIndicator={true}`)
+- Always wrap content in `<ScrollView>` for proper overflow handling
+- Snap points: `'half'`, `'full'`, `{ fraction: 0.6 }`, or `{ height: 400 }`
+- Versioned docs: https://docs.expo.dev/versions/v56.0.0/sdk/ui/universal/bottomsheet/
 
 ### When to Use Which
 

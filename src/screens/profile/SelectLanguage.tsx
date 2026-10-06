@@ -2,16 +2,16 @@ import { AppLanguage, getSavedLanguageOption, setAppLanguage } from '@/assets/i1
 import { Box, Button, HStack, Pressable, Text } from '@/components/base';
 import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
-import BottomSheet from '@expo/ui/community/bottom-sheet';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, useColorScheme } from 'react-native';
+import { BottomSheet } from '@expo/ui';
+import { useEffect, useMemo, useState } from 'react';
+import { FlatList, ScrollView } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
 export const SelectLanguage = () => {
   const { t } = useTranslation();
-  const colorScheme = useColorScheme();
   const [language, setLanguage] = useState<AppLanguage>(AppLanguage.AUTO);
+  const [isPresented, setIsPresented] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -42,16 +42,12 @@ export const SelectLanguage = () => {
   const onLanguagePress = async (lang: AppLanguage) => {
     await setAppLanguage(lang);
     setLanguage(lang);
+    setIsPresented(false);
   };
-
-  const sheetRef = useRef<BottomSheet>(null);
-
-  // Determine background color based on color scheme
-  const backgroundColor = colorScheme === 'dark' ? '#18181b' : '#ffffff';
 
   return (
     <>
-      <Pressable className="flex flex-row justify-between items-center h-20 border border-border dark:border-border-dark rounded-xl p-4" onPress={() => sheetRef.current?.snapToIndex(0)}>
+      <Pressable className="flex flex-row justify-between items-center h-20 border border-border dark:border-border-dark rounded-xl p-4" onPress={() => setIsPresented(true)}>
         <HStack gap={3} className="items-center">
           <Box className="w-10 h-10 flex items-center justify-center rounded-xl border border-border dark:border-border-dark">
             <CustomIcon name={IconNames.LANGUAGE} />
@@ -62,31 +58,30 @@ export const SelectLanguage = () => {
       </Pressable>
 
       <BottomSheet
-        backgroundStyle={{ backgroundColor }}
-        ref={sheetRef}
-        snapPoints={['50%', '90%']}
-        index={-1}
-        enablePanDownToClose
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
       >
-        <FlatList
-          scrollEnabled={false}
-          style={{ flex: 1 }}
-          data={LANGUAGE_OPTIONS}
-          keyExtractor={item => item.label}
-          contentContainerStyle={{ padding: 24 }}
-          renderItem={({ item }) => {
-            const isSelected = item.value === language;
-            return (
-              <Button
-                className='mb-4'
-                variant={isSelected ? 'default' : 'outline'}
-                onPress={async () => await onLanguagePress(item.value)}
-              >
-                {item.label}
-              </Button>
-            );
-          }}
-        />
+        <ScrollView style={{ flex: 1 }}>
+          <FlatList
+            scrollEnabled={false}
+            data={LANGUAGE_OPTIONS}
+            keyExtractor={item => item.label}
+            contentContainerStyle={{ padding: 24 }}
+            renderItem={({ item }) => {
+              const isSelected = item.value === language;
+              return (
+                <Button
+                  className='mb-4'
+                  variant={isSelected ? 'default' : 'outline'}
+                  onPress={async () => await onLanguagePress(item.value)}
+                >
+                  {item.label}
+                </Button>
+              );
+            }}
+          />
+        </ScrollView>
       </BottomSheet>
     </>
   )

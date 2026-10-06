@@ -19,9 +19,8 @@ import { IconNames } from "@/icons/icon.type";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
-import { BottomSheet } from "@expo/ui/community/bottom-sheet";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, ScrollView } from "react-native";
 import { AddTransactionSheet } from "./AddTransactionSheet";
@@ -38,7 +37,7 @@ export default function CashboxDetailsPage() {
 
   const [sheetVisible, setSheetVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
-  // const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
+  const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
   const [breakdownVisible, setBreakdownVisible] = useState(false);
 
   const { data: cashbox, isLoading, isError } = useCashboxById(id, {
@@ -48,7 +47,6 @@ export default function CashboxDetailsPage() {
   const createTransactionMutation = useCreateTransaction();
 
   const isOpen = cashbox?.status === CashboxStatus.OPEN;
-  const sheetRef = useRef<BottomSheet>(null);
   const handleCloseCashbox = () => {
     Alert.alert(
       t('payment.closeCashboxConfirmation.title'),
@@ -249,7 +247,7 @@ export default function CashboxDetailsPage() {
           <HStack className="items-center justify-between mb-3">
             <Text size="xl" variant={'bold'}>{t('payment.transactions')}</Text>
             {hasMoreTransactions && (
-              <Button size="sm" variant="outline" onPress={() => sheetRef.current?.snapToIndex(0)}>
+              <Button size="sm" variant="outline" onPress={() => setAllTransactionsVisible(true)}>
                 <ButtonText>{t('payment.all')}</ButtonText>
               </Button>
             )}
@@ -284,7 +282,8 @@ export default function CashboxDetailsPage() {
 
       {/* All Transactions Sheet */}
       <AllTransactionsSheet
-        sheetRef={sheetRef}
+        isPresented={allTransactionsVisible}
+        onDismiss={() => setAllTransactionsVisible(false)}
         transactions={sortedTransactions}
       />
 

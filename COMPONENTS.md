@@ -137,18 +137,28 @@ import { Box, Button, Input, Text, VStack } from '@/components/base';
 </Modal>
 ```
 
-**BottomSheet** — Bottom sheet (@gorhom wrapper)
+**BottomSheet** — Official @expo/ui BottomSheet (controlled pattern)
 ```tsx
-const sheetRef = useRef<BottomSheetModal>(null);
+import { BottomSheet } from '@expo/ui';
+import { useState } from 'react';
+import { ScrollView } from 'react-native';
 
-<BottomSheet ref={sheetRef} snapPoints={['50%', '90%']}>
-  <Box className="p-4">
-    <Text>Sheet content</Text>
-  </Box>
+const [isPresented, setIsPresented] = useState(false);
+
+<BottomSheet
+  isPresented={isPresented}
+  onDismiss={() => setIsPresented(false)}
+  snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+>
+  <ScrollView style={{ flex: 1 }}>
+    <Box className="p-4">
+      <Text>Sheet content</Text>
+    </Box>
+  </ScrollView>
 </BottomSheet>
 
-// Open: sheetRef.current?.present()
-// Close: sheetRef.current?.dismiss()
+// Open: setIsPresented(true)
+// Close: setIsPresented(false)
 ```
 
 ---

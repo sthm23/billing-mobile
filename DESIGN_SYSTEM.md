@@ -302,7 +302,7 @@ export interface ButtonProps extends VariantProps<typeof buttonVariants> {
 
 - `Card` — карточка с контентом
 - `Modal` — модальное окно
-- `BottomSheet` — нижняя панель
+- `BottomSheet` — нижняя панель (из @expo/ui, controlled pattern)
 - `Avatar` — аватар
 - `Badge` — бейдж
 - `Alert` — алерт

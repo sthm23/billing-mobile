@@ -98,7 +98,7 @@ src/
 │   │   ├── Button.tsx         # Button with variants
 │   │   ├── Input.tsx          # Text input
 │   │   ├── Modal.tsx          # Modal overlay
-│   │   ├── BottomSheet.tsx    # Bottom sheet (@gorhom)
+│   │   ├── (removed)          # BottomSheet: use @expo/ui directly
 │   │   └── ...                # + 12 more components
 │   ├── common/                # Common utility components
 │   ├── order/                 # Order-specific components
@@ -206,7 +206,7 @@ const BASE_URL = Platform.select({
 - **Zod** 4.4.3 — Schema validation
 
 ### UI & Interaction
-- **@gorhom/bottom-sheet** 5.2.14 — Native bottom sheets
+- **@expo/ui** 57.0.20 — Native bottom sheets
 - **react-native-gesture-handler** — Touch gestures
 - **react-native-reanimated** — Smooth animations
 - **expo-image** — Optimized image component
@@ -238,7 +238,7 @@ const BASE_URL = Platform.select({
 - ✅ **Accessibility** — ARIA labels, roles, and states
 - ✅ **Offline-ready** — AsyncStorage for local data
 - ✅ **Pull-to-refresh** — Native refresh controls
-- ✅ **Bottom Sheets** — @gorhom/bottom-sheet for native UX
+- ✅ **Bottom Sheets** — @expo/ui for native UX
 
 ---
 
@@ -363,7 +363,6 @@ npx expo start --clear
 
 **Libraries**:
 - [React Query (TanStack Query)](https://tanstack.com/query/latest)
-- [@gorhom/bottom-sheet](https://gorhom.dev/react-native-bottom-sheet/)
 - [React Hook Form](https://react-hook-form.com/)
 
 ---

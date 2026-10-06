@@ -1,5 +1,4 @@
 import {
-  BottomSheet,
   Box,
   Button,
   Card,
@@ -15,8 +14,8 @@ import {
   TextArea,
   VStack,
 } from '@/components/base';
-// import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useRef, useState } from 'react';
+import { BottomSheet } from '@expo/ui';
+import { useState } from 'react';
 import { ScrollView } from 'react-native';
 
 /**
@@ -29,13 +28,13 @@ import { ScrollView } from 'react-native';
  */
 export default function ComponentDemoScreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [textAreaValue, setTextAreaValue] = useState('');
   const [loading, setLoading] = useState(false);
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const handleOpenBottomSheet = () => {
-    bottomSheetRef.current?.present();
+    setBottomSheetVisible(true);
   };
 
   const handleToggleLoading = () => {
@@ -309,18 +308,24 @@ export default function ComponentDemoScreen() {
       </Modal>
 
       {/* Bottom Sheet */}
-      <BottomSheet ref={bottomSheetRef} snapPoints={['50%', '80%']}>
-        <Box className="p-4">
-          <VStack gap={3}>
-            <Heading level={3}>Bottom Sheet</Heading>
-            <Text>This is bottom sheet content using @gorhom/bottom-sheet.</Text>
-            <Divider />
-            <Input placeholder="Try typing in bottom sheet..." />
-            <Button onPress={() => bottomSheetRef.current?.dismiss()}>
-              Close Bottom Sheet
-            </Button>
-          </VStack>
-        </Box>
+      <BottomSheet
+        isPresented={bottomSheetVisible}
+        onDismiss={() => setBottomSheetVisible(false)}
+        snapPoints={[{ fraction: 0.5 }, { fraction: 0.8 }]}
+      >
+        <ScrollView style={{ flex: 1 }}>
+          <Box className="p-4">
+            <VStack gap={3}>
+              <Heading level={3}>Bottom Sheet</Heading>
+              <Text>This is bottom sheet content</Text>
+              <Divider />
+              <Input placeholder="Try typing in bottom sheet..." />
+              <Button onPress={() => setBottomSheetVisible(false)}>
+                Close Bottom Sheet
+              </Button>
+            </VStack>
+          </Box>
+        </ScrollView>
       </BottomSheet>
     </ScrollView>
   );
