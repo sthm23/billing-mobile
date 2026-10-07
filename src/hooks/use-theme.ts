@@ -41,5 +41,8 @@ export function useTheme() {
     destructive: isDark ? '#ff6467' : '#e7000b',
     success: isDark ? '#86efac' : '#22c55e',
     muted: isDark ? '#262626' : '#f5f5f5',
+
+    foreground: isDark ? '#fafafa' : '#171717',
+    mutedForeground: isDark ? '#a1a1a1' : '#737373',
   };
 }

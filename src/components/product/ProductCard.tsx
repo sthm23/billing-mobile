@@ -2,8 +2,8 @@ import { Box, HStack, Pressable, Text, VStack } from '@/components/base';
 import { formatPrice, getTotalQuantity } from '@/libs/product-utils';
 import { Product } from '@/models/product.model';
 import { useTranslation } from 'react-i18next';
+import { StatusBadge } from '../cashbox';
 import { ProductImage } from './ProductImage';
-import { QuantityBadge } from './QuantityBadge';
 
 interface ProductCardProps {
   product: Product;
@@ -67,7 +67,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
             </Text>
           </HStack>
           {/* Quantity Badge */}
-          <QuantityBadge quantity={totalQuantity} variant={totalQuantity === 0 ? 'destructive' : totalQuantity < 9 ? 'warn' : 'success'} />
+          <StatusBadge label={totalQuantity.toString()} size='md' variant={totalQuantity === 0 ? 'error' : totalQuantity < 9 ? 'warning' : 'success'} />
         </Box>
 
         {/* Price */}

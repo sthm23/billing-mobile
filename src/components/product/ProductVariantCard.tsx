@@ -1,10 +1,10 @@
 import { Button, Card, Divider, HStack, Text, VStack } from '@/components/base';
 import { useTheme } from '@/hooks/use-theme';
-import { ProductVariant, StockMovementType } from '@/services/product/product.type';
+import { ProductVariant, StockMovementType } from '@/models/product.model';
 import { Clock, Plus } from 'lucide-react-native';
-import { PricePair } from './PricePair';
-import { QuantityBadge } from './QuantityBadge';
 import { useTranslation } from 'react-i18next';
+import { StatusBadge } from '../cashbox';
+import { PricePair } from './PricePair';
 
 interface ProductVariantCardProps {
   variant: ProductVariant;
@@ -26,9 +26,9 @@ function getLatestCostPrice(variant: ProductVariant): number {
   return lastIn ? parseFloat(lastIn.unitCost) : 0;
 }
 
-function getQuantityVariant(qty: number): 'success' | 'destructive' | 'warn' {
-  if (qty === 0) return 'destructive';
-  if (qty < 5) return 'warn';
+function getQuantityVariant(qty: number): 'success' | 'error' | 'warning' {
+  if (qty === 0) return 'error';
+  if (qty < 5) return 'warning';
   return 'success';
 }
 
@@ -51,8 +51,9 @@ export function ProductVariantCard({
           <Text className="text-sm font-semibold text-foreground">{label}</Text>
           <Text className="text-xs text-typography-400">{variant.sku}</Text>
         </VStack>
-        <QuantityBadge
-          quantity={variant.quantity}
+        <StatusBadge
+          label={variant.quantity.toString()}
+          size='md'
           variant={getQuantityVariant(variant.quantity)}
         />
       </HStack>

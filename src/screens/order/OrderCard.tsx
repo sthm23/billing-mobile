@@ -9,13 +9,33 @@ type OrderCardProps = {
     t: TFunction;
 };
 
+
+type StatusVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
+
+function getStatusVariant(status: OrderStatus): StatusVariant {
+    switch (status) {
+        case OrderStatus.CREATED:
+            return 'info';
+        case OrderStatus.COMPLETED:
+            return 'success';
+        case OrderStatus.CANCELLED:
+            return 'error';
+        case OrderStatus.HOLD:
+            return 'default';
+        case OrderStatus.DEBT:
+            return 'error';
+        default:
+            return 'default';
+    }
+}
+
 export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
     const cashierName = order.cashier.user.fullName;
     const warehouseName = order.warehouse.name;
     const total = Number(order.totalAmount);
 
     const statusLabel = t(`order.status.${order.status}`);
-    const isOpen = order.status === OrderStatus.CREATED;
+
     const formattedDate = new Date(order.createdAt).toLocaleDateString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
@@ -50,7 +70,7 @@ export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
                     {/* Status Badge */}
                     <StatusBadge
                         label={statusLabel}
-                        variant={isOpen ? 'success' : 'default'}
+                        variant={getStatusVariant(order.status)}
                     />
 
                     {/* total */}

@@ -1,3 +1,4 @@
+import { Button, Divider, HStack, Text, VStack } from '@/components/base';
 import { AdminSectionHeader } from '@/components/product/AdminSectionHeader';
 import { AvailabilityBadge } from '@/components/product/AvailabilityBadge';
 import { ChipSelector } from '@/components/product/ChipSelector';
@@ -5,17 +6,16 @@ import { ImageCarousel } from '@/components/product/ImageCarousel';
 import { PriceLabel } from '@/components/product/PriceLabel';
 import { ProductVariantCard } from '@/components/product/ProductVariantCard';
 import { QuantityStepper } from '@/components/product/QuantityStepper';
-import { Button, Divider, HStack, Text, VStack } from '@/components/base';
 import {
   Attribute,
   ProductDetail,
   ProductVariant,
   StockMovementType,
-} from '@/services/product/product.type';
+} from '@/models/product.model';
 import { Plus } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
-import { ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { ScrollView } from 'react-native';
 
 interface ProductDetailScreenProps {
   product: ProductDetail;

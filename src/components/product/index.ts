@@ -11,6 +11,6 @@ export { ProductCardSkeleton } from './ProductCardSkeleton';
 export { ProductImage } from './ProductImage';
 export { ProductListHeader } from './ProductListHeader';
 export { ProductVariantCard } from './ProductVariantCard';
-export { QuantityBadge } from './QuantityBadge';
 export { QuantityStepper } from './QuantityStepper';
 export { SearchBar } from './SearchBar';
+

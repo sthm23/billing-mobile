@@ -1,12 +1,12 @@
 import { Box, Button, HStack, Pressable, Spinner, Text } from '@/components/base';
+import { useTheme } from '@/hooks/use-theme';
 import { useOrders } from '@/services/order/order.queries';
 import { OrderParams, OrderStatus } from '@/services/order/order.type';
-import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
+import { Filter, Plus, ShoppingBag } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList } from 'react-native';
-import { Unlock } from 'lucide-react-native';
 import { OrderCard } from './OrderCard';
 
 
@@ -67,7 +67,7 @@ export default function OrderPage() {
     if (isLoading) {
         return (
             <Box className="flex-1 items-center justify-center">
-                <Spinner size="large" />
+                <Spinner size="lg" />
             </Box>
         )
     }
@@ -86,41 +86,59 @@ export default function OrderPage() {
     return (
         <>
             <Box className="w-full p-2">
+                <HStack className="items-center justify-between mb-3">
+                    <HStack className="items-center gap-2">
+                        <ShoppingBag size={28} color={colors.foreground} />
+                        <Text className="text-2xl font-bold">
+                            {t('order.orderTitle')}
+                        </Text>
+                    </HStack>
+                    <Button
+                        size="sm"
+                    >
+                        <Plus size={20} color={colors.secondary} />
+                        <Text className='text-white dark:text-black'>{t('order.create')}</Text>
+                    </Button>
+                </HStack>
                 <HStack gap={4} className="justify-between items-center">
                     {/* Custom Tab Switcher */}
-                    <HStack gap={2} className="flex-1">
-                        {tabOptions.map((option) => {
-                            const isActive = status === option.value;
+                    <HStack className="flex-1 rounded-lg border border-border bg-muted overflow-hidden">
+                        {tabOptions.map((tab, index) => {
+                            const isActive = status === tab.value;
+                            const isFirst = index === 0;
+                            const isLast = index === tabOptions.length - 1;
+
                             return (
                                 <Pressable
-                                    key={option.value}
-                                    onPress={() => setStatus(option.value)}
-                                    className={`
-                                        px-4 py-2 rounded-lg
-                                        ${isActive
-                                            ? 'bg-primary'
-                                            : 'bg-surface'
-                                        }
-                                    `}
+                                    key={tab.value}
+                                    onPress={() => setStatus(tab.value)}
+                                    className="flex-1 py-2 px-3 items-center justify-center"
+                                    style={{
+                                        backgroundColor: isActive ? colors.background : 'transparent',
+                                        borderRightWidth: isLast ? 0 : 1,
+                                        borderRightColor: colors.border,
+                                    }}
                                 >
                                     <Text
-                                        variant={isActive ? 'default' : 'muted'}
-                                        className={isActive ? 'text-white' : ''}
+                                        style={{
+                                            color: isActive ? colors.primary : colors.mutedForeground,
+                                            fontWeight: isActive ? '600' : '400',
+                                            fontSize: 14,
+                                        }}
                                     >
-                                        {option.label}
+                                        {tab.label}
                                     </Text>
                                 </Pressable>
-                            )
+                            );
                         })}
                     </HStack>
 
                     {/* Unlock Button */}
                     <Button
-                        variant="ghost"
-                        size="lg"
-                        className="rounded-full p-3"
+                        variant="outline"
+                        size="md"
                     >
-                        <Unlock size={20} color={colors.textMuted} />
+                        <Filter size={20} color={colors.textMuted} />
                     </Button>
                 </HStack>
             </Box>

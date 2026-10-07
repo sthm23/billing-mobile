@@ -1,12 +1,12 @@
+import { Box, Divider, VStack } from '@/components/base';
 import { ActionButtons } from '@/components/product/ActionButtons';
 import { EmptyProductList } from '@/components/product/EmptyProductList';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { ProductListHeader } from '@/components/product/ProductListHeader';
 import { SearchBar } from '@/components/product/SearchBar';
-import { Box, Divider, VStack } from '@/components/base';
 import { useDebounce } from '@/hooks/use-debounce';
-import { Product } from '@/services/product/product.type';
+import { Product } from '@/models/product.model';
 import { DEBOUNCE_TIME_MS, useProducts } from '@/services/product/product.queries';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';

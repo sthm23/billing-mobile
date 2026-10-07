@@ -1,7 +1,7 @@
 import { Button, HStack, Text } from '@/components/base';
-import { Receipt } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/hooks/use-theme';
+import { Plus, Receipt } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 interface CashboxHeaderProps {
   onOpenCashbox?: () => void;
@@ -22,9 +22,9 @@ export function CashboxHeader({ onOpenCashbox }: CashboxHeaderProps) {
       <Button
         size="sm"
         onPress={onOpenCashbox}
-        disabled
       >
-        {`+ ${t('payment.openCashbox')}`}
+        <Plus size={20} color={colors.secondary} />
+        <Text className='text-white dark:text-black'>{t('payment.openCashbox')}</Text>
       </Button>
     </HStack>
   );

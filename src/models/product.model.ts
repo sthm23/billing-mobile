@@ -37,7 +37,6 @@ export interface ProductVariant {
   storeId: string // это для быстрого поиска уникального SKU в пределах магазина
   product: Product
   quantity: number
-  // orderItems:     OrderItem[]
   stockMovements: StockMovement[]
   attributes: AttributeItem[]
 }
@@ -200,3 +199,16 @@ export interface InventoryMovementPayload {
 export interface UpdateProductVariantPrice {
   price: number;
 }
+
+export interface ProductParams {
+  currentPage?: number;
+  pageSize?: number;
+  fromDate?: Date;
+  toDate?: Date;
+  search?: string;
+}
+
+export interface ProductVariantSearchParams {
+  text: string;
+  warehouseId: string;
+};

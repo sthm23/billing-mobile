@@ -1,6 +1,6 @@
 import { Box, Button, Text } from "@/components/base";
+import { Product, ProductParams } from "@/models/product.model";
 import { useProducts } from "@/services/product/product.queries";
-import { Product, ProductParams } from "@/services/product/product.type";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";

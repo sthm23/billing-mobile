@@ -1,8 +1,8 @@
 import { HStack, Pressable } from '@/components/base';
+import { useTheme } from '@/hooks/use-theme';
 import { CashboxStatus } from '@/models/payment.model';
 import { Funnel } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/hooks/use-theme';
 import { Text } from 'react-native';
 
 export type CashboxStatusFilter = 'all' | CashboxStatus.OPEN | CashboxStatus.CLOSED;
@@ -58,7 +58,7 @@ export function CashboxFilters({ value, onValueChange, onFilterPress }: CashboxF
       <Pressable
         className="p-2 rounded-lg border border-border bg-muted"
         onPress={onFilterPress}
-        disabled
+
       >
         <Funnel size={20} color={colors.mutedForeground} />
       </Pressable>
