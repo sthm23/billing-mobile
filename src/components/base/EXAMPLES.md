@@ -77,7 +77,6 @@ function MyScreen() {
 import { BottomSheet } from '@expo/ui';
 import { Box, Button, Text } from '@/components/base';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
 
 function MyScreen() {
   const [isPresented, setIsPresented] = useState(false);
@@ -93,35 +92,33 @@ function MyScreen() {
         onDismiss={() => setIsPresented(false)}
         snapPoints={['half', 'full']}
       >
-        <ScrollView style={{ flex: 1 }}>
-          <Box className="p-4">
-            <Text className="text-xl font-bold mb-4">Bottom Sheet Title</Text>
-            <Text>Bottom sheet content goes here.</Text>
-          </Box>
-        </ScrollView>
+        <Box className="flex-1 p-4">
+          <Text className="text-xl font-bold mb-4">Bottom Sheet Title</Text>
+          <Text>Bottom sheet content goes here.</Text>
+        </Box>
       </BottomSheet>
     </>
   );
 }
 ```
 
-### With Custom Snap Points (fraction/height)
+### With Scrollable Content
 
 ```tsx
+import { ScrollView } from 'react-native';
+
 <BottomSheet
   isPresented={isPresented}
   onDismiss={() => setIsPresented(false)}
-  snapPoints={[
-    { fraction: 0.4 },
-    { fraction: 0.6 },
-    { fraction: 0.9 }
-  ]}
+  snapPoints={['half', 'full']}
 >
-  <ScrollView style={{ flex: 1 }}>
-    <Box className="p-4">
-      <Text>Scrollable content</Text>
-    </Box>
-  </ScrollView>
+  <Box className="flex-1 p-4">
+    <Text className="text-xl font-bold mb-4">Scrollable Content</Text>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <Text>Long content here...</Text>
+      {/* More content */}
+    </ScrollView>
+  </Box>
 </BottomSheet>
 ```
 
@@ -131,14 +128,12 @@ function MyScreen() {
 <BottomSheet
   isPresented={isPresented}
   onDismiss={() => setIsPresented(false)}
-  snapPoints={[{ fraction: 0.3 }]}
+  snapPoints={['half']}
   showDragIndicator={false}
 >
-  <ScrollView style={{ flex: 1 }}>
-    <Box className="p-4">
-      <Text>Bottom sheet without drag indicator</Text>
-    </Box>
-  </ScrollView>
+  <Box className="flex-1 p-4">
+    <Text>Bottom sheet without drag indicator</Text>
+  </Box>
 </BottomSheet>
 ```
 
@@ -146,9 +141,9 @@ function MyScreen() {
 
 ```tsx
 import { BottomSheet } from '@expo/ui';
-import { Box, Button, Input } from '@/components/base';
+import { Box, Button, Input, Text } from '@/components/base';
 import { useState } from 'react';
-import { FlatList, ScrollView } from 'react-native';
+import { FlatList } from 'react-native';
 
 function ProductSearchExample() {
   const [isPresented, setIsPresented] = useState(false);
@@ -163,22 +158,20 @@ function ProductSearchExample() {
       <BottomSheet
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
-        snapPoints={[{ fraction: 0.6 }, { fraction: 0.9 }]}
+        snapPoints={['half', 'full']}
       >
-        <ScrollView style={{ flex: 1 }}>
-          <Box className="p-4">
-            <Input placeholder="Search..." className="mb-4" />
-            <FlatList
-              data={products}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <Box className="p-3 border-b border-border">
-                  <Text>{item.name}</Text>
-                </Box>
-              )}
-            />
-          </Box>
-        </ScrollView>
+        <Box className="flex-1 p-4">
+          <Input placeholder="Search..." className="mb-4" />
+          <FlatList
+            data={products}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Box className="p-3 border-b border-border">
+                <Text>{item.name}</Text>
+              </Box>
+            )}
+          />
+        </Box>
       </BottomSheet>
     </>
   );
@@ -189,7 +182,9 @@ function ProductSearchExample() {
 
 ```tsx
 import { BottomSheet } from '@expo/ui';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { Box } from '@/components/base';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { ScrollView } from 'react-native';
 
 interface SheetRef {
   open: () => void;
@@ -209,11 +204,13 @@ export const MySheet = forwardRef<SheetRef, { children: React.ReactNode }>(
       <BottomSheet
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
-        snapPoints={[{ fraction: 0.7 }]}
+        snapPoints={['half', 'full']}
       >
-        <ScrollView style={{ flex: 1 }}>
-          {children}
-        </ScrollView>
+        <Box className="flex-1">
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {children}
+          </ScrollView>
+        </Box>
       </BottomSheet>
     );
   }
@@ -253,8 +250,13 @@ function ParentComponent() {
 - Default backdrop (dismissible by tapping)
 - Supports swipe-down to dismiss gesture
 - Drag indicator included by default (`showDragIndicator={true}`)
-- Always wrap content in `<ScrollView>` for proper overflow handling
-- Snap points: `'half'`, `'full'`, `{ fraction: 0.6 }`, or `{ height: 400 }`
+- **IMPORTANT**: Wrap content in `<Box className="flex-1 p-4">` for proper layout
+- For scrollable content, add `<ScrollView>` inside the Box
+- **Snap points**: Use `'half'` and `'full'` for best cross-platform compatibility
+  - `'half'` — Approximately half-screen ✅ **Recommended**
+  - `'full'` — Fully expanded ✅ **Recommended**
+  - `{ fraction: 0.6 }` — May not work on Android ⚠️
+  - `{ height: 400 }` — May not work on Android ⚠️
 - Versioned docs: https://docs.expo.dev/versions/v56.0.0/sdk/ui/universal/bottomsheet/
 
 ### When to Use Which

@@ -141,24 +141,22 @@ import { Box, Button, Input, Text, VStack } from '@/components/base';
 ```tsx
 import { BottomSheet } from '@expo/ui';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
 
 const [isPresented, setIsPresented] = useState(false);
 
 <BottomSheet
   isPresented={isPresented}
   onDismiss={() => setIsPresented(false)}
-  snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+  snapPoints={['half', 'full']}
 >
-  <ScrollView style={{ flex: 1 }}>
-    <Box className="p-4">
-      <Text>Sheet content</Text>
-    </Box>
-  </ScrollView>
+  <Box className="flex-1 p-4">
+    <Text>Sheet content</Text>
+  </Box>
 </BottomSheet>
 
 // Open: setIsPresented(true)
 // Close: setIsPresented(false)
+// Note: Use 'half' and 'full' snap points for best compatibility
 ```
 
 ---

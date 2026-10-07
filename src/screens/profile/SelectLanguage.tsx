@@ -4,9 +4,9 @@ import CustomIcon from '@/icons/custom-icon';
 import { IconNames } from '@/icons/icon.type';
 import { BottomSheet } from '@expo/ui';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, ScrollView } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { View } from 'react-native';
 
 export const SelectLanguage = () => {
   const { t } = useTranslation();
@@ -60,28 +60,23 @@ export const SelectLanguage = () => {
       <BottomSheet
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
-        snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+        snapPoints={['half']}
       >
-        <ScrollView style={{ flex: 1 }}>
-          <FlatList
-            scrollEnabled={false}
-            data={LANGUAGE_OPTIONS}
-            keyExtractor={item => item.label}
-            contentContainerStyle={{ padding: 24 }}
-            renderItem={({ item }) => {
-              const isSelected = item.value === language;
-              return (
-                <Button
-                  className='mb-4'
-                  variant={isSelected ? 'default' : 'outline'}
-                  onPress={async () => await onLanguagePress(item.value)}
-                >
-                  {item.label}
-                </Button>
-              );
-            }}
-          />
-        </ScrollView>
+        <View style={{ flex: 1, padding: 24 }}>
+          {LANGUAGE_OPTIONS.map((item) => {
+            const isSelected = item.value === language;
+            return (
+              <Button
+                key={item.value}
+                className='mb-4'
+                variant={isSelected ? 'default' : 'outline'}
+                onPress={async () => await onLanguagePress(item.value)}
+              >
+                {item.label}
+              </Button>
+            );
+          })}
+        </View>
       </BottomSheet>
     </>
   )

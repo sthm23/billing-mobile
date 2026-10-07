@@ -7,7 +7,7 @@ import {
 import { CashboxTransaction } from "@/models/payment.model";
 import { BottomSheet } from '@expo/ui';
 import { useTranslation } from "react-i18next";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { TransactionCard } from "./TransactionCard";
 
 type Props = {
@@ -23,23 +23,23 @@ export const AllTransactionsSheet = ({ isPresented, onDismiss, transactions }: P
     <BottomSheet
       isPresented={isPresented}
       onDismiss={onDismiss}
-      snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+      snapPoints={['half', 'full']}
     >
-      <ScrollView style={{ flex: 1 }}>
-        <Box className="w-full px-4 pt-3 pb-6">
-          {/* Header */}
-          <HStack className="items-center justify-between mb-4">
-            <Text size="xl" variant='bold'>{t('payment.transactions')}</Text>
-            <Text size="sm" className="text-typography-500">
-              {transactions.length} {t('payment.payments')}
-            </Text>
-          </HStack>
+      <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24 }}>
+        {/* Header */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <Text size="xl" variant='bold'>{t('payment.transactions')}</Text>
+          <Text size="sm" className="text-typography-500">
+            {transactions.length} {t('payment.payments')}
+          </Text>
+        </View>
 
-          {/* Transactions list */}
+        {/* Transactions list */}
+        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
           {transactions.length === 0 ? (
-            <Box className="py-10 items-center">
+            <View style={{ paddingVertical: 40, alignItems: 'center' }}>
               <Text className="text-typography-500">{t('payment.noFound')}</Text>
-            </Box>
+            </View>
           ) : (
             <Card className="rounded-xl bg-surface overflow-hidden">
               {transactions.map((transaction, index) => (
@@ -52,8 +52,8 @@ export const AllTransactionsSheet = ({ isPresented, onDismiss, transactions }: P
               ))}
             </Card>
           )}
-        </Box>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </BottomSheet>
   );
 };

@@ -10,7 +10,7 @@ import { CashTransactionType } from "@/models/payment.model";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { BottomSheet } from "@expo/ui";
 import { useTranslation } from "react-i18next";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { TransactionForm } from "./TransactionForm";
 
 type Props = {
@@ -42,19 +42,19 @@ export const AddTransactionSheet = ({
     <BottomSheet
       isPresented={isOpen}
       onDismiss={onClose}
-      snapPoints={[{ fraction: 0.7 }]}
+      snapPoints={['full']}
     >
-      <ScrollView style={{ flex: 1 }}>
-        <Box className="px-4 pt-2 pb-6">
-          <HStack className="items-center gap-3 mb-4">
-            <Box className={`h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}>
-              <CustomIcon name={iconName} size={18} color={iconColor} />
-            </Box>
-            <Text size="2xl" variant={'bold'}>{typeLabel}</Text>
-          </HStack>
+      <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 }}>
+        <HStack className="items-center gap-3 mb-4">
+          <Box className={`h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}>
+            <CustomIcon name={iconName} size={18} color={iconColor} />
+          </Box>
+          <Text size="2xl" variant={'bold'}>{typeLabel}</Text>
+        </HStack>
 
-          <Divider className="mb-5" />
+        <Divider className="mb-5" />
 
+        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
           <TransactionForm
             cashboxId={cashboxId}
             transactionType={transactionType}
@@ -62,8 +62,8 @@ export const AddTransactionSheet = ({
             onCancel={onClose}
             isLoading={isLoading}
           />
-        </Box>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </BottomSheet>
   );
 };

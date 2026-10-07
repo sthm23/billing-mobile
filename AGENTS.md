@@ -587,7 +587,7 @@ import { BottomSheet } from '@expo/ui';
 ```tsx
 import { BottomSheet } from '@expo/ui';
 import { useState } from 'react';
-import { ScrollView, Text } from 'react-native';
+import { Box, Text } from '@/components/base';
 
 function MyScreen() {
   const [isPresented, setIsPresented] = useState(false);
@@ -601,11 +601,11 @@ function MyScreen() {
       <BottomSheet
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
-        snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+        snapPoints={['half', 'full']}
       >
-        <ScrollView style={{ flex: 1 }}>
+        <Box className="flex-1 p-4">
           <Text>Sheet Content</Text>
-        </ScrollView>
+        </Box>
       </BottomSheet>
     </>
   );
@@ -619,13 +619,15 @@ function MyScreen() {
 - `showDragIndicator` (boolean) — Shows/hides drag handle (default: true)
 
 **Snap Points**:
-- `'half'` — Approximately half-screen
-- `'full'` — Fully expanded
-- `{ fraction: number }` — Screen height fraction (0-1)
-- `{ height: number }` — Fixed pixel height
+- `'half'` — Approximately half-screen (recommended)
+- `'full'` — Fully expanded (recommended)
+- `{ fraction: number }` — Screen height fraction (0-1) - **may not work correctly on Android**
+- `{ height: number }` — Fixed pixel height - **may not work correctly on Android**
 
 **Important Notes**:
-- Always wrap content in `<ScrollView>` for proper overflow handling
+- **Use `'half'` and `'full'` snap points** for best cross-platform compatibility
+- Wrap content in `<Box className="flex-1 p-4">` for proper layout
+- For scrollable content, use `<ScrollView>` inside the Box
 - Sheet visibility is **controlled** via `isPresented` state
 - No ref-based methods (present/dismiss) — use state instead
 - Versioned docs: https://docs.expo.dev/versions/v56.0.0/sdk/ui/universal/bottomsheet/
@@ -634,13 +636,15 @@ function MyScreen() {
 ```tsx
 import { BottomSheet } from '@expo/ui';
 import { forwardRef, useImperativeHandle, useState } from 'react';
+import { Box } from '@/components/base';
+import { ScrollView } from 'react-native';
 
 interface SheetRef {
   open: () => void;
   close: () => void;
 }
 
-export const MySheet = forwardRef<SheetRef, Props>(
+export const MySheet = forwardRef<SheetRef, { children: React.ReactNode }>(
   function MySheet({ children }, ref) {
     const [isPresented, setIsPresented] = useState(false);
 
@@ -653,9 +657,13 @@ export const MySheet = forwardRef<SheetRef, Props>(
       <BottomSheet
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
-        snapPoints={[{ fraction: 0.6 }]}
+        snapPoints={['half', 'full']}
       >
-        {children}
+        <Box className="flex-1">
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {children}
+          </ScrollView>
+        </Box>
       </BottomSheet>
     );
   }

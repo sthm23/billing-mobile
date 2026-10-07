@@ -6,7 +6,7 @@ import { BottomSheet } from '@expo/ui';
 import { Plus, Search } from 'lucide-react-native';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, ScrollView, StyleSheet, TextInput, useColorScheme } from 'react-native';
+import { FlatList, StyleSheet, TextInput, useColorScheme, View } from 'react-native';
 
 export interface ProductSearchSheetRef {
   open: () => void;
@@ -103,38 +103,47 @@ function SheetContent({
   const textMuted = isDark ? '#a1a1a1' : '#737373';
   const borderColor = isDark ? '#2e2e2e' : '#e5e5e5';
   return (
-    <Box className="flex-1">
+    <View style={{ flex: 1 }}>
       {/* Search input */}
-      <HStack
-        className="mx-4 mb-3 mt-1 rounded-xl items-center px-3 gap-2"
-        style={{ height: 44, backgroundColor: surface, borderWidth: 1, borderColor, borderRadius: 12 }}
-      >
-        <Search size={18} className="text-muted-foreground shrink-0" />
-        <TextInput
-          value={searchText}
-          onChangeText={onSearchChange}
-          placeholder={t('search.searchPlaceholder')}
-          placeholderTextColor={textMuted}
-          autoFocus
-          clearButtonMode="while-editing"
-          style={[styles.input, { color: textColor }]}
-        />
-      </HStack>
+      <View style={{ marginHorizontal: 16, marginBottom: 12, marginTop: 4 }}>
+        <View style={{
+          height: 44,
+          backgroundColor: surface,
+          borderWidth: 1,
+          borderColor,
+          borderRadius: 12,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 12,
+          gap: 8
+        }}>
+          <Search size={18} className="text-muted-foreground shrink-0" />
+          <TextInput
+            value={searchText}
+            onChangeText={onSearchChange}
+            placeholder={t('search.searchPlaceholder')}
+            placeholderTextColor={textMuted}
+            autoFocus
+            clearButtonMode="while-editing"
+            style={[styles.input, { color: textColor }]}
+          />
+        </View>
+      </View>
 
       {!hasMinLength ? (
-        <Box className="flex-1 items-center justify-center p-8">
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <Text className="text-typography-400 text-sm text-center">
             {t('search.minCharacters')}
           </Text>
-        </Box>
+        </View>
       ) : isSearching ? (
-        <Box className="flex-1 items-center justify-center p-8">
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <Text className="text-typography-400 text-sm">{t('search.searching')}</Text>
-        </Box>
+        </View>
       ) : results.length === 0 ? (
-        <Box className="flex-1 items-center justify-center p-8">
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
           <Text className="text-typography-400 text-sm">{t('search.noProductsFound')}</Text>
-        </Box>
+        </View>
       ) : (
         <FlatList
           data={results}
@@ -145,7 +154,7 @@ function SheetContent({
           contentContainerStyle={{ paddingBottom: 16 }}
         />
       )}
-    </Box>
+    </View>
   );
 }
 
@@ -188,18 +197,16 @@ export const ProductSearchSheet = forwardRef<ProductSearchSheetRef, ProductSearc
         <BottomSheet
           isPresented={isPresented}
           onDismiss={handleDismiss}
-          snapPoints={[{ fraction: 0.6 }, { fraction: 0.9 }]}
+          snapPoints={['half', 'full']}
         >
-          <ScrollView style={{ flex: 1 }}>
-            <SheetContent
-              searchText={searchText}
-              onSearchChange={setSearchText}
-              results={results}
-              isSearching={isLoading || isFetching}
-              hasMinLength={debouncedText.length >= 2}
-              onSelect={handleSelect}
-            />
-          </ScrollView>
+          <SheetContent
+            searchText={searchText}
+            onSearchChange={setSearchText}
+            results={results}
+            isSearching={isLoading || isFetching}
+            hasMinLength={debouncedText.length >= 2}
+            onSelect={handleSelect}
+          />
         </BottomSheet>
       </>
     );

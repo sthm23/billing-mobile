@@ -6,7 +6,7 @@ import { BottomSheet } from '@expo/ui';
 import { ChevronRight } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, ScrollView } from 'react-native';
+import { View } from 'react-native';
 
 export type SelectThemeType = {
   mode: ThemeMode;
@@ -44,28 +44,23 @@ export const SelectTheme = () => {
       <BottomSheet
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
-        snapPoints={[{ fraction: 0.5 }, { fraction: 0.9 }]}
+        snapPoints={['half']}
       >
-        <ScrollView style={{ flex: 1 }}>
-          <FlatList
-            scrollEnabled={false}
-            data={THEME_OPTIONS}
-            keyExtractor={item => item.mode}
-            contentContainerStyle={{ padding: 24 }}
-            renderItem={({ item }) => {
-              const isSelected = item.mode === themeMode;
-              return (
-                <Button
-                  className='mb-4'
-                  variant={isSelected ? 'default' : 'outline'}
-                  onPress={() => handleThemeSelect(item.mode)}
-                >
-                  {item.label}
-                </Button>
-              );
-            }}
-          />
-        </ScrollView>
+        <View style={{ flex: 1, padding: 24 }}>
+          {THEME_OPTIONS.map((item) => {
+            const isSelected = item.mode === themeMode;
+            return (
+              <Button
+                key={item.mode}
+                className='mb-4'
+                variant={isSelected ? 'default' : 'outline'}
+                onPress={() => handleThemeSelect(item.mode)}
+              >
+                {item.label}
+              </Button>
+            );
+          })}
+        </View>
       </BottomSheet>
     </>
   );

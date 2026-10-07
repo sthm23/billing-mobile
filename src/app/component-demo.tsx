@@ -16,7 +16,7 @@ import {
 } from '@/components/base';
 import { BottomSheet } from '@expo/ui';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 /**
  * Component Demo Screen — демонстрация всех базовых компонентов
@@ -311,21 +311,19 @@ export default function ComponentDemoScreen() {
       <BottomSheet
         isPresented={bottomSheetVisible}
         onDismiss={() => setBottomSheetVisible(false)}
-        snapPoints={[{ fraction: 0.5 }, { fraction: 0.8 }]}
+        snapPoints={['half', 'full']}
       >
-        <ScrollView style={{ flex: 1 }}>
-          <Box className="p-4">
-            <VStack gap={3}>
-              <Heading level={3}>Bottom Sheet</Heading>
-              <Text>This is bottom sheet content</Text>
-              <Divider />
-              <Input placeholder="Try typing in bottom sheet..." />
-              <Button onPress={() => setBottomSheetVisible(false)}>
-                Close Bottom Sheet
-              </Button>
-            </VStack>
-          </Box>
-        </ScrollView>
+        <View style={{ flex: 1, padding: 16 }}>
+          <VStack gap={3}>
+            <Heading level={3}>Bottom Sheet</Heading>
+            <Text>This is bottom sheet content</Text>
+            <Divider />
+            <Input placeholder="Try typing in bottom sheet..." />
+            <Button onPress={() => setBottomSheetVisible(false)}>
+              Close Bottom Sheet
+            </Button>
+          </VStack>
+        </View>
       </BottomSheet>
     </ScrollView>
   );
