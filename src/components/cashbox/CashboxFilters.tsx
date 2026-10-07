@@ -1,4 +1,4 @@
-import { HStack, Pressable } from '@/components/base';
+import { Button, HStack, Pressable } from '@/components/base';
 import { useTheme } from '@/hooks/use-theme';
 import { CashboxStatus } from '@/models/payment.model';
 import { Funnel } from 'lucide-react-native';
@@ -55,13 +55,13 @@ export function CashboxFilters({ value, onValueChange, onFilterPress }: CashboxF
           );
         })}
       </HStack>
-      <Pressable
-        className="p-2 rounded-lg border border-border bg-muted"
+      <Button
+        variant='outline'
         onPress={onFilterPress}
-
+        size="md"
       >
         <Funnel size={20} color={colors.mutedForeground} />
-      </Pressable>
+      </Button>
     </HStack>
   );
 }

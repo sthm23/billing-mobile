@@ -56,7 +56,7 @@ export const TransactionCard = ({ transaction, showDivider = true, t }: Props) =
         </VStack>
 
         {/* Amount */}
-        <Text size="md" variant='bold' className={amountColor}>
+        <Text size="lg" variant='bold' className={amountColor}>
           {amountSign} {(+transaction.amount).toLocaleString()} {t('common.currency')}
         </Text>
       </HStack>

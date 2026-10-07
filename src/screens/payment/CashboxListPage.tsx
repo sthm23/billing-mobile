@@ -1,6 +1,7 @@
-import { CashboxFilters, CashboxHeader, CashboxStatusFilter } from '@/components/cashbox';
-import { EmptyState, LoadingState } from '@/components/common';
 import { Box, Button, Text } from '@/components/base';
+import { CashboxFilters, CashboxHeader, CashboxStatusFilter } from '@/components/cashbox';
+import { FilterSheet } from '@/components/cashbox/FilterSheet';
+import { EmptyState, LoadingState } from '@/components/common';
 import { Payment } from '@/models/payment.model';
 import { useCashboxList } from '@/services/cashbox';
 import { CashboxParams } from '@/services/cashbox/cashbox.types';
@@ -14,6 +15,7 @@ export default function CashboxListPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
+  const [isOpenFilter, setToggleFilter] = useState<boolean>(false);
   const [cashboxes, setCashboxes] = useState<Payment[]>([]);
   const [statusFilter, setStatusFilter] = useState<CashboxStatusFilter>('all');
   const pageSize = 10;
@@ -82,41 +84,47 @@ export default function CashboxListPage() {
   };
 
   return (
-    <Box className="flex-1">
-      {/* Header */}
-      <Box className="px-4 py-3 border-b border-border">
-        <CashboxHeader
-          onOpenCashbox={() => router.push('/(tabs)/(payments)/create')}
-        />
+    <>
+      <Box className="flex-1">
+        {/* Header */}
+        <Box className="px-4 py-3 border-b border-border">
+          <CashboxHeader
+            onOpenCashbox={() => router.push('/(tabs)/(payments)/create')}
+          />
 
-        {/* Filters */}
-        <CashboxFilters
-          value={statusFilter}
-          onValueChange={handleStatusFilterChange}
+          {/* Filters */}
+          <CashboxFilters
+            value={statusFilter}
+            onFilterPress={() => setToggleFilter(prev => !prev)}
+            onValueChange={handleStatusFilterChange}
+          />
+        </Box>
+
+        {/* List */}
+        <FlatList
+          data={filteredCashboxes}
+          renderItem={({ item }) => (
+            <CashboxCard cashbox={item} onPress={handleCashboxPress} t={t} />
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: 16, gap: 8 }}
+          ListEmptyComponent={<EmptyState message={t('payment.noFound')} />}
+          ListFooterComponent={
+            hasMore ? (
+              <Button onPress={handleLoadMore} disabled={isFetching} variant="outline">
+                {isFetching ? t('common.loading') : t('common.loadMore')}
+              </Button>
+            ) : filteredCashboxes.length > 0 ? (
+              <Text className="py-4 text-center text-typography-500">
+                {t('common.noMoreData')}
+              </Text>
+            ) : null
+          }
         />
       </Box>
-
-      {/* List */}
-      <FlatList
-        data={filteredCashboxes}
-        renderItem={({ item }) => (
-          <CashboxCard cashbox={item} onPress={handleCashboxPress} t={t} />
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: 16, gap: 8 }}
-        ListEmptyComponent={<EmptyState message={t('payment.noFound')} />}
-        ListFooterComponent={
-          hasMore ? (
-            <Button onPress={handleLoadMore} disabled={isFetching} variant="outline">
-              {isFetching ? t('common.loading') : t('common.loadMore')}
-            </Button>
-          ) : filteredCashboxes.length > 0 ? (
-            <Text className="py-4 text-center text-typography-500">
-              {t('common.noMoreData')}
-            </Text>
-          ) : null
-        }
-      />
-    </Box>
+      {isOpenFilter && (
+        <FilterSheet isOpen={isOpenFilter} isClose={() => setToggleFilter(false)} />
+      )}
+    </>
   );
 }

@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, type ViewProps } from 'react-native';
 import { cn } from '@/libs/utils';
+import { View, type ViewProps } from 'react-native';
 
 export interface CardProps extends ViewProps {
   /**
@@ -55,6 +54,8 @@ export function Card({
     <View
       className={cn(baseStyles, variantStyles[variant], className)}
       {...props}
-    />
+    >
+      {props.children}
+    </View>
   );
 }

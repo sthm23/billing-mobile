@@ -1,8 +1,6 @@
 import {
   ArrowDownIcon,
   ArrowUpIcon,
-  Badge,
-  BadgeText,
   Box,
   Button,
   ButtonIcon,
@@ -12,14 +10,16 @@ import {
   HStack,
   Pressable,
   Text,
-  VStack,
+  VStack
 } from "@/components/base";
+import { StatusBadge } from "@/components/cashbox/StatusBadge";
 import CustomIcon from "@/icons/custom-icon";
 import { IconNames } from "@/icons/icon.type";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { Link, Lock } from "lucide-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, ScrollView } from "react-native";
@@ -29,6 +29,10 @@ import { PaymentBreakdownDialog } from "./PaymentBreakdownDialog";
 import { TransactionCard } from "./TransactionCard";
 
 const PREVIEW_COUNT = 5;
+
+function splittedNumber(num: number) {
+  return Number(num).toLocaleString('ru-RU');
+}
 
 export default function CashboxDetailsPage() {
   const { t } = useTranslation();
@@ -41,7 +45,7 @@ export default function CashboxDetailsPage() {
   const [breakdownVisible, setBreakdownVisible] = useState(false);
 
   const { data: cashbox, isLoading, isError } = useCashboxById(id, {
-    refetchInterval: 30000,
+    // refetchInterval: 30000,
   });
   const closeCashboxMutation = useCloseCashbox();
   const createTransactionMutation = useCreateTransaction();
@@ -145,7 +149,8 @@ export default function CashboxDetailsPage() {
               disabled={closeCashboxMutation.isPending}
               className="mr-2"
             >
-              <ButtonText>{t('payment.closeCashbox')}</ButtonText>
+              <Lock size={16} color={'white'} />
+              <ButtonText className="text-white">{t('payment.closeCashbox')}</ButtonText>
             </Button>
           ) : null,
         }}
@@ -172,13 +177,11 @@ export default function CashboxDetailsPage() {
                     </Text>
                   </HStack>
                 </VStack>
-                <Badge
-                  action={isOpen ? 'success' : 'muted'}
-                  variant="outline"
-                  size="sm"
-                >
-                  <BadgeText>{t(`payment.cashboxStatus.${cashbox.status}`)}</BadgeText>
-                </Badge>
+                <StatusBadge
+                  variant={isOpen ? 'success' : 'default'}
+                  size="lg"
+                  label={t(`payment.cashboxStatus.${cashbox.status}`)}
+                />
               </HStack>
 
               {/* Tappable balance */}
@@ -189,9 +192,9 @@ export default function CashboxDetailsPage() {
                   </Text>
                   <HStack className="items-center gap-2 mt-1">
                     <Text size="3xl" variant={'bold'}>
-                      {cashbox.balance.toLocaleString()} {t('common.currency')}
+                      {splittedNumber(cashbox.balance)} {t('common.currency')}
                     </Text>
-                    <CustomIcon name={IconNames.ARROW_RIGHT} size={18} />
+                    <Link size={18} />
                   </HStack>
                 </VStack>
               </Pressable>
@@ -205,7 +208,7 @@ export default function CashboxDetailsPage() {
                     {t('payment.totalIncome')}
                   </Text>
                   <Text size="lg" variant={'bold'} className="text-success-600 mt-1">
-                    + {totalIncome.toLocaleString()} {t('common.currency')}
+                    + {splittedNumber(totalIncome)} {t('common.currency')}
                   </Text>
                 </VStack>
                 <VStack className="items-end">
@@ -213,7 +216,7 @@ export default function CashboxDetailsPage() {
                     {t('payment.totalExpense')}
                   </Text>
                   <Text size="lg" variant={'bold'} className="text-error-600 mt-1">
-                    - {totalExpense.toLocaleString()} {t('common.currency')}
+                    - {splittedNumber(totalExpense)} {t('common.currency')}
                   </Text>
                 </VStack>
               </HStack>
@@ -222,19 +225,19 @@ export default function CashboxDetailsPage() {
               {isOpen && (
                 <HStack className="gap-3">
                   <Button
-                    className="flex-1"
+                    className="flex-1 bg-green-400 dark:bg-green-600"
                     onPress={handleAddIncome}
                   >
-                    <ButtonIcon as={ArrowUpIcon} />
-                    <ButtonText>{t('payment.addIncome')}</ButtonText>
+                    <ButtonIcon as={ArrowUpIcon} color="white" />
+                    <ButtonText className="text-white">{t('payment.addIncome')}</ButtonText>
                   </Button>
                   <Button
                     variant="destructive"
                     className="flex-1"
                     onPress={handleAddExpense}
                   >
-                    <ButtonIcon as={ArrowDownIcon} />
-                    <ButtonText>{t('payment.addExpense')}</ButtonText>
+                    <ButtonIcon as={ArrowDownIcon} color="white" />
+                    <ButtonText className="text-white">{t('payment.addExpense')}</ButtonText>
                   </Button>
                 </HStack>
               )}
