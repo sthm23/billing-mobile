@@ -1,165 +1,252 @@
 # Base Components — Quick Reference
 
-> Custom components in `src/components/base/`, built on React Native + NativeWind.
-> Styling rules and tokens: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md).
-
-> ⚠️ These components still have their pre-STHM look (they use the legacy color aliases). They are rewritten to the STHM design in redesign stage 1 — this page documents the **current** API.
+> STHM design primitives in `src/components/base/`, built on React Native + NativeWind.
+> Tokens and rules: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md). Live showcase: `/component-demo` (light / dark switch on top).
 
 ---
 
 ## Import
 
 ```tsx
-import { Box, Button, Input, InputField, Text, VStack } from '@/components/base';
+import { Button, HeroCard, ListCard, SearchField, Text } from '@/components/base';
 ```
 
-Every component's `*Props` type is exported too.
+Every component's `*Props` type is exported too. Icons are lucide components (`import { Plus } from 'lucide-react-native'`).
 
 ---
 
-## Layout
+## Actions
 
-**Box** — `View` with `className`.
-```tsx
-<Box className="p-4 bg-card rounded-xl">…</Box>
-```
+### Button
 
-**VStack / HStack** — `flex-col` / `flex-row`. Props: `gap?: number`, `className?`.
-```tsx
-<VStack gap={4}>…</VStack>
-<HStack className="gap-3 items-center">…</HStack>
-```
-> `gap={n}` builds the class `gap-${n}` at runtime; Tailwind only generates it if `gap-n` also appears literally somewhere in the source. Prefer `className="gap-n"`.
-
-**Center** — `View` with `items-center justify-center`.
-
-**Divider** — `orientation?: 'horizontal' | 'vertical'` (default `horizontal`), `bg-border`, 1px.
-
----
-
-## Typography
-
-**Text** — `variant?: 'default' | 'muted' | 'small' | 'large' | 'bold'` (default `default`), `size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl'`. Uses Onest.
-```tsx
-<Text>Regular</Text>
-<Text variant="muted">Secondary</Text>
-<Text className="type-body-strong text-ink">STHM text style</Text>
-```
-
-**Heading** — `level?: 1 | 2 | 3 | 4` (default `2`): 30 / 24 / 20 / 18 px, Onest bold / semibold, `accessibilityRole="header"`.
-
----
-
-## Interactive
-
-**Button**
+Pill button. At most one `primary` and one `accent` per screen.
 
 | Prop | Type | Default |
 |---|---|---|
-| `variant` | `'default' \| 'outline' \| 'ghost' \| 'destructive'` | `'default'` |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| `loading` | `boolean` | `false` |
+| `variant` | `'primary' \| 'accent' \| 'secondary' \| 'danger' \| 'ghost'` | `'primary'` |
+| `size` | `'sm'` 36 · `'md'` 44 · `'lg'` 56 | `'md'` |
+| `icon` | lucide component (left of the label) | — |
+| `full` | `boolean` — full width | `false` |
+| `loading` | `boolean` — spinner, disabled | `false` |
+| `disabled` | `boolean` — neutral disabled look | — |
 | `textClassName` | `string` | — |
-| `children` | `ReactNode` (required) | — |
-
-- A **string child** is wrapped in `Text` automatically. Other children render as-is.
-- `loading` disables the button and shows `ActivityIndicator`.
-- `ButtonText` and `ButtonIcon` (`as`, `size`, `color`) are available for custom content.
 
 ```tsx
-<Button onPress={save} loading={isSaving}>Сохранить</Button>
-<Button variant="outline" size="sm">Отмена</Button>
+<Button variant="accent" size="lg" full onPress={pay}>Оплатить</Button>
+<Button icon={Plus}>Новый</Button>
+<Button variant="danger" icon={Trash2}>Удалить</Button>
 ```
 
-**Pressable** — RN `Pressable` + `className`, `active:opacity-70`, `opacity-50` when disabled, `accessibilityRole="button"`.
+- A string child is the label (Onest bold). Other children render as-is (`ButtonText`, `ButtonIcon` available).
+- Main screen action → `size="lg"`.
+- **Deprecated** variants (pre-STHM, remove after stage 3): `default` → `primary`, `outline` → `secondary`, `destructive` → `danger`.
+
+### IconButton
+
+Round icon-only button. `accessibilityLabel` is required.
+
+| Prop | Type | Default |
+|---|---|---|
+| `icon` | lucide component (required) | — |
+| `variant` | `'card' \| 'sunken' \| 'primary' \| 'accent' \| 'danger'` | `'card'` |
+| `size` | `'sm'` 36 · `'md'` 44 · `'lg'` 52 | `'md'` |
+
+```tsx
+<IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={router.back} />
+<IconButton icon={ScanBarcode} variant="accent" size="lg" accessibilityLabel={t('common.scan')} />
+```
+
+`card` on `bg`, `sunken` inside a card.
+
+### Chip
+
+Filter / option chip.
+
+| Prop | Type | Default |
+|---|---|---|
+| `label` | `string` | — |
+| `selected` | `boolean` — black | `false` |
+| `tone` | `'default'` (white, on `bg`) · `'sunken'` (in a card) · `'err'` («Мало · 3») | `'default'` |
+| `size` | `'md'` 36 · `'lg'` 40 | `'md'` |
+
+### Segmented
+
+Single choice on a track. Generic over the value type.
+
+```tsx
+<Segmented
+  options={[{ value: 'all', label: 'Все' }, { value: 'open', label: 'Открытые' }]}
+  value={filter}
+  onChange={setFilter}
+/>
+```
+
+### Stepper
+
+Quantity control. UI bounds only — the backend validates stock.
+
+| Prop | Type | Default |
+|---|---|---|
+| `value` / `onChange` | `number` / `(n) => void` | — |
+| `min` / `max` | `number` | `1` / — |
+| `vertical` | `boolean` — + on top (order lines) | `false` |
+| `size` | `'sm'` 34 · `'md'` 40 | `'md'` |
+| `disabled` | `boolean` | `false` |
+
+### Pressable
+
+RN `Pressable` + `className`, `active:opacity-70`, `opacity-50` when disabled.
+
+---
+
+## Display
+
+### HeroCard
+
+The one dark main block of a screen: totals only, amounts from the backend.
+
+| Prop | Type | Default |
+|---|---|---|
+| `label` | `string` — caption | — |
+| `amount` | `string \| number` | — |
+| `currency` | `string \| null` | `'UZS'` |
+| `chip` / `chipTone` | `string` / `'neutral' \| 'accent'` | — / `'neutral'` |
+| `tiles` | up to 2 × `{ label, value, tone?: 'default' \| 'accent' \| 'err' \| 'warn', signed? }` | — |
+| `children` | extra content (actions, progress) | — |
+
+```tsx
+<HeroCard
+  label="Сумма в кассе"
+  chip="Открыта"
+  chipTone="accent"
+  amount={cashbox.balance}
+  tiles={[
+    { label: 'Приход', value: cashbox.income, tone: 'accent', signed: true },
+    { label: 'Расход', value: cashbox.expense, tone: 'err' },
+  ]}
+/>
+```
+
+### ListCard
+
+List row for orders, cashboxes, debtors, products. Pressable when `onPress` is set.
+
+| Prop | Type |
+|---|---|
+| `title`, `subtitle` | `string` |
+| `lead` | `string` — initials «ТС» or «#127» in a round lead |
+| `leading` | `ReactNode` — custom lead (e.g. `<PhotoPlaceholder size="md" />`) |
+| `amount` / `amountTone` | `string \| number` / `'default' \| 'err'` |
+| `badge` | `{ label, tone: StatusTone }` |
+| `highlight` | `boolean` — accent ring + accent lead |
+
+### StatusBadge
+
+`label` (required — color is never the only signal), `tone`, `size: 'sm' | 'md'`.
+
+| Tone | Use |
+|---|---|
+| `ok` | Завершено, приход, в наличии |
+| `warn` | Ожидание, мало, 20–30 дней |
+| `err` | Долг, расход, нет на складе |
+| `info` | Создано |
+| `neutral` | Закрыта, отменено |
+| `accent` | Открыта |
+
+### Money
+
+Formatted amount, digits tabular, «UZS» smaller and `muted`. Display only.
+
+```tsx
+<Money value={order.totalAmount} className="text-[15px] text-ink" />
+<Money value={income} signed currency={null} className="text-accent" />
+```
+
+Props: `value`, `signed`, `currency` (`'UZS'`; `null` hides), `className`, `currencyClassName`. Formatting helper: `formatMoney()` in `src/libs/format.ts` («18 056 319», «−6 443 681»).
+
+### Card
+
+`variant`: `'default'` (white, `rounded-xl`) · `'hero'` (dark, `rounded-2xl`) · `'sunken'` (plate in a card, `rounded-md`). `p-4`, no shadow. `elevated` is deprecated (= `default`).
+
+### PhotoPlaceholder
+
+`size`: `sm` 44 · `md` 56 · `lg` 64 · `hero` full width × 260.
+
+### Avatar
+
+`size`: `sm` 32 · `md` 44 · `lg` 64 · `xl` 96. `tone`: `sunken` (default) · `accent` (current user / highlighted) · `primary`. `AvatarFallbackText` shows up to 2 initials; `AvatarImage` shows a photo.
 
 ---
 
 ## Forms
 
-**Input + InputField** — `Input` is a container `View`; `InputField` is the `TextInput`.
+### Input + InputField
+
+`Input` is the filled container; `InputField` is the `TextInput`.
 
 | `Input` prop | Type | Default |
 |---|---|---|
-| `variant` | `'outline' \| 'underlined' \| 'rounded'` | `'outline'` |
-| `size` | `'sm' \| 'md' \| 'lg'` (40 / 48 / 56 px) | `'md'` |
+| `size` | `'sm'` 40 · `'md'` 48 · `'lg'` 52 (forms) | `'md'` |
+| `variant` | `'sunken'` (in a card) · `'card'` (on `bg`) | `'sunken'` |
+| `invalid` | `boolean` — red ring | `false` |
 
 ```tsx
-<Input size="lg">
-  <InputField placeholder="Логин" value={login} onChangeText={setLogin} />
+<Input size="lg" invalid={!!errors.login}>
+  <InputField placeholder={t('login.login')} value={value} onChangeText={onChange} autoCapitalize="none" />
 </Input>
 ```
-> `placeholder`, `value`, `onChangeText`, `editable` go on **`InputField`**, not `Input`. There is no `error` prop.
+> `placeholder`, `value`, `onChangeText` go on **`InputField`**. Deprecated variants `outline` / `underlined` / `rounded` render as `sunken`.
 
-**TextArea** — `TextInput`, always multiline. `size?: 'sm' | 'md' | 'lg'`, `error?: boolean`, `rows?: number` (default 3).
+### SearchField
 
-**Select** — wraps `@react-native-picker/picker` (Android dropdown, iOS wheel).
-```tsx
-<Select selectedValue={value} onValueChange={setValue} variant="outline" size="md">
-  <Select.Item label="Склад 1" value="w1" />
-</Select>
-```
-Props: `selectedValue`, `onValueChange`, `variant: 'outline' | 'underlined' | 'rounded'`, `size: 'sm' | 'md' | 'lg'`, `disabled`.
+Pill search (48px) with search icon, clear button (when there's text) and optional accent scan button.
 
-**FormControl** — `isInvalid`, `isRequired`, `isDisabled` + `FormControlLabel(Text)`, `FormControlHelper(Text)`, `FormControlError(Text)`. `isRequired` adds ` *` to the label. (`isInvalid` / `isDisabled` are not yet used by subcomponents.)
+Props: `TextInput` props + `onScanPress?`, `variant: 'card' | 'sunken'` (default `card`).
+
+### TextArea
+
+Multiline, filled `sunken`, `rounded-md`. Props: `size`, `error`, `rows` (default 3), `TextInput` props.
+
+### Select
+
+Native picker (`@react-native-picker/picker`) in a filled `sunken` box. Props: `selectedValue`, `onValueChange`, `size: 'sm' | 'md' | 'lg'`, `variant` (`rounded` → pill), `disabled`; items via `<Select.Item label value />`.
+
+### FormControl
+
+`isRequired` adds a red ` *` to the label. Subcomponents: `FormControlLabel(Text)` (13 / 600, `soft`), `FormControlHelper(Text)` (`muted`), `FormControlError(Text)` (`err-fg`).
+
+---
+
+## Layout & Typography
+
+- **Box**, **Center**, **VStack / HStack** (`gap?: number` — prefer `className="gap-n"`, runtime `gap-${n}` is only generated if the class exists literally somewhere), **Divider** (`bg-line`, `orientation`).
+- **Text** — `variant: 'default' | 'muted' | 'small' | 'large' | 'bold'`, `size`. Onest, `text-ink`. For STHM text styles pass `className="type-body-strong text-ink"`.
+- **Heading** — `level: 1–4`, Onest bold / semibold, `text-ink`.
 
 ---
 
 ## Overlays
 
-**Modal** — RN `Modal`, transparent, fade by default.
-
-| Prop | Type | Default |
-|---|---|---|
-| `visible` | `boolean` (required) | — |
-| `onClose` | `() => void` | — |
-| `showCloseButton` | `boolean` | `false` |
-| `closeOnBackdropPress` | `boolean` | `true` |
-| `animationType` | `'none' \| 'fade' \| 'slide'` | `'fade'` |
-
-**AlertDialog** — `isOpen`, `onClose`, `size` (currently ignored) + `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogBody`, `AlertDialogFooter`.
-
-**BottomSheet** — not a base component; use `@expo/ui` directly (controlled):
-```tsx
-import { BottomSheet } from '@expo/ui';
-
-<BottomSheet isPresented={open} onDismiss={() => setOpen(false)} snapPoints={['half', 'full']}>
-  <Box className="flex-1 p-4">…</Box>
-</BottomSheet>
-```
+- **Modal** — `visible`, `onClose`, `showCloseButton`, `closeOnBackdropPress`, `animationType`. `scrim` backdrop, `bg-card rounded-2xl p-6`.
+- **AlertDialog** — `isOpen`, `onClose`, `size: 'sm' | 'md' | 'lg' | 'full'` + `AlertDialogContent/Header/Body/Footer`.
+- **BottomSheet** — use `@expo/ui` directly (controlled `isPresented` / `onDismiss`, snap points `'half'` / `'full'`). The native sheet can't be styled with className — build its content from the components above on a `bg-card` view.
 
 ---
 
-## Display & Feedback
+## Feedback
 
-**Card** — `variant?: 'default' | 'elevated'`; `bg-card rounded-xl p-4` with a shadow. (STHM design has no shadows — changes in stage 1.)
-
-**Badge / BadgeText** — `variant: 'solid' | 'outline'`, `action: 'success' | 'error' | 'warning' | 'info' | 'muted'`, `size: 'sm' | 'md' | 'lg'`. Uses palette classes that don't exist in the theme — replaced by `StatusBadge` in stage 1.
-
-**Avatar / AvatarImage / AvatarFallbackText** — `size: 'sm' | 'md' | 'lg' | 'xl'` (32 / 48 / 64 / 96 px); fallback shows up to 2 initials.
-
-**Spinner** — `size: 'sm' | 'md' | 'lg'` (`md` and `lg` both render `large`), `color` (default `#171717`).
-
-**Icons** — lucide re-exports: `ArrowUpIcon`, `ArrowDownIcon`, `ChevronUp/Down/Left/RightIcon`, `CloseIcon`, `CheckIcon`. Props: `size`, `color`, `strokeWidth`.
+- **Spinner** — `size: 'sm' | 'md' | 'lg'` (`md`/`lg` → native `large`), `color` (default theme `ink`).
+- `components/common`: **EmptyState** (`message`, `description?`, `icon?`, `card?`, `children` for actions), **LoadingState** (`message?`).
 
 ---
 
-## Outside `base/`
+## Outside `base/` (pre-STHM, restyled in stage 3)
 
-- `components/common`: `EmptyState({ message })`, `LoadingState({ message? })`.
 - `components/product`: `ProductCard`, `ProductCardSkeleton`, `ProductVariantCard`, `ProductImage`, `ImageCarousel`, `PriceLabel`, `PricePair`, `QuantityStepper`, `ChipSelector`, `AvailabilityBadge`, `SearchBar`, `ProductListHeader`, `EmptyProductList`, `ActionButtons`, `AdminSectionHeader`.
 - `components/order`: `OrderCard`, `SwipeableOrderCard`, `OrderItemCard`, `SwipeableOrderItemCard`, `OrderInfoCard`, `OrderPaymentCard`, `ProductSearchSheet`.
-- `components/cashbox`: `CashboxHeader`, `CashboxFilters`, `StatusBadge`, `FilterSheet` (not exported from `index.ts`).
-- `src/icons/custom-icon.tsx`: `CustomIcon({ name: IconNames, size?, color? })` — SF Symbols / Material Symbols.
+- `components/cashbox`: `CashboxHeader`, `CashboxFilters`, `StatusBadge` (domain version — replace with base `StatusBadge`), `FilterSheet`.
+- `src/icons/custom-icon.tsx`: `CustomIcon({ name, size?, color? })` — SF Symbols / Material Symbols.
 
 ---
 
-## Tips
-
-1. Use tokens (`bg-card`, `text-ink`) — never hex colors.
-2. Merge classes with `cn()` from `@/libs/utils`.
-3. See `src/components/base/EXAMPLES.md` and the `/component-demo` screen.
-
----
-
-**Last Updated**: 2026-10-19
+**Last Updated**: 2026-10-19 (redesign stage 1)

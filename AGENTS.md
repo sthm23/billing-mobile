@@ -172,7 +172,7 @@ Full rules: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Design source: STHM design
 <View style={{ backgroundColor: '#FFFFFF' }} />
 ```
 
-- Colors: `bg`, `card`, `sunken`, `ink`, `soft`, `muted`, `line`, `primary`/`on-primary`, `accent`/`on-accent`, `hero*`, `nav*`, `ok|err|warn|info-bg/-fg`, `ph-bg/-fg`, `track`, `seg`, `disabled-bg/-fg`, `scrim`. Text on `accent` is always `text-on-accent` (graphite), never white.
+- Colors: `bg`, `card`, `sunken`, `ink`, `soft`, `muted`, `line`, `primary`/`on-primary`, `accent`/`on-accent`, `hero*` (incl. `hero-err`, `hero-warn`), `nav*`, `ok|err|warn|info-bg/-fg`, `ph-bg/-fg`, `track`, `seg`, `disabled-bg/-fg`, `scrim`. Text on `accent` is always `text-on-accent` (graphite), never white.
 - Fonts: React Native can't pick weights from one custom family, so each weight is its own family. Use `type-*` utilities or `font-onest` / `font-onest-medium` / `font-onest-semibold` / `font-onest-bold`. **Do not combine them with `font-bold`/`font-semibold`** (Android double-bolds).
 - Text styles are named `type-*` (not `text-*`) on purpose: tailwind-merge in `cn()` treats unknown `text-*` as a color and would drop it.
 - `cn()` (`src/libs/utils.ts`) is a `tailwind-merge` extended with STHM names (`rounded-pill`, `font-onest-*`, `type-*`). Always merge classNames with `cn()`.
@@ -199,9 +199,13 @@ Quick reference with exact props: [`COMPONENTS.md`](./COMPONENTS.md). Import fro
 import { Button, Input, InputField, Text, VStack } from '@/components/base';
 ```
 
-Gotchas from the current API:
-- `Button` variants are `default | outline | ghost | destructive`, sizes `sm | md | lg`, plus `loading`. A string child is wrapped in `Text` automatically.
-- `Input` is a **container View**; text-input props go on `InputField`: `<Input><InputField placeholder="…" /></Input>`.
+STHM components: `Button`, `IconButton`, `Chip`, `Segmented`, `Stepper`, `SearchField`, `HeroCard`, `ListCard`, `StatusBadge`, `Money`, `Card`, `PhotoPlaceholder`, `Avatar`, `Input`/`InputField`, `TextArea`, `Select`, `FormControl`, `Modal`, `AlertDialog`. Live showcase with a theme switch: `/component-demo`. Build screens from these before writing custom views.
+
+Gotchas:
+- `Button` variants: `primary | accent | secondary | danger | ghost`; sizes `sm` 36 / `md` 44 (default) / `lg` 56; `icon`, `full`, `loading`. Legacy `default | outline | destructive` still work (deprecated).
+- `Input` is a **container View**; text-input props go on `InputField`: `<Input invalid={…}><InputField placeholder="…" /></Input>`.
+- Amounts: `<Money value={…} />` or `formatMoney()` from `src/libs/format.ts` — display only, never compute totals on the client.
+- Icon-only buttons need `accessibilityLabel` (use `t('common.*')`).
 - There is no `ThemedView` / `ThemedText`.
 
 ### BottomSheet (`@expo/ui`)
@@ -316,8 +320,9 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - `src/app/_layout.tsx`: `ThemeControlContext` value misses `currentMode` (type error).
-- `component-demo.tsx`, `SearchBar.tsx`: pass `placeholder` etc. to `Input` instead of `InputField`.
-- `Spinner`: `md` and `lg` both map to `'large'`. `AlertDialog` ignores `size`. `Badge` uses `success-500`-style classes that don't exist in the theme.
+- `LoginPage.tsx`, `SearchBar.tsx`: pass `placeholder`/`error` to `Input` instead of `InputField` (fixed when the screens are reskinned).
+- `ProductSearchSheet.tsx` passes `size="icon"` to `Button`; `OrderCardMenu.tsx` passes `title` to `Modal`; profile screens pass `size` to `Heading` — props that don't exist.
+- `services/product/*` import a missing `./product.type`.
 - `assets/orders/` contains stray route files that don't compile; `scripts/reset-project.js` is missing.
 - Service paths that don't match the backend: `searchProductsForOrder` (sends orderId, backend expects warehouseId), `addPaymentToOrder` (`/payments` vs `/payment`), `updateProductVariant` (POST vs PUT).
 
