@@ -1,13 +1,13 @@
-import { Box, Button, HStack, Pressable, Spinner, Text } from '@/components/base';
+import { Button, IconButton, Segmented, Text } from '@/components/base';
+import { EmptyState, LoadingState } from '@/components/common';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
-import { useTheme } from '@/hooks/use-theme';
 import { useOrders } from '@/services/order/order.queries';
 import { OrderParams, OrderStatus } from '@/services/order/order.type';
 import { router } from 'expo-router';
-import { Filter, Plus, ShoppingBag } from 'lucide-react-native';
+import { CircleAlert, Plus, ReceiptText, SlidersHorizontal } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { OrderCard } from './OrderCard';
 
 
@@ -22,11 +22,10 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
 };
 export default function OrderPage() {
     const { t } = useTranslation();
-    const colors = useTheme();
     const bottomInset = useBottomNavInset();
     const page = 1
     const pageSize = 10
-    const [searchText, setSearchText] = useState('');
+    const [searchText] = useState('');
     const [status, setStatus] = useState<OrderStatusType>('active');
 
     const tabOptions: {
@@ -56,115 +55,48 @@ export default function OrderPage() {
 
     const { data, isLoading, isError } = useOrders(listParams);
 
-    if (isError) {
-        return (
-            <Box className="flex-1 items-center justify-center p-4">
-                <Text variant="large" className="text-error">
-                    {t('order.errorLoading')}
-                </Text>
-            </Box>
-        )
-    }
-
-    if (isLoading) {
-        return (
-            <Box className="flex-1 items-center justify-center">
-                <Spinner size="lg" />
-            </Box>
-        )
-    }
-
     const orders = data?.data ?? []
-
-    const handleDeleteOrder = (orderId: string) => {
-        console.log('Delete order:', orderId);
-        // TODO: Implement API integration
-    };
 
     const handleOrderPress = (orderId: string) => {
         router.push(`/(tabs)/(orders)/${orderId}`);
     };
 
     return (
-        <>
-            <Box className="w-full p-2">
-                <HStack className="items-center justify-between mb-3">
-                    <HStack className="items-center gap-2">
-                        <ShoppingBag size={28} color={colors.foreground} />
-                        <Text className="text-2xl font-bold">
-                            {t('order.orderTitle')}
-                        </Text>
-                    </HStack>
-                    <Button
-                        size="sm"
-                    >
-                        <Plus size={20} color={colors.secondary} />
-                        <Text className='text-white dark:text-black'>{t('order.create')}</Text>
+        <View className="flex-1 bg-bg">
+            <View className="px-4 pt-2 pb-3 gap-3">
+                <View className="flex-row items-center justify-between">
+                    <Text className="type-title text-ink" accessibilityRole="header">{t('navigation.orders')}</Text>
+                    {/* Order creation arrives with the new order flow (redesign stage 5) */}
+                    <Button variant="primary" icon={Plus} disabled>
+                        {t('order.create')}
                     </Button>
-                </HStack>
-                <HStack gap={4} className="justify-between items-center">
-                    {/* Custom Tab Switcher */}
-                    <HStack className="flex-1 rounded-lg border border-border bg-sunken overflow-hidden">
-                        {tabOptions.map((tab, index) => {
-                            const isActive = status === tab.value;
-                            const isFirst = index === 0;
-                            const isLast = index === tabOptions.length - 1;
+                </View>
+                <View className="flex-row items-center gap-2">
+                    <Segmented options={tabOptions} value={status} onChange={setStatus} className="flex-1" />
+                    {/* Filters are not available yet */}
+                    <IconButton icon={SlidersHorizontal} accessibilityLabel={t('common.filter')} disabled />
+                </View>
+            </View>
 
-                            return (
-                                <Pressable
-                                    key={tab.value}
-                                    onPress={() => setStatus(tab.value)}
-                                    className="flex-1 py-2 px-3 items-center justify-center"
-                                    style={{
-                                        backgroundColor: isActive ? colors.background : 'transparent',
-                                        borderRightWidth: isLast ? 0 : 1,
-                                        borderRightColor: colors.border,
-                                    }}
-                                >
-                                    <Text
-                                        style={{
-                                            color: isActive ? colors.primary : colors.mutedForeground,
-                                            fontWeight: isActive ? '600' : '400',
-                                            fontSize: 14,
-                                        }}
-                                    >
-                                        {tab.label}
-                                    </Text>
-                                </Pressable>
-                            );
-                        })}
-                    </HStack>
-
-                    {/* Unlock Button */}
-                    <Button
-                        variant="outline"
-                        size="md"
-                    >
-                        <Filter size={20} color={colors.textMuted} />
-                    </Button>
-                </HStack>
-            </Box>
-
-            <FlatList
-                data={orders}
-                keyExtractor={(item) => item.id}
-                style={{
-                    padding: 6
-                }}
-                renderItem={({ item }) => (
-                    <OrderCard
-                        order={item}
-                        onPress={handleOrderPress}
-                        t={t}
-                    />
-                )}
-                ListEmptyComponent={() => (
-                    <Box className="flex-1 items-center justify-center p-8">
-                        <Text variant="muted">{t('order.noOrders')}</Text>
-                    </Box>
-                )}
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomInset }}
-            />
-        </>
+            {isError ? (
+                <EmptyState icon={CircleAlert} message={t('order.errorLoading')} />
+            ) : isLoading ? (
+                <LoadingState />
+            ) : (
+                <FlatList
+                    data={orders}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <OrderCard
+                            order={item}
+                            onPress={handleOrderPress}
+                            t={t}
+                        />
+                    )}
+                    ListEmptyComponent={<EmptyState icon={ReceiptText} message={t('order.noOrders')} />}
+                    contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: bottomInset, gap: 8 }}
+                />
+            )}
+        </View>
     )
 }

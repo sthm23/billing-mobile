@@ -1,10 +1,10 @@
 import CashboxDetailsPage from '@/screens/payment/CashboxDetailsPage';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function CashboxDetailScreen() {
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView edges={['top']} className="flex-1 bg-bg">
       <CashboxDetailsPage />
-    </View>
+    </SafeAreaView>
   );
 }

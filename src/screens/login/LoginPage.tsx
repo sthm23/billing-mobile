@@ -1,13 +1,26 @@
-import { Button, Card, Center, Heading, HStack, Input, InputField, Pressable, Text, VStack } from '@/components/base';
+import {
+    Button,
+    FormControl,
+    FormControlError,
+    FormControlErrorText,
+    FormControlLabel,
+    FormControlLabelText,
+    Input,
+    InputField,
+    Pressable,
+    Text,
+} from '@/components/base';
+import { Logo } from '@/components/brand/Logo';
 import { useTheme } from '@/hooks/use-theme';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react-native';
 import { AuthRequest } from '@/models/auth.model';
 import { useAuth } from '@/provider/AuthProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { CircleAlert, Eye, EyeOff, Lock, User } from 'lucide-react-native';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { ScrollView, View } from 'react-native';
 import * as z from 'zod';
 
 export function LoginPage() {
@@ -22,11 +35,6 @@ export function LoginPage() {
     const [submitError, setSubmitError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const handleState = () => {
-        setShowPassword((showState) => {
-            return !showState;
-        });
-    };
     const {
         control,
         handleSubmit,
@@ -68,126 +76,122 @@ export function LoginPage() {
             setLoading(false);
         }
     };
+
     return (
-        <Center className="w-full h-full p-4">
-            <Card className="w-full">
-                <VStack gap={4}>
-                    <Center>
-                        <Heading level={1} className="text-foreground">{t('login.title')}</Heading>
-                        <Heading level={2} className="text-foreground/60">{t('login.subTitle')}</Heading>
-                    </Center>
+        <ScrollView
+            className="flex-1"
+            contentContainerClassName="grow px-4 pt-6 pb-8 gap-4"
+            keyboardShouldPersistTaps="handled"
+        >
+            {/* Brand */}
+            <View className="bg-hero rounded-4xl px-5.5 py-7 gap-3.5">
+                <Logo width={220} onDark />
+                <Text className="type-body text-hero-muted">{t('login.tagline')}</Text>
+            </View>
 
-                    {/* Login Field */}
-                    <VStack gap={2}>
-                        <Text variant="small" className="text-foreground/60">
-                            {t('login.email')}
-                        </Text>
-                        <Controller
-                            control={control}
-                            name="login"
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <Input size="lg" invalid={!!errors.login}>
-                                    <InputField
-                                        keyboardType="email-address"
-                                        autoCapitalize="none"
-                                        autoCorrect={false}
-                                        value={value}
-                                        onBlur={onBlur}
-                                        onChangeText={onChange}
-                                        placeholder={t('login.email')}
-                                    />
-                                </Input>
-                            )}
-                        />
-                        {errors.login && (
-                            <HStack gap={2} className="items-center">
-                                <AlertCircle size={16} color="#EF4444" />
-                                <Text variant="small" className="text-destructive">
-                                    {errors.login.message}
-                                </Text>
-                            </HStack>
+            {/* Form */}
+            <View className="bg-card rounded-2xl px-4.5 py-5.5 gap-3.5">
+                <Text className="type-heading text-ink" accessibilityRole="header">
+                    {t('login.heading')}
+                </Text>
+
+                {submitError && (
+                    <View
+                        className="flex-row items-center gap-2.5 bg-err-bg rounded-md px-3.5 py-3"
+                        accessibilityRole="alert"
+                    >
+                        <CircleAlert size={18} color={colors.errFg} strokeWidth={2} />
+                        <Text className="flex-1 font-onest-medium text-sm text-err-fg">{submitError}</Text>
+                    </View>
+                )}
+
+                <FormControl isInvalid={!!errors.login}>
+                    <FormControlLabel>
+                        <FormControlLabelText>{t('login.loginLabel')}</FormControlLabelText>
+                    </FormControlLabel>
+                    <Controller
+                        control={control}
+                        name="login"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <Input size="lg" invalid={!!errors.login || !!submitError}>
+                                <User size={20} color={colors.muted} strokeWidth={2} />
+                                <InputField
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    autoComplete="username"
+                                    textContentType="username"
+                                    value={value}
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    placeholder={t('login.loginPlaceholder')}
+                                    accessibilityLabel={t('login.loginLabel')}
+                                />
+                            </Input>
                         )}
-                    </VStack>
-
-                    {/* Password Field */}
-                    <VStack gap={2}>
-                        <Text variant="small" className="text-foreground/60">
-                            {t('login.password')}
-                        </Text>
-                        <Controller
-                            control={control}
-                            name="password"
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <Input size="lg" invalid={!!errors.password}>
-                                    <InputField
-                                        secureTextEntry={!showPassword}
-                                        autoCapitalize="none"
-                                        autoCorrect={false}
-                                        value={value}
-                                        onBlur={onBlur}
-                                        onChangeText={onChange}
-                                        placeholder={t('login.password')}
-                                    />
-                                    <Pressable
-                                        onPress={handleState}
-                                        className="h-full justify-center"
-                                        accessibilityRole="button"
-                                    >
-                                        {showPassword ? (
-                                            <Eye size={20} color={colors.muted} />
-                                        ) : (
-                                            <EyeOff size={20} color={colors.muted} />
-                                        )}
-                                    </Pressable>
-                                </Input>
-                            )}
-                        />
-                        {errors.password && (
-                            <HStack gap={2} className="items-center">
-                                <AlertCircle size={16} color="#EF4444" />
-                                <Text variant="small" className="text-destructive">
-                                    {errors.password.message}
-                                </Text>
-                            </HStack>
-                        )}
-                    </VStack>
-
-                    {/* Submit Error */}
-                    {submitError && (
-                        <HStack gap={2} className="items-center bg-destructive/10 p-3 rounded-lg">
-                            <AlertCircle size={16} color="#EF4444" />
-                            <Text variant="small" className="text-destructive flex-1">
-                                {submitError}
-                            </Text>
-                        </HStack>
+                    />
+                    {errors.login && (
+                        <FormControlError>
+                            <FormControlErrorText>{errors.login.message}</FormControlErrorText>
+                        </FormControlError>
                     )}
+                </FormControl>
 
-                    {/* Submit Button */}
-                    <VStack gap={2}>
-                        <Button
-                            size="md"
-                            onPress={handleSubmit(handleFormSubmit)}
-                            loading={loading}
-                            disabled={loading}
-                            className="w-full"
-                        >
-                            {loading ? t('login.pleaseWait') : t('login.loginButton')}
-                        </Button>
-
-                        {/* Sign Up Link */}
-                        <Center>
-                            <HStack gap={1} className="items-center">
-                                <Text>{t('login.signUptext')}</Text>
-                                <Pressable>
-                                    <Text className="font-bold text-primary">
-                                        {t('login.signUp')}
-                                    </Text>
+                <FormControl isInvalid={!!errors.password}>
+                    <FormControlLabel>
+                        <FormControlLabelText>{t('login.password')}</FormControlLabelText>
+                    </FormControlLabel>
+                    <Controller
+                        control={control}
+                        name="password"
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <Input size="lg" invalid={!!errors.password || !!submitError} className="pr-1.5">
+                                <Lock size={20} color={colors.muted} strokeWidth={2} />
+                                <InputField
+                                    secureTextEntry={!showPassword}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                    autoComplete="current-password"
+                                    textContentType="password"
+                                    value={value}
+                                    onBlur={onBlur}
+                                    onChangeText={onChange}
+                                    placeholder={t('login.password')}
+                                    accessibilityLabel={t('login.password')}
+                                    onSubmitEditing={handleSubmit(handleFormSubmit)}
+                                    returnKeyType="go"
+                                />
+                                <Pressable
+                                    onPress={() => setShowPassword((shown) => !shown)}
+                                    className="w-10 h-10 rounded-full items-center justify-center"
+                                    accessibilityLabel={showPassword ? t('login.hidePassword') : t('login.showPassword')}
+                                >
+                                    {showPassword ? (
+                                        <EyeOff size={20} color={colors.muted} strokeWidth={2} />
+                                    ) : (
+                                        <Eye size={20} color={colors.muted} strokeWidth={2} />
+                                    )}
                                 </Pressable>
-                            </HStack>
-                        </Center>
-                    </VStack>
-                </VStack>
-            </Card>
-        </Center>
+                            </Input>
+                        )}
+                    />
+                    {errors.password && (
+                        <FormControlError>
+                            <FormControlErrorText>{errors.password.message}</FormControlErrorText>
+                        </FormControlError>
+                    )}
+                </FormControl>
+
+                <Button
+                    variant="accent"
+                    size="lg"
+                    full
+                    onPress={handleSubmit(handleFormSubmit)}
+                    loading={loading}
+                    className="mt-1"
+                >
+                    {loading ? t('login.pleaseWait') : t('login.loginButton')}
+                </Button>
+            </View>
+        </ScrollView>
     )
 }

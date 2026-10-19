@@ -1,47 +1,51 @@
-import {
-  Avatar,
-  AvatarFallbackText,
-  Box,
-  Heading,
-  HStack,
-  Text,
-  VStack,
-} from "@/components/base";
+import { Avatar, AvatarFallbackText, AvatarImage, Text } from "@/components/base";
 import { CurrentUserType } from "@/models/auth.model";
 import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 
 type ProfileCardProps = {
   user: CurrentUserType;
 }
 
 const normalizePhoneNumber = (phone: string) => {
-  // Remove all non-digit characters
-  const digitsOnly = phone.slice(0, 4) + ' ' + phone.slice(4, 6) + ' ' + phone.slice(6, 9) + ' ' + phone.slice(9);
-  return digitsOnly;
+  // +998 90 123 4567
+  return phone.slice(0, 4) + ' ' + phone.slice(4, 6) + ' ' + phone.slice(6, 9) + ' ' + phone.slice(9);
 }
 
+/**
+ * Profile hero: avatar, name, phone, role and store.
+ */
 const ProfileCard = ({ user }: ProfileCardProps) => {
   const { t } = useTranslation();
-  return (
-    <HStack className="flex flex-row justify-between items-center w-full">
-      <Box className="flex-row items-center gap-4">
-        <Avatar className="border border-gray-400 rounded-full" >
-          {
-            user.image ?
-              ''
-              : <AvatarFallbackText>{user.fullName}</AvatarFallbackText>
-          }
+  const roleLabel = t(`user.${user.type.toLocaleLowerCase()}.${user.role.toLocaleLowerCase()}`);
+  const storeName = user.stores?.[0]?.name;
 
+  return (
+    <View className="bg-hero rounded-2xl p-5 gap-4">
+      <View className="flex-row items-center gap-3.5">
+        <Avatar tone="accent" size="lg">
+          {user.image ? <AvatarImage source={{ uri: user.image }} alt={user.fullName} /> : null}
+          {user.image ? null : <AvatarFallbackText>{user.fullName}</AvatarFallbackText>}
         </Avatar>
-        <VStack>
-          <Heading size="lg">{user.fullName}</Heading>
-          <Text size="sm">
-            {normalizePhoneNumber(user.phone)}
-          </Text>
-          <Text>{t(`user.${user.type.toLocaleLowerCase()}.${user.role.toLocaleLowerCase()}`)}</Text>
-        </VStack>
-      </Box>
-    </HStack>
+        <View className="flex-1 min-w-0 gap-0.5">
+          <Text className="type-subhead text-hero-ink" numberOfLines={1}>{user.fullName}</Text>
+          {user.phone ? (
+            <Text className="font-onest text-sm text-hero-muted tabular-nums">{normalizePhoneNumber(user.phone)}</Text>
+          ) : null}
+        </View>
+      </View>
+
+      <View className="flex-row flex-wrap gap-2">
+        <View className="rounded-pill bg-accent px-3 py-1">
+          <Text className="font-onest-semibold text-xs text-on-accent">{roleLabel}</Text>
+        </View>
+        {storeName ? (
+          <View className="rounded-pill bg-hero-sub px-3 py-1">
+            <Text className="font-onest-semibold text-xs text-hero-ink">{storeName}</Text>
+          </View>
+        ) : null}
+      </View>
+    </View>
   );
 };
 

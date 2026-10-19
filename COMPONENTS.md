@@ -23,7 +23,7 @@ Pill button. At most one `primary` and one `accent` per screen.
 
 | Prop | Type | Default |
 |---|---|---|
-| `variant` | `'primary' \| 'accent' \| 'secondary' \| 'danger' \| 'ghost'` | `'primary'` |
+| `variant` | `'primary' \| 'accent' \| 'secondary' \| 'danger' \| 'ghost' \| 'hero'` | `'primary'` |
 | `size` | `'sm'` 36 · `'md'` 44 · `'lg'` 56 | `'md'` |
 | `icon` | lucide component (left of the label) | — |
 | `full` | `boolean` — full width | `false` |
@@ -39,7 +39,7 @@ Pill button. At most one `primary` and one `accent` per screen.
 
 - A string child is the label (Onest bold). Other children render as-is (`ButtonText`, `ButtonIcon` available).
 - Main screen action → `size="lg"`.
-- **Deprecated** variants (pre-STHM, remove after stage 3): `default` → `primary`, `outline` → `secondary`, `destructive` → `danger`.
+- `hero` — secondary action on the dark `hero` block (`bg-hero-sub`, light label and icon).
 
 ### IconButton
 
@@ -48,7 +48,7 @@ Round icon-only button. `accessibilityLabel` is required.
 | Prop | Type | Default |
 |---|---|---|
 | `icon` | lucide component (required) | — |
-| `variant` | `'card' \| 'sunken' \| 'primary' \| 'accent' \| 'danger'` | `'card'` |
+| `variant` | `'card' \| 'sunken' \| 'primary' \| 'accent' \| 'danger' \| 'hero'` | `'card'` |
 | `size` | `'sm'` 36 · `'md'` 44 · `'lg'` 52 | `'md'` |
 
 ```tsx
@@ -166,7 +166,7 @@ Props: `value`, `signed`, `currency` (`'UZS'`; `null` hides), `className`, `curr
 
 ### Card
 
-`variant`: `'default'` (white, `rounded-xl`) · `'hero'` (dark, `rounded-2xl`) · `'sunken'` (plate in a card, `rounded-md`). `p-4`, no shadow. `elevated` is deprecated (= `default`).
+`variant`: `'default'` (white, `rounded-xl`) · `'hero'` (dark, `rounded-2xl`) · `'sunken'` (plate in a card, `rounded-md`). `p-4`, no shadow.
 
 ### PhotoPlaceholder
 
@@ -195,7 +195,7 @@ Props: `value`, `signed`, `currency` (`'UZS'`; `null` hides), `className`, `curr
   <InputField placeholder={t('login.login')} value={value} onChangeText={onChange} autoCapitalize="none" />
 </Input>
 ```
-> `placeholder`, `value`, `onChangeText` go on **`InputField`**. Deprecated variants `outline` / `underlined` / `rounded` render as `sunken`.
+> `placeholder`, `value`, `onChangeText` go on **`InputField`**.
 
 ### SearchField
 
@@ -240,13 +240,16 @@ Native picker (`@react-native-picker/picker`) in a filled `sunken` box. Props: `
 
 ---
 
-## Outside `base/` (pre-STHM, restyled in stage 3)
+## Outside `base/`
 
-- `components/product`: `ProductCard`, `ProductCardSkeleton`, `ProductVariantCard`, `ProductImage`, `ImageCarousel`, `PriceLabel`, `PricePair`, `QuantityStepper`, `ChipSelector`, `AvailabilityBadge`, `SearchBar`, `ProductListHeader`, `EmptyProductList`, `ActionButtons`, `AdminSectionHeader`.
-- `components/order`: `OrderCard`, `SwipeableOrderCard`, `OrderItemCard`, `SwipeableOrderItemCard`, `OrderInfoCard`, `OrderPaymentCard`, `ProductSearchSheet`.
-- `components/cashbox`: `CashboxHeader`, `CashboxFilters`, `StatusBadge` (domain version — replace with base `StatusBadge`), `FilterSheet`.
+- `components/brand`: **Logo** (`variant: 'horizontal' | 'icon'`, `width`, `onDark?` — official SVGs via `react-native-svg`), **SplashView** (in-app splash while the session is restored).
+- `components/navigation`: **BottomNav** (floating tab bar) + `useBottomNavInset()`.
+- `components/common`: **ComingSoonScreen** (`title`, `description?`, `icon?`) — header with back + «Скоро будет доступно» for routes whose feature isn't built yet.
+- `components/product`: `ProductCard` (ListCard row), `ProductCardSkeleton`, `ProductImage` (thumbnail with placeholder fallback), `ImageCarousel` (photo gallery, `overlay` for back/edit buttons), `ProductVariantCard`.
+- `components/order`: `OrderItemCard`, `SwipeableOrderItemCard` (swipe left → delete), `ProductSearchSheet`.
+- `components/cashbox`: `FilterSheet` (placeholder), type `CashboxStatusFilter`.
 - `src/icons/custom-icon.tsx`: `CustomIcon({ name, size?, color? })` — SF Symbols / Material Symbols.
 
 ---
 
-**Last Updated**: 2026-10-19 (redesign stage 1)
+**Last Updated**: 2026-10-19 (redesign stage 3)

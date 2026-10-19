@@ -57,7 +57,7 @@ function MyScreen() {
       <Button variant="ghost" onPress={() => setShowConfirm(false)}>
         Cancel
       </Button>
-      <Button variant="destructive" onPress={handleDelete}>
+      <Button variant="danger" onPress={handleDelete}>
         Delete
       </Button>
     </HStack>

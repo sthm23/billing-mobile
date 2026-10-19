@@ -1,5 +1,4 @@
-import { HStack, Pressable, Text, VStack } from '@/components/base';
-import { StatusBadge } from '@/components/cashbox';
+import { ListCard, type StatusTone } from '@/components/base';
 import { Order, OrderStatus } from '@/services/order/order.type';
 import { TFunction } from 'i18next';
 
@@ -9,76 +8,45 @@ type OrderCardProps = {
     t: TFunction;
 };
 
+const STATUS_TONE: Record<OrderStatus, StatusTone> = {
+    [OrderStatus.CREATED]: 'info',
+    [OrderStatus.HOLD]: 'warn',
+    [OrderStatus.DEBT]: 'err',
+    [OrderStatus.COMPLETED]: 'ok',
+    [OrderStatus.CANCELLED]: 'neutral',
+    [OrderStatus.REFUNDED]: 'neutral',
+};
 
-type StatusVariant = 'default' | 'success' | 'error' | 'warning' | 'info';
-
-function getStatusVariant(status: OrderStatus): StatusVariant {
-    switch (status) {
-        case OrderStatus.CREATED:
-            return 'info';
-        case OrderStatus.COMPLETED:
-            return 'success';
-        case OrderStatus.CANCELLED:
-            return 'error';
-        case OrderStatus.HOLD:
-            return 'default';
-        case OrderStatus.DEBT:
-            return 'error';
-        default:
-            return 'default';
-    }
+function getInitials(name: string): string {
+    return name
+        .split(' ')
+        .filter(Boolean)
+        .map((word) => word[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
 }
 
+/**
+ * Order row: cashier, warehouse and time, total and status.
+ */
 export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
     const cashierName = order.cashier.user.fullName;
-    const warehouseName = order.warehouse.name;
-    const total = Number(order.totalAmount);
-
-    const statusLabel = t(`order.status.${order.status}`);
-
-    const formattedDate = new Date(order.createdAt).toLocaleDateString('ru-RU', {
+    const createdAt = new Date(order.createdAt).toLocaleString('ru-RU', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
     });
+
     return (
-        <Pressable
-            className="mb-2 rounded-xl border border-border bg-card p-4 shadow-sm"
+        <ListCard
+            lead={getInitials(cashierName)}
+            title={cashierName}
+            subtitle={`${order.warehouse.name} · ${createdAt}`}
+            amount={order.totalAmount}
+            badge={{ label: t(`order.status.${order.status}`), tone: STATUS_TONE[order.status] ?? 'neutral' }}
             onPress={() => onPress(order.id)}
-        >
-            <HStack className="items-start justify-between">
-                {/* Left side - Info */}
-                <VStack className="flex-1 gap-1">
-                    {/* Cashier Name */}
-                    <Text variant="large" className="font-bold text-foreground">
-                        {cashierName}
-                    </Text>
-
-                    {/* Warehouse */}
-                    <Text variant="muted">
-                        {warehouseName}
-                    </Text>
-
-                    {/* Date */}
-                    <Text variant="muted">
-                        {formattedDate}
-                    </Text>
-                </VStack>
-
-                {/* Right side - Status and Balance */}
-                <VStack className="items-end gap-2">
-                    {/* Status Badge */}
-                    <StatusBadge
-                        label={statusLabel}
-                        variant={getStatusVariant(order.status)}
-                    />
-
-                    {/* total */}
-                    <Text variant="large" className="font-bold text-foreground">
-                        {total.toLocaleString()} {t('common.currency')}
-                    </Text>
-                </VStack>
-            </HStack>
-        </Pressable>
+        />
     );
 };

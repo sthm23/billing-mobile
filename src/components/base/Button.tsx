@@ -13,9 +13,7 @@ import { Text, type TextProps } from './Text';
 /** Icon component compatible with lucide-react-native. */
 export type ButtonIconComponent = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
 
-type StyleVariant = 'primary' | 'accent' | 'secondary' | 'danger' | 'ghost';
-/** @deprecated Pre-STHM names, mapped to STHM variants. Remove after stage 3. */
-type LegacyVariant = 'default' | 'outline' | 'destructive';
+type StyleVariant = 'primary' | 'accent' | 'secondary' | 'danger' | 'ghost' | 'hero';
 
 export interface ButtonProps extends Omit<PressableProps, 'children'> {
   /**
@@ -24,9 +22,9 @@ export interface ButtonProps extends Omit<PressableProps, 'children'> {
   children?: React.ReactNode;
   /**
    * `primary` — black, `accent` — sage (main action), `secondary` — neutral fill,
-   * `danger` — destructive, `ghost` — no fill.
+   * `danger` — destructive, `ghost` — no fill, `hero` — secondary action on the dark `hero` block.
    */
-  variant?: StyleVariant | LegacyVariant;
+  variant?: StyleVariant;
   /**
    * `sm` 36px, `md` 44px (default), `lg` 56px — main action of a screen
    */
@@ -53,18 +51,13 @@ export interface ButtonProps extends Omit<PressableProps, 'children'> {
   textClassName?: string;
 }
 
-const LEGACY_VARIANTS: Record<LegacyVariant, StyleVariant> = {
-  default: 'primary',
-  outline: 'secondary',
-  destructive: 'danger',
-};
-
 const containerVariants: Record<StyleVariant, string> = {
   primary: 'bg-primary',
   accent: 'bg-accent',
   secondary: 'bg-ph-bg',
   danger: 'bg-err-bg',
   ghost: 'bg-transparent active:bg-sunken',
+  hero: 'bg-hero-sub',
 };
 
 const labelVariants: Record<StyleVariant, string> = {
@@ -73,6 +66,7 @@ const labelVariants: Record<StyleVariant, string> = {
   secondary: 'text-ink',
   danger: 'text-err-fg',
   ghost: 'text-ink',
+  hero: 'text-hero-ink',
 };
 
 const containerSizes = {
@@ -88,10 +82,6 @@ const labelSizes = {
 };
 
 const iconSizes = { sm: 16, md: 18, lg: 18 };
-
-export function resolveButtonVariant(variant: StyleVariant | LegacyVariant): StyleVariant {
-  return variant in LEGACY_VARIANTS ? LEGACY_VARIANTS[variant as LegacyVariant] : (variant as StyleVariant);
-}
 
 /**
  * Button — pill-shaped button (STHM)
@@ -122,7 +112,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const colors = useTheme();
-  const styleVariant = resolveButtonVariant(variant);
+  const styleVariant = variant;
   const isDisabled = Boolean(disabled || loading);
   // Disabled (not loading) buttons switch to the neutral disabled look.
   const showDisabledLook = Boolean(disabled) && !loading;
@@ -135,6 +125,7 @@ export function Button({
       secondary: colors.ink,
       danger: colors.errFg,
       ghost: colors.ink,
+      hero: colors.heroInk,
     }[styleVariant];
 
   const label =

@@ -16,7 +16,7 @@ import type {
   ProductDetail,
   ProductParams,
   ProductVariantSearchParams,
-} from './product.type'
+} from '@/models/product.model'
 
 export const productQueryKeys = {
   all: () => ['product'] as const,

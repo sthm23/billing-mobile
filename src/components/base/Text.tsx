@@ -18,7 +18,7 @@ export interface TextProps extends RNTextProps {
  * Text — базовый текстовый компонент
  *
  * Обертка над React Native Text с поддержкой Tailwind и вариантов.
- * По умолчанию использует semantic color (text-foreground).
+ * По умолчанию использует цвет текста STHM (text-ink).
  *
  * @example
  * <Text>Regular text</Text>

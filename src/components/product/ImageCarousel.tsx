@@ -1,19 +1,26 @@
-import { Box } from '@/components/base';
+import { PhotoPlaceholder } from '@/components/base';
+import { cn } from '@/libs/utils';
 import { Image } from 'expo-image';
-import { ImageIcon } from 'lucide-react-native';
-import { useRef, useState } from 'react';
-import { Dimensions, FlatList, ViewToken } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { FlatList, View, ViewToken } from 'react-native';
 
 interface ImageCarouselProps {
   images: { url: string; id: string; isMain: boolean }[];
   productName: string;
+  /**
+   * Content laid over the photo (back / edit buttons)
+   */
+  overlay?: React.ReactNode;
 }
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const IMAGE_HEIGHT = 260;
 
-export function ImageCarousel({ images, productName }: ImageCarouselProps) {
+/**
+ * Product photo gallery (STHM): rounded block, page dots over the photo.
+ */
+export function ImageCarousel({ images, productName, overlay }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [width, setWidth] = useState(0);
 
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -23,51 +30,52 @@ export function ImageCarousel({ images, productName }: ImageCarouselProps) {
     }
   ).current;
 
-  if (!images || images.length === 0) {
-    return (
-      <Box
-        className="bg-background-50 border-b border-border items-center justify-center"
-        style={{ width: SCREEN_WIDTH, height: IMAGE_HEIGHT }}
-      >
-        <ImageIcon size={48} color="#9CA3AF" />
-      </Box>
-    );
-  }
+  const hasImages = images && images.length > 0;
 
   return (
-    <Box>
-      <FlatList
-        data={images}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        renderItem={({ item }) => (
-          <Image
-            source={{ uri: item.url }}
-            style={{ width: SCREEN_WIDTH, height: IMAGE_HEIGHT }}
-            contentFit="cover"
-            alt={productName}
-          />
-        )}
-      />
+    <View
+      className="relative rounded-2xl overflow-hidden bg-ph-bg"
+      style={{ height: IMAGE_HEIGHT }}
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+    >
+      {!hasImages ? (
+        <PhotoPlaceholder size="hero" />
+      ) : width > 0 ? (
+        <FlatList
+          data={images}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+          renderItem={({ item }) => (
+            <Image
+              source={{ uri: item.url }}
+              style={{ width, height: IMAGE_HEIGHT }}
+              contentFit="cover"
+              alt={productName}
+            />
+          )}
+        />
+      ) : null}
 
-      {images.length > 1 && (
-        <Box className="flex-row justify-center items-center gap-1.5 py-2">
-          {images.map((_, index) => (
-            <Box
-              key={index}
-              className={`rounded-full ${
-                index === activeIndex
-                  ? 'bg-primary w-4 h-1.5'
-                  : 'bg-typography-300 w-1.5 h-1.5'
-              }`}
+      {hasImages && images.length > 1 && (
+        <View className="absolute bottom-3.5 left-0 right-0 flex-row justify-center gap-1.5" pointerEvents="none">
+          {images.map((image, index) => (
+            <View
+              key={image.id}
+              className={cn('h-1.5 rounded-full', index === activeIndex ? 'w-4.5 bg-ink' : 'w-1.5 bg-muted')}
             />
           ))}
-        </Box>
+        </View>
       )}
-    </Box>
+
+      {overlay ? (
+        <View className="absolute top-3 left-3 right-3 flex-row justify-between" pointerEvents="box-none">
+          {overlay}
+        </View>
+      ) : null}
+    </View>
   );
 }

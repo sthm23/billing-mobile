@@ -6,9 +6,8 @@ import { TextInput, View, type TextInputProps, type ViewProps } from 'react-nati
 export interface InputProps extends ViewProps {
   /**
    * `sunken` — field inside a card (default); `card` — field on `bg`.
-   * `outline` / `underlined` / `rounded` are deprecated and render as `sunken`.
    */
-  variant?: 'sunken' | 'card' | 'outline' | 'underlined' | 'rounded';
+  variant?: 'sunken' | 'card';
   /**
    * `sm` 40px, `md` 48px, `lg` 52px (forms)
    */

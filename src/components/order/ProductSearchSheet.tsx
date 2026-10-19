@@ -1,4 +1,5 @@
-import { Box, Button, HStack, Text, VStack } from '@/components/base';
+import { IconButton, Money, PhotoPlaceholder, SearchField, StatusBadge, Text } from '@/components/base';
+import { EmptyState } from '@/components/common';
 import { useDebounce } from '@/hooks/use-debounce';
 import { OrderProductVariant } from '@/services/order/order.type';
 import { useOrderProductSearch } from '@/services/product/product.queries';
@@ -6,7 +7,7 @@ import { BottomSheet } from '@expo/ui';
 import { Plus, Search } from 'lucide-react-native';
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, TextInput, useColorScheme, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 
 export interface ProductSearchSheetRef {
   open: () => void;
@@ -19,62 +20,43 @@ interface ProductSearchSheetProps {
   children: React.ReactNode;
 }
 
-const formatAmount = (amount: number) =>
-  new Intl.NumberFormat('ru-RU', {
-    style: 'decimal',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-
-const BG_COLORS = ['#3B82F6', '#22C55E', '#A855F7', '#F97316', '#EC4899'];
-
 function SearchResultItem({
   item,
-  index,
   onAdd,
 }: {
   item: OrderProductVariant;
-  index: number;
   onAdd: (item: OrderProductVariant) => void;
 }) {
   const { t } = useTranslation();
-  const bgColor = BG_COLORS[index % BG_COLORS.length];
-  const initial = item.sku?.charAt(0)?.toUpperCase() ?? '?';
+  const outOfStock = item.quantity === 0;
 
   return (
-    <HStack className="px-4 py-3 gap-3 items-center border-b border-border">
-      <Box
-        style={{ backgroundColor: bgColor, width: 48, height: 48, borderRadius: 10 }}
-        className="items-center justify-center shrink-0"
-      >
-        <Text className="text-white text-lg font-bold">{initial}</Text>
-      </Box>
+    <View className="flex-row items-center gap-3 bg-sunken rounded-lg p-2.5">
+      <PhotoPlaceholder size="sm" className="bg-card" />
 
-      <VStack className="flex-1 gap-0.5">
-        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
+      <View className="flex-1 min-w-0 gap-1">
+        <Text className="type-body-strong text-ink" numberOfLines={1}>
           {item.sku}
         </Text>
-        <Text className="text-xs text-typography-500">{item.barCode}</Text>
-        <HStack className="gap-3 mt-0.5">
-          <Text className="text-sm font-bold text-foreground">
-            {formatAmount(item.price)} {t('common.currency')}
-          </Text>
-          <Text className="text-xs text-typography-500 self-center">
-            {t('product.inStockLabel')}: {item.quantity} {t('product.unit')}
-          </Text>
-        </HStack>
-      </VStack>
+        <Text className="font-onest text-xs text-muted tabular-nums">{item.barCode}</Text>
+        <View className="flex-row items-center gap-2">
+          <Money value={item.price} currency={t('common.currency')} className="text-[15px]" />
+          <StatusBadge
+            label={`${t('product.inStockLabel')}: ${item.quantity} ${t('product.unit')}`}
+            tone={outOfStock ? 'err' : 'ok'}
+            size="sm"
+          />
+        </View>
+      </View>
 
-      <Button
-        variant="outline"
-        size="icon"
-        className="h-9 w-9 rounded-xl"
+      <IconButton
+        icon={Plus}
+        variant="primary"
+        accessibilityLabel={t('order.add')}
         onPress={() => onAdd(item)}
-        disabled={item.quantity === 0}
-      >
-        <Plus size={20} />
-      </Button>
-    </HStack>
+        disabled={outOfStock}
+      />
+    </View>
   );
 }
 
@@ -96,75 +78,35 @@ function SheetContent({
   onSelect,
 }: SheetContentProps) {
   const { t } = useTranslation();
-  // useColorScheme is a built-in RN hook — works without any provider, safe inside portal
-  const isDark = useColorScheme() === 'dark';
-  const surface = isDark ? '#171717' : '#f5f5f5';
-  const textColor = isDark ? '#fafafa' : '#0a0a0a';
-  const textMuted = isDark ? '#a1a1a1' : '#737373';
-  const borderColor = isDark ? '#2e2e2e' : '#e5e5e5';
+
   return (
-    <View style={{ flex: 1 }}>
-      {/* Search input */}
-      <View style={{ marginHorizontal: 16, marginBottom: 12, marginTop: 4 }}>
-        <View style={{
-          height: 44,
-          backgroundColor: surface,
-          borderWidth: 1,
-          borderColor,
-          borderRadius: 12,
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingHorizontal: 12,
-          gap: 8
-        }}>
-          <Search size={18} className="text-muted-foreground shrink-0" />
-          <TextInput
-            value={searchText}
-            onChangeText={onSearchChange}
-            placeholder={t('search.searchPlaceholder')}
-            placeholderTextColor={textMuted}
-            autoFocus
-            clearButtonMode="while-editing"
-            style={[styles.input, { color: textColor }]}
-          />
-        </View>
-      </View>
+    <View className="flex-1 bg-card px-4 pt-2 gap-3">
+      <SearchField
+        value={searchText}
+        onChangeText={onSearchChange}
+        placeholder={t('search.searchPlaceholder')}
+        variant="sunken"
+        autoFocus
+      />
 
       {!hasMinLength ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <Text className="text-typography-400 text-sm text-center">
-            {t('search.minCharacters')}
-          </Text>
-        </View>
+        <EmptyState icon={Search} message={t('search.minCharacters')} />
       ) : isSearching ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <Text className="text-typography-400 text-sm">{t('search.searching')}</Text>
-        </View>
+        <EmptyState message={t('search.searching')} />
       ) : results.length === 0 ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <Text className="text-typography-400 text-sm">{t('search.noProductsFound')}</Text>
-        </View>
+        <EmptyState icon={Search} message={t('search.noProductsFound')} />
       ) : (
         <FlatList
           data={results}
           keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
-            <SearchResultItem item={item} index={index} onAdd={onSelect} />
-          )}
-          contentContainerStyle={{ paddingBottom: 16 }}
+          renderItem={({ item }) => <SearchResultItem item={item} onAdd={onSelect} />}
+          contentContainerStyle={{ paddingBottom: 16, gap: 8 }}
+          keyboardShouldPersistTaps="handled"
         />
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    flex: 1,
-    fontSize: 14,
-    height: '100%',
-  },
-});
 
 export const ProductSearchSheet = forwardRef<ProductSearchSheetRef, ProductSearchSheetProps>(
   function ProductSearchSheet({ orderId, onSelect, children }, ref) {

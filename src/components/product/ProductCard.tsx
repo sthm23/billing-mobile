@@ -1,8 +1,7 @@
-import { Box, HStack, Pressable, Text, VStack } from '@/components/base';
-import { formatPrice, getTotalQuantity } from '@/libs/product-utils';
+import { ListCard, type StatusTone } from '@/components/base';
+import { getTotalQuantity } from '@/libs/product-utils';
 import { Product } from '@/models/product.model';
 import { useTranslation } from 'react-i18next';
-import { StatusBadge } from '../cashbox';
 import { ProductImage } from './ProductImage';
 
 interface ProductCardProps {
@@ -10,71 +9,39 @@ interface ProductCardProps {
   onPress: (productId: string) => void;
 }
 
+// Display thresholds for the stock badge (same as before the redesign).
+const LOW_STOCK_BELOW = 9;
+
+function getStockTone(quantity: number): StatusTone {
+  if (quantity === 0) return 'err';
+  if (quantity < LOW_STOCK_BELOW) return 'warn';
+
+  return 'ok';
+}
+
+/**
+ * Product row in the list: photo, name, category · brand · warehouse,
+ * «от» price and stock badge.
+ */
 export function ProductCard({ product, onPress }: ProductCardProps) {
   const { t } = useTranslation();
   const totalQuantity = getTotalQuantity(product);
 
   // Get translated category or fallback to original
-  const categoryKey = `category.${product.category}`;
-  const category = t(categoryKey, { defaultValue: product.category });
-
-  // Get warehouse name
-  const warehouseName = product.warehouse?.name || t('product.warehouse');
+  const category = t(`category.${product.category}`, { defaultValue: product.category });
+  const meta = [category, product.brand, product.warehouse?.name].filter(Boolean).join(' · ');
 
   return (
-    <Pressable
-      className="flex-row bg-card rounded-lg p-4 active:opacity-80"
+    <ListCard
+      leading={<ProductImage images={product.images} productName={product.name} size="md" />}
+      title={product.name}
+      subtitle={meta}
+      amount={product.priceRange?.min ?? 0}
+      amountPrefix={t('product.from')}
+      amountCurrency={t('common.currency')}
+      badge={{ label: `${totalQuantity} ${t('product.unit')}`, tone: getStockTone(totalQuantity) }}
       onPress={() => onPress(product.id)}
-    >
-      {/* Product Image */}
-      <ProductImage
-        images={product.images}
-        productName={product.name}
-        size="md"
-      />
-
-      {/* Product Info (Center) */}
-      <VStack className="flex-1 ml-3 justify-between">
-        {/* Product Name */}
-        <Text className="text-lg font-bold text-foreground">
-          {product.name}
-        </Text>
-
-        {/* Category */}
-        <Text className="text-sm text-typography-500 mt-1">
-          {category}
-        </Text>
-
-        {/* Brand (if available) */}
-        {product.brand && (
-          <Text className="text-sm text-typography-400 mt-1" numberOfLines={1}>
-            {product.brand}
-          </Text>
-        )}
-
-
-      </VStack>
-
-      {/* Right Section (Quantity & Price) */}
-      <VStack className="items-end justify-between ml-2">
-
-        <Box className="flex flex-row items-center gap-3">
-
-          {/* Warehouse Name */}
-          <HStack className="mt-2 gap-2 items-center">
-            <Text className="text-sm text-typography-400">
-              {warehouseName}
-            </Text>
-          </HStack>
-          {/* Quantity Badge */}
-          <StatusBadge label={totalQuantity.toString()} size='md' variant={totalQuantity === 0 ? 'error' : totalQuantity < 9 ? 'warning' : 'success'} />
-        </Box>
-
-        {/* Price */}
-        <Text className="text-lg font-bold text-foreground mt-auto">
-          {t('product.from')} {formatPrice(product.priceRange?.min ?? 0)} {t('common.currency')}
-        </Text>
-      </VStack>
-    </Pressable>
+      className="pl-2.5"
+    />
   );
 }

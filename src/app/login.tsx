@@ -1,15 +1,11 @@
-
 import { LoginPage } from '@/screens/login/LoginPage';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function login() {
   return (
-    <SafeAreaView edges={['top']} className='h-full w-full bg-background'>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-
-      >
+    <SafeAreaView edges={['top', 'bottom']} className="flex-1 bg-bg">
+      <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <LoginPage />
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -1,34 +1,20 @@
-import { Box, VStack } from '@/components/base';
+import { View } from 'react-native';
 
+/**
+ * Loading placeholder shaped like a product row.
+ */
 export function ProductCardSkeleton() {
   return (
-    <Box className="flex-row bg-card rounded-lg p-4">
-      {/* Image Skeleton */}
-      <Box className="h-20 w-20 bg-background-100 rounded-lg" />
-
-      {/* Info Skeleton */}
-      <VStack className="flex-1 ml-3 justify-between">
-        {/* Name */}
-        <Box className="h-5 w-32 bg-background-100 rounded" />
-
-        {/* Category */}
-        <Box className="h-4 w-20 bg-background-50 rounded mt-2" />
-
-        {/* Description */}
-        <Box className="h-4 w-40 bg-background-50 rounded mt-2" />
-
-        {/* Warehouse */}
-        <Box className="h-4 w-24 bg-background-50 rounded mt-2" />
-      </VStack>
-
-      {/* Right Section Skeleton */}
-      <VStack className="items-end justify-between ml-2">
-        {/* Quantity Badge */}
-        <Box className="h-8 w-12 bg-background-100 rounded" />
-
-        {/* Price */}
-        <Box className="h-5 w-32 bg-background-100 rounded mt-auto" />
-      </VStack>
-    </Box>
+    <View className="flex-row items-center gap-3 bg-card rounded-lg py-3 pl-3 pr-4" accessibilityElementsHidden>
+      <View className="w-14 h-14 rounded-[14px] bg-sunken" />
+      <View className="flex-1 gap-2">
+        <View className="h-4 w-3/5 rounded-sm bg-sunken" />
+        <View className="h-3 w-2/5 rounded-sm bg-sunken" />
+      </View>
+      <View className="items-end gap-2">
+        <View className="h-4 w-20 rounded-sm bg-sunken" />
+        <View className="h-4 w-12 rounded-pill bg-sunken" />
+      </View>
+    </View>
   );
 }

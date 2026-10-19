@@ -1,13 +1,12 @@
-import { Box, Text } from "@/components/base";
-import { SafeAreaView, } from "react-native-safe-area-context";
+import { ComingSoonScreen } from "@/components/common";
+import { UserRoundPlus } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 
-export default function CreateProfileLayout() {
+/**
+ * Staff creation (OWNER only) arrives in redesign stage 4.
+ */
+export default function CreateStaffScreen() {
+    const { t } = useTranslation();
 
-    return (
-        <SafeAreaView edges={['top']} className="flex-1 items-center justify-center bg-background">
-            <Box>
-                <Text size="2xl" variant='bold'>Create Profile page</Text>
-            </Box>
-        </SafeAreaView>
-    )
+    return <ComingSoonScreen title={t('user.createTitle')} icon={UserRoundPlus} />;
 }

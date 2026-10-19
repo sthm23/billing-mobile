@@ -22,7 +22,7 @@ export interface BoxProps extends ViewProps {
  *
  * @example
  * // Карточка с границей
- * <Box className="p-4 border border-border rounded-lg">
+ * <Box className="p-4 bg-card rounded-xl">
  *   <Text>Card content</Text>
  * </Box>
  */

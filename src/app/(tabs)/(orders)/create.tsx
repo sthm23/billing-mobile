@@ -1,15 +1,13 @@
-import { Box, Text } from "@/components/base";
+import { ComingSoonScreen } from "@/components/common";
+import { ScanBarcode } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function CreateOrderLayout() {
+/**
+ * New sale — target of the BottomNav scan button.
+ * Order creation with barcode scanning arrives in redesign stage 5.
+ */
+export default function CreateOrderScreen() {
     const { t } = useTranslation();
 
-    return (
-        <SafeAreaView className="flex-1 justify-center items-center bg-background">
-            <Box className="flex-row items-center justify-center p-4 rounded-lg">
-                <Text size="2xl" variant='bold'>{t('order.noFound')}</Text>
-            </Box>
-        </SafeAreaView>
-    )
+    return <ComingSoonScreen title={t('navigation.newSale')} icon={ScanBarcode} />;
 }

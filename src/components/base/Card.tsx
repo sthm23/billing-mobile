@@ -4,9 +4,9 @@ import { View, type ViewProps } from 'react-native';
 export interface CardProps extends ViewProps {
   /**
    * `default` — white block on `bg`; `hero` — the one dark main block of a screen;
-   * `sunken` — plate inside a card. `elevated` is deprecated (same as `default`).
+   * `sunken` — plate inside a card.
    */
-  variant?: 'default' | 'hero' | 'sunken' | 'elevated';
+  variant?: 'default' | 'hero' | 'sunken';
   /**
    * Additional className for styling
    */
@@ -15,7 +15,6 @@ export interface CardProps extends ViewProps {
 
 const variantClasses = {
   default: 'bg-card rounded-xl',
-  elevated: 'bg-card rounded-xl',
   hero: 'bg-hero rounded-2xl',
   sunken: 'bg-sunken rounded-md',
 };

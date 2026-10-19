@@ -186,7 +186,7 @@ function getIconNameAndroid(name: IconNames): any {
 
 export default function CustomIcon(props: IconProps) {
   const colors = useTheme()
-  const { size = 24, color = colors.text, name } = props;
+  const { size = 24, color = colors.ink, name } = props;
 
   const iconName = Icon.select({
     ios: getIconNameIOS(name),

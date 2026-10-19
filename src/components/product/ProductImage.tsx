@@ -1,46 +1,45 @@
-import { Box } from '@/components/base';
+import { PhotoPlaceholder } from '@/components/base';
 import { getMainImageUrl } from '@/libs/product-utils';
+import { cn } from '@/libs/utils';
 import { Image } from 'expo-image';
-import { ImageIcon } from 'lucide-react-native';
 import { useState } from 'react';
+import { Pressable } from 'react-native';
 
 interface ProductImageProps {
   images?: { url: string; id: string; isMain: boolean }[];
   productName: string;
+  /**
+   * `sm` 44px, `md` 56px (list rows), `lg` 64px
+   */
   size?: 'sm' | 'md' | 'lg';
   onPress?: () => void;
 }
 
 const sizeClasses = {
-  sm: 'h-16 w-16',
-  md: 'h-20 w-20',
-  lg: 'h-24 w-24',
+  sm: 'w-11 h-11 rounded-sm',
+  md: 'w-14 h-14 rounded-[14px]',
+  lg: 'w-16 h-16 rounded-[14px]',
 };
 
-const iconSizes = {
-  sm: 24,
-  md: 32,
-  lg: 40,
-};
-
+/**
+ * Product thumbnail: main image, or the STHM photo placeholder when there is
+ * no image or it fails to load.
+ */
 export function ProductImage({ images, productName, size = 'md', onPress }: ProductImageProps) {
   const imageUrl = getMainImageUrl(images);
   const [hasError, setHasError] = useState(false);
 
   if (!imageUrl || hasError) {
-    return (
-      <Box
-        className={`${sizeClasses[size]} rounded-lg overflow-hidden bg-background-50 border border-border items-center justify-center`}
-      >
-        <ImageIcon size={iconSizes[size]} color="#9CA3AF" />
-      </Box>
-    );
+    return <PhotoPlaceholder size={size} />;
   }
 
   return (
-    <Box
-      className={`${sizeClasses[size]} rounded-lg overflow-hidden bg-background-50`}
-      onTouchEnd={onPress}
+    <Pressable
+      className={cn('overflow-hidden bg-ph-bg', sizeClasses[size])}
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? 'imagebutton' : 'image'}
+      accessibilityLabel={productName}
     >
       <Image
         source={{ uri: imageUrl }}
@@ -50,6 +49,6 @@ export function ProductImage({ images, productName, size = 'md', onPress }: Prod
         onError={() => setHasError(true)}
         transition={200}
       />
-    </Box>
+    </Pressable>
   );
 }

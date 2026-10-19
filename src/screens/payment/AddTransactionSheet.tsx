@@ -1,14 +1,10 @@
-import {
-  Box,
-  Divider,
-  HStack,
-  Text
-} from "@/components/base";
-import CustomIcon from "@/icons/custom-icon";
-import { IconNames } from "@/icons/icon.type";
+import { Text } from "@/components/base";
+import { useTheme } from "@/hooks/use-theme";
+import { cn } from "@/libs/utils";
 import { CashTransactionType } from "@/models/payment.model";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { BottomSheet } from "@expo/ui";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { TransactionForm } from "./TransactionForm";
@@ -31,12 +27,11 @@ export const AddTransactionSheet = ({
   isLoading = false,
 }: Props) => {
   const { t } = useTranslation();
+  const colors = useTheme();
 
   const isIncome = transactionType === CashTransactionType.INCOME;
-  const iconName = isIncome ? IconNames.ARROW_UP : IconNames.ARROW_DOWN;
-  const iconBgColor = isIncome ? 'bg-success-100' : 'bg-error-100';
-  const iconColor = isIncome ? '#16a34a' : '#dc2626';
-  const typeLabel = isIncome ? t('payment.type.INCOME') : t('payment.type.EXPENSE');
+  const Icon = isIncome ? ArrowDownRight : ArrowUpRight;
+  const typeLabel = isIncome ? t('payment.addIncome') : t('payment.addExpense');
 
   return (
     <BottomSheet
@@ -44,17 +39,15 @@ export const AddTransactionSheet = ({
       onDismiss={onClose}
       snapPoints={['full']}
     >
-      <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 }}>
-        <HStack className="items-center gap-3 mb-4">
-          <Box className={`h-10 w-10 items-center justify-center rounded-full ${iconBgColor}`}>
-            <CustomIcon name={iconName} size={18} color={iconColor} />
-          </Box>
-          <Text size="2xl" variant={'bold'}>{typeLabel}</Text>
-        </HStack>
+      <View className="flex-1 bg-card px-4 pt-2 pb-6">
+        <View className="flex-row items-center gap-3 pb-4">
+          <View className={cn('w-10 h-10 rounded-full items-center justify-center', isIncome ? 'bg-ok-bg' : 'bg-err-bg')}>
+            <Icon size={18} color={isIncome ? colors.okFg : colors.errFg} strokeWidth={2} />
+          </View>
+          <Text className="type-heading text-ink">{typeLabel}</Text>
+        </View>
 
-        <Divider className="mb-5" />
-
-        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="flex-1">
           <TransactionForm
             cashboxId={cashboxId}
             transactionType={transactionType}

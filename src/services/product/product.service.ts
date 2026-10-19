@@ -10,7 +10,7 @@ import type {
   ProductParams,
   ProductVariant,
   UpdateProductVariantPrice
-} from './product.type'
+} from '@/models/product.model'
 
 const ENDPOINTS = {
   BASE: '/',

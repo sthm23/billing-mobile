@@ -209,22 +209,6 @@
   --color-disabled-fg: rgb(var(--disabled-fg));
   --color-scrim: rgb(var(--scrim));
 
-  /* Legacy aliases (pre-STHM shadcn names) — remove once every screen
-     is migrated to the tokens above (migration stage 3). */
-  --color-background: rgb(var(--bg));
-  --color-foreground: rgb(var(--ink));
-  --color-popover: rgb(var(--card));
-  --color-popover-foreground: rgb(var(--ink));
-  --color-primary-foreground: rgb(var(--on-primary));
-  --color-secondary: rgb(var(--sunken));
-  --color-secondary-foreground: rgb(var(--ink));
-  --color-muted-foreground: rgb(var(--muted));
-  --color-accent-foreground: rgb(var(--ink));
-  --color-destructive: rgb(var(--err-fg));
-  --color-border: rgb(var(--line));
-  --color-input: rgb(var(--line));
-  --color-ring: rgb(var(--soft));
-
   /* Radius — STHM scale */
   --radius-sm: 12px;
   --radius-md: 16px;

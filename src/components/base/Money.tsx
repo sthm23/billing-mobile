@@ -13,6 +13,10 @@ export interface MoneyProps extends Omit<TextProps, 'children'> {
    */
   signed?: boolean;
   /**
+   * Text before the amount, e.g. «от» for price ranges
+   */
+  prefix?: string;
+  /**
    * Currency label; `null` hides it
    */
   currency?: string | null;
@@ -39,6 +43,7 @@ export interface MoneyProps extends Omit<TextProps, 'children'> {
 export function Money({
   value,
   signed = false,
+  prefix,
   currency = 'UZS',
   className,
   currencyClassName,
@@ -46,6 +51,7 @@ export function Money({
 }: MoneyProps) {
   return (
     <Text className={cn('font-onest-bold text-ink tabular-nums', className)} numberOfLines={1} {...props}>
+      {prefix ? `${prefix} ` : null}
       {formatMoney(value, { signed })}
       {currency ? (
         <Text className={cn('font-onest-medium text-[11px] text-muted', currencyClassName)}>

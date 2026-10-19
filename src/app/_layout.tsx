@@ -1,4 +1,5 @@
 import '@/assets/i18next/i18next';
+import { SplashView } from '@/components/brand/SplashView';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
 import {
   Onest_400Regular,
@@ -34,7 +35,7 @@ const InitiallyLayout = () => {
   const { authStatus, isAuthenticated } = useAuth();
 
   if (authStatus === AuthStatusEnum.Loading) {
-    return null;
+    return <SplashView />;
   }
 
   return (
@@ -118,7 +119,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeControlContext.Provider value={{ themeMode, setThemeMode }}>
+      <ThemeControlContext.Provider value={{ themeMode, setThemeMode, currentMode: isDarkMode ? 'dark' : 'light' }}>
         <StatusBar style={isDarkMode ? 'light' : 'dark'} />
         <AuthProvider >
           <QueryClientProvider client={queryClient}>

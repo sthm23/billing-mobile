@@ -25,7 +25,7 @@ export interface CenterProps extends ViewProps {
  * // Пустое состояние
  * <Center className="flex-1 p-6">
  *   <Icon name="inbox" size={48} />
- *   <Text className="mt-4 text-muted-foreground">No items found</Text>
+ *   <Text className="mt-4 text-muted">No items found</Text>
  * </Center>
  */
 export function Center({ className, ...props }: CenterProps) {

@@ -1,10 +1,7 @@
-import { Button, Card, Divider, HStack, Text, VStack } from '@/components/base';
-import { useTheme } from '@/hooks/use-theme';
+import { Button, Money, Text } from '@/components/base';
 import { ProductVariant, StockMovementType } from '@/models/product.model';
-import { Clock, Plus } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { StatusBadge } from '../cashbox';
-import { PricePair } from './PricePair';
+import { View } from 'react-native';
 
 interface ProductVariantCardProps {
   variant: ProductVariant;
@@ -13,10 +10,10 @@ interface ProductVariantCardProps {
   onMovement?: (variantId: string) => void;
 }
 
-function getVariantLabel(variant: ProductVariant, nameById: Record<string, string>): string {
+function getVariantLabel(variant: ProductVariant): string {
   const attrs = variant.attributes ?? [];
   if (attrs.length === 0) return variant.sku;
-  return attrs.map((a) => String(a.value)).join(' - ');
+  return attrs.map((a) => String(a.value)).join(' · ');
 }
 
 function getLatestCostPrice(variant: ProductVariant): number {
@@ -26,62 +23,49 @@ function getLatestCostPrice(variant: ProductVariant): number {
   return lastIn ? parseFloat(lastIn.unitCost) : 0;
 }
 
-function getQuantityVariant(qty: number): 'success' | 'error' | 'warning' {
-  if (qty === 0) return 'error';
-  if (qty < 5) return 'warning';
-  return 'success';
-}
-
-export function ProductVariantCard({
-  variant,
-  nameById = {},
-  onHistory,
-  onMovement,
-}: ProductVariantCardProps) {
+/**
+ * Variant block for staff: attributes, SKU, stock, purchase and sale price.
+ */
+export function ProductVariantCard({ variant, onHistory, onMovement }: ProductVariantCardProps) {
   const { t } = useTranslation();
-  const colors = useTheme();
-  const label = getVariantLabel(variant, nameById);
   const costPrice = getLatestCostPrice(variant);
   const retailPrice = parseFloat(String(variant.price));
+  const outOfStock = variant.quantity === 0;
 
   return (
-    <Card className="p-4 gap-3">
-      <HStack className="justify-between items-start">
-        <VStack className="flex-1 gap-0.5">
-          <Text className="text-sm font-semibold text-foreground">{label}</Text>
-          <Text className="text-xs text-typography-400">{variant.sku}</Text>
-        </VStack>
-        <StatusBadge
-          label={variant.quantity.toString()}
-          size='md'
-          variant={getQuantityVariant(variant.quantity)}
-        />
-      </HStack>
+    <View className="bg-card rounded-xl p-4 gap-3.5">
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-1 gap-0.5">
+          <Text className="type-body-strong text-ink">{getVariantLabel(variant)}</Text>
+          <Text className="font-onest text-xs text-muted tabular-nums">{variant.sku}</Text>
+        </View>
+        <View className="items-end">
+          <Text className={outOfStock ? 'font-onest-bold text-xl text-err-fg' : 'font-onest-bold text-xl text-ink'}>
+            {variant.quantity}
+          </Text>
+          <Text className="font-onest text-[11px] text-muted">{t('product.unit')}</Text>
+        </View>
+      </View>
 
-      <PricePair costPrice={costPrice} retailPrice={retailPrice} />
+      <View className="flex-row gap-2">
+        <View className="flex-1 bg-sunken rounded-[14px] px-3 py-2.5 gap-0.5">
+          <Text className="font-onest text-xs text-muted">{t('product.costPrice')}</Text>
+          <Money value={costPrice} currency={null} className="font-onest-semibold text-[15px]" />
+        </View>
+        <View className="flex-1 bg-sunken rounded-[14px] px-3 py-2.5 gap-0.5">
+          <Text className="font-onest text-xs text-muted">{t('product.retailPriceLabel')}</Text>
+          <Money value={retailPrice} currency={null} className="font-onest-semibold text-[15px]" />
+        </View>
+      </View>
 
-      <Divider />
-
-      <HStack className="gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onPress={() => onHistory?.(variant.id)}
-        >
-          <Clock size={16} color={colors.text} />
-          <Text className="ml-2 ">{t('product.history')}</Text>
+      <View className="flex-row gap-2">
+        <Button variant="secondary" className="flex-1" onPress={() => onHistory?.(variant.id)}>
+          {t('product.history')}
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onPress={() => onMovement?.(variant.id)}
-        >
-          <Plus size={16} color={colors.text} />
-          <Text className="ml-2 ">{t('product.stockMovementButton')}</Text>
+        <Button variant="primary" className="flex-1" onPress={() => onMovement?.(variant.id)}>
+          {t('product.stockMovementButton')}
         </Button>
-      </HStack>
-    </Card>
+      </View>
+    </View>
   );
 }

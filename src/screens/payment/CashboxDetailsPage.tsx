@@ -1,38 +1,19 @@
-import {
-  ArrowDownIcon,
-  ArrowUpIcon,
-  Box,
-  Button,
-  ButtonIcon,
-  ButtonText,
-  Card,
-  Divider,
-  HStack,
-  Pressable,
-  Text,
-  VStack
-} from "@/components/base";
-import { StatusBadge } from "@/components/cashbox/StatusBadge";
-import CustomIcon from "@/icons/custom-icon";
-import { IconNames } from "@/icons/icon.type";
+import { Button, HeroCard, IconButton, Text } from "@/components/base";
+import { EmptyState, LoadingState } from "@/components/common";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Link, Lock } from "lucide-react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ArrowDownRight, ArrowUpRight, ChevronLeft, CircleAlert, Lock, PieChart, Receipt } from "lucide-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Alert, ScrollView } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { AddTransactionSheet } from "./AddTransactionSheet";
 import { AllTransactionsSheet } from "./AllTransactionsSheet";
 import { PaymentBreakdownDialog } from "./PaymentBreakdownDialog";
 import { TransactionCard } from "./TransactionCard";
 
 const PREVIEW_COUNT = 5;
-
-function splittedNumber(num: number) {
-  return Number(num).toLocaleString('ru-RU');
-}
 
 export default function CashboxDetailsPage() {
   const { t } = useTranslation();
@@ -59,6 +40,7 @@ export default function CashboxDetailsPage() {
         { text: t('payment.closeCashboxConfirmation.cancelButton'), style: 'cancel' },
         {
           text: t('payment.closeCashboxConfirmation.confirmButton'),
+          style: 'destructive',
           onPress: () => {
             closeCashboxMutation.mutate(id, {
               onSuccess: () => router.back(),
@@ -84,38 +66,42 @@ export default function CashboxDetailsPage() {
     setSheetVisible(false);
   };
 
-  const createdDate = cashbox
-    ? new Date(cashbox.createdAt).toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    })
-    : '';
+  const header = (
+    <View className="flex-row items-center gap-2 px-4 pt-2 pb-3">
+      <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
+      <View className="flex-1 min-w-0">
+        <Text className="type-heading text-ink" numberOfLines={1} accessibilityRole="header">
+          {cashbox ? `${t('payment.cashbox')} · ${cashbox.warehouse?.name ?? ''}` : t('payment.cashbox')}
+        </Text>
+        {cashbox ? (
+          <Text className="font-onest text-[13px] text-muted" numberOfLines={1}>
+            {cashbox.seller?.user?.fullName ?? t('payment.cashier')} ·{' '}
+            {new Date(cashbox.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          </Text>
+        ) : null}
+      </View>
+    </View>
+  );
 
   if (isLoading) {
     return (
-      <>
-        <Stack.Screen options={{ title: t('payment.cashbox') }} />
-        <Box className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" />
-        </Box>
-      </>
+      <View className="flex-1 bg-bg">
+        {header}
+        <LoadingState />
+      </View>
     );
   }
 
   if (isError || !cashbox) {
     return (
-      <>
-        <Stack.Screen options={{ title: t('payment.cashbox') }} />
-        <Box className="flex-1 items-center justify-center p-4">
-          <Text size="xl" variant={'bold'} className="text-error-600">
-            {t('payment.noFound')}
-          </Text>
-        </Box>
-      </>
+      <View className="flex-1 bg-bg">
+        {header}
+        <EmptyState icon={CircleAlert} message={t('payment.noFound')} />
+      </View>
     );
   }
 
+  // Pre-existing client-side totals; to be replaced by backend values (redesign stage 7).
   const totalIncome = cashbox.transactions
     .filter(tx => tx.type === CashTransactionType.INCOME)
     .reduce((sum, tx) => +sum + +tx.amount, 0);
@@ -131,148 +117,71 @@ export default function CashboxDetailsPage() {
   const hasMoreTransactions = sortedTransactions.length > PREVIEW_COUNT;
 
   return (
-    <>
-      {/* Override navigation header with cashbox info */}
-      <Stack.Screen
-        options={{
-          headerTitle: () => (
-            <VStack className="gap-0">
-              <Text variant={'bold'} size="lg">{t('payment.cashbox')}</Text>
-              <Text size="xs" className="text-typography-500">{createdDate}</Text>
-            </VStack>
-          ),
-          headerRight: () => isOpen ? (
-            <Button
-              variant="destructive"
-              size="sm"
-              onPress={handleCloseCashbox}
-              disabled={closeCashboxMutation.isPending}
-              className="mr-2"
-            >
-              <Lock size={16} color={'white'} />
-              <ButtonText className="text-white">{t('payment.closeCashbox')}</ButtonText>
-            </Button>
-          ) : null,
-        }}
-      />
+    <View className="flex-1 bg-bg">
+      {header}
 
-      <ScrollView className="flex-1 bg-background" contentContainerStyle={{ paddingBottom: 16 }}>
-        {/* Balance Card */}
-        <Box className="px-4 pt-3 pb-4">
-          <Card className="p-5 rounded-2xl bg-surface">
-            <VStack className="gap-4">
-              {/* Card header: seller+warehouse on left, status badge on right */}
-              <HStack className="items-start justify-between">
-                <VStack className="gap-1">
-                  <HStack className="items-center gap-1.5">
-                    <CustomIcon name={IconNames.PERSON} size={14} />
-                    <Text size="xs" className="text-typography-500">
-                      {cashbox.seller?.user?.fullName ?? t('payment.cashier')}
-                    </Text>
-                  </HStack>
-                  <HStack className="items-center gap-1.5">
-                    <CustomIcon name={IconNames.BOX} size={14} />
-                    <Text size="xs" className="text-typography-500">
-                      {cashbox.warehouse?.name}
-                    </Text>
-                  </HStack>
-                </VStack>
-                <StatusBadge
-                  variant={isOpen ? 'success' : 'default'}
-                  size="lg"
-                  label={t(`payment.cashboxStatus.${cashbox.status}`)}
+      <ScrollView className="flex-1" contentContainerClassName="px-4 pb-10 gap-3">
+        <HeroCard
+          label={t('payment.balanceInCashbox')}
+          chip={t(`payment.cashboxStatus.${cashbox.status}`)}
+          chipTone={isOpen ? 'accent' : 'neutral'}
+          amount={cashbox.balance}
+          tiles={[
+            { label: t('payment.totalIncome'), value: totalIncome, tone: 'accent', signed: true },
+            { label: t('payment.totalExpense'), value: -totalExpense, tone: 'err' },
+          ]}
+        >
+          <View className="flex-row gap-2">
+            {isOpen ? (
+              <>
+                <Button variant="accent" icon={ArrowDownRight} className="flex-1" onPress={handleAddIncome}>
+                  {t('payment.type.INCOME')}
+                </Button>
+                <Button variant="hero" icon={ArrowUpRight} className="flex-1" onPress={handleAddExpense}>
+                  {t('payment.type.EXPENSE')}
+                </Button>
+                <IconButton
+                  icon={Lock}
+                  variant="danger"
+                  accessibilityLabel={t('payment.closeCashbox')}
+                  onPress={handleCloseCashbox}
+                  disabled={closeCashboxMutation.isPending}
                 />
-              </HStack>
-
-              {/* Tappable balance */}
-              <Pressable onPress={() => setBreakdownVisible(true)}>
-                <VStack>
-                  <Text size="sm" className="text-typography-500">
-                    {t('payment.balanceInCashbox')}
-                  </Text>
-                  <HStack className="items-center gap-2 mt-1">
-                    <Text size="3xl" variant={'bold'}>
-                      {splittedNumber(cashbox.balance)} {t('common.currency')}
-                    </Text>
-                    <Link size={18} />
-                  </HStack>
-                </VStack>
-              </Pressable>
-
-              <Divider />
-
-              {/* Income / Expense summary */}
-              <HStack className="justify-between">
-                <VStack>
-                  <Text size="sm" className="text-typography-500">
-                    {t('payment.totalIncome')}
-                  </Text>
-                  <Text size="lg" variant={'bold'} className="text-success-600 mt-1">
-                    + {splittedNumber(totalIncome)} {t('common.currency')}
-                  </Text>
-                </VStack>
-                <VStack className="items-end">
-                  <Text size="sm" className="text-typography-500">
-                    {t('payment.totalExpense')}
-                  </Text>
-                  <Text size="lg" variant={'bold'} className="text-error-600 mt-1">
-                    - {splittedNumber(totalExpense)} {t('common.currency')}
-                  </Text>
-                </VStack>
-              </HStack>
-
-              {/* Action Buttons */}
-              {isOpen && (
-                <HStack className="gap-3">
-                  <Button
-                    className="flex-1 bg-green-400 dark:bg-green-600"
-                    onPress={handleAddIncome}
-                  >
-                    <ButtonIcon as={ArrowUpIcon} color="white" />
-                    <ButtonText className="text-white">{t('payment.addIncome')}</ButtonText>
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1"
-                    onPress={handleAddExpense}
-                  >
-                    <ButtonIcon as={ArrowDownIcon} color="white" />
-                    <ButtonText className="text-white">{t('payment.addExpense')}</ButtonText>
-                  </Button>
-                </HStack>
-              )}
-            </VStack>
-          </Card>
-        </Box>
+              </>
+            ) : null}
+            <IconButton
+              icon={PieChart}
+              accessibilityLabel={t('payment.paymentBreakdown')}
+              variant="hero"
+              onPress={() => setBreakdownVisible(true)}
+            />
+          </View>
+        </HeroCard>
 
         {/* Transactions */}
-        <Box className="px-4">
-          <HStack className="items-center justify-between mb-3">
-            <Text size="xl" variant={'bold'}>{t('payment.transactions')}</Text>
+        <View className="bg-card rounded-xl px-4 pt-3 pb-1">
+          <View className="flex-row items-center justify-between pb-1">
+            <Text className="type-subhead text-ink">{t('payment.transactions')}</Text>
             {hasMoreTransactions && (
-              <Button size="sm" variant="outline" onPress={() => setAllTransactionsVisible(true)}>
-                <ButtonText>{t('payment.all')}</ButtonText>
+              <Button variant="ghost" size="sm" onPress={() => setAllTransactionsVisible(true)}>
+                {t('payment.all')}
               </Button>
             )}
-          </HStack>
+          </View>
 
           {previewTransactions.length === 0 ? (
-            <Box className="py-10 items-center">
-              <Text className="text-typography-500">{t('payment.noFound')}</Text>
-            </Box>
+            <EmptyState icon={Receipt} message={t('payment.noFound')} className="py-6" />
           ) : (
-            <Card className="rounded-xl bg-surface overflow-hidden">
-              {previewTransactions.map((transaction, index) => (
-                <TransactionCard
-                  key={transaction.id}
-                  transaction={transaction}
-                  showDivider={index < previewTransactions.length - 1}
-                  t={t}
-                />
-              ))}
-            </Card>
+            previewTransactions.map((transaction, index) => (
+              <TransactionCard
+                key={transaction.id}
+                transaction={transaction}
+                showDivider={index < previewTransactions.length - 1}
+                t={t}
+              />
+            ))
           )}
-        </Box>
+        </View>
       </ScrollView>
 
       {/* Payment Breakdown Dialog */}
@@ -299,6 +208,6 @@ export default function CashboxDetailsPage() {
         onSubmit={handleCreateTransaction}
         isLoading={createTransactionMutation.isPending}
       />
-    </>
+    </View>
   );
 }

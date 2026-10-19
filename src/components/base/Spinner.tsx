@@ -29,7 +29,7 @@ export interface SpinnerProps extends ViewProps {
  *
  * @example
  * // Большой спиннер с кастомным цветом
- * <Spinner size="lg" color="#E7000B" />
+ * <Spinner size="lg" color={colors.errFg} />
  *
  * @example
  * // В карточке

@@ -1,55 +1,40 @@
-import {
-  Box,
-  Divider,
-  Heading,
-  Text,
-} from "@/components/base";
+import { Text } from "@/components/base";
+import { EmptyState } from "@/components/common";
 import { useBottomNavInset } from "@/components/navigation/BottomNav";
 import { useAuth } from "@/provider/AuthProvider";
+import Constants from "expo-constants";
+import { UserRoundX } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import LogoutButton from "./LogoutButton";
 import ProfileCard from "./ProfileCard";
 import SettingItems from "./SettingItems";
 
-const MobileProfilePage = ({ isActive }: any) => {
+const MobileProfilePage = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const bottomInset = useBottomNavInset();
-  // const router = useRouter();
-
-  const handleLogout = () => {
-    logout();
-  }
+  const version = Constants.expoConfig?.version ?? '';
 
   if (!user) {
-    return (
-      <Box className="flex-1 flex items-center justify-center">
-        <Text>{t('profile.noUser')}</Text>
-      </Box>
-    )
+    return <EmptyState icon={UserRoundX} message={t('profile.noUser')} />;
   }
 
   return (
     <ScrollView
-      style={{ display: isActive ? "flex" : "none", height: '100%', width: '100%' }}
-      contentContainerStyle={{ justifyContent: "space-between", flexGrow: 1, width: '100%', paddingBottom: bottomInset }}
+      className="flex-1 bg-bg"
+      contentContainerClassName="px-4 pt-2 gap-3"
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomInset }}
     >
-      <Box className="flex h-full px-5 py-4">
-        <Box className="flex flex-col gap-4">
-          <Heading className="mb-1" size="2xl">{t('profile.title')}</Heading>
-          <ProfileCard user={user} />
-          <Divider className="my-2" />
-          <SettingItems />
-        </Box>
-        <Box className="flex-1 flex flex-col items-center justify-center gap-2">
-          <LogoutButton
-            onLogOutPress={handleLogout}
-          />
-          <Text>{t('profile.version')}</Text>
-        </Box>
-      </Box>
+      <Text className="type-title text-ink pb-1" accessibilityRole="header">{t('profile.title')}</Text>
+      <ProfileCard user={user} />
+      <SettingItems />
+      <View className="flex-1 justify-end gap-3 pt-3">
+        <LogoutButton onLogOutPress={logout} />
+        {version ? (
+          <Text className="font-onest text-xs text-muted text-center">STHM · {t('app.version', { version })}</Text>
+        ) : null}
+      </View>
     </ScrollView>
   );
 };

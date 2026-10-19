@@ -14,9 +14,9 @@ export interface IconButtonProps extends Omit<PressableProps, 'children'> {
   accessibilityLabel: string;
   /**
    * `card` — on `bg`, `sunken` — inside a card, `primary` — black,
-   * `accent` — sage (scan), `danger` — delete
+   * `accent` — sage (scan), `danger` — delete, `hero` — on the dark `hero` block
    */
-  variant?: 'card' | 'sunken' | 'primary' | 'accent' | 'danger';
+  variant?: 'card' | 'sunken' | 'primary' | 'accent' | 'danger' | 'hero';
   /**
    * `sm` 36px, `md` 44px, `lg` 52px
    */
@@ -30,6 +30,7 @@ const variantClasses = {
   primary: 'bg-primary',
   accent: 'bg-accent',
   danger: 'bg-err-bg',
+  hero: 'bg-hero-sub',
 };
 
 const sizeClasses = { sm: 'w-9 h-9', md: 'w-11 h-11', lg: 'w-13 h-13' };
@@ -58,6 +59,7 @@ export function IconButton({
     primary: colors.onPrimary,
     accent: colors.onAccent,
     danger: colors.errFg,
+    hero: colors.heroInk,
   }[variant];
 
   return (

@@ -1,16 +1,15 @@
 import {
   Button,
-  ButtonText,
+  Chip,
   FormControl,
   FormControlError,
   FormControlErrorText,
   FormControlLabel,
   FormControlLabelText,
-  HStack,
   Input,
   InputField,
-  Select,
-  VStack
+  Text,
+  TextArea,
 } from "@/components/base";
 import { PaymentType } from "@/models/order.model";
 import { CashTransactionCategory, CashTransactionType } from "@/models/payment.model";
@@ -18,6 +17,7 @@ import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 import { z } from "zod";
 
 const transactionSchema = z.object({
@@ -86,76 +86,9 @@ export const TransactionForm = ({
   const categoryOptions = Object.values(CashTransactionCategory);
   const paymentTypeOptions = Object.values(PaymentType);
 
-  const isIncome = transactionType === CashTransactionType.INCOME;
-  const formTitle = isIncome ? t('payment.addIncome') : t('payment.addExpense');
-
   return (
-    <VStack className="gap-4">
-      {/* Category Select */}
-      <FormControl isInvalid={!!errors.category}>
-        <FormControlLabel>
-          <FormControlLabelText>{t('payment.category.name')}</FormControlLabelText>
-        </FormControlLabel>
-        <Controller
-          control={control}
-          name="category"
-          render={({ field: { onChange, value } }) => (
-            <Select
-              variant="outline"
-              size="md"
-              selectedValue={value}
-              onValueChange={onChange}
-            >
-              {categoryOptions.map((category) => (
-                <Select.Item
-                  key={category}
-                  label={t(`payment.category.${category}`)}
-                  value={category}
-                />
-              ))}
-            </Select>
-          )}
-        />
-        {errors.category && (
-          <FormControlError>
-            <FormControlErrorText>{errors.category.message}</FormControlErrorText>
-          </FormControlError>
-        )}
-      </FormControl>
-
-      {/* Payment Type Select */}
-      <FormControl isInvalid={!!errors.paymentType}>
-        <FormControlLabel>
-          <FormControlLabelText>{t('order.paymentMethod.name')}</FormControlLabelText>
-        </FormControlLabel>
-        <Controller
-          control={control}
-          name="paymentType"
-          render={({ field: { onChange, value } }) => (
-            <Select
-              variant="outline"
-              size="md"
-              selectedValue={value}
-              onValueChange={onChange}
-            >
-              {paymentTypeOptions.map((type) => (
-                <Select.Item
-                  key={type}
-                  label={t(`order.paymentMethod.${type}`)}
-                  value={type}
-                />
-              ))}
-            </Select>
-          )}
-        />
-        {errors.paymentType && (
-          <FormControlError>
-            <FormControlErrorText>{errors.paymentType.message}</FormControlErrorText>
-          </FormControlError>
-        )}
-      </FormControl>
-
-      {/* Amount Input */}
+    <View className="gap-4">
+      {/* Amount */}
       <FormControl isInvalid={!!errors.amount}>
         <FormControlLabel>
           <FormControlLabelText>{t('payment.amount')}</FormControlLabelText>
@@ -164,13 +97,15 @@ export const TransactionForm = ({
           control={control}
           name="amount"
           render={({ field: { onChange, value } }) => (
-            <Input variant="outline" size="md">
+            <Input size="lg" invalid={!!errors.amount} className="h-16">
               <InputField
                 placeholder="0"
                 keyboardType="numeric"
                 value={value}
                 onChangeText={onChange}
+                className="font-onest-bold text-[28px]"
               />
+              <Text className="font-onest-medium text-[15px] text-muted">{t('common.currency')}</Text>
             </Input>
           )}
         />
@@ -181,7 +116,66 @@ export const TransactionForm = ({
         )}
       </FormControl>
 
-      {/* Comment Input */}
+      {/* Category */}
+      <FormControl isInvalid={!!errors.category}>
+        <FormControlLabel>
+          <FormControlLabelText>{t('payment.category.name')}</FormControlLabelText>
+        </FormControlLabel>
+        <Controller
+          control={control}
+          name="category"
+          render={({ field: { onChange, value } }) => (
+            <View className="flex-row flex-wrap gap-2">
+              {categoryOptions.map((category) => (
+                <Chip
+                  key={category}
+                  label={t(`payment.category.${category}`)}
+                  tone="sunken"
+                  selected={value === category}
+                  onPress={() => onChange(category)}
+                />
+              ))}
+            </View>
+          )}
+        />
+        {errors.category && (
+          <FormControlError>
+            <FormControlErrorText>{errors.category.message}</FormControlErrorText>
+          </FormControlError>
+        )}
+      </FormControl>
+
+      {/* Payment method */}
+      <FormControl isInvalid={!!errors.paymentType}>
+        <FormControlLabel>
+          <FormControlLabelText>{t('order.paymentMethod.name')}</FormControlLabelText>
+        </FormControlLabel>
+        <Controller
+          control={control}
+          name="paymentType"
+          render={({ field: { onChange, value } }) => (
+            <View className="flex-row flex-wrap gap-2">
+              {paymentTypeOptions.map((type) => (
+                <Chip
+                  key={type}
+                  label={t(`order.paymentMethod.${type}`)}
+                  tone="sunken"
+                  size="lg"
+                  selected={value === type}
+                  onPress={() => onChange(type)}
+                />
+              ))}
+            </View>
+          )}
+        />
+        {errors.paymentType && (
+          <FormControlError>
+            <FormControlErrorText>{errors.paymentType.message}</FormControlErrorText>
+          </FormControlError>
+        )}
+      </FormControl>
+
+      {/* Comment */}
       <FormControl>
         <FormControlLabel>
           <FormControlLabelText>{t('payment.comment')}</FormControlLabelText>
@@ -190,39 +184,25 @@ export const TransactionForm = ({
           control={control}
           name="comment"
           render={({ field: { onChange, value } }) => (
-            <Input variant="outline" size="md">
-              <InputField
-                placeholder={t('payment.comment')}
-                value={value}
-                onChangeText={onChange}
-                multiline
-                numberOfLines={3}
-              />
-            </Input>
+            <TextArea
+              placeholder={t('payment.comment')}
+              value={value}
+              onChangeText={onChange}
+              rows={3}
+            />
           )}
         />
       </FormControl>
 
-      {/* Action Buttons */}
-      <HStack className="gap-3 mt-4">
-        <Button
-          className="flex-1"
-          variant="outline"
-          onPress={onCancel}
-          disabled={isLoading}
-        >
-          <ButtonText>{t('order.cancel')}</ButtonText>
+      {/* Actions */}
+      <View className="flex-row gap-2.5 mt-2">
+        <Button variant="secondary" size="lg" className="flex-1" onPress={onCancel} disabled={isLoading}>
+          {t('order.cancel')}
         </Button>
-        <Button
-          className="flex-1"
-          onPress={handleSubmit(onSubmit)}
-          disabled={isLoading}
-        >
-          <ButtonText>
-            {isLoading ? t('order.search') + '...' : t('payment.save')}
-          </ButtonText>
+        <Button variant="accent" size="lg" className="flex-1" onPress={handleSubmit(onSubmit)} loading={isLoading}>
+          {t('payment.save')}
         </Button>
-      </HStack>
-    </VStack>
+      </View>
+    </View>
   );
 };

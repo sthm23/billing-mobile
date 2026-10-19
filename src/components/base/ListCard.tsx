@@ -25,6 +25,14 @@ export interface ListCardProps extends Omit<PressableProps, 'children'> {
    */
   amountTone?: 'default' | 'err';
   /**
+   * Text before the amount («от» for price ranges)
+   */
+  amountPrefix?: string;
+  /**
+   * Currency label after the amount; hidden by default
+   */
+  amountCurrency?: string;
+  /**
    * Status under the amount
    */
   badge?: { label: string; tone: StatusTone };
@@ -57,6 +65,8 @@ export function ListCard({
   leading,
   amount,
   amountTone = 'default',
+  amountPrefix,
+  amountCurrency,
   badge,
   highlight = false,
   onPress,
@@ -110,7 +120,8 @@ export function ListCard({
           {amount !== undefined ? (
             <Money
               value={amount}
-              currency={null}
+              prefix={amountPrefix}
+              currency={amountCurrency ?? null}
               className={cn('text-[15px]', amountTone === 'err' ? 'text-err-fg' : 'text-ink')}
             />
           ) : null}

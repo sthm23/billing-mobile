@@ -21,7 +21,7 @@ export interface IconProps {
  * Icon exports
  *
  * Экспортирует базовые иконки из lucide-react-native.
- * Используйте как компоненты: <ArrowUpIcon size={20} color="#000" />
+ * Используйте как компоненты: <ArrowUpIcon size={20} color={colors.ink} />
  */
 
 export const ArrowUpIcon: LucideIcon = ArrowUp;

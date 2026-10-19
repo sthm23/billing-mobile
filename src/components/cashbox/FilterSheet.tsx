@@ -1,32 +1,31 @@
-import { BottomSheet, Column, ScrollView, Text } from "@expo/ui";
+import { Text } from "@/components/base";
+import { EmptyState } from "@/components/common";
+import { BottomSheet } from "@expo/ui";
+import { SlidersHorizontal } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import { useColorScheme } from "react-native";
-
+import { View } from "react-native";
 
 export interface FilterSheetProps {
     isOpen: boolean;
     isClose: () => void;
 }
 
+/**
+ * Cashbox filters (by date and warehouse) — not available yet.
+ */
 export function FilterSheet({ isOpen, isClose }: FilterSheetProps) {
-
     const { t } = useTranslation();
-    const colorScheme = useColorScheme();
-    const ink = { color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' };
+
     return (
         <BottomSheet
             isPresented={isOpen}
             onDismiss={isClose}
-            snapPoints={['half', 'full']}
+            snapPoints={['half']}
         >
-            <ScrollView>
-                <Column spacing={12}>
-                    <Text textStyle={{ ...ink, fontSize: 20, fontWeight: '700' }}>Filter sheet</Text>
-                    <Text textStyle={ink}>
-                        {t('payment.info')}
-                    </Text>
-                </Column>
-            </ScrollView>
+            <View className="flex-1 bg-card px-4 pt-2">
+                <Text className="type-subhead text-ink">{t('common.filter')}</Text>
+                <EmptyState icon={SlidersHorizontal} message={t('common.comingSoon')} />
+            </View>
         </BottomSheet>
     );
 }

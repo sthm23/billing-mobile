@@ -76,7 +76,8 @@ billing-mobile/
     ├── components/
     │   ├── base/                 # Design primitives (see COMPONENTS.md)
     │   ├── navigation/           # BottomNav (floating tab bar) + useBottomNavInset
-    │   ├── common/               # EmptyState, LoadingState
+    │   ├── brand/                # Logo (official SVGs via SvgXml), SplashView
+    │   ├── common/               # EmptyState, LoadingState, ComingSoonScreen
     │   ├── product/ order/ cashbox/  # Domain components
     ├── constants/
     │   ├── tokens.ts             # STHM color palette (JS mirror of global.css) + FontFamily
@@ -101,9 +102,12 @@ billing-mobile/
 - Loads i18n and the Onest fonts; keeps the native splash (`expo-splash-screen`) until fonts and the saved theme are ready. On font error it falls back to the system font.
 - Provider order: `GestureHandlerRootView` → `ThemeControlContext.Provider` → `StatusBar` → `AuthProvider` → `QueryClientProvider`.
 - QueryClient: `staleTime` 60 s; no retry for axios responses with status < 500, otherwise up to 2 retries.
+- While the session is being restored it renders `SplashView` (`components/brand`).
 - `Stack.Protected`: `(tabs)` when authenticated, `login` when unauthenticated.
 
-Other root routes: `index.tsx` (redirects by auth state), `login.tsx` (→ `screens/login/LoginPage`), `component-demo.tsx` (`/component-demo`, dev showcase).
+Other root routes: `index.tsx` (redirects by auth state), `login.tsx` (→ `screens/login/LoginPage`), `+not-found.tsx` (404 for unknown routes), `component-demo.tsx` (`/component-demo`, dev showcase).
+
+All stacks use `headerShown: false` — screens draw their own header (back `IconButton` + title) inside a `SafeAreaView edges={['top']}`.
 
 ### Tabs (`src/app/(tabs)/_layout.tsx`)
 
@@ -111,10 +115,12 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 
 | Tab | Routes | Renders |
 |---|---|---|
-| `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, placeholder |
-| `(orders)` | `index`, `[id]`, `create` | `OrderPage`, `OrderDetailScreen`, placeholder |
+| `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen` |
+| `(orders)` | `index`, `[id]`, `create` | `OrderPage`, `OrderDetailScreen`, `ComingSoonScreen` (new sale — stage 5) |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, placeholders |
+| `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, `ComingSoonScreen` (staff creation — stage 4), `ComingSoonScreen` |
+
+Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
 - The center **Scan** button starts a new sale: `router.push('/(tabs)/(orders)/create')` (order creation + barcode scan arrive in redesign stage 5).
 - The bar is **absolutely positioned** over the content and **hidden** on nested screens (any stack screen above a tab's root) and while the keyboard is open.
@@ -182,11 +188,9 @@ Full rules: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Design source: STHM design
 - No shadows — blocks are separated by color (`card` on `bg`).
 - Icons: lucide, stroke width 2 at 24px.
 
-### Transitional (remove at end of redesign stage 3)
+⚠️ There are **no** shadcn-style names (`bg-background`, `text-foreground`, `text-muted-foreground`, `border-border`, `bg-destructive`, `typography-*`, …) — they compile to nothing. `muted` is a **text** color and `accent` is **sage**; for neutral fills use `bg-sunken`, for borders/dividers `border-line`.
 
-`global.css` keeps **legacy aliases** of the old shadcn names (`background`, `foreground`, `muted-foreground`, `secondary`, `border`, `input`, `ring`, `destructive`, `popover`, `primary-foreground`, `accent-foreground`) mapped to STHM values, and `useTheme()` keeps legacy keys (`background`, `text`, `textMuted`, `surface`, …). **Don't use them in new code.**
-
-⚠️ `bg-muted` / `bg-accent` changed meaning: `muted` is now a **text** color and `accent` is **sage**. For neutral fills use `bg-sunken`.
+- Brand logo: `<Logo width={…} onDark? />` / `<Logo variant="icon" />` from `components/brand/Logo` — never redraw or recolor it.
 
 ### Theme mode
 
@@ -205,7 +209,7 @@ import { Button, Input, InputField, Text, VStack } from '@/components/base';
 STHM components: `Button`, `IconButton`, `Chip`, `Segmented`, `Stepper`, `SearchField`, `HeroCard`, `ListCard`, `StatusBadge`, `Money`, `Card`, `PhotoPlaceholder`, `Avatar`, `Input`/`InputField`, `TextArea`, `Select`, `FormControl`, `Modal`, `AlertDialog`. Live showcase with a theme switch: `/component-demo`. Build screens from these before writing custom views.
 
 Gotchas:
-- `Button` variants: `primary | accent | secondary | danger | ghost`; sizes `sm` 36 / `md` 44 (default) / `lg` 56; `icon`, `full`, `loading`. Legacy `default | outline | destructive` still work (deprecated).
+- `Button` variants: `primary | accent | secondary | danger | ghost | hero` (`hero` — on the dark hero block); sizes `sm` 36 / `md` 44 (default) / `lg` 56; `icon`, `full`, `loading`. `IconButton` has the same `hero` variant.
 - `Input` is a **container View**; text-input props go on `InputField`: `<Input invalid={…}><InputField placeholder="…" /></Input>`.
 - Amounts: `<Money value={…} />` or `formatMoney()` from `src/libs/format.ts` — display only, never compute totals on the client.
 - Icon-only buttons need `accessibilityLabel` (use `t('common.*')`).
@@ -311,7 +315,7 @@ React Hook Form + Zod (`@hookform/resolvers/zod`). Wrap fields with `FormControl
 There is no test runner and no ESLint config yet (`npm run lint` would try to set ESLint up).
 
 ```bash
-npx tsc --noEmit                         # Type-check (has pre-existing errors — don't add new ones)
+npx tsc --noEmit                         # Type-check — must stay at 0 errors
 npx expo export --platform android       # Bundles the app: catches CSS/import errors
 npx expo start --clear                   # Run with a clean NativeWind cache
 ```
@@ -322,12 +326,10 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 ## Known Issues
 
-- `src/app/_layout.tsx`: `ThemeControlContext` value misses `currentMode` (type error).
-- `ProductSearchSheet.tsx` passes `size="icon"` to `Button`; `OrderCardMenu.tsx` passes `title` to `Modal`; profile screens pass `size` to `Heading` — props that don't exist.
-- `services/product/*` import a missing `./product.type`.
-- `CashboxListPage.tsx`: `useMemo` is called after early `return`s (breaks the Rules of Hooks when loading/error state changes); "open cashbox" pushes to `/(tabs)/(cashbox)/create`, which doesn't exist.
-- `assets/orders/` contains stray route files that don't compile; `scripts/reset-project.js` is missing.
+- Client-side totals that belong to the backend: order subtotal/discount (`OrderDetailScreen`), cashbox income/expense and per-method breakdown (`CashboxDetailsPage`, `PaymentBreakdownDialog`). To be replaced by backend values (redesign stage 7).
+- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, order create, customer selection, open cashbox, cashbox filters, staff creation. Order detail actions (hold, place order, item quantity/delete) and product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
 - Service paths that don't match the backend: `searchProductsForOrder` (sends orderId, backend expects warehouseId), `addPaymentToOrder` (`/payments` vs `/payment`), `updateProductVariant` (POST vs PUT).
+- `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
 ---
 

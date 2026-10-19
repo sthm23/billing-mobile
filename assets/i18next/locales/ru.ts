@@ -1,5 +1,8 @@
 const ru = {
   "common": {
+    "filter": "Фильтр",
+    "comingSoon": "Скоро будет доступно",
+    "back": "Назад",
     "loading": "Загрузка...",
     "loadMore": "Загрузить ещё",
     "noMoreData": "Больше нет данных",
@@ -139,6 +142,12 @@ const ru = {
     "poweredBy": "Разработано с {{company}}"
   },
   "login": {
+    "tagline": "Продажи, склад и касса магазина — в одном приложении",
+    "heading": "Вход",
+    "loginLabel": "Логин",
+    "loginPlaceholder": "Ваш логин",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль",
     "title": "Добро пожаловать",
     "subTitle": "Зайдите что бы продолжить",
     "withApple": "Войти с Apple",
@@ -170,6 +179,7 @@ const ru = {
     "signinText": "Если уже сушествует аккаунт?"
   },
   "product": {
+    "deleteProduct": "Удалить товар",
     "noFound": "Товар не найден.",
     "img": "Фото",
     "detail": "Детали товара",
@@ -278,6 +288,8 @@ const ru = {
     "cancel": "Отмена"
   },
   "order": {
+    "itemsCount": "{{count}} поз.",
+    "addProduct": "Добавить товар",
     "activeTab": "Активные",
     "completedTab": "Завершённые",
     "errorLoading": "Ошибка загрузки заказов",
@@ -395,6 +407,7 @@ const ru = {
     "selectOne": "Выберите один"
   },
   "profile": {
+    "logout": "Выйти из аккаунта",
     "title": "Профиль",
     "notFound": "Данные пользователя недоступны.",
     "noUser": "Нет данных пользователя",
@@ -520,6 +533,10 @@ const ru = {
     "loginFailed": "Ошибка входа",
     "invalidCredentials": "Неверный логин или пароль",
     "networkUnavailable": "Нет соединения с сервером. Проверьте интернет и настройки API URL."
+  },
+  "app": {
+    "tagline": "Sotuv · Toʻlov · Hisobot · Mahsulot",
+    "version": "версия {{version}}"
   },
   "navigation": {
     "dashboard": "Панель управления",

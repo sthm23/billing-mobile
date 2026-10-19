@@ -1,21 +1,17 @@
-import { Button, Divider, HStack, Text, VStack } from '@/components/base';
-import { AdminSectionHeader } from '@/components/product/AdminSectionHeader';
-import { AvailabilityBadge } from '@/components/product/AvailabilityBadge';
-import { ChipSelector } from '@/components/product/ChipSelector';
+import { Button, Chip, IconButton, Money, StatusBadge, Stepper, Text } from '@/components/base';
 import { ImageCarousel } from '@/components/product/ImageCarousel';
-import { PriceLabel } from '@/components/product/PriceLabel';
 import { ProductVariantCard } from '@/components/product/ProductVariantCard';
-import { QuantityStepper } from '@/components/product/QuantityStepper';
 import {
   Attribute,
   ProductDetail,
   ProductVariant,
   StockMovementType,
 } from '@/models/product.model';
-import { Plus } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { ChevronLeft, Pencil, Trash2 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 interface ProductDetailScreenProps {
   product: ProductDetail;
@@ -113,119 +109,109 @@ export default function ProductDetailScreen({ product }: ProductDetailScreenProp
   };
 
   const attributeNames = (product.attributes ?? []).map((a) => a.name);
+  const category = product.category
+    ? t(`category.${product.category}`, { defaultValue: product.category })
+    : '';
+  const subtitle = [category, product.brand].filter(Boolean).join(' · ');
 
   return (
     <ScrollView
-      className="flex-1 bg-background"
+      className="flex-1 bg-bg"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 32 }}
+      contentContainerClassName="px-4 pt-2 pb-10 gap-3"
     >
-      {/* Image Carousel */}
-      <ImageCarousel images={product.images ?? []} productName={product.name} />
+      <ImageCarousel
+        images={product.images ?? []}
+        productName={product.name}
+        overlay={
+          <>
+            <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
+            <IconButton icon={Pencil} accessibilityLabel={t('common.edit')} onPress={() => console.log('Edit')} />
+          </>
+        }
+      />
 
-      <VStack className="px-4 pt-4 gap-4">
-
-        {/* Product Header */}
-        <VStack className="gap-1">
-          <HStack className="justify-between items-start gap-2">
-            <Text className="text-2xl font-bold text-foreground flex-1">
-              {product.name}
-            </Text>
-            <AvailabilityBadge isAvailable={totalStock > 0} />
-          </HStack>
-
-          {(product.category || product.brand) && (
-            <Text className="text-sm text-typography-500">
-              {[t('product.categoryLabel'), product.category, product.brand ? `(${product.brand})` : '']
-                .filter(Boolean)
-                .join(' ')}
-            </Text>
-          )}
-
-          <PriceLabel
-            price={displayPrice}
-            prefix={selectedVariant ? undefined : t('product.from')}
-            unit={t('product.priceUnit')}
-            size="lg"
+      {/* Name, availability, price */}
+      <View className="bg-hero rounded-2xl p-5 gap-3.5">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="flex-1 gap-1">
+            <Text className="type-heading text-hero-ink">{product.name}</Text>
+            {subtitle ? <Text className="font-onest text-[13px] text-hero-muted">{subtitle}</Text> : null}
+          </View>
+          <StatusBadge
+            label={totalStock > 0 ? t('product.available') : t('product.notAvailable')}
+            tone={totalStock > 0 ? 'accent' : 'neutral'}
           />
-        </VStack>
+        </View>
+        <Money
+          value={displayPrice}
+          prefix={selectedVariant ? undefined : t('product.from')}
+          currency={`${t('common.currency')} ${t('product.priceUnit')}`}
+          className="text-[30px] tracking-[-0.6px] text-hero-ink"
+          currencyClassName="text-[15px] text-hero-muted"
+          adjustsFontSizeToFit
+        />
+      </View>
 
-        <Divider />
-
-        {/* Parameter Selection */}
-        {attributeNames.length > 0 && (
-          <VStack className="gap-4">
-            <Text className="text-xs font-semibold text-typography-500 uppercase tracking-wider">
-              {t('product.parametersSelection')}
-            </Text>
-
-            {attributeNames.map((attrName) => {
-              const values = attributeMap[attrName];
-              if (!values || values.length === 0) return null;
-              return (
-                <VStack key={attrName} className="gap-1.5">
-                  <Text className="text-sm font-medium text-foreground">{attrName}</Text>
-                  {values.length === 1 ? (
-                    <Text className="text-sm text-typography-500">{values[0]}</Text>
-                  ) : (
-                    <ChipSelector
-                      values={values}
-                      selected={selectedAttrs[attrName] ?? null}
-                      onSelect={(val) => handleAttrSelect(attrName, val)}
+      {/* Parameters and quantity for the sale */}
+      {attributeNames.length > 0 && (
+        <View className="bg-card rounded-xl p-4.5 gap-4">
+          {attributeNames.map((attrName) => {
+            const values = attributeMap[attrName];
+            if (!values || values.length === 0) return null;
+            return (
+              <View key={attrName} className="gap-2.5">
+                <Text className="type-label text-muted">{attrName}</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {values.map((value) => (
+                    <Chip
+                      key={value}
+                      label={value}
+                      tone="sunken"
+                      size="lg"
+                      selected={selectedAttrs[attrName] === value}
+                      onPress={() => handleAttrSelect(attrName, value)}
                     />
-                  )}
-                </VStack>
-              );
-            })}
+                  ))}
+                </View>
+              </View>
+            );
+          })}
 
-            <VStack className="gap-1.5">
-              <HStack className="justify-between items-center">
-                <Text className="text-sm font-medium text-foreground">{t('product.quantity')}</Text>
-                <Text className="text-xs text-typography-400">
-                  {t('product.stockRemaining')} {stockForSelected} {t('product.unit')}
-                </Text>
-              </HStack>
-              <QuantityStepper
-                value={buyQty}
-                max={Math.max(stockForSelected, 1)}
-                onChange={setBuyQty}
-              />
-            </VStack>
+          <View className="flex-row items-center justify-between pt-1">
+            <View className="gap-0.5">
+              <Text className="type-body-strong text-ink">{t('product.quantity')}</Text>
+              <Text className="font-onest text-[13px] text-muted">
+                {t('product.stockRemaining')} {stockForSelected} {t('product.unit')}
+              </Text>
+            </View>
+            <Stepper value={buyQty} onChange={setBuyQty} max={Math.max(stockForSelected, 1)} />
+          </View>
 
-            <Button
-              variant="default"
-              size="md"
-              className="w-full"
-              onPress={handleBuy}
-              disabled={stockForSelected === 0}
-            >
-              <Plus size={20} color="#ffffff" />
-              <Text className="ml-2 text-white font-semibold">{t('product.buy')}</Text>
-            </Button>
-          </VStack>
-        )}
+          <Button variant="accent" size="lg" full onPress={handleBuy} disabled={stockForSelected === 0}>
+            {t('product.buy')}
+          </Button>
+        </View>
+      )}
 
-        <Divider />
+      {/* Staff: stock and prices per variant */}
+      <View className="flex-row items-center justify-between px-1 pt-2">
+        <View className="gap-0.5">
+          <Text className="type-subhead text-ink">{t('product.staffPanel')}</Text>
+          <Text className="font-onest text-[13px] text-muted">{t('product.adminAccess')}</Text>
+        </View>
+        <IconButton icon={Trash2} variant="danger" accessibilityLabel={t('product.deleteProduct')} onPress={handleDelete} />
+      </View>
 
-        {/* Admin Panel */}
-        <VStack className="gap-3">
-          <AdminSectionHeader
-            title={t('product.staffPanel')}
-            subtitle={t('product.adminAccess')}
-            onDelete={handleDelete}
-          />
-
-          {product.variants.map((variant) => (
-            <ProductVariantCard
-              key={variant.id}
-              variant={variant}
-              nameById={nameById}
-              onHistory={(id) => console.log('History', id)}
-              onMovement={(id) => console.log('Movement', id)}
-            />
-          ))}
-        </VStack>
-      </VStack>
+      {product.variants.map((variant) => (
+        <ProductVariantCard
+          key={variant.id}
+          variant={variant}
+          nameById={nameById}
+          onHistory={(id) => console.log('History', id)}
+          onMovement={(id) => console.log('Movement', id)}
+        />
+      ))}
     </ScrollView>
   );
 }

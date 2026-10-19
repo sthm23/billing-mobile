@@ -1,5 +1,8 @@
 const en = {
   "common": {
+    "filter": "Filter",
+    "comingSoon": "Coming soon",
+    "back": "Back",
     "loading": "Loading...",
     "loadMore": "Load more",
     "noMoreData": "No more data",
@@ -139,6 +142,12 @@ const en = {
     "poweredBy": "Powered by {{company}}"
   },
   "login": {
+    "tagline": "Sales, stock and the cash register of your store — in one app",
+    "heading": "Sign in",
+    "loginLabel": "Login",
+    "loginPlaceholder": "Your login",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "title": "Welcome back",
     "subTitle": "Sign in to continue",
     "withApple": "Login with Apple",
@@ -170,6 +179,7 @@ const en = {
     "signinText": "Already have an account?"
   },
   "product": {
+    "deleteProduct": "Delete product",
     "noFound": "No product found.",
     "img": "Image",
     "detail": "Product details",
@@ -278,6 +288,8 @@ const en = {
     "cancel": "Cancel"
   },
   "order": {
+    "itemsCount": "{{count}} items",
+    "addProduct": "Add product",
     "activeTab": "Active",
     "completedTab": "Completed",
     "errorLoading": "Error loading orders",
@@ -395,6 +407,7 @@ const en = {
     "selectOne": "Choose one"
   },
   "profile": {
+    "logout": "Log out",
     "title": "Profile",
     "notFound": "No user data available.",
     "noUser": "No user data",
@@ -519,6 +532,10 @@ const en = {
     "loginFailed": "Login Failed",
     "invalidCredentials": "Invalid login or password",
     "networkUnavailable": "Cannot connect to the server. Check your internet connection and API URL settings."
+  },
+  "app": {
+    "tagline": "Sotuv · Toʻlov · Hisobot · Mahsulot",
+    "version": "version {{version}}"
   },
   "navigation": {
     "dashboard": "Dashboard",

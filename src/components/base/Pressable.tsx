@@ -32,10 +32,10 @@ export interface PressableProps extends RNPressableProps {
  * // Карточка продукта с pressable
  * <Pressable
  *   onPress={() => router.push(`/product/${id}`)}
- *   className="bg-card rounded-xl p-4 shadow-sm active:bg-sunken"
+ *   className="bg-card rounded-xl p-4"
  * >
  *   <Text className="text-lg font-bold">Product Name</Text>
- *   <Text className="text-sm text-muted-foreground">$99.99</Text>
+ *   <Text className="text-sm text-muted">$99.99</Text>
  * </Pressable>
  *
  * @example
@@ -45,7 +45,7 @@ export interface PressableProps extends RNPressableProps {
  *   onPress={handleAction}
  *   className="p-4 bg-primary rounded-lg disabled:opacity-50"
  * >
- *   <Text className="text-white">Submit</Text>
+ *   <Text className="text-on-primary">Submit</Text>
  * </Pressable>
  *
  * @example

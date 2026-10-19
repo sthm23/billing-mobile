@@ -1,5 +1,8 @@
 const uz = {
   "common": {
+    "filter": "Filtr",
+    "comingSoon": "Tez orada mavjud boʻladi",
+    "back": "Orqaga",
     "loading": "Yuklanmoqda...",
     "loadMore": "Yana yuklash",
     "noMoreData": "Boshqa ma'lumot yo'q",
@@ -139,6 +142,12 @@ const uz = {
     "poweredBy": "{{company}} tomonidan ishlab chiqilgan"
   },
   "login": {
+    "tagline": "Do'kon savdosi, ombori va kassasi — bitta ilovada",
+    "heading": "Kirish",
+    "loginLabel": "Login",
+    "loginPlaceholder": "Loginingiz",
+    "showPassword": "Parolni ko'rsatish",
+    "hidePassword": "Parolni yashirish",
     "title": "Xush kelibsiz",
     "subTitle": "Kirish uchun davom eting",
     "withApple": "Apple account orqali",
@@ -170,6 +179,7 @@ const uz = {
     "signinText": "Accaountingiz bor bo'lsa?"
   },
   "product": {
+    "deleteProduct": "Mahsulotni o'chirish",
     "noFound": "Tovar topilmadi.",
     "img": "Rasm",
     "detail": "Mahsulot tafsilotlari",
@@ -278,6 +288,8 @@ const uz = {
     "cancel": "Bekor qilmoq"
   },
   "order": {
+    "itemsCount": "{{count}} ta",
+    "addProduct": "Mahsulot qo'shish",
     "activeTab": "Faol",
     "completedTab": "Tugallangan",
     "errorLoading": "Zakazlarni yuklashda xato",
@@ -395,6 +407,7 @@ const uz = {
     "selectOne": "Bittasini tanlang"
   },
   "profile": {
+    "logout": "Hisobdan chiqish",
     "title": "Profil",
     "notFound": "Foydalanuvchi ma'lumotlari mavjud emas.",
     "noUser": "Foydalanuvchi ma'lumotlari yo'q",
@@ -520,6 +533,10 @@ const uz = {
     "loginFailed": "Kirish muvaffaqiyatsiz",
     "invalidCredentials": "Noto'g'ri login yoki parol",
     "networkUnavailable": "Server bilan ulanish yo'q. Internetni va API URL sozlamalarini tekshiring."
+  },
+  "app": {
+    "tagline": "Sotuv · Toʻlov · Hisobot · Mahsulot",
+    "version": "versiya {{version}}"
   },
   "navigation": {
     "dashboard": "Xisobot",
