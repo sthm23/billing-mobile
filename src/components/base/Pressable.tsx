@@ -23,7 +23,7 @@ export interface PressableProps extends RNPressableProps {
  * // Простой pressable
  * <Pressable
  *   onPress={() => console.log('Pressed')}
- *   className="p-4 bg-card rounded-xl active:bg-accent"
+ *   className="p-4 bg-card rounded-xl active:bg-sunken"
  * >
  *   <Text>Tap me</Text>
  * </Pressable>
@@ -32,7 +32,7 @@ export interface PressableProps extends RNPressableProps {
  * // Карточка продукта с pressable
  * <Pressable
  *   onPress={() => router.push(`/product/${id}`)}
- *   className="bg-card rounded-xl p-4 shadow-sm active:bg-accent"
+ *   className="bg-card rounded-xl p-4 shadow-sm active:bg-sunken"
  * >
  *   <Text className="text-lg font-bold">Product Name</Text>
  *   <Text className="text-sm text-muted-foreground">$99.99</Text>
@@ -53,7 +53,7 @@ export interface PressableProps extends RNPressableProps {
  * <Pressable
  *   onPress={handlePress}
  *   className={({ pressed }) =>
- *     cn('p-4 rounded-lg', pressed ? 'bg-accent' : 'bg-card')
+ *     cn('p-4 rounded-lg', pressed ? 'bg-sunken' : 'bg-card')
  *   }
  * >
  *   <Text>Press me</Text>
@@ -63,7 +63,7 @@ export interface PressableProps extends RNPressableProps {
  * // Кастомная иконка кнопка
  * <Pressable
  *   onPress={onDelete}
- *   className="p-2 rounded-full active:bg-accent"
+ *   className="p-2 rounded-full active:bg-sunken"
  *   accessibilityLabel="Delete item"
  *   accessibilityRole="button"
  * >

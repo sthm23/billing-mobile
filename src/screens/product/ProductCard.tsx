@@ -16,7 +16,7 @@ export const ProductCard = ({ product, onPress, t }: ProductCardProps) => (
                 className="w-15 h-15 rounded-lg border-2 border-border"
             />
         ) : (
-            <Box className="w-15 h-15 rounded-lg border-2 border-border bg-muted items-center justify-center">
+            <Box className="w-15 h-15 rounded-lg border-2 border-border bg-sunken items-center justify-center">
                 <Text className="text-muted-foreground">📷</Text>
             </Box>
         )}

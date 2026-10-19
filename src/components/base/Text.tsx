@@ -42,11 +42,11 @@ export function Text({
   ...props
 }: TextProps) {
   const variantStyles = {
-    default: 'text-base text-foreground',
-    muted: 'text-sm text-muted-foreground',
-    small: 'text-xs text-foreground',
-    large: 'text-lg text-foreground',
-    bold: 'text-base font-bold text-foreground',
+    default: 'font-onest text-base text-foreground',
+    muted: 'font-onest text-sm text-muted-foreground',
+    small: 'font-onest text-xs text-foreground',
+    large: 'font-onest text-lg text-foreground',
+    bold: 'font-onest-bold text-base text-foreground',
   };
 
   return (

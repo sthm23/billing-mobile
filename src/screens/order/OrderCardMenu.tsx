@@ -31,7 +31,7 @@ export const OrderCardMenu = () => {
       <Modal visible={isMenuOpen} onClose={handleClose} title="Actions">
         <VStack gap={2}>
           <Pressable
-            className="flex-row items-center gap-3 rounded-lg p-4 active:bg-muted"
+            className="flex-row items-center gap-3 rounded-lg p-4 active:bg-sunken"
             onPress={() => handleAction('Edit')}
           >
             <Edit size={20} className="text-foreground" />
@@ -39,7 +39,7 @@ export const OrderCardMenu = () => {
           </Pressable>
 
           <Pressable
-            className="flex-row items-center gap-3 rounded-lg p-4 active:bg-muted"
+            className="flex-row items-center gap-3 rounded-lg p-4 active:bg-sunken"
             onPress={() => handleAction('Share')}
           >
             <Share2 size={20} className="text-foreground" />
@@ -47,7 +47,7 @@ export const OrderCardMenu = () => {
           </Pressable>
 
           <Pressable
-            className="flex-row items-center gap-3 rounded-lg p-4 active:bg-muted"
+            className="flex-row items-center gap-3 rounded-lg p-4 active:bg-sunken"
             onPress={() => handleAction('Delete')}
           >
             <Trash2 size={20} className="text-destructive" />

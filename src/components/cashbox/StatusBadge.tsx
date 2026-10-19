@@ -26,7 +26,7 @@ export function StatusBadge({
 }: StatusBadgeProps) {
   // Variant styles — используем семантические и Tailwind цвета
   const variantStyles = {
-    default: 'bg-muted',
+    default: 'bg-sunken',
     success: 'bg-green-100 dark:bg-green-900/30',
     error: 'bg-red-100 dark:bg-red-900/30',
     warning: 'bg-amber-100 dark:bg-amber-900/30',

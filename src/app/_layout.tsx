@@ -1,8 +1,16 @@
 import '@/assets/i18next/i18next';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
+import {
+  Onest_400Regular,
+  Onest_500Medium,
+  Onest_600SemiBold,
+  Onest_700Bold,
+  useFonts,
+} from '@expo-google-fonts/onest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +25,9 @@ import {
   saveThemeMode,
 } from '@/hooks/use-theme-control';
 import "../global.css";
+
+// Keep the native splash until fonts and the saved theme are ready.
+SplashScreen.preventAutoHideAsync();
 
 const InitiallyLayout = () => {
   const { t } = useTranslation();
@@ -45,6 +56,14 @@ export default function RootLayout() {
   const systemScheme = useColorScheme();
   const [themeMode, setThemeModeState] = useState<ThemeMode>(ThemeMode.AUTO);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
+  const [fontsLoaded, fontError] = useFonts({
+    Onest_400Regular,
+    Onest_500Medium,
+    Onest_600SemiBold,
+    Onest_700Bold,
+  });
+  // On font error fall back to the system font instead of blocking the app.
+  const isFontReady = fontsLoaded || fontError !== null;
 
   const [queryClient] = useState(
     () =>
@@ -75,6 +94,12 @@ export default function RootLayout() {
     initTheme();
   }, []);
 
+  useEffect(() => {
+    if (isThemeLoaded && isFontReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [isThemeLoaded, isFontReady]);
+
   // Apply theme when it changes
   const setThemeMode = async (mode: ThemeMode) => {
     setThemeModeState(mode);
@@ -87,7 +112,7 @@ export default function RootLayout() {
     themeMode === ThemeMode.DARK ||
     (themeMode === ThemeMode.AUTO && systemScheme === 'dark');
 
-  if (!isThemeLoaded) {
+  if (!isThemeLoaded || !isFontReady) {
     return null;
   }
 

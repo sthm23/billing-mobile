@@ -112,7 +112,7 @@ export function Modal({
           {showCloseButton && onClose && (
             <Pressable
               onPress={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full active:bg-accent"
+              className="absolute top-4 right-4 p-2 rounded-full active:bg-sunken"
               accessibilityRole="button"
               accessibilityLabel="Close"
             >

@@ -102,7 +102,7 @@ export default function OrderPage() {
                 </HStack>
                 <HStack gap={4} className="justify-between items-center">
                     {/* Custom Tab Switcher */}
-                    <HStack className="flex-1 rounded-lg border border-border bg-muted overflow-hidden">
+                    <HStack className="flex-1 rounded-lg border border-border bg-sunken overflow-hidden">
                         {tabOptions.map((tab, index) => {
                             const isActive = status === tab.value;
                             const isFirst = index === 0;

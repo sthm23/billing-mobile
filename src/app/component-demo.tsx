@@ -191,7 +191,7 @@ export default function ComponentDemoScreen() {
           <Heading level={2}>Pressable</Heading>
           <Pressable
             onPress={() => alert('Pressable clicked!')}
-            className="bg-card rounded-xl p-4 border border-border active:bg-accent"
+            className="bg-card rounded-xl p-4 border border-border active:bg-sunken"
           >
             <Text variant="bold">Tap me!</Text>
             <Text variant="muted">I'm a clickable card</Text>
@@ -241,7 +241,7 @@ export default function ComponentDemoScreen() {
 
               <VStack gap={1}>
                 <Text variant="bold">Center</Text>
-                <Center className="bg-accent h-24 rounded-lg">
+                <Center className="bg-sunken h-24 rounded-lg">
                   <Text>Centered Content</Text>
                 </Center>
               </VStack>

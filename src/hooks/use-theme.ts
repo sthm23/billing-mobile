@@ -1,48 +1,34 @@
 import { useColorScheme } from 'react-native';
 
+import { palette } from '@/constants/tokens';
+
 /**
- * Hook to get theme colors based on current color scheme.
- * Returns color values compatible with GlueStack UI and NativeWind.
+ * Hook to get STHM theme colors for the current color scheme.
  *
- * Note: This hook is a legacy compatibility layer.
- * For new code, prefer using Tailwind classes directly with NativeWind.
+ * Use it only where className does not reach (navigator options, icon `color`
+ * props, SVG). In components prefer Tailwind classes (`bg-card`, `text-ink`).
  */
 export function useTheme() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useColorScheme() === 'dark';
+  const t = isDark ? palette.dark : palette.light;
 
   return {
-    // Background colors
-    background: isDark ? '#0a0a0a' : '#ffffff',
-    surface: isDark ? '#171717' : '#f5f5f5',
-    card: isDark ? '#171717' : '#ffffff',
+    ...t,
 
-    // Text colors
-    text: isDark ? '#fafafa' : '#0a0a0a',
-    textMuted: isDark ? '#a1a1a1' : '#737373',
-
-    // Primary colors
-    primary: isDark ? '#fff5f5' : '#171717',
-    primaryForeground: isDark ? '#171717' : '#fafafa',
-
-    // Secondary colors
-    secondary: isDark ? '#262626' : '#f5f5f5',
-    secondaryForeground: isDark ? '#fafafa' : '#171717',
-
-    // Border colors
-    border: isDark ? '#2e2e2e' : '#e5e5e5',
-    input: isDark ? '#2e2e2e' : '#e5e5e5',
-
-    // Accent colors
-    accent: isDark ? '#262626' : '#f7f7f7',
-    accentForeground: isDark ? '#fafafa' : '#343434',
-
-    // Status colors
-    destructive: isDark ? '#ff6467' : '#e7000b',
-    success: isDark ? '#86efac' : '#22c55e',
-    muted: isDark ? '#262626' : '#f5f5f5',
-
-    foreground: isDark ? '#fafafa' : '#171717',
-    mutedForeground: isDark ? '#a1a1a1' : '#737373',
+    // Legacy keys (pre-STHM) — remove once screens are migrated (stage 3).
+    background: t.bg,
+    surface: t.sunken,
+    text: t.ink,
+    textMuted: t.muted,
+    foreground: t.ink,
+    mutedForeground: t.muted,
+    primaryForeground: t.onPrimary,
+    secondary: t.sunken,
+    secondaryForeground: t.ink,
+    accentForeground: t.ink,
+    border: t.line,
+    input: t.line,
+    destructive: t.errFg,
+    success: t.okFg,
   };
 }

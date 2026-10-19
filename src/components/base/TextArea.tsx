@@ -91,7 +91,7 @@ export function TextArea({
   const minHeight = rows * lineHeightMap[size] + 16; // +16px for vertical padding
 
   // Disabled styles
-  const disabledStyles = 'opacity-50 bg-muted';
+  const disabledStyles = 'opacity-50 bg-sunken';
 
   // Default placeholder color (muted-foreground)
   const defaultPlaceholderColor = '#737373'; // muted-foreground from design system

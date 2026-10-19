@@ -25,7 +25,7 @@ export function CashboxFilters({ value, onValueChange, onFilterPress }: CashboxF
 
   return (
     <HStack className="items-center justify-between gap-3">
-      <HStack className="flex-1 rounded-lg border border-border bg-muted overflow-hidden">
+      <HStack className="flex-1 rounded-lg border border-border bg-sunken overflow-hidden">
         {tabs.map((tab, index) => {
           const isActive = value === tab.value;
           const isFirst = index === 0;

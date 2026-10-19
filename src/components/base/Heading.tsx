@@ -35,10 +35,10 @@ export function Heading({
   ...props
 }: HeadingProps) {
   const levelStyles = {
-    1: 'text-3xl font-bold',  // 30px
-    2: 'text-2xl font-bold',  // 24px
-    3: 'text-xl font-semibold',  // 20px
-    4: 'text-lg font-semibold',  // 18px
+    1: 'text-3xl font-onest-bold',  // 30px
+    2: 'text-2xl font-onest-bold',  // 24px
+    3: 'text-xl font-onest-semibold',  // 20px
+    4: 'text-lg font-onest-semibold',  // 18px
   };
 
   return (

@@ -85,8 +85,8 @@ export function Button({
   const variantStyles = {
     default: 'bg-primary active:bg-primary/90',
     outline:
-      'border border-border bg-background active:bg-accent',
-    ghost: 'bg-transparent active:bg-accent',
+      'border border-border bg-background active:bg-sunken',
+    ghost: 'bg-transparent active:bg-sunken',
     destructive:
       'bg-destructive active:bg-destructive/90',
   };
