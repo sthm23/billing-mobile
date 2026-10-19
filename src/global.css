@@ -28,6 +28,8 @@
     --hero-sub: 38 38 36;
     --hero-muted: 181 181 174;
     --hero-line: 46 46 43;
+    --hero-err: 255 155 143;
+    --hero-warn: 240 195 107;
     --nav: 20 20 20;
     --nav-ink: 255 255 255;
     --nav-muted: 154 154 147;
@@ -66,6 +68,8 @@
       --hero-sub: 51 51 47;
       --hero-muted: 163 163 156;
       --hero-line: 58 58 55;
+      --hero-err: 255 155 143;
+      --hero-warn: 240 195 107;
       --nav: 38 38 36;
       --nav-ink: 242 242 239;
       --nav-muted: 142 142 135;
@@ -104,6 +108,8 @@
     --hero-sub: 51 51 47;
     --hero-muted: 163 163 156;
     --hero-line: 58 58 55;
+    --hero-err: 255 155 143;
+    --hero-warn: 240 195 107;
     --nav: 38 38 36;
     --nav-ink: 242 242 239;
     --nav-muted: 142 142 135;
@@ -141,6 +147,8 @@
     --hero-sub: 38 38 36;
     --hero-muted: 181 181 174;
     --hero-line: 46 46 43;
+    --hero-err: 255 155 143;
+    --hero-warn: 240 195 107;
     --nav: 20 20 20;
     --nav-ink: 255 255 255;
     --nav-muted: 154 154 147;
@@ -180,6 +188,8 @@
   --color-hero-sub: rgb(var(--hero-sub));
   --color-hero-muted: rgb(var(--hero-muted));
   --color-hero-line: rgb(var(--hero-line));
+  --color-hero-err: rgb(var(--hero-err));
+  --color-hero-warn: rgb(var(--hero-warn));
   --color-nav: rgb(var(--nav));
   --color-nav-ink: rgb(var(--nav-ink));
   --color-nav-muted: rgb(var(--nav-muted));

@@ -1,4 +1,4 @@
-import { Box, Text, Spinner } from '@/components/base';
+import { Box, Spinner, Text } from '@/components/base';
 
 interface LoadingStateProps {
   message?: string;
@@ -6,10 +6,10 @@ interface LoadingStateProps {
 
 export function LoadingState({ message }: LoadingStateProps) {
   return (
-    <Box className="flex-1 items-center justify-center">
-      <Spinner size="large" />
+    <Box className="flex-1 items-center justify-center gap-4">
+      <Spinner size="lg" />
       {message && (
-        <Text variant="large" className="mt-4">
+        <Text className="font-onest-medium text-[15px] text-muted">
           {message}
         </Text>
       )}

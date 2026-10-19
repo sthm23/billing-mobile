@@ -5,7 +5,12 @@ const en = {
     "noMoreData": "No more data",
     "edit": "Edit",
     "currency": "UZS",
-    "searchPlaceholder": "Search..."
+    "searchPlaceholder": "Search...",
+    "clear": "Clear",
+    "scan": "Scan",
+    "decrease": "Decrease",
+    "increase": "Increase",
+    "close": "Close"
   },
   "tag": {
     "Material": "Material",

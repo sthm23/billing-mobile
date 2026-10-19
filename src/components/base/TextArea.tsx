@@ -1,6 +1,7 @@
+import { useTheme } from '@/hooks/use-theme';
+import { cn } from '@/libs/utils';
 import React from 'react';
 import { TextInput, type TextInputProps } from 'react-native';
-import { cn } from '@/libs/utils';
 
 export interface TextAreaProps extends TextInputProps {
   /**
@@ -12,7 +13,7 @@ export interface TextAreaProps extends TextInputProps {
    */
   size?: 'sm' | 'md' | 'lg';
   /**
-   * Error state (shows red border)
+   * Error state (red ring)
    */
   error?: boolean;
   /**
@@ -21,40 +22,23 @@ export interface TextAreaProps extends TextInputProps {
   rows?: number;
 }
 
+const sizeClasses = {
+  sm: 'px-3 py-2 text-sm',
+  md: 'px-4 py-3 text-[15px]',
+  lg: 'px-4 py-3.5 text-base',
+};
+
+// Approximate line height per size, used for the min height.
+const lineHeights = { sm: 20, md: 22, lg: 24 };
+
 /**
- * TextArea — многострочный текстовый инпут
- *
- * Обертка над React Native TextInput с multiline=true.
- * Поддерживает размеры, состояние ошибки и количество строк.
+ * TextArea — multi-line field (STHM): filled `sunken`, `rounded-md`, no border.
  *
  * @example
- * <TextArea placeholder="Enter description" rows={4} />
+ * <TextArea placeholder="Например: аренда за октябрь" rows={3} value={comment} onChangeText={setComment} />
  *
  * @example
- * // С размерами
- * <TextArea size="sm" placeholder="Small textarea" />
- * <TextArea size="lg" placeholder="Large textarea" rows={6} />
- *
- * @example
- * // Состояние ошибки
- * <TextArea error placeholder="Invalid value" rows={3} />
- *
- * @example
- * // С контролируемым значением
- * <TextArea
- *   value={description}
- *   onChangeText={setDescription}
- *   placeholder="Enter product description"
- *   rows={5}
- * />
- *
- * @example
- * // Disabled state
- * <TextArea
- *   editable={false}
- *   placeholder="Disabled textarea"
- *   rows={4}
- * />
+ * <TextArea error placeholder="Invalid value" />
  */
 export function TextArea({
   className,
@@ -63,53 +47,26 @@ export function TextArea({
   rows = 3,
   editable = true,
   placeholderTextColor,
+  style,
   ...props
 }: TextAreaProps) {
-  // Base styles
-  const baseStyles =
-    'rounded-lg border bg-background text-foreground';
-
-  // Border styles
-  const borderStyles = error
-    ? 'border-destructive'
-    : 'border-input focus:border-primary';
-
-  // Size styles (horizontal padding and font size)
-  const sizeStyles = {
-    sm: 'px-3 py-2 text-sm',
-    md: 'px-4 py-2.5 text-base',
-    lg: 'px-6 py-3 text-lg',
-  };
-
-  // Min height based on rows (approximate line height)
-  const lineHeightMap = {
-    sm: 20, // ~14px font + 6px spacing
-    md: 24, // ~16px font + 8px spacing
-    lg: 28, // ~18px font + 10px spacing
-  };
-
-  const minHeight = rows * lineHeightMap[size] + 16; // +16px for vertical padding
-
-  // Disabled styles
-  const disabledStyles = 'opacity-50 bg-sunken';
-
-  // Default placeholder color (muted-foreground)
-  const defaultPlaceholderColor = '#737373'; // muted-foreground from design system
+  const colors = useTheme();
+  const minHeight = rows * lineHeights[size] + 24;
 
   return (
     <TextInput
       multiline
       textAlignVertical="top"
       className={cn(
-        baseStyles,
-        borderStyles,
-        sizeStyles[size],
-        !editable && disabledStyles,
+        'rounded-md bg-sunken font-onest-medium text-ink border-[1.5px]',
+        error ? 'border-err-fg' : 'border-transparent',
+        sizeClasses[size],
+        !editable && 'opacity-50',
         className,
       )}
-      style={{ minHeight }}
+      style={[{ minHeight }, style]}
       editable={editable}
-      placeholderTextColor={placeholderTextColor ?? defaultPlaceholderColor}
+      placeholderTextColor={placeholderTextColor ?? colors.muted}
       {...props}
     />
   );

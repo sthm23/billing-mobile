@@ -1,11 +1,22 @@
-import React from 'react';
-import { View, Image, Text, type ViewProps, type ImageProps } from 'react-native';
 import { cn } from '@/libs/utils';
+import React, { createContext, useContext } from 'react';
+import { Image, View, type ImageProps, type ViewProps } from 'react-native';
+import { Text } from './Text';
+
+type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
+type AvatarTone = 'sunken' | 'accent' | 'primary';
 
 export interface AvatarProps extends ViewProps {
   className?: string;
   children?: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  /**
+   * `sm` 32px, `md` 44px (list rows), `lg` 64px, `xl` 96px
+   */
+  size?: AvatarSize;
+  /**
+   * `sunken` — neutral (default), `accent` — current user / highlighted, `primary` — black
+   */
+  tone?: AvatarTone;
 }
 
 export interface AvatarImageProps extends Omit<ImageProps, 'source'> {
@@ -19,56 +30,57 @@ export interface AvatarFallbackTextProps {
   children: string;
 }
 
-const sizeClasses = {
+const sizeClasses: Record<AvatarSize, string> = {
   sm: 'w-8 h-8',
-  md: 'w-12 h-12',
+  md: 'w-11 h-11',
   lg: 'w-16 h-16',
   xl: 'w-24 h-24',
 };
 
-const textSizeClasses = {
+const textSizeClasses: Record<AvatarSize, string> = {
   sm: 'text-xs',
-  md: 'text-base',
+  md: 'text-[13px]',
   lg: 'text-xl',
   xl: 'text-3xl',
 };
 
+const toneClasses: Record<AvatarTone, { box: string; text: string }> = {
+  sunken: { box: 'bg-sunken', text: 'text-ink' },
+  accent: { box: 'bg-accent', text: 'text-on-accent' },
+  primary: { box: 'bg-primary', text: 'text-on-primary' },
+};
+
+const AvatarContext = createContext<{ size: AvatarSize; tone: AvatarTone }>({ size: 'md', tone: 'sunken' });
+
 /**
- * Avatar — аватар пользователя
- *
- * Круглое изображение профиля с поддержкой fallback текста (инициалов).
+ * Avatar — round avatar with image or initials (STHM)
  *
  * @example
- * // С изображением
- * <Avatar>
- *   <AvatarImage source={{ uri: user.avatarUrl }} alt={user.name} />
- *   <AvatarFallbackText>{user.initials}</AvatarFallbackText>
+ * <Avatar tone="accent" size="lg">
+ *   <AvatarFallbackText>{user.fullName}</AvatarFallbackText>
  * </Avatar>
  *
  * @example
- * // Только с инициалами
  * <Avatar>
- *   <AvatarFallbackText>JD</AvatarFallbackText>
- * </Avatar>
- *
- * @example
- * // С размером
- * <Avatar size="lg">
- *   <AvatarFallbackText>JD</AvatarFallbackText>
+ *   <AvatarImage source={{ uri: user.avatarUrl }} alt={user.fullName} />
+ *   <AvatarFallbackText>{user.fullName}</AvatarFallbackText>
  * </Avatar>
  */
-export function Avatar({ className, children, size = 'md', ...props }: AvatarProps) {
+export function Avatar({ className, children, size = 'md', tone = 'sunken', ...props }: AvatarProps) {
   return (
-    <View
-      className={cn(
-        'rounded-full bg-primary items-center justify-center overflow-hidden',
-        sizeClasses[size],
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </View>
+    <AvatarContext.Provider value={{ size, tone }}>
+      <View
+        className={cn(
+          'rounded-full items-center justify-center overflow-hidden',
+          toneClasses[tone].box,
+          sizeClasses[size],
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </View>
+    </AvatarContext.Provider>
   );
 }
 
@@ -89,15 +101,13 @@ export function AvatarImage({ source, alt, className, ...props }: AvatarImagePro
 }
 
 /**
- * AvatarFallbackText — текст-заглушка (инициалы)
- *
- * Отображается когда нет изображения.
- * Автоматически извлекает первые буквы из имени.
+ * AvatarFallbackText — инициалы из имени ("Тухтамишев Санжар" → "ТС")
  */
 export function AvatarFallbackText({ children, className }: AvatarFallbackTextProps) {
-  // Extract initials from full name (e.g., "John Doe" -> "JD")
+  const { size, tone } = useContext(AvatarContext);
   const initials = children
     .split(' ')
+    .filter(Boolean)
     .map(word => word[0])
     .join('')
     .toUpperCase()
@@ -105,10 +115,7 @@ export function AvatarFallbackText({ children, className }: AvatarFallbackTextPr
 
   return (
     <Text
-      className={cn(
-        'font-semibold text-white',
-        className
-      )}
+      className={cn('font-onest-bold', textSizeClasses[size], toneClasses[tone].text, className)}
     >
       {initials}
     </Text>

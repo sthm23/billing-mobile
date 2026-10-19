@@ -1,3 +1,5 @@
+import { useTheme } from '@/hooks/use-theme';
+import { cn } from '@/libs/utils';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -6,181 +8,177 @@ import {
   type PressableProps,
   type ViewProps,
 } from 'react-native';
-import { cn } from '@/libs/utils';
 import { Text, type TextProps } from './Text';
+
+/** Icon component compatible with lucide-react-native. */
+export type ButtonIconComponent = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+
+type StyleVariant = 'primary' | 'accent' | 'secondary' | 'danger' | 'ghost';
+/** @deprecated Pre-STHM names, mapped to STHM variants. Remove after stage 3. */
+type LegacyVariant = 'default' | 'outline' | 'destructive';
 
 export interface ButtonProps extends Omit<PressableProps, 'children'> {
   /**
-   * Button content (text or React elements)
+   * Button content. A string is rendered as the label.
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
   /**
-   * Button variant
+   * `primary` — black, `accent` — sage (main action), `secondary` — neutral fill,
+   * `danger` — destructive, `ghost` — no fill.
    */
-  variant?: 'default' | 'outline' | 'ghost' | 'destructive';
+  variant?: StyleVariant | LegacyVariant;
   /**
-   * Button size
+   * `sm` 36px, `md` 44px (default), `lg` 56px — main action of a screen
    */
   size?: 'sm' | 'md' | 'lg';
   /**
-   * Loading state (shows spinner)
+   * Icon shown before the label (lucide icon component)
+   */
+  icon?: ButtonIconComponent;
+  /**
+   * Stretch to the parent's width
+   */
+  full?: boolean;
+  /**
+   * Loading state (shows spinner, disables the button)
    */
   loading?: boolean;
   /**
-   * Additional className for styling
+   * Additional className for the container
    */
   className?: string;
   /**
-   * Additional className for text
+   * Additional className for the label
    */
   textClassName?: string;
 }
 
+const LEGACY_VARIANTS: Record<LegacyVariant, StyleVariant> = {
+  default: 'primary',
+  outline: 'secondary',
+  destructive: 'danger',
+};
+
+const containerVariants: Record<StyleVariant, string> = {
+  primary: 'bg-primary',
+  accent: 'bg-accent',
+  secondary: 'bg-ph-bg',
+  danger: 'bg-err-bg',
+  ghost: 'bg-transparent active:bg-sunken',
+};
+
+const labelVariants: Record<StyleVariant, string> = {
+  primary: 'text-on-primary',
+  accent: 'text-on-accent',
+  secondary: 'text-ink',
+  danger: 'text-err-fg',
+  ghost: 'text-ink',
+};
+
+const containerSizes = {
+  sm: 'h-9 px-3.5 gap-1.5',
+  md: 'h-11 px-4 gap-2',
+  lg: 'h-14 px-6 gap-2',
+};
+
+const labelSizes = {
+  sm: 'text-[13px]',
+  md: 'text-sm',
+  lg: 'text-base',
+};
+
+const iconSizes = { sm: 16, md: 18, lg: 18 };
+
+export function resolveButtonVariant(variant: StyleVariant | LegacyVariant): StyleVariant {
+  return variant in LEGACY_VARIANTS ? LEGACY_VARIANTS[variant as LegacyVariant] : (variant as StyleVariant);
+}
+
 /**
- * Button — интерактивная кнопка с вариантами
+ * Button — pill-shaped button (STHM)
  *
- * Поддерживает разные варианты стилей, размеры, состояние загрузки.
- * Автоматически отключается при loading=true.
- *
- * @example
- * <Button onPress={() => console.log('Pressed')}>
- *   Click Me
- * </Button>
+ * One `primary` and one `accent` button per screen at most.
+ * Labels are verbs with only the first word capitalized: «Оплатить».
  *
  * @example
- * // С вариантами
- * <Button variant="outline">Outline Button</Button>
- * <Button variant="ghost" size="sm">Small Ghost</Button>
- * <Button variant="destructive">Delete</Button>
+ * <Button variant="accent" size="lg" full onPress={pay}>Оплатить</Button>
  *
  * @example
- * // С загрузкой
- * <Button loading={isLoading} onPress={handleSubmit}>
- *   Submit
- * </Button>
+ * <Button variant="primary" size="md" icon={Plus}>Новый</Button>
+ * <Button variant="danger" icon={Trash2}>Удалить</Button>
  *
  * @example
- * // С кастомным контентом
- * <Button>
- *   <Icon name="plus" />
- *   <Text>Add Item</Text>
- * </Button>
+ * <Button loading={isSaving} onPress={save}>Сохранить</Button>
  */
 export function Button({
   children,
-  variant = 'default',
+  variant = 'primary',
   size = 'md',
+  icon: Icon,
+  full = false,
   loading = false,
   disabled,
   className,
   textClassName,
   ...props
 }: ButtonProps) {
-  const isDisabled = disabled || loading;
+  const colors = useTheme();
+  const styleVariant = resolveButtonVariant(variant);
+  const isDisabled = Boolean(disabled || loading);
+  // Disabled (not loading) buttons switch to the neutral disabled look.
+  const showDisabledLook = Boolean(disabled) && !loading;
 
-  // Base styles
-  const baseStyles = 'rounded-lg flex-row items-center justify-center gap-2';
+  const contentColor = showDisabledLook
+    ? colors.disabledFg
+    : {
+      primary: colors.onPrimary,
+      accent: colors.onAccent,
+      secondary: colors.ink,
+      danger: colors.errFg,
+      ghost: colors.ink,
+    }[styleVariant];
 
-  // Variant styles
-  const variantStyles = {
-    default: 'bg-primary active:bg-primary/90',
-    outline:
-      'border border-border bg-background active:bg-sunken',
-    ghost: 'bg-transparent active:bg-sunken',
-    destructive:
-      'bg-destructive active:bg-destructive/90',
-  };
-
-  // Size styles
-  const sizeStyles = {
-    sm: 'px-3 py-1.5 min-h-8',
-    md: 'px-4 py-2 min-h-10',
-    lg: 'px-6 py-3 min-h-12',
-  };
-
-  // Disabled styles
-  const disabledStyles = 'opacity-50';
-
-  // Text styles by variant
-  const textVariantStyles = {
-    default: 'text-white font-semibold',
-    outline: 'text-foreground font-medium',
-    ghost: 'text-foreground font-medium',
-    destructive: 'text-white font-semibold',
-  };
-
-  // Text size styles
-  const textSizeStyles = {
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-lg',
-  };
-
-  // Render text content
-  const renderContent = () => {
-    if (loading) {
-      const spinnerColor = variant === 'default' || variant === 'destructive'
-        ? '#FFFFFF'
-        : undefined;
-
-      return (
-        <>
-          <ActivityIndicator size="small" color={spinnerColor} />
-          {typeof children === 'string' && (
-            <Text
-              className={cn(
-                textVariantStyles[variant],
-                textSizeStyles[size],
-                textClassName,
-              )}
-            >
-              {children}
-            </Text>
-          )}
-        </>
-      );
-    }
-
-    if (typeof children === 'string') {
-      return (
-        <Text
-          className={cn(
-            textVariantStyles[variant],
-            textSizeStyles[size],
-            textClassName,
-          )}
-        >
-          {children}
-        </Text>
-      );
-    }
-
-    return children;
-  };
+  const label =
+    typeof children === 'string' || typeof children === 'number' ? (
+      <Text
+        className={cn(
+          'font-onest-bold',
+          labelSizes[size],
+          showDisabledLook ? 'text-disabled-fg' : labelVariants[styleVariant],
+          textClassName,
+        )}
+        numberOfLines={1}
+      >
+        {children}
+      </Text>
+    ) : (
+      children
+    );
 
   return (
     <Pressable
       className={cn(
-        baseStyles,
-        variantStyles[variant],
-        sizeStyles[size],
-        isDisabled && disabledStyles,
+        'flex-row items-center justify-center rounded-pill active:opacity-80',
+        containerSizes[size],
+        showDisabledLook ? 'bg-disabled-bg' : containerVariants[styleVariant],
+        full && 'w-full',
         className,
       )}
       disabled={isDisabled}
       accessibilityRole="button"
-      accessibilityState={{
-        disabled: isDisabled,
-        busy: loading,
-      }}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
       {...props}
     >
-      {renderContent()}
+      {loading ? (
+        <ActivityIndicator size="small" color={contentColor} />
+      ) : (
+        Icon && <Icon size={iconSizes[size]} color={contentColor} strokeWidth={2.2} />
+      )}
+      {label}
     </Pressable>
   );
 }
 
-// Sub-components for compound button pattern
+// Sub-components for custom button content
 
 export interface ButtonTextProps extends TextProps {
   className?: string;
@@ -189,17 +187,14 @@ export interface ButtonTextProps extends TextProps {
 
 export function ButtonText({ className, children, ...props }: ButtonTextProps) {
   return (
-    <Text
-      className={cn('text-base font-medium', className)}
-      {...props}
-    >
+    <Text className={cn('font-onest-bold text-base text-ink', className)} {...props}>
       {children}
     </Text>
   );
 }
 
 export interface ButtonIconProps extends ViewProps {
-  as: React.ComponentType<any>;
+  as: ButtonIconComponent;
   className?: string;
   size?: number;
   color?: string;

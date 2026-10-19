@@ -3,59 +3,39 @@ import { View, type ViewProps } from 'react-native';
 
 export interface CardProps extends ViewProps {
   /**
-   * Card variant
+   * `default` — white block on `bg`; `hero` — the one dark main block of a screen;
+   * `sunken` — plate inside a card. `elevated` is deprecated (same as `default`).
    */
-  variant?: 'default' | 'elevated';
+  variant?: 'default' | 'hero' | 'sunken' | 'elevated';
   /**
    * Additional className for styling
    */
   className?: string;
 }
 
+const variantClasses = {
+  default: 'bg-card rounded-xl',
+  elevated: 'bg-card rounded-xl',
+  hero: 'bg-hero rounded-2xl',
+  sunken: 'bg-sunken rounded-md',
+};
+
 /**
- * Card — карточка с контентом
+ * Card — content block (STHM)
  *
- * Обертка над View для отображения контента в карточке.
- * Автоматически применяет фон, скругление, отступы и тень.
- *
- * @example
- * <Card>
- *   <Text>Card content</Text>
- * </Card>
+ * No shadows: blocks are separated by color (`card` on `bg`).
+ * For totals with an amount and two plates use `HeroCard`.
  *
  * @example
- * // Приподнятая карточка с большей тенью
- * <Card variant="elevated">
- *   <Text>Elevated card</Text>
- * </Card>
- *
- * @example
- * // С кастомными стилями
  * <Card className="gap-3">
- *   <Text className="text-lg font-bold">Title</Text>
- *   <Text className="text-sm text-muted-foreground">Description</Text>
+ *   <Text className="type-subhead text-ink">Остатки и цены</Text>
+ * </Card>
+ *
+ * @example
+ * <Card variant="hero">
+ *   <Text className="type-heading text-hero-ink">Strapela 6м</Text>
  * </Card>
  */
-export function Card({
-  variant = 'default',
-  className,
-  ...props
-}: CardProps) {
-  // Base styles
-  const baseStyles = 'bg-card rounded-xl p-4';
-
-  // Variant styles
-  const variantStyles = {
-    default: 'shadow-sm',
-    elevated: 'shadow-md',
-  };
-
-  return (
-    <View
-      className={cn(baseStyles, variantStyles[variant], className)}
-      {...props}
-    >
-      {props.children}
-    </View>
-  );
+export function Card({ variant = 'default', className, ...props }: CardProps) {
+  return <View className={cn('p-4', variantClasses[variant], className)} {...props} />;
 }

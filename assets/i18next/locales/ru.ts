@@ -5,7 +5,12 @@ const ru = {
     "noMoreData": "Больше нет данных",
     "edit": "Изменить",
     "currency": "UZS",
-    "searchPlaceholder": "Поиск..."
+    "searchPlaceholder": "Поиск...",
+    "clear": "Очистить",
+    "scan": "Сканировать",
+    "decrease": "Меньше",
+    "increase": "Больше",
+    "close": "Закрыть"
   },
   "tag": {
     "Material": "Материал",

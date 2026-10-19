@@ -5,7 +5,12 @@ const uz = {
     "noMoreData": "Boshqa ma'lumot yo'q",
     "edit": "O'zgartirish",
     "currency": "UZS",
-    "searchPlaceholder": "Qidirish..."
+    "searchPlaceholder": "Qidirish...",
+    "clear": "Tozalash",
+    "scan": "Skanerlash",
+    "decrease": "Kamaytirish",
+    "increase": "Ko'paytirish",
+    "close": "Yopish"
   },
   "tag": {
     "Material": "Material",

@@ -89,7 +89,7 @@ export function FormControl({
 }: FormControlProps) {
   return (
     <FormControlContext.Provider value={{ isInvalid, isRequired, isDisabled }}>
-      <View className={cn('gap-1.5', className)} {...props}>
+      <View className={cn('gap-0.5', className)} {...props}>
         {children}
       </View>
     </FormControlContext.Provider>
@@ -115,11 +115,11 @@ export function FormControlLabelText({ className, children, ...props }: FormCont
 
   return (
     <Text
-      className={cn('text-sm font-medium text-foreground', className)}
+      className={cn('font-onest-semibold text-[13px] text-soft', className)}
       {...props}
     >
       {children}
-      {isRequired && <Text className="text-error-500"> *</Text>}
+      {isRequired && <Text className="text-err-fg"> *</Text>}
     </Text>
   );
 }
@@ -141,7 +141,7 @@ export function FormControlError({ className, children, ...props }: FormControlE
 export function FormControlErrorText({ className, children, ...props }: FormControlErrorTextProps) {
   return (
     <Text
-      className={cn('text-xs text-error-600', className)}
+      className={cn('font-onest-medium text-xs text-err-fg', className)}
       {...props}
     >
       {children}
@@ -166,7 +166,7 @@ export function FormControlHelper({ className, children, ...props }: FormControl
 export function FormControlHelperText({ className, children, ...props }: FormControlHelperTextProps) {
   return (
     <Text
-      className={cn('text-xs text-muted-foreground', className)}
+      className={cn('font-onest text-xs text-muted', className)}
       {...props}
     >
       {children}

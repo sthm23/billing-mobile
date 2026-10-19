@@ -1,11 +1,10 @@
-import React from 'react';
+import { cn } from '@/libs/utils';
+import React, { createContext, useContext } from 'react';
 import {
   Modal as RNModal,
   View,
-  Pressable,
   type ViewProps,
 } from 'react-native';
-import { cn } from '@/libs/utils';
 
 export interface AlertDialogProps {
   isOpen: boolean;
@@ -43,6 +42,8 @@ const sizeClasses = {
   full: 'max-w-full',
 };
 
+const AlertDialogSizeContext = createContext<keyof typeof sizeClasses>('md');
+
 /**
  * AlertDialog — диалоговое окно для важных уведомлений
  *
@@ -74,7 +75,7 @@ export function AlertDialog({ isOpen, onClose, children, size = 'md' }: AlertDia
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      {children}
+      <AlertDialogSizeContext.Provider value={size}>{children}</AlertDialogSizeContext.Provider>
     </RNModal>
   );
 }
@@ -90,12 +91,14 @@ export function AlertDialogBackdrop({ className, ...props }: AlertDialogBackdrop
  * AlertDialogContent — контейнер содержимого
  */
 export function AlertDialogContent({ className, children, ...props }: AlertDialogContentProps) {
+  const size = useContext(AlertDialogSizeContext);
+
   return (
-    <View className="flex-1 bg-black/50 items-center justify-center p-4">
+    <View className="flex-1 bg-scrim items-center justify-center p-4">
       <View
         className={cn(
-          'bg-background rounded-2xl w-full shadow-lg',
-          'max-w-md',
+          'bg-card rounded-2xl w-full',
+          sizeClasses[size],
           className
         )}
         {...props}

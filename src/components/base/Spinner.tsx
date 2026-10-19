@@ -1,14 +1,15 @@
+import { useTheme } from '@/hooks/use-theme';
+import { cn } from '@/libs/utils';
 import React from 'react';
 import { ActivityIndicator, View, type ViewProps } from 'react-native';
-import { cn } from '@/libs/utils';
 
 export interface SpinnerProps extends ViewProps {
   /**
-   * Spinner size
+   * `sm` small native indicator; `md` / `lg` large
    */
   size?: 'sm' | 'md' | 'lg';
   /**
-   * Spinner color (hex color)
+   * Spinner color (default: theme `ink`)
    */
   color?: string;
   /**
@@ -38,10 +39,12 @@ export interface SpinnerProps extends ViewProps {
  */
 export function Spinner({
   size = 'md',
-  color = '#171717', // primary color
+  color,
   className,
   ...props
 }: SpinnerProps) {
+  const colors = useTheme();
+
   // Map size to ActivityIndicator size
   const activitySize = size === 'sm' ? 'small' : 'large';
 
@@ -50,7 +53,7 @@ export function Spinner({
       className={cn('items-center justify-center', className)}
       {...props}
     >
-      <ActivityIndicator size={activitySize} color={color} />
+      <ActivityIndicator size={activitySize} color={color ?? colors.ink} />
     </View>
   );
 }

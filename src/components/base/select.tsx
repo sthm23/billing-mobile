@@ -1,3 +1,4 @@
+import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/libs/utils';
 import { Picker } from '@react-native-picker/picker';
 import React from 'react';
@@ -53,10 +54,11 @@ export interface SelectItemProps {
   fontFamily?: string;
 }
 
+// STHM fields are filled, without borders; `outline` / `underlined` are kept for compatibility.
 const variantClasses = {
-  outline: 'border border-border rounded-lg',
-  underlined: 'border-b border-border',
-  rounded: 'border border-border rounded-full',
+  outline: 'rounded-md',
+  underlined: 'rounded-md',
+  rounded: 'rounded-pill',
 };
 
 const sizeClasses = {
@@ -101,9 +103,11 @@ export function Select<T = string>({
   children,
   disabled = false,
 }: SelectProps<T>) {
+  const colors = useTheme();
   const pickerStyle = Platform.select({
-    ios: {},
+    ios: { color: colors.ink },
     android: {
+      color: colors.ink,
       marginLeft: -8, // Compensate for Android padding
     },
   });
@@ -112,6 +116,7 @@ export function Select<T = string>({
     ios: {
       fontSize: 16,
       height: 120,
+      color: colors.ink,
     },
     android: undefined,
   });
@@ -119,7 +124,7 @@ export function Select<T = string>({
   return (
     <View
       className={cn(
-        'overflow-hidden justify-center bg-background',
+        'overflow-hidden justify-center bg-sunken px-2',
         variantClasses[variant],
         sizeClasses[size],
         disabled && 'opacity-50',
@@ -132,6 +137,7 @@ export function Select<T = string>({
         enabled={!disabled}
         style={pickerStyle}
         itemStyle={pickerItemStyle}
+        dropdownIconColor={colors.muted}
       >
         {children}
       </Picker>

@@ -1,21 +1,13 @@
+import { formatMoney } from '@/libs/format';
 import { Product } from '@/models/product.model';
 
 /**
  * Formats price with thousands separator
  * @param price - Price value (string or number)
- * @returns Formatted price string (e.g., "60,000")
+ * @returns Formatted price string (e.g., "60 000")
  */
 export function formatPrice(price: string | number): string {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-
-  if (isNaN(numPrice)) {
-    return '0';
-  }
-
-  return new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0,
-    minimumFractionDigits: 0,
-  }).format(numPrice);
+  return formatMoney(price);
 }
 
 /**

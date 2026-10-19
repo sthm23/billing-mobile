@@ -43,7 +43,7 @@ export function Heading({
 
   return (
     <Text
-      className={cn('text-foreground', levelStyles[level], className)}
+      className={cn('text-ink', levelStyles[level], className)}
       accessibilityRole="header"
       {...props}
     />

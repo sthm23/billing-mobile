@@ -1,11 +1,13 @@
+import { useTheme } from '@/hooks/use-theme';
+import { cn } from '@/libs/utils';
+import { X } from 'lucide-react-native';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
-  Modal as RNModal,
-  View,
   Pressable,
+  Modal as RNModal,
   type ModalProps as RNModalProps,
 } from 'react-native';
-import { cn } from '@/libs/utils';
 
 export interface ModalProps extends Omit<RNModalProps, 'transparent' | 'animationType'> {
   /**
@@ -81,6 +83,8 @@ export function Modal({
   animationType = 'fade',
   ...props
 }: ModalProps) {
+  const colors = useTheme();
+  const { t } = useTranslation();
   const handleBackdropPress = () => {
     if (closeOnBackdropPress && onClose) {
       onClose();
@@ -97,14 +101,14 @@ export function Modal({
       {...props}
     >
       <Pressable
-        className="flex-1 bg-black/50 items-center justify-center p-4"
+        className="flex-1 bg-scrim items-center justify-center p-4"
         onPress={handleBackdropPress}
         accessibilityRole="button"
-        accessibilityLabel="Close modal"
+        accessibilityLabel={t('common.close')}
       >
         <Pressable
           className={cn(
-            'bg-card rounded-2xl p-6 w-full max-w-md shadow-lg',
+            'bg-card rounded-2xl p-6 w-full max-w-md',
             className,
           )}
           onPress={(e) => e.stopPropagation()}
@@ -112,15 +116,11 @@ export function Modal({
           {showCloseButton && onClose && (
             <Pressable
               onPress={onClose}
-              className="absolute top-4 right-4 p-2 rounded-full active:bg-sunken"
+              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-sunken items-center justify-center active:opacity-80"
               accessibilityRole="button"
-              accessibilityLabel="Close"
+              accessibilityLabel={t('common.close')}
             >
-              <View className="w-5 h-5 items-center justify-center">
-                {/* Simple X icon using View */}
-                <View className="absolute w-4 h-0.5 bg-foreground rotate-45" />
-                <View className="absolute w-4 h-0.5 bg-foreground -rotate-45" />
-              </View>
+              <X size={16} color={colors.ink} strokeWidth={2.2} />
             </Pressable>
           )}
           {children}

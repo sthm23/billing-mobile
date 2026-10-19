@@ -1,10 +1,22 @@
-import React from 'react';
-import { View, TextInput, type TextInputProps, type ViewProps } from 'react-native';
+import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/libs/utils';
+import React from 'react';
+import { TextInput, View, type TextInputProps, type ViewProps } from 'react-native';
 
 export interface InputProps extends ViewProps {
-  variant?: 'outline' | 'underlined' | 'rounded';
+  /**
+   * `sunken` — field inside a card (default); `card` — field on `bg`.
+   * `outline` / `underlined` / `rounded` are deprecated and render as `sunken`.
+   */
+  variant?: 'sunken' | 'card' | 'outline' | 'underlined' | 'rounded';
+  /**
+   * `sm` 40px, `md` 48px, `lg` 52px (forms)
+   */
   size?: 'sm' | 'md' | 'lg';
+  /**
+   * Error state: red ring (pair it with FormControlErrorText)
+   */
+  invalid?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
@@ -13,29 +25,26 @@ export interface InputFieldProps extends TextInputProps {
   className?: string;
 }
 
-const variantClasses = {
-  outline: 'border border-border rounded-lg',
-  underlined: 'border-b border-border',
-  rounded: 'border border-border rounded-full',
-};
-
 const sizeClasses = {
   sm: 'h-10',
   md: 'h-12',
-  lg: 'h-14',
+  lg: 'h-13',
 };
 
 /**
- * Input — контейнер для поля ввода
+ * Input — field container (STHM): filled, no border, `rounded-md`.
+ *
+ * Put `InputField` (the TextInput) inside; icons or buttons can sit next to it.
  *
  * @example
- * <Input variant="outline" size="md">
- *   <InputField placeholder="Enter text" />
+ * <Input size="lg" invalid={!!errors.login}>
+ *   <InputField placeholder={t('login.login')} value={value} onChangeText={onChange} />
  * </Input>
  */
 export function Input({
-  variant = 'outline',
+  variant = 'sunken',
   size = 'md',
+  invalid = false,
   className,
   children,
   ...props
@@ -43,10 +52,12 @@ export function Input({
   return (
     <View
       className={cn(
-        'flex-row items-center bg-background px-4',
-        variantClasses[variant],
+        // Border is always reserved so the error ring doesn't shift the layout.
+        'flex-row items-center gap-2.5 rounded-md px-4 border-[1.5px]',
+        variant === 'card' ? 'bg-card' : 'bg-sunken',
+        invalid ? 'border-err-fg' : 'border-transparent',
         sizeClasses[size],
-        className
+        className,
       )}
       {...props}
     >
@@ -56,22 +67,20 @@ export function Input({
 }
 
 /**
- * InputField — текстовое поле ввода
+ * InputField — the text input inside `Input`
  *
  * @example
  * <Input>
- *   <InputField placeholder="Email" keyboardType="email-address" />
+ *   <InputField placeholder="+998 90 123 45 67" keyboardType="phone-pad" />
  * </Input>
  */
-export function InputField({
-  className,
-  placeholderTextColor = '#737373',
-  ...props
-}: InputFieldProps) {
+export function InputField({ className, placeholderTextColor, ...props }: InputFieldProps) {
+  const colors = useTheme();
+
   return (
     <TextInput
-      className={cn('flex-1 text-base text-foreground', className)}
-      placeholderTextColor={placeholderTextColor}
+      className={cn('flex-1 h-full font-onest-medium text-[15px] text-ink', className)}
+      placeholderTextColor={placeholderTextColor ?? colors.muted}
       {...props}
     />
   );

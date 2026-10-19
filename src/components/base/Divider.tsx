@@ -44,7 +44,7 @@ export function Divider({
   ...props
 }: DividerProps) {
   // Base styles
-  const baseStyles = 'bg-border';
+  const baseStyles = 'bg-line';
 
   // Orientation styles
   const orientationStyles = {
