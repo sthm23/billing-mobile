@@ -141,7 +141,7 @@ import { ScrollView } from 'react-native';
 
 ```tsx
 import { BottomSheet } from '@expo/ui';
-import { Box, Button, Input, Text } from '@/components/base';
+import { Box, Button, Input, InputField, Text } from '@/components/base';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
 
@@ -161,7 +161,9 @@ function ProductSearchExample() {
         snapPoints={['half', 'full']}
       >
         <Box className="flex-1 p-4">
-          <Input placeholder="Search..." className="mb-4" />
+          <Input className="mb-4">
+            <InputField placeholder="Search..." />
+          </Input>
           <FlatList
             data={products}
             keyExtractor={(item) => item.id}
@@ -257,7 +259,7 @@ function ParentComponent() {
   - `'full'` — Fully expanded ✅ **Recommended**
   - `{ fraction: 0.6 }` — May not work on Android ⚠️
   - `{ height: 400 }` — May not work on Android ⚠️
-- Versioned docs: https://docs.expo.dev/versions/v56.0.0/sdk/ui/universal/bottomsheet/
+- Versioned docs: https://docs.expo.dev/versions/v57.0.0/sdk/ui/
 
 ### When to Use Which
 

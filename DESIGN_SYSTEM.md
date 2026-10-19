@@ -1,397 +1,210 @@
-# Design System — Billing Mobile
+# Design System — STHM Mobile
 
-> **Единый источник правды для всех UI компонентов**
+> Правила оформления мобильного приложения. Источник правды — дизайн-система **STHM** (артефакт claude.ai «My Billing Design system») и макеты экранов («My Billing — Mobile»). В коде токены живут в `src/global.css` (классы Tailwind) и `src/constants/tokens.ts` (те же значения для JS).
 
----
-
-## 🎨 Принципы дизайна
-
-1. **Простота** — компоненты должны быть понятными и легкими в использовании
-2. **Консистентность** — единый стиль во всем приложении
-3. **Accessibility** — доступность для всех пользователей
-4. **Performance** — быстрая работа на любых устройствах
-5. **Native First** — использовать нативные компоненты React Native
+STHM — сервис для магазинов: продажи, склад, касса и отчёты. Название — цикл магазина: **S**otuv · **T**oʻlov · **H**isobot · **M**ahsulot.
 
 ---
 
-## 🎨 Цветовая палитра
+## Принципы
 
-Используется **dual theme** (light/dark) из `src/global.css`.
-
-### Semantic Colors
-
-```typescript
-// Light Mode
-primary: rgb(23, 23, 23)           // #171717 - основной цвет
-primary-foreground: rgb(250, 250, 250)  // #FAFAFA - текст на primary
-background: rgb(255, 255, 255)     // #FFFFFF - фон
-foreground: rgb(10, 10, 10)        // #0A0A0A - основной текст
-card: rgb(255, 255, 255)           // #FFFFFF - карточки
-border: rgb(229, 229, 229)         // #E5E5E5 - границы
-input: rgb(229, 229, 229)          // #E5E5E5 - поля ввода
-muted: rgb(245, 245, 245)          // #F5F5F5 - приглушенный фон
-muted-foreground: rgb(115, 115, 115)  // #737373 - приглушенный текст
-accent: rgb(247, 247, 247)         // #F7F7F7 - акценты
-destructive: rgb(231, 0, 11)       // #E7000B - ошибки/удаление
-
-// Dark Mode
-primary: rgb(255, 245, 245)        // #FFF5F5
-background: rgb(10, 10, 10)        // #0A0A0A
-foreground: rgb(250, 250, 250)     // #FAFAFA
-card: rgb(23, 23, 23)              // #171717
-border: rgb(46, 46, 46)            // #2E2E2E
-destructive: rgb(255, 100, 103)    // #FF6467
-```
-
-### Использование в компонентах
-
-```tsx
-// ✅ Правильно — использовать Tailwind классы
-<View className="bg-background border-border">
-  <Text className="text-foreground">Hello</Text>
-</View>
-
-// ❌ Неправильно — хардкодить цвета
-<View style={{ backgroundColor: '#FFFFFF' }}>
-  <Text style={{ color: '#000000' }}>Hello</Text>
-</View>
-```
+1. **Нейтральный интерфейс, один акцент.** Светлый фон, белые блоки, текст графитом. Шалфей (`accent`) — только для главного действия экрана, скана и статуса «Открыта».
+2. **Один тёмный главный блок на экран** (`hero`): итог кассы, итог заказа, цена товара.
+3. **Без теней и рамок.** Блоки отделяются цветом: `card` на `bg`, поля — `sunken` внутри `card`.
+4. **Мягкие крупные скругления.** Кнопки и чипы — pill.
+5. **Цвет никогда не единственный признак** — статус всегда со словом.
+6. **Тёмная тема — те же имена токенов**, меняются только значения.
 
 ---
 
-## 📏 Spacing Scale
+## Цвет
 
-Используйте Tailwind spacing:
+Классы: `bg-<token>`, `text-<token>`, `border-<token>`. В JS — `useTheme().<token>` (camelCase).
 
-```typescript
-// Padding/Margin Scale
-0.5 = 2px   // очень маленький
-1   = 4px   // маленький
-2   = 8px   // средний-маленький
-3   = 12px  // средний
-4   = 16px  // стандартный (базовый)
-5   = 20px  // средний-большой
-6   = 24px  // большой
-8   = 32px  // очень большой
-12  = 48px  // extra большой
+| Токен (класс) | JS | Светлая | Тёмная | Назначение |
+|---|---|---|---|---|
+| `bg` | `bg` | `#F2F2EF` | `#0F0F0E` | Фон экрана |
+| `card` | `card` | `#FFFFFF` | `#1B1B19` | Блоки, строки списка, кнопки-иконки на `bg` |
+| `sunken` | `sunken` | `#F2F2EF` | `#262624` | Поля ввода, плашки и неактивные чипы внутри `card` |
+| `ink` | `ink` | `#141414` | `#F2F2EF` | Основной текст |
+| `soft` | `soft` | `#55554F` | `#B5B5AE` | Подписи полей, второстепенный текст |
+| `muted` | `muted` | `#6B6B66` | `#A3A39C` | Даты, «UZS», метаданные; от 12px |
+| `line` | `line` | `#F0F0EB` | `#2A2A27` | Разделители внутри `card` (не край элемента) |
+| `primary` / `on-primary` | `primary` / `onPrimary` | `#141414` / `#FFFFFF` | `#F2F2EF` / `#141414` | Чёрная кнопка, выбранный чип |
+| `accent` / `on-accent` | `accent` / `onAccent` | `#B7C9A0` / `#141414` | то же | Главное действие. Текст на нём **всегда графит, не белый** |
+| `hero` / `hero-ink` | `hero` / `heroInk` | `#141414` / `#FFFFFF` | `#262624` / `#F2F2EF` | Главный блок экрана |
+| `hero-sub` / `hero-muted` | `heroSub` / `heroMuted` | `#262624` / `#B5B5AE` | `#33332F` / `#A3A39C` | Плашки и подписи внутри `hero` |
+| `hero-line` | `heroLine` | `#2E2E2B` | `#3A3A37` | Разделители внутри `hero` |
+| `nav` / `nav-ink` / `nav-muted` | `nav` / `navInk` / `navMuted` | `#141414` / `#FFFFFF` / `#9A9A93` | `#262624` / `#F2F2EF` / `#8E8E87` | Нижнее меню |
+| `ok-bg` / `ok-fg` | `okBg` / `okFg` | `#E3F3DF` / `#1F6B35` | `#1E3324` / `#8FD49E` | Завершено, приход, в наличии |
+| `err-bg` / `err-fg` | `errBg` / `errFg` | `#FCE6E2` / `#B42318` | `#3A1E1B` / `#FF9B8F` | Долг, расход, удалить, ошибка; кольцо поля с ошибкой |
+| `warn-bg` / `warn-fg` | `warnBg` / `warnFg` | `#FDF0D5` / `#8A5300` | `#3A2E14` / `#F0C36B` | Ожидание, мало на складе |
+| `info-bg` / `info-fg` | `infoBg` / `infoFg` | `#E3EBFC` / `#2650B8` | `#1C2840` / `#9DB8F5` | Создано |
+| `ph-bg` / `ph-fg` | `phBg` / `phFg` | `#EDEDE8` / `#8A8A83` | `#262624` / `#77776F` | Заглушка фото товара |
+| `track` / `seg` | `track` / `seg` | `#E6E6E0` / `#FFFFFF` | `#1B1B19` / `#3A3A37` | Segmented: дорожка / выбранный сегмент |
+| `disabled-bg` / `disabled-fg` | `disabledBg` / `disabledFg` | `#E6E6E0` / `#8A8A83` | `#262624` / `#6B6B66` | Неактивная кнопка |
+| `scrim` | `scrim` | `rgba(20,20,20,.55)` | `rgba(0,0,0,.7)` | Затемнение под шитом |
 
-// Примеры
-p-4  = padding: 16px (стандартный для карточек)
-px-6 = padding-horizontal: 24px
-gap-3 = gap: 12px
-```
+Статусы — всегда парой фон/текст: `bg-ok-bg text-ok-fg`.
 
-### Рекомендации
+Соответствие статусов заказа: `CREATED` → info «Создано», `HOLD` → warn «Ожидание», `DEBT` → err «Долг», `COMPLETED` → ok «Завершено», `CANCELLED` / `REFUNDED` → нейтральный (`bg-sunken text-soft`).
 
-- **Карточки/Контейнеры:** `p-4` (16px)
-- **Экраны:** `p-6` (24px)
-- **Кнопки:** `px-4 py-2` (16px/8px)
-- **Иконки:** `p-2` или `p-3` (8px/12px)
-- **Gap между элементами:** `gap-2` или `gap-3` (8px/12px)
+Брендовые цвета логотипа (`brandGraphite`, `brandSage`, …) в интерфейсе не используются — только готовые SVG из `assets/brand/`.
 
----
+### Изменение старых имён
 
-## 🔤 Typography
+До конца этапа 3 редизайна в `global.css` остаются алиасы старых shadcn-имён (`bg-background`, `text-foreground`, `text-muted-foreground`, `bg-secondary`, `border-border`, `bg-destructive`, …) на значения STHM. В новом коде их не использовать.
 
-### Font Sizes
+⚠️ **Поменялся смысл двух имён:**
+- `muted` теперь **цвет текста** (было — серый фон);
+- `accent` теперь **шалфей** (было — светло-серый фон).
 
-```typescript
-text-xs   = 12px  // очень маленький
-text-sm   = 14px  // маленький
-text-base = 16px  // базовый (по умолчанию)
-text-lg   = 18px  // большой
-text-xl   = 20px  // очень большой
-text-2xl  = 24px  // заголовок
-text-3xl  = 30px  // большой заголовок
-```
-
-### Font Weights
-
-```typescript
-font-normal    = 400  // обычный текст
-font-medium    = 500  // средний (подзаголовки)
-font-semibold  = 600  // полужирный (акценты)
-font-bold      = 700  // жирный (заголовки)
-```
-
-### Компоненты
-
-- **Заголовки:** `text-2xl font-bold` или `text-xl font-semibold`
-- **Основной текст:** `text-base font-normal`
-- **Описания:** `text-sm text-muted-foreground`
-- **Лейблы:** `text-sm font-medium`
-- **Цены/числа:** `text-lg font-bold`
+Нейтральная заливка — `bg-sunken`.
 
 ---
 
-## 🎯 Border Radius
+## Шрифт и типографика
 
-```typescript
-rounded-none = 0px
-rounded-sm   = 2px
-rounded      = 4px   // стандартный
-rounded-md   = 6px
-rounded-lg   = 8px   // кнопки
-rounded-xl   = 12px  // карточки
-rounded-2xl  = 16px  // большие карточки
-rounded-full = 9999px // круглые элементы
-```
+Один шрифт — **Onest** (кириллица и латиница), грузится в `src/app/_layout.tsx`. В React Native каждое начертание — отдельное семейство:
 
-### Рекомендации
+| Класс | Семейство | Вес |
+|---|---|---|
+| `font-onest` | `Onest_400Regular` | 400 |
+| `font-onest-medium` | `Onest_500Medium` | 500 |
+| `font-onest-semibold` | `Onest_600SemiBold` | 600 |
+| `font-onest-bold` | `Onest_700Bold` | 700 |
 
-- **Кнопки:** `rounded-lg` (8px)
-- **Карточки:** `rounded-xl` (12px)
-- **Инпуты:** `rounded-lg` (8px)
-- **Аватары:** `rounded-full`
-- **Модальные окна:** `rounded-2xl` (16px)
+**Не сочетайте** их с `font-bold` / `font-semibold`: на Android текст станет «двойным жирным».
 
----
+Стили текста (`@utility` в `global.css`):
 
-## 🎨 Shadows
+| Класс | Размер / вес | Где |
+|---|---|---|
+| `type-display` | 32 / 700, трекинг −0.64 | Крупные суммы |
+| `type-title` | 26 / 700 | Заголовок экрана |
+| `type-heading` | 22 / 700 | Заголовок блока, название в hero |
+| `type-subhead` | 18 / 700 | Подзаголовок блока |
+| `type-body-strong` | 15 / 600 | Названия товаров, суммы в строках |
+| `type-body` | 15 / 500, интерлиньяж 22 | Основной текст |
+| `type-label` | 13 / 600 | Подписи полей |
+| `type-caption` | 12 / 600 | Бейджи, мелкие подписи |
 
-```typescript
-// iOS-style тени
-shadow-sm  // маленькая тень
-shadow     // средняя тень (по умолчанию)
-shadow-md  // средняя-большая
-shadow-lg  // большая
+Классы называются `type-*`, а не `text-*`: `tailwind-merge` в `cn()` считает неизвестные `text-*` цветом и выкидывает их рядом с `text-ink`. Цвет задаётся отдельно: `className="type-title text-ink"`.
 
-// Для карточек
-className="bg-card rounded-xl shadow-sm"
-```
-
-**Android:** Используйте `elevation` вместо `shadow`:
-
-```tsx
-<View style={{ elevation: 2 }} className="bg-card">
-```
+**Суммы:** цифры `tabular-nums`, пробелы по разрядам, «UZS» мельче и `text-muted` — `18 056 319 UZS`. Форматирование только для отображения; суммы считает бэкенд.
 
 ---
 
-## 📦 Component Guidelines
+## Отступы
 
-### 1. Именование компонентов
+Шкала Tailwind (`inlineRem: 16`, 1 = 4px) совпадает с токенами STHM:
 
-```
-src/components/base/
-  ├── Box.tsx           // Layout container
-  ├── Text.tsx          // Text component
-  ├── Button.tsx        // Button with variants
-  ├── Input.tsx         // Text input
-  └── ...
-```
+| Токен | Класс | Где |
+|---|---|---|
+| space-2 | `0.5` | Строки внутри подписи |
+| space-4 | `1` | Иконка и текст в чипе |
+| space-6 | `1.5` | Подпись над полем |
+| space-8 | `2` | Основной шаг между элементами |
+| space-10 | `2.5` | Иконка и текст в поле |
+| space-12 | `3` | Между карточками списка |
+| space-14 | `3.5` | Внутренний отступ плашки |
+| space-16 | `4` | Поля экрана, между блоками |
 
-### 2. Структура компонента
-
-```tsx
-import React from 'react';
-import { View, type ViewProps } from 'react-native';
-import { cn } from '@/libs/utils';
-
-export interface BoxProps extends ViewProps {
-  // Дополнительные пропсы
-}
-
-/**
- * Box — базовый layout контейнер
- * 
- * @example
- * <Box className="p-4 bg-card rounded-xl">
- *   <Text>Content</Text>
- * </Box>
- */
-export function Box({ className, ...props }: BoxProps) {
-  return (
-    <View 
-      className={cn('bg-background', className)} 
-      {...props} 
-    />
-  );
-}
-```
-
-### 3. Обязательные элементы
-
-- ✅ TypeScript интерфейс с расширением нативного типа
-- ✅ JSDoc комментарий с примером использования
-- ✅ Использование `cn()` для объединения className
-- ✅ Forwarding props (`...props`)
-- ✅ Дефолтные стили через Tailwind
-
-### 4. Variants (если нужны)
-
-Используйте `tailwind-variants` для компонентов с вариантами:
-
-```tsx
-import { tv, type VariantProps } from 'tailwind-variants';
-
-const buttonVariants = tv({
-  base: 'rounded-lg flex-row items-center justify-center gap-2',
-  variants: {
-    variant: {
-      default: 'bg-primary',
-      outline: 'border border-border bg-background',
-      ghost: 'bg-transparent',
-    },
-    size: {
-      sm: 'px-3 py-1.5',
-      md: 'px-4 py-2',
-      lg: 'px-6 py-3',
-    },
-  },
-  defaultVariants: {
-    variant: 'default',
-    size: 'md',
-  },
-});
-
-export interface ButtonProps extends VariantProps<typeof buttonVariants> {
-  // ...
-}
-```
+Экран: `px-4`, сверху safe area. Между блоками — `gap-3`, внутри блока — `p-4`…`p-5`.
 
 ---
 
-## 🧩 Component Checklist
+## Скругления
 
-При создании нового компонента проверьте:
+Шкала Tailwind переопределена под STHM (`--radius-*` в `global.css`):
 
-- [ ] Расширяет соответствующий React Native тип (ViewProps, TextProps, etc.)
-- [ ] Использует semantic colors из global.css (не хардкод)
-- [ ] Поддерживает dark mode (через Tailwind классы)
-- [ ] Использует spacing scale (p-4, gap-3, etc.)
-- [ ] Имеет TypeScript интерфейс с экспортом
-- [ ] Использует `cn()` для объединения className
-- [ ] Имеет JSDoc комментарий с примером
-- [ ] Forwarding всех props (`...props`)
-- [ ] Accessibility (accessibilityLabel, accessibilityRole)
-- [ ] Тестирование на iOS и Android
-
----
-
-## 🎨 Компонентная библиотека
-
-### Базовые компоненты (Layer 1)
-
-**Layout:**
-- `Box` — базовый контейнер
-- `VStack` — вертикальный стек
-- `HStack` — горизонтальный стек
-- `Center` — центрирование
-- `Divider` — разделитель
-
-**Typography:**
-- `Text` — текст с вариантами
-- `Heading` — заголовки
-
-**Interactive:**
-- `Pressable` — кликабельный элемент
-- `Button` — кнопка с вариантами
-- `IconButton` — кнопка с иконкой
-
-**Forms:**
-- `Input` — текстовый инпут
-- `TextArea` — многострочный инпут
-- `Label` — лейбл для форм
-
-**Feedback:**
-- `Spinner` — индикатор загрузки
-- `Toast` — уведомления
-
-### Сложные компоненты (Layer 2)
-
-- `Card` — карточка с контентом
-- `Modal` — модальное окно
-- `BottomSheet` — нижняя панель (из @expo/ui, controlled pattern)
-- `Avatar` — аватар
-- `Badge` — бейдж
-- `Alert` — алерт
+| Класс | px | Где |
+|---|---|---|
+| `rounded-sm` | 12 | Мелкие плашки, миниатюры |
+| `rounded-md` | 16 | Поля ввода, плашки внутри блока |
+| `rounded-lg` | 20 | Строки списка |
+| `rounded-xl` | 24 | Карточки, `hero` |
+| `rounded-2xl` | 28 | Крупные блоки, формы, фото товара |
+| `rounded-pill` | 999 | Кнопки, чипы, статусы, нижнее меню |
+| `rounded-full` | — | Круглые аватары и кнопки-иконки |
 
 ---
 
-## 🚀 Миграция с GlueStack
+## Иконки
 
-### Маппинг компонентов
-
-```tsx
-// Было (GlueStack)
-import { Box } from '@/components/base/box';
-import { Text } from '@/components/base/text';
-import { Button, ButtonText } from '@/components/base/button';
-
-<Box className="p-4">
-  <Text>Hello</Text>
-  <Button>
-    <ButtonText>Click</ButtonText>
-  </Button>
-</Box>
-
-// Стало (Native)
-import { Box, Text, Button } from '@/components/base';
-
-<Box className="p-4">
-  <Text>Hello</Text>
-  <Button>Click</Button>
-</Box>
-```
-
-### Ключевые отличия
-
-1. **Проще структура** — Button не требует вложенного ButtonText
-2. **Меньше импортов** — один компонент = один импорт
-3. **Чистый React Native** — понятнее, что происходит
-4. **Легче кастомизация** — прямой доступ к View/Text/Pressable
+`lucide-react-native`: линейные, скруглённые концы, `strokeWidth={2}` при 24px (20–22px в кнопках). Без эмодзи. Цвет передаётся из `useTheme()`, т.к. `className` не доходит до SVG.
 
 ---
 
-## 📚 Примеры использования
+## Логотип и иконка приложения
 
-### Карточка продукта
-
-```tsx
-<Box className="bg-card rounded-xl p-4 shadow-sm gap-3">
-  <Text className="text-lg font-bold">Product Name</Text>
-  <Text className="text-sm text-muted-foreground">Description</Text>
-  <HStack className="justify-between items-center">
-    <Text className="text-xl font-bold">$99.99</Text>
-    <Button size="sm">Add to Cart</Button>
-  </HStack>
-</Box>
-```
-
-### Форма
-
-```tsx
-<VStack className="p-6 gap-4">
-  <Heading>Login</Heading>
-  
-  <VStack className="gap-2">
-    <Label>Email</Label>
-    <Input placeholder="Enter email" />
-  </VStack>
-  
-  <VStack className="gap-2">
-    <Label>Password</Label>
-    <Input secureTextEntry placeholder="Enter password" />
-  </VStack>
-  
-  <Button>Sign In</Button>
-</VStack>
-```
+- SVG в `assets/brand/`: `sthm-mark`, `sthm-logo-horizontal` (+ `-on-dark`), `sthm-app-icon`.
+- Знак с плитками — от 32px. Меньше — только иконка приложения.
+- Свободное поле — не меньше половины плитки. Не растягивать, не перекрашивать, без теней.
+- PNG-иконки (`assets/images/icon.png`, адаптивная иконка Android, splash, favicon) сгенерированы из `sthm-app-icon.svg`. Splash: фон `#F2F2EF` / тёмный `#0F0F0E`.
 
 ---
 
-## 🎯 Best Practices
+## Компоненты из макета
 
-1. **Всегда используйте semantic colors** — `text-foreground` вместо `text-black`
-2. **Используйте spacing scale** — `p-4` вместо `style={{ padding: 15 }}`
-3. **Группируйте импорты** — все base компоненты вместе
-4. **Не злоупотребляйте вариантами** — максимум 3-4 варианта
-5. **Тестируйте на обеих темах** — light и dark
-6. **Accessibility** — всегда добавляйте accessibilityLabel для интерактивных элементов
-7. **Переиспользуйте** — если делаете похожий компонент 3 раза, создайте общий
+Размеры по макетам. Реализацию добавляем в `src/components/base/` (этап 1 редизайна).
+
+| Компонент | Ключевые параметры |
+|---|---|
+| **Button** | Варианты `primary` (чёрная), `accent` (шалфей), `secondary` (`sunken`), `danger` (`err-bg`/`err-fg`), disabled. `lg` 56px / 16px, `md` 44px / 14px, pill, иконка слева 18px, `full`. На экране — максимум одна чёрная и одна акцентная |
+| **StatusBadge** | Тона `ok / warn / err / info / neutral / accent`. Отступы 4×10, `type-caption`, pill |
+| **HeroCard** | `bg-hero`, `rounded-2xl`, p 18. Подпись + чип, сумма 32/700 + «UZS», две плашки `hero-sub` (левая — `accent`, правая — `err` на тёмном) |
+| **ListCard** | `bg-card`, `rounded-lg`, p 14×16. Аватар 44 (инициалы / номер), title `type-body-strong`, subtitle 13 `muted`, сумма справа + StatusBadge; `highlight` — кольцо 2px `accent` |
+| **SearchField** | 48px, pill, `bg-card`, иконка поиска; опционально кнопка «Скан» 36px `accent` |
+| **Segmented** | Дорожка `track`, p 4, gap 4; сегмент 36px, выбранный `seg` + 600 |
+| **Chip** | 36px, pill; выбран — `primary`, обычный — `card`, предупреждение — `err-bg` |
+| **Stepper** | Кнопки 40px круглые на `card`, контейнер `sunken` pill; горизонтальный и вертикальный; min 1 |
+| **PhotoPlaceholder** | `sm` 44 / `md` 64 / `hero` 260; `ph-bg`, иконка `ph-fg` |
+| **Input** | 52px, `rounded-md`, `bg-sunken`; ошибка — кольцо 1.5px `err-fg` |
+| **BottomNav** | Плавающий: `bg-nav`, высота 68, pill, 16px от краёв, 24px снизу; центральная кнопка скана 52px `accent` |
+| **Sheet** | Верх `rounded-[32px]`, `bg-card`, ручка, подложка `scrim` |
 
 ---
 
-**Last updated**: 2026-09-30  
-**Version**: 1.0
+## Тон текста
+
+- Интерфейс — коротко и по делу: «Оплатить», «Новый заказ», «Касса открыта».
+- Кнопки — глагол, с заглавной только первое слово.
+- Все строки — через i18next (`ru`, `uz`, `en`).
+
+---
+
+## Доступность
+
+- Касание ≥ 44px.
+- Контраст текста ≥ 4.5:1 (токены `ink` / `soft` / `muted` на `bg` и `card` проходят в обеих темах).
+- Иконки-кнопки — `accessibilityLabel`; интерактивное — `accessibilityRole`.
+
+---
+
+## Чеклист компонента
+
+- [ ] Только токены (никаких hex в `className` / `style`), обе темы проверены
+- [ ] Типографика через `type-*` или `font-onest-*`
+- [ ] `cn()` для объединения `className`, `...props` пробрасываются
+- [ ] TypeScript-интерфейс расширяет нативный тип (`ViewProps`, `PressableProps`, …)
+- [ ] Состояния: pressed, disabled, loading (если применимо)
+- [ ] Доступность: роль, label, размер касания
+- [ ] Компонент добавлен в `index.ts`, `COMPONENTS.md` и `/component-demo`
+
+---
+
+## Статус редизайна
+
+| Этап | Что | Статус |
+|---|---|---|
+| 0 | Токены, шрифт Onest, иконки и splash, `cn()` | ✅ готово |
+| 1 | Базовые компоненты по таблице выше | ⏳ |
+| 2 | Навигация: плавающий BottomNav вместо `NativeTabs`, вкладка «Касса» | ⏳ |
+| 3 | Рескин существующих экранов; удалить legacy-алиасы цветов | ⏳ |
+| 4+ | Новые экраны (сотрудники, оплата, должники, …) с доработками бэкенда | ⏳ |
+
+---
+
+**Last updated**: 2026-10-19
+**Version**: 2.0 (STHM)

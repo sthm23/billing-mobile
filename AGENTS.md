@@ -1,57 +1,58 @@
 # Billing Mobile — Expo + React Native App
 
-> **Context**: Mobile application for my-billing retail POS system
+> **Context**: Mobile application (brand **STHM**) for the my-billing retail POS system.
+> Read the root [`../AGENTS.md`](../AGENTS.md) first.
 
 ---
 
 ## ⚠️ CRITICAL: Expo Documentation
 
 **ALWAYS use versioned Expo documentation**:
-👉 https://docs.expo.dev/versions/v56.0.0/
+👉 https://docs.expo.dev/versions/v57.0.0/
 
 Expo changes significantly between versions. Do NOT use:
 - ❌ Unversioned docs (docs.expo.dev without `/versions/`)
-- ❌ Patterns from other Expo versions (v54, v55)
-- ❌ Stack Overflow answers without checking Expo version
+- ❌ Patterns from other Expo versions (v55, v56)
+- ❌ Stack Overflow answers without checking the Expo version
 
-**When searching for solutions**:
-1. Verify Expo SDK version in `package.json` → currently **v56**
-2. Use versioned docs link above
-3. Check package versions match `package.json` dependencies
+Verify the SDK in `package.json` (`expo`) before relying on any doc.
 
 ---
 
 ## Technology Stack
 
-- **Expo SDK**: 56.0.0
-- **React Native**: 0.85.3
-- **React**: 19.2.3
-- **Expo Router**: v56 (file-based routing with typed routes)
-- **Styling**: NativeWind v4 (Tailwind CSS for React Native)
-- **UI**: @expo/ui (icons), custom base components, @react-native-picker/picker
-- **Data Fetching**: React Query
-- **Forms**: React Hook Form + Zod validation
-- **i18n**: i18next (en, ru, uz)
-- **Networking**: Axios with interceptors
-- **Storage**: AsyncStorage
+| Area | Library | Version |
+|---|---|---|
+| Platform | Expo SDK | 57 (`expo ~57.0.25`) |
+| Runtime | React Native / React | 0.86.3 / 19.2.3 |
+| Language | TypeScript (`strict`) | ~6.0.3 |
+| Routing | Expo Router (typed routes, `Stack.Protected`) | ~57.0.23 |
+| Styling | NativeWind **5 (preview)** + `react-native-css` + **Tailwind CSS v4** | 5.0.0-preview.2 / 3.0.4 / 4.2.0 |
+| Font | Onest via `@expo-google-fonts/onest` | 0.4.2 |
+| Icons | `lucide-react-native` (UI), `CustomIcon` (SF Symbols / Material Symbols) | 1.45.0 |
+| Native UI | `@expo/ui` (BottomSheet) | ~57.0.20 |
+| Data | `@tanstack/react-query` + `axios` | 5.101.2 / 1.18.1 |
+| Forms | `react-hook-form` + `zod` | 7.81 / 4.4 |
+| i18n | `i18next` + `react-i18next` + `expo-localization` (en, ru, uz) | 26 / 17 |
+| Storage | `@react-native-async-storage/async-storage` | 2.2.0 |
+
+`app.json` enables `typedRoutes`, `reactCompiler` and `userInterfaceStyle: automatic`.
+
+**Not installed yet** (planned): `expo-camera` (barcode scanning), a test runner, ESLint config.
 
 ---
 
 ## Responsibility
 
-This application provides the **mobile user interface** for the billing system.
-
 **What mobile does**:
-- Display data from backend API
-- Handle user interactions (touch, swipe, scan)
-- Barcode scanning via Expo Camera
+- Display data from the backend API
+- Handle user interactions (touch, swipe; barcode scan — planned)
 - Client-side validation (UX only)
-- Manage local state and cache
-- Offline-first features (planned)
+- Local state, React Query cache, user preferences (theme, language)
 
 **What mobile does NOT do**:
 - Implement business logic (backend's responsibility)
-- Calculate stock, prices, totals independently
+- Calculate stock, prices, totals, debt or cashbox balances independently
 - Make direct database calls
 
 ---
@@ -59,879 +60,290 @@ This application provides the **mobile user interface** for the billing system.
 ## File Structure
 
 ```
-src/
-├── api/                          # Axios configuration
-│   └── axios-instance.ts         # Auth interceptors, token refresh
-├── app/                          # Expo Router screens (file-based routing)
-│   ├── _layout.tsx               # Root layout with providers
-│   ├── index.tsx                 # Entry point (redirect)
-│   ├── login.tsx                 # Login screen (public)
-│   └── (tabs)/                   # Main authenticated app
-│       ├── _layout.tsx           # Bottom tab navigation
-│       ├── (products)/           # Product management
-│       ├── (orders)/             # Order creation/viewing
-│       ├── (search)/             # Search & barcode scan
-│       ├── (payments)/           # Payment/cashbox
-│       └── (profile)/            # User settings
-├── assets/                       # Static assets (moved from root)
-│   └── i18next/                  # Translation files
-├── components/                   # Reusable UI components
-│   └── ui/                       # Base UI (button, input, etc.)
-├── constants/                    # App constants (theme, colors)
-├── hooks/                        # Custom React hooks
-├── icons/                        # Custom icon components
-├── libs/                         # Utility functions (cn, etc.)
-├── models/                       # TypeScript interfaces
-├── provider/                     # React Context providers
-└── services/                     # API service layer
+billing-mobile/
+├── app.json                      # Expo config (name "STHM", icons, splash)
+├── metro.config.js               # withNativewind(config, { inlineRem: 16, input: './src/global.css' })
+├── babel.config.js               # babel-preset-expo + nativewind/babel, module-resolver, worklets
+├── postcss.config.mjs            # @tailwindcss/postcss
+├── assets/                       # Project-root assets (alias @/assets/*)
+│   ├── brand/                    # STHM logo SVGs (mark, horizontal, app icon; -on-dark variants)
+│   ├── i18next/                  # i18next.ts + locales/{en,ru,uz}.ts
+│   └── images/                   # App icon, adaptive icon layers, splash, favicon
+└── src/                          # Alias @/*
+    ├── api/axios-instance.ts     # Axios instances, auth + refresh interceptors
+    ├── app/                      # Expo Router routes (thin wrappers around screens/)
+    ├── screens/                  # Screen implementations: login, order, payment, product, profile
+    ├── components/
+    │   ├── base/                 # Design primitives (see COMPONENTS.md)
+    │   ├── common/               # EmptyState, LoadingState
+    │   ├── product/ order/ cashbox/  # Domain components
+    ├── constants/
+    │   ├── tokens.ts             # STHM color palette (JS mirror of global.css) + FontFamily
+    │   └── theme.ts              # Spacing, BottomTabInset, MaxContentWidth (legacy Fonts)
+    ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
+    ├── hooks/                    # use-theme, use-theme-control, use-debounce
+    ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
+    ├── libs/                     # cn() (utils.ts), product-utils.ts
+    ├── models/                   # API types (app, auth, order, payment, product, store, user)
+    ├── provider/AuthProvider.tsx # Auth context
+    └── services/                 # API services + React Query hooks (auth, cashbox, order, product)
 ```
+
+`src/app` route files mostly import a component from `src/screens/` — put screen code in `screens/`, keep routes thin.
 
 ---
 
-## Expo Router (File-Based Routing)
+## Routing (Expo Router)
 
-**CRITICAL**: Routes are determined by file structure in `src/app/`.
+### Root (`src/app/_layout.tsx`)
 
-### Route Groups
+- Loads i18n and the Onest fonts; keeps the native splash (`expo-splash-screen`) until fonts and the saved theme are ready. On font error it falls back to the system font.
+- Provider order: `GestureHandlerRootView` → `ThemeControlContext.Provider` → `StatusBar` → `AuthProvider` → `QueryClientProvider`.
+- QueryClient: `staleTime` 60 s; no retry for axios responses with status < 500, otherwise up to 2 retries.
+- `Stack.Protected`: `(tabs)` when authenticated, `login` when unauthenticated.
 
-Directories wrapped in `()` don't appear in the URL but organize screens and create layouts.
+Other root routes: `index.tsx` (redirects by auth state), `login.tsx` (→ `screens/login/LoginPage`), `component-demo.tsx` (`/component-demo`, dev showcase).
 
-**Example**:
-```
-app/
-├── _layout.tsx              # Root layout
-├── login.tsx                # Route: /login
-├── (tabs)/                  # Group (not in URL)
-│   ├── _layout.tsx          # Tab navigation layout
-│   ├── (products)/          # Group
-│   │   ├── index.tsx        # Route: /(tabs)/(products)
-│   │   └── create.tsx       # Route: /(tabs)/(products)/create
-│   └── (orders)/
-│       ├── index.tsx        # Route: /(tabs)/(orders)
-│       └── [id].tsx         # Route: /(tabs)/(orders)/[id] (dynamic)
-```
+### Tabs (`src/app/(tabs)/_layout.tsx`)
 
----
+`NativeTabs` from `expo-router/unstable-native-tabs`, colored from `useTheme()`. Each tab has its own Stack:
+
+| Tab | Routes | Renders |
+|---|---|---|
+| `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, placeholder |
+| `(orders)` | `index`, `[id]`, `create` | `OrderPage`, `OrderDetailScreen`, placeholder |
+| `(payments)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
+| `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, placeholders |
+| `(search)` | `index`, `search`, `scan` | redirect, placeholders |
+
+> The STHM redesign replaces this with a custom floating tab bar (Products · Orders · Scan · Cashbox · Profile) — see "Redesign status" in [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Until then, keep `NativeTabs`.
 
 ### Navigation
 
-**Import**:
 ```typescript
-import { router } from 'expo-router';
-```
+import { router, useLocalSearchParams } from 'expo-router';
 
-**Navigate**:
-```typescript
-// Push new screen
-router.push('/(tabs)/(products)/create');
-
-// Go back
+router.push({ pathname: '/(tabs)/(orders)/[id]', params: { id: order.id } });
 router.back();
 
-// Replace current screen
-router.replace('/login');
-
-// Navigate with params
-router.push({
-  pathname: '/(tabs)/(orders)/[id]',
-  params: { id: '123' }
-});
+const { id } = useLocalSearchParams<{ id: string }>();
 ```
 
-**Get params in component**:
-```typescript
-import { useLocalSearchParams } from 'expo-router';
-
-function OrderDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  // Use id...
-}
-```
+After adding a route, typed routes regenerate on `npx expo start` (delete `.expo/` if types are stale).
 
 ---
 
 ## Path Aliases
 
-Configured in `tsconfig.json`:
+`tsconfig.json` + `babel.config.js` (module-resolver):
 
 ```typescript
-@/*           // src/*
-@/assets/*    // assets/*
+@/*          → src/*
+@/assets/*   → assets/*   (project root, NOT src/assets)
 ```
 
-**Always use path aliases**:
-```typescript
-import { Button } from '@/components/base/button';
-import { useAuth } from '@/provider/AuthProvider';
-import { api } from '@/api/axios-instance';
-```
+Always use aliases instead of relative imports.
 
 ---
 
-## Authentication Flow
+## Styling — STHM Design System
 
-### Stack.Protected Guards
+Full rules: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Design source: STHM design system (claude.ai artifact "My Billing Design system") and the "My Billing — Mobile" screen mockups.
 
-In `app/_layout.tsx`:
+### Where things live
 
-```typescript
-<Stack.Protected guard={isAuthenticated}>
-  <Stack.Screen name="(tabs)" />  {/* Authenticated routes */}
-</Stack.Protected>
+- **Tailwind config is CSS-only** (Tailwind v4) — there is **no `tailwind.config.js`**. Everything is in `src/global.css`:
+  - `:root` / `@media (prefers-color-scheme: dark)` / `:root.dark` / `:root.light` — token values as RGB triplets.
+  - `@theme inline` — maps tokens to classes (`--color-*`, `--radius-*`, `--font-*`).
+  - `@utility type-*` — text styles.
+- **`src/constants/tokens.ts`** — the same palette as hex for JS. **Keep it in sync with `global.css`.**
+- **`useTheme()`** (`src/hooks/use-theme.ts`) — returns the current palette. Use it only where `className` does not reach: navigator options, icon `color` props, SVG fills, Reanimated styles.
 
-<Stack.Protected guard={!isAuthenticated}>
-  <Stack.Screen name="login" />    {/* Public routes */}
-</Stack.Protected>
-```
+### Rules
 
-### Token Management
-
-**Access Token**:
-- Stored in AsyncStorage (`LOCALE_STORAGE_KEYS.TOKEN`)
-- Sent in `Authorization: Bearer <token>` header
-- Valid for 15 minutes
-
-**Refresh Token**:
-- Stored in httpOnly cookie (managed by backend)
-- Used to get new access token when expired
-
-**Auto-Refresh** (`axios-instance.ts`):
-```typescript
-// On 401 response
-if (error.response?.status === 401) {
-  // Attempt token refresh
-  const newToken = await refreshAccessToken();
-  // Retry original request with new token
-  // If refresh fails → logout
-}
-```
-
----
-
-## API Communication
-
-### Base URL
-
-Configured in `src/api/axios-instance.ts`:
-
-```typescript
-const BASE_URL = Platform.select({
-  ios: 'https://sthm23.uz/api',
-  android: 'https://sthm23.uz/api',
-  default: 'https://sthm23.uz/api',
-});
-```
-
-### API Instances
-
-```typescript
-import { api } from '@/api/axios-instance';
-
-// General API calls
-const response = await api.get('/order');
-
-// Specific instances (if available)
-import { ordersApi, productsApi, paymentsApi } from '@/api/axios-instance';
-```
-
-### Request Pattern
-
-```typescript
-async function fetchOrders() {
-  try {
-    const response = await api.get<Order[]>('/order', {
-      params: { storeId: '123', status: 'DEBT' }
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch orders:', error);
-    throw error;
-  }
-}
-```
-
----
-
-## Styling with NativeWind
-
-**NativeWind v4** provides Tailwind CSS utilities for React Native.
-
-### Theme System
-
-**Dual theme** (light/dark) with automatic mode detection.
-
-**Usage**:
 ```tsx
-<View className="bg-background dark:bg-background-dark p-4">
-  <Text className="text-text dark:text-text-dark text-lg">
-    Hello World
-  </Text>
+// ✅ Tokens via Tailwind classes
+<View className="bg-card rounded-xl p-4">
+  <Text className="type-body-strong text-ink">Strapela 6м</Text>
+  <Text className="type-label text-muted">Склад 1</Text>
 </View>
+
+// ❌ Hard-coded colors / StyleSheet for themable values
+<View style={{ backgroundColor: '#FFFFFF' }} />
 ```
 
-**Theme Colors** (from `tailwind.config.js`):
-```typescript
-// Light mode
-background, text, primary, secondary, surface, error, success, border
+- Colors: `bg`, `card`, `sunken`, `ink`, `soft`, `muted`, `line`, `primary`/`on-primary`, `accent`/`on-accent`, `hero*`, `nav*`, `ok|err|warn|info-bg/-fg`, `ph-bg/-fg`, `track`, `seg`, `disabled-bg/-fg`, `scrim`. Text on `accent` is always `text-on-accent` (graphite), never white.
+- Fonts: React Native can't pick weights from one custom family, so each weight is its own family. Use `type-*` utilities or `font-onest` / `font-onest-medium` / `font-onest-semibold` / `font-onest-bold`. **Do not combine them with `font-bold`/`font-semibold`** (Android double-bolds).
+- Text styles are named `type-*` (not `text-*`) on purpose: tailwind-merge in `cn()` treats unknown `text-*` as a color and would drop it.
+- `cn()` (`src/libs/utils.ts`) is a `tailwind-merge` extended with STHM names (`rounded-pill`, `font-onest-*`, `type-*`). Always merge classNames with `cn()`.
+- No shadows — blocks are separated by color (`card` on `bg`).
+- Icons: lucide, stroke width 2 at 24px.
 
-// Dark mode
-background-dark, text-dark, primary-dark, secondary-dark, etc.
-```
+### Transitional (remove at end of redesign stage 3)
 
-### Utility Function
+`global.css` keeps **legacy aliases** of the old shadcn names (`background`, `foreground`, `muted-foreground`, `secondary`, `border`, `input`, `ring`, `destructive`, `popover`, `primary-foreground`, `accent-foreground`) mapped to STHM values, and `useTheme()` keeps legacy keys (`background`, `text`, `textMuted`, `surface`, …). **Don't use them in new code.**
 
-```typescript
-import { cn } from '@/libs/utils';
+⚠️ `bg-muted` / `bg-accent` changed meaning: `muted` is now a **text** color and `accent` is **sage**. For neutral fills use `bg-sunken`.
 
-<Button className={cn('bg-primary', isActive && 'bg-error')} />
-```
+### Theme mode
+
+`src/hooks/use-theme-control.ts`: `ThemeMode` (`light` | `dark` | `system`), stored under `sthm23-theme-mode`, applied with `Appearance.setColorScheme`. `useThemeControl()` gives `{ themeMode, setThemeMode }`. NativeWind follows the color scheme automatically.
 
 ---
 
 ## UI Components
 
-### Base Components (`components/base/`)
-
-**Button**:
-```tsx
-import { Button } from '@/components/base/button';
-
-<Button
-  variant="default" | "error" | "outline" | "secondary" | "ghost" | "link"
-  size="default" | "sm" | "lg" | "icon"
-  loading={false}
-  disabled={false}
-  onPress={() => console.log('Pressed')}
->
-  Press me
-</Button>
-```
-
-**Input**:
-```tsx
-import { Input } from '@/components/base/input';
-
-<Input
-  placeholder="Enter text"
-  value={text}
-  onChangeText={setText}
-/>
-```
-
-**Select** (Native Picker):
-```tsx
-import { Select } from '@/components/base';
-
-<Select
-  variant="outline" | "underlined" | "rounded"
-  size="sm" | "md" | "lg"
-  selectedValue={value}
-  onValueChange={setValue}
-  disabled={false}
->
-  <Select.Item label="Option 1" value="opt1" />
-  <Select.Item label="Option 2" value="opt2" />
-</Select>
-```
-
-**IMPORTANT**: Select uses native `@react-native-picker/picker`:
-- **Android**: Shows dropdown menu
-- **iOS**: Shows wheel picker at bottom
-
-**Example with dynamic options**:
-```tsx
-<Select
-  variant="outline"
-  size="md"
-  selectedValue={selectedCategory}
-  onValueChange={setSelectedCategory}
->
-  {categories.map((cat) => (
-    <Select.Item
-      key={cat.id}
-      label={cat.name}
-      value={cat.id}
-    />
-  ))}
-</Select>
-```
-
-### Themed Components
-
-**ThemedView** and **ThemedText** automatically adapt to current theme:
-```tsx
-import { ThemedView, ThemedText } from '@/components/themed-view';
-
-<ThemedView type="surface">
-  <ThemedText type="title">Title</ThemedText>
-</ThemedView>
-```
-
----
-
-## Native Tabs Navigation
-
-Bottom tab navigation using **NativeTabs** (from `expo-router/unstable-native-tabs`):
+Quick reference with exact props: [`COMPONENTS.md`](./COMPONENTS.md). Import from the barrel:
 
 ```tsx
-import { NativeTabs } from 'expo-router/unstable-native-tabs';
-
-<NativeTabs
-  backgroundColor={colors.background}
-  indicatorColor={colors.surface}
->
-  <NativeTabs.Trigger name="(products)">
-    <NativeTabs.Trigger.Label>Products</NativeTabs.Trigger.Label>
-    <NativeTabs.Trigger.Icon md='list' sf='list.bullet' />
-  </NativeTabs.Trigger>
-  {/* More tabs... */}
-</NativeTabs>
+import { Button, Input, InputField, Text, VStack } from '@/components/base';
 ```
 
-**Tab Routes**:
-- `(products)` — Product list/create
-- `(orders)` — Order list/create
-- `(search)` — Search & barcode scan
-- `(payments)` — Payment history & cashbox
-- `(profile)` — User settings
+Gotchas from the current API:
+- `Button` variants are `default | outline | ghost | destructive`, sizes `sm | md | lg`, plus `loading`. A string child is wrapped in `Text` automatically.
+- `Input` is a **container View**; text-input props go on `InputField`: `<Input><InputField placeholder="…" /></Input>`.
+- There is no `ThemedView` / `ThemedText`.
 
-**Icons**:
-- `md='icon'` — Material Design (Android)
-- `sf='icon'` — SF Symbols (iOS)
+### BottomSheet (`@expo/ui`)
 
----
+Controlled pattern only:
 
-## Internationalization (i18n)
-
-**i18next** with 3 languages: English (en), Russian (ru), Uzbek (uz).
-
-**Setup**:
-- Translation files: `assets/i18next/locales/{en,ru,uz}.ts`
-- Initialized: `assets/i18next/i18next.ts`
-- Loaded before app renders in `_layout.tsx`
-
-**Usage**:
-```tsx
-import { useTranslation } from 'react-i18next';
-
-function MyComponent() {
-  const { t } = useTranslation();
-
-  return (
-    <View>
-      <Text>{t('navigation.products')}</Text>
-      <Text>{t('order.status.DEBT')}</Text>
-    </View>
-  );
-}
-```
-
-**Language Management**:
-```typescript
-import { setAppLanguage, AppLanguage } from '@/assets/i18next/i18next';
-
-// Change language
-setAppLanguage(AppLanguage.EN);  // 'en', 'ru', 'uz', 'auto'
-```
-
----
-
-## TypeScript Models
-
-**Location**: `src/models/`
-
-**Key Models**:
-- `auth.model.ts` — `AuthRequest`, `AuthResponse`, `CurrentUserType`
-- `user.model.ts` — `User`, `Staff`, `Customer`
-- `order.model.ts` — `Order`, `OrderItem`, `OrderStatus`
-- `product.model.ts` — `Product`, `ProductVariant`, `Inventory`
-- `payment.model.ts` — `Payment`, `Cashbox`, `CashTransaction`
-- `store.model.ts` — `Store`, `Warehouse`
-
-**Always import and use these types**:
-```typescript
-import { Order, OrderStatus } from '@/models/order.model';
-import { Product } from '@/models/product.model';
-```
-
----
-
-## Common Patterns
-
-### Loading Data
-
-```tsx
-import { useState, useEffect } from 'react';
-import { api } from '@/api/axios-instance';
-
-function ProductListScreen() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
-  async function loadProducts() {
-    try {
-      setLoading(true);
-      const response = await api.get<Product[]>('/product');
-      setProducts(response.data);
-    } catch (error) {
-      console.error('Failed to load products:', error);
-      // Show error toast
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <View>
-      {loading && <ActivityIndicator />}
-      {products.map(p => <Text key={p.id}>{p.name}</Text>)}
-    </View>
-  );
-}
-```
-
----
-
-### Form with Validation
-
-```tsx
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-const schema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  price: z.number().positive('Price must be positive'),
-});
-
-type FormData = z.infer<typeof schema>;
-
-function CreateProductScreen() {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
-
-  const onSubmit = async (data: FormData) => {
-    try {
-      await api.post('/product', data);
-      router.back();
-    } catch (error) {
-      // Handle error
-    }
-  };
-
-  return (
-    <View>
-      <Controller
-        control={control}
-        name="name"
-        render={({ field }) => (
-          <Input
-            placeholder="Product name"
-            value={field.value}
-            onChangeText={field.onChange}
-          />
-        )}
-      />
-      {errors.name && <Text>{errors.name.message}</Text>}
-
-      <Button onPress={handleSubmit(onSubmit)}>
-        Create Product
-      </Button>
-    </View>
-  );
-}
-```
-
----
-
-### Navigation with Params
-
-```tsx
-// Navigate to screen with params
-router.push({
-  pathname: '/(tabs)/(orders)/[id]',
-  params: { id: order.id }
-});
-
-// Receive params in screen
-import { useLocalSearchParams } from 'expo-router';
-
-function OrderDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-
-  useEffect(() => {
-    loadOrder(id);
-  }, [id]);
-
-  // ...
-}
-```
-
----
-
-### BottomSheet
-
-**Official `@expo/ui` BottomSheet** with **controlled pattern**.
-
-**Import**:
 ```tsx
 import { BottomSheet } from '@expo/ui';
+
+<BottomSheet isPresented={open} onDismiss={() => setOpen(false)} snapPoints={['half', 'full']}>
+  <Box className="flex-1 p-4">…</Box>
+</BottomSheet>
 ```
 
-**Basic Usage**:
+- Prefer `'half'` / `'full'` snap points (`{ fraction }` / `{ height }` are unreliable on Android).
+- No ref methods; drive it with state. Versioned docs: https://docs.expo.dev/versions/v57.0.0/sdk/ui/
+
+### Icons
+
+- UI icons: `lucide-react-native` directly, or the re-exports in `components/base/icon.tsx`.
+- `CustomIcon` (`src/icons/custom-icon.tsx`) renders SF Symbols (iOS) / Material Symbols (Android) by `IconNames`; it wraps `@expo/ui` in `<Host matchContents>`.
+- Any `@expo/ui` Jetpack Compose component (Icon, Column, Picker, Text) **must** be inside `<Host>`.
+
+---
+
+## API Communication
+
+`src/api/axios-instance.ts`:
+- `BASE_URL` is chosen with `Platform.select`. **It currently points to a LAN dev server** (`http://<lan-ip>:4000/api`, `localhost` for web); production is `https://sthm23.uz/api` (commented). Check it before building a release.
+- Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payments`), `warehouseApi` (`/warehouse`). Timeout 30 s, `withCredentials: true`.
+- Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup`, `/refresh`, `/logout`.
+- On 401: one shared `GET /refresh` (httpOnly cookie) → save new token → retry once. If refresh fails: `POST /logout` and clear stored token/user.
+
+Endpoint reference: [`../docs/api-map.md`](../docs/api-map.md) (verify against the backend controller — parts are outdated).
+
+### Services + React Query
+
+Pattern per domain in `src/services/<domain>/`:
+- `<domain>.service.ts` — object with axios calls (`orderService`, `productService`, `cashboxService`).
+- `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, …).
+
 ```tsx
-import { BottomSheet } from '@expo/ui';
-import { useState } from 'react';
-import { Box, Text } from '@/components/base';
-
-function MyScreen() {
-  const [isPresented, setIsPresented] = useState(false);
-
-  return (
-    <>
-      <Button onPress={() => setIsPresented(true)}>
-        Open Sheet
-      </Button>
-
-      <BottomSheet
-        isPresented={isPresented}
-        onDismiss={() => setIsPresented(false)}
-        snapPoints={['half', 'full']}
-      >
-        <Box className="flex-1 p-4">
-          <Text>Sheet Content</Text>
-        </Box>
-      </BottomSheet>
-    </>
-  );
-}
+const { data, isLoading, isError, refetch } = useOrders(params);
 ```
 
-**Key Props**:
-- `isPresented` (boolean) — Controls sheet visibility
-- `onDismiss` (() => void) — Called when user dismisses sheet
-- `snapPoints` (SnapPoint[]) — Heights where sheet can rest
-- `showDragIndicator` (boolean) — Shows/hides drag handle (default: true)
+Always handle loading / error / empty states (`components/common/LoadingState`, `EmptyState`).
 
-**Snap Points**:
-- `'half'` — Approximately half-screen (recommended)
-- `'full'` — Fully expanded (recommended)
-- `{ fraction: number }` — Screen height fraction (0-1) - **may not work correctly on Android**
-- `{ height: number }` — Fixed pixel height - **may not work correctly on Android**
+`toast.service.ts` currently exports **types only** (no working toast function).
 
-**Important Notes**:
-- **Use `'half'` and `'full'` snap points** for best cross-platform compatibility
-- Wrap content in `<Box className="flex-1 p-4">` for proper layout
-- For scrollable content, use `<ScrollView>` inside the Box
-- Sheet visibility is **controlled** via `isPresented` state
-- No ref-based methods (present/dismiss) — use state instead
-- Versioned docs: https://docs.expo.dev/versions/v56.0.0/sdk/ui/universal/bottomsheet/
+---
 
-**Example with forwardRef** (for imperative control):
+## Authentication
+
+`src/provider/AuthProvider.tsx` exports `AuthProvider`, `useAuth`, `AuthStatusEnum` (`loading` | `authenticated` | `unauthenticated`).
+`useAuth()` → `{ isAuthenticated, authStatus, user, login(data), logout() }`. On start it reads the token and loads `GET /auth/me`.
+
+Role checks in the UI are UX only — the backend enforces permissions.
+
+---
+
+## Storage Keys
+
+| Key | Where | Purpose |
+|---|---|---|
+| `my_billing_access_token` | `LOCALE_STORAGE_KEYS.TOKEN` (`models/app.models.ts`) | Access token |
+| `my_billing_current_user` | `LOCALE_STORAGE_KEYS.USER` | Cached user |
+| `sthm23-theme-mode` | `ThemeStorageKey.THEME_MODE` (`hooks/use-theme-control.ts`) | Theme mode |
+| `sthm23_app-language` | `assets/i18next/i18next.ts` | Language |
+
+---
+
+## Internationalization
+
+- `assets/i18next/i18next.ts` exports `AppLanguage` (`auto` | `en` | `ru` | `uz`), `setAppLanguage()`, `getSavedLanguageOption()`, default `i18n`.
+- Device language is used if it's en/ru/uz, otherwise `ru`.
+- Strings live in `assets/i18next/locales/{en,ru,uz}.ts`. Add every new key to all three.
+
 ```tsx
-import { BottomSheet } from '@expo/ui';
-import { forwardRef, useImperativeHandle, useState } from 'react';
-import { Box } from '@/components/base';
-import { ScrollView } from 'react-native';
-
-interface SheetRef {
-  open: () => void;
-  close: () => void;
-}
-
-export const MySheet = forwardRef<SheetRef, { children: React.ReactNode }>(
-  function MySheet({ children }, ref) {
-    const [isPresented, setIsPresented] = useState(false);
-
-    useImperativeHandle(ref, () => ({
-      open: () => setIsPresented(true),
-      close: () => setIsPresented(false),
-    }));
-
-    return (
-      <BottomSheet
-        isPresented={isPresented}
-        onDismiss={() => setIsPresented(false)}
-        snapPoints={['half', 'full']}
-      >
-        <Box className="flex-1">
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {children}
-          </ScrollView>
-        </Box>
-      </BottomSheet>
-    );
-  }
-);
+const { t } = useTranslation();
+t('navigation.products');
 ```
 
 ---
 
-## AsyncStorage Keys
+## Forms
 
-Defined in `src/models/app.models.ts`:
-
-```typescript
-LOCALE_STORAGE_KEYS = {
-  TOKEN: 'sthm23-auth-token',
-  USER: 'sthm23-user-profile',
-}
-```
-
-**Additional keys**:
-- `sthm23-theme-mode` — Theme preference
-- `sthm23_app-language` — Language preference
-
-**Usage**:
-```typescript
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Save
-await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.TOKEN, token);
-
-// Read
-const token = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN);
-
-// Remove
-await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.TOKEN);
-```
+React Hook Form + Zod (`@hookform/resolvers/zod`). Wrap fields with `FormControl` from `components/base`. Client validation is UX only — the backend validates again.
 
 ---
 
-## Platform-Specific Code
+## Adding Packages
 
-Test on **both iOS and Android** — components may behave differently.
-
-**Platform.select**:
-```typescript
-import { Platform } from 'react-native';
-
-const fontSize = Platform.select({
-  ios: 16,
-  android: 14,
-  default: 16,
-});
-```
-
-**Platform.OS**:
-```typescript
-if (Platform.OS === 'ios') {
-  // iOS-specific code
-}
-```
+- Use `npx expo install <package>` so versions match SDK 57.
+- This repo resolves packages from the **public npm registry** (see `package-lock.json`). If the global npm config points elsewhere, pass `-- --registry=https://registry.npmjs.org/`.
 
 ---
 
-## Important Notes
+## Verification
 
-### Expo SDK Version Lock
-
-**Current version**: Expo SDK 56
-
-When adding new packages:
-1. Check compatibility with Expo 56
-2. Use `npx expo install <package>` (not `npm install`)
-3. Verify versioned docs
-
-### NativeWind v4
-
-- Configuration: `tailwind.config.js`, `metro.config.js`, `babel.config.js`
-- Global CSS: `src/global.css`
-- JSX runtime: `nativewind` (in babel config)
-
-### State Management
-
-**Current approach**:
-- React Context for auth, theme
-- Component state for most features
-- React Query for API data (if used)
-
-**No Redux/MobX** — keep it simple with built-in React hooks.
-
----
-
-## Development Workflow
-
-### 1. Adding New Screen
-
-**Example**: Create "Debt Payment" screen
-
-1. Create file in appropriate directory:
-   ```
-   src/app/(tabs)/(payments)/debt-pay.tsx
-   ```
-
-2. Implement screen:
-   ```tsx
-   import { View, Text } from 'react-native';
-   import { useLocalSearchParams } from 'expo-router';
-
-   export default function DebtPayScreen() {
-     const { debtId } = useLocalSearchParams<{ debtId: string }>();
-
-     return (
-       <View className="flex-1 p-4">
-         <Text>Pay Debt: {debtId}</Text>
-       </View>
-     );
-   }
-   ```
-
-3. Navigate to screen:
-   ```tsx
-   router.push({
-     pathname: '/(tabs)/(payments)/debt-pay',
-     params: { debtId: debt.id }
-   });
-   ```
-
----
-
-### 2. Adding API Service
-
-**Example**: Create `DebtService`
-
-```typescript
-// src/services/debt.service.ts
-import { api } from '@/api/axios-instance';
-
-export interface CustomerDebt {
-  id: string;
-  totalAmount: number;
-  paidAmount: number;
-  status: 'ACTIVE' | 'PAID';
-}
-
-export const DebtService = {
-  async getDebts(storeId: string): Promise<CustomerDebt[]> {
-    const response = await api.get('/debt', {
-      params: { storeId }
-    });
-    return response.data;
-  },
-
-  async payDebt(debtId: string, amount: number) {
-    const response = await api.post('/debt/payment', {
-      debtId,
-      payments: [{ type: 'CASH', amount }]
-    });
-    return response.data;
-  }
-};
-```
-
----
-
-### 3. Before Creating New Feature
-
-**Always check existing implementation**:
-
-1. Find similar screen:
-   ```bash
-   ls src/app/(tabs)/(orders)/
-   ```
-
-2. Check existing service:
-   ```bash
-   ls src/services/
-   ```
-
-3. Review existing patterns
-4. **Follow existing patterns** — don't introduce new architecture
-
----
-
-## Related Documentation
-
-- **Root entry point**: `../AGENTS.md`
-- **Business concepts**: `../docs/business-domain.md`
-- **API endpoints**: `../docs/api-map.md`
-- **Backend architecture**: `../billing/AGENTS.md`
-- **Web architecture**: `../billing_ui/AGENTS.md`
-
----
-
-## Quick Commands
+There is no test runner and no ESLint config yet (`npm run lint` would try to set ESLint up).
 
 ```bash
-# Development
-npm start                         # Start Expo dev server
-npm run android                   # Run on Android emulator
-npm run ios                       # Run on iOS simulator
-npm run web                       # Run in web browser
-
-# Project Management
-npx expo install <package>        # Install Expo-compatible package
-npx expo prebuild                 # Generate native projects (iOS/Android)
-
-# Code Quality
-npm run lint                      # ESLint check
+npx tsc --noEmit                         # Type-check (has pre-existing errors — don't add new ones)
+npx expo export --platform android       # Bundles the app: catches CSS/import errors
+npx expo start --clear                   # Run with a clean NativeWind cache
 ```
+
+Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo prebuild --clean` / new dev client).
+
+---
+
+## Known Issues
+
+- `src/app/_layout.tsx`: `ThemeControlContext` value misses `currentMode` (type error).
+- `component-demo.tsx`, `SearchBar.tsx`: pass `placeholder` etc. to `Input` instead of `InputField`.
+- `Spinner`: `md` and `lg` both map to `'large'`. `AlertDialog` ignores `size`. `Badge` uses `success-500`-style classes that don't exist in the theme.
+- `assets/orders/` contains stray route files that don't compile; `scripts/reset-project.js` is missing.
+- Service paths that don't match the backend: `searchProductsForOrder` (sends orderId, backend expects warehouseId), `addPaymentToOrder` (`/payments` vs `/payment`), `updateProductVariant` (POST vs PUT).
 
 ---
 
 ## Troubleshooting
 
-### "Cannot find module 'expo-camera'"
+**Styling not applied** — check `metro.config.js` uses `withNativewind`, `babel.config.js` has `nativewind/babel`, then `npx expo start --clear`. Remember Tailwind only generates classes that appear in source; dynamic class strings (`` `gap-${n}` ``) are not generated unless the full class appears somewhere.
 
-**Cause**: Native module not prebuilt
+**Custom font not applied** — make sure the class sets a family (`type-*`, `font-onest-*`) and that the root layout finished loading fonts.
 
-**Solution**:
-```bash
-npx expo prebuild --clean
-npx expo run:android  # or run:ios
-```
+**"A Jetpack Compose view must be rendered as a direct child of <Host>"** — wrap `@expo/ui` Compose components in `<Host>`, or use RN components (`Select` from base for pickers, `CustomIcon` for icons).
 
-### Navigation type errors after adding route
-
-**Cause**: Expo Router types not regenerated
-
-**Solution**:
-```bash
-rm -rf .expo
-npx expo start
-```
-
-### Styling not working
-
-**Cause**: NativeWind configuration issue
-
-**Solution**:
-1. Check `metro.config.js` has `withNativeWind`
-2. Check `babel.config.js` has `nativewind/babel`
-3. Clear cache: `npx expo start --clear`
-
-### "Text strings must be rendered within a <Text> component"
-
-**Cause**: Using `text-primary-foreground` class with NativeWind
-
-**Why it fails**: NativeWind doesn't correctly process complex CSS variables like `text-primary-foreground` defined in `global.css`, causing text to render outside `<Text>` components.
-
-**Solution**: Replace `text-primary-foreground` with `text-white`:
-```tsx
-// ❌ Wrong
-<Text className="text-primary-foreground">Button Text</Text>
-
-// ✅ Correct
-<Text className="text-white">Button Text</Text>
-```
-
-### "A Jetpack Compose view must be rendered as a direct child of <Host>"
-
-**Cause**: Using `@expo/ui` Compose components (Icon, Picker, Column, Text) without proper `<Host>` wrapper
-
-**Note**: `<Host>` is only needed when using `@expo/ui` Jetpack Compose components (Icon, Column, Picker, Text). Regular React Native components don't need it.
-
-**Better solution**: Use native React Native components instead of `@expo/ui` Compose components:
-- For Picker: Use `<Select>` from `@/components/base` (wraps `@react-native-picker/picker`)
-- For Icons: Use `CustomIcon` (properly wrapped with `<Host>`)
-- For BottomSheet: Use `BottomSheet` from `@expo/ui` (controlled pattern with `isPresented`/`onDismiss`)
+**Navigation type errors after adding a route** — `rm -rf .expo && npx expo start`.
 
 ---
 
-**Remember**: This mobile app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always reference versioned Expo docs (v56)!
+## Related Documentation
+
+- Root entry point: [`../AGENTS.md`](../AGENTS.md)
+- Design system: [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) · Components: [`COMPONENTS.md`](./COMPONENTS.md) · Examples: [`src/components/base/EXAMPLES.md`](./src/components/base/EXAMPLES.md)
+- Docs index: [`../docs/INDEX.md`](../docs/INDEX.md) · Features: [`../docs/features/`](../docs/features/) · API map: [`../docs/api-map.md`](../docs/api-map.md)
+- Backend: [`../billing/AGENTS.md`](../billing/AGENTS.md)
+
+---
+
+**Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
+
+**Last updated**: 2026-10-19
