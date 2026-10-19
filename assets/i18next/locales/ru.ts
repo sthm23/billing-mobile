@@ -544,7 +544,9 @@ const ru = {
     "payments": "Платежи",
     "attribute": "Атрибут",
     "more": "Еще",
-    "search": "Поиск"
+    "search": "Поиск",
+    "cashbox": "Касса",
+    "newSale": "Новая продажа — сканировать"
   },
   "search": {
     "title": "Поиск",

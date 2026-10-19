@@ -1,4 +1,5 @@
 import { Box, Divider, VStack } from '@/components/base';
+import { useBottomNavInset } from '@/components/navigation/BottomNav';
 import { ActionButtons } from '@/components/product/ActionButtons';
 import { EmptyProductList } from '@/components/product/EmptyProductList';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -16,6 +17,7 @@ const PAGE_SIZE = 10;
 
 export default function ProductListScreen() {
   const router = useRouter();
+  const bottomInset = useBottomNavInset();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -110,7 +112,7 @@ export default function ProductListScreen() {
           onEndReachedThreshold={0.3}
           contentContainerStyle={{
             paddingHorizontal: 16,
-            paddingBottom: 16,
+            paddingBottom: bottomInset,
             flexGrow: allProducts.length === 0 ? 1 : undefined,
           }}
         />

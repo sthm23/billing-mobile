@@ -2,6 +2,7 @@ import { Box, Button, Text } from '@/components/base';
 import { CashboxFilters, CashboxHeader, CashboxStatusFilter } from '@/components/cashbox';
 import { FilterSheet } from '@/components/cashbox/FilterSheet';
 import { EmptyState, LoadingState } from '@/components/common';
+import { useBottomNavInset } from '@/components/navigation/BottomNav';
 import { Payment } from '@/models/payment.model';
 import { useCashboxList } from '@/services/cashbox';
 import { CashboxParams } from '@/services/cashbox/cashbox.types';
@@ -14,6 +15,7 @@ import { CashboxCard } from './CashboxCard';
 export default function CashboxListPage() {
   const { t } = useTranslation();
   const router = useRouter();
+  const bottomInset = useBottomNavInset();
   const [page, setPage] = useState(1);
   const [isOpenFilter, setToggleFilter] = useState<boolean>(false);
   const [cashboxes, setCashboxes] = useState<Payment[]>([]);
@@ -76,7 +78,7 @@ export default function CashboxListPage() {
   };
 
   const handleCashboxPress = (cashbox: Payment) => {
-    router.push(`/(tabs)/(payments)/${cashbox.id}`);
+    router.push(`/(tabs)/(cashbox)/${cashbox.id}`);
   };
 
   const handleStatusFilterChange = (value: string) => {
@@ -89,7 +91,7 @@ export default function CashboxListPage() {
         {/* Header */}
         <Box className="px-4 py-3 border-b border-border">
           <CashboxHeader
-            onOpenCashbox={() => router.push('/(tabs)/(payments)/create')}
+            onOpenCashbox={() => router.push('/(tabs)/(cashbox)/create')}
           />
 
           {/* Filters */}
@@ -107,7 +109,7 @@ export default function CashboxListPage() {
             <CashboxCard cashbox={item} onPress={handleCashboxPress} t={t} />
           )}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: 16, gap: 8 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: bottomInset, gap: 8 }}
           ListEmptyComponent={<EmptyState message={t('payment.noFound')} />}
           ListFooterComponent={
             hasMore ? (

@@ -75,11 +75,12 @@ billing-mobile/
     ├── screens/                  # Screen implementations: login, order, payment, product, profile
     ├── components/
     │   ├── base/                 # Design primitives (see COMPONENTS.md)
+    │   ├── navigation/           # BottomNav (floating tab bar) + useBottomNavInset
     │   ├── common/               # EmptyState, LoadingState
     │   ├── product/ order/ cashbox/  # Domain components
     ├── constants/
     │   ├── tokens.ts             # STHM color palette (JS mirror of global.css) + FontFamily
-    │   └── theme.ts              # Spacing, BottomTabInset, MaxContentWidth (legacy Fonts)
+    │   └── theme.ts              # Spacing, MaxContentWidth (legacy Fonts)
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
@@ -106,17 +107,19 @@ Other root routes: `index.tsx` (redirects by auth state), `login.tsx` (→ `scre
 
 ### Tabs (`src/app/(tabs)/_layout.tsx`)
 
-`NativeTabs` from `expo-router/unstable-native-tabs`, colored from `useTheme()`. Each tab has its own Stack:
+Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navigation/BottomNav.tsx`) — the floating STHM bar **Products · Orders · [Scan] · Cashbox · Profile**. Each tab has its own Stack:
 
 | Tab | Routes | Renders |
 |---|---|---|
 | `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, placeholder |
 | `(orders)` | `index`, `[id]`, `create` | `OrderPage`, `OrderDetailScreen`, placeholder |
-| `(payments)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
+| `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
 | `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, placeholders |
-| `(search)` | `index`, `search`, `scan` | redirect, placeholders |
 
-> The STHM redesign replaces this with a custom floating tab bar (Products · Orders · Scan · Cashbox · Profile) — see "Redesign status" in [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md). Until then, keep `NativeTabs`.
+- The center **Scan** button starts a new sale: `router.push('/(tabs)/(orders)/create')` (order creation + barcode scan arrive in redesign stage 5).
+- The bar is **absolutely positioned** over the content and **hidden** on nested screens (any stack screen above a tab's root) and while the keyboard is open.
+- **Tab root screens must reserve space for it**: `const bottomInset = useBottomNavInset();` → `contentContainerStyle={{ paddingBottom: bottomInset }}` on the scroll container.
+- To add a tab: add the route group, a `Tabs.Screen` in the layout, and an entry in `LEFT_TABS` / `RIGHT_TABS` in `BottomNav.tsx` (lucide icon + i18n key under `navigation.*`).
 
 ### Navigation
 
@@ -320,9 +323,9 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - `src/app/_layout.tsx`: `ThemeControlContext` value misses `currentMode` (type error).
-- `LoginPage.tsx`, `SearchBar.tsx`: pass `placeholder`/`error` to `Input` instead of `InputField` (fixed when the screens are reskinned).
 - `ProductSearchSheet.tsx` passes `size="icon"` to `Button`; `OrderCardMenu.tsx` passes `title` to `Modal`; profile screens pass `size` to `Heading` — props that don't exist.
 - `services/product/*` import a missing `./product.type`.
+- `CashboxListPage.tsx`: `useMemo` is called after early `return`s (breaks the Rules of Hooks when loading/error state changes); "open cashbox" pushes to `/(tabs)/(cashbox)/create`, which doesn't exist.
 - `assets/orders/` contains stray route files that don't compile; `scripts/reset-project.js` is missing.
 - Service paths that don't match the backend: `searchProductsForOrder` (sends orderId, backend expects warehouseId), `addPaymentToOrder` (`/payments` vs `/payment`), `updateProductVariant` (POST vs PUT).
 

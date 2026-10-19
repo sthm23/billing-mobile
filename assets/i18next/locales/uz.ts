@@ -544,7 +544,9 @@ const uz = {
     "payments": "To'lovlar",
     "attribute": "Atribut",
     "more": "Boshqa",
-    "search": "Qidirish"
+    "search": "Qidirish",
+    "cashbox": "Kassa",
+    "newSale": "Yangi savdo — skanerlash"
   },
   "search": {
     "title": "Qidirish",

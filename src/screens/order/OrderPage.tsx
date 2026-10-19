@@ -1,4 +1,5 @@
 import { Box, Button, HStack, Pressable, Spinner, Text } from '@/components/base';
+import { useBottomNavInset } from '@/components/navigation/BottomNav';
 import { useTheme } from '@/hooks/use-theme';
 import { useOrders } from '@/services/order/order.queries';
 import { OrderParams, OrderStatus } from '@/services/order/order.type';
@@ -22,6 +23,7 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
 export default function OrderPage() {
     const { t } = useTranslation();
     const colors = useTheme();
+    const bottomInset = useBottomNavInset();
     const page = 1
     const pageSize = 10
     const [searchText, setSearchText] = useState('');
@@ -161,7 +163,7 @@ export default function OrderPage() {
                         <Text variant="muted">{t('order.noOrders')}</Text>
                     </Box>
                 )}
-                contentContainerStyle={{ flexGrow: 1 }}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomInset }}
             />
         </>
     )

@@ -1,4 +1,5 @@
-import { Box, Button, Card, Center, Heading, HStack, Input, Pressable, Text, VStack } from '@/components/base';
+import { Button, Card, Center, Heading, HStack, Input, InputField, Pressable, Text, VStack } from '@/components/base';
+import { useTheme } from '@/hooks/use-theme';
 import { AlertCircle, Eye, EyeOff } from 'lucide-react-native';
 import { AuthRequest } from '@/models/auth.model';
 import { useAuth } from '@/provider/AuthProvider';
@@ -11,6 +12,7 @@ import * as z from 'zod';
 
 export function LoginPage() {
     const { t } = useTranslation();
+    const colors = useTheme();
 
     const formSchema = z.object({
         login: z.string().min(1, t('login.loginRequired')),
@@ -84,15 +86,17 @@ export function LoginPage() {
                             control={control}
                             name="login"
                             render={({ field: { onChange, onBlur, value } }) => (
-                                <Input
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    value={value}
-                                    onBlur={onBlur}
-                                    onChangeText={onChange}
-                                    error={!!errors.login}
-                                    placeholder={t('login.email')}
-                                />
+                                <Input size="lg" invalid={!!errors.login}>
+                                    <InputField
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
+                                        value={value}
+                                        onBlur={onBlur}
+                                        onChangeText={onChange}
+                                        placeholder={t('login.email')}
+                                    />
+                                </Input>
                             )}
                         />
                         {errors.login && (
@@ -110,33 +114,34 @@ export function LoginPage() {
                         <Text variant="small" className="text-foreground/60">
                             {t('login.password')}
                         </Text>
-                        <Box className="relative">
-                            <Controller
-                                control={control}
-                                name="password"
-                                render={({ field: { onChange, onBlur, value } }) => (
-                                    <Input
+                        <Controller
+                            control={control}
+                            name="password"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <Input size="lg" invalid={!!errors.password}>
+                                    <InputField
                                         secureTextEntry={!showPassword}
+                                        autoCapitalize="none"
+                                        autoCorrect={false}
                                         value={value}
                                         onBlur={onBlur}
                                         onChangeText={onChange}
-                                        error={!!errors.password}
                                         placeholder={t('login.password')}
-                                        className="pr-12"
                                     />
-                                )}
-                            />
-                            <Pressable
-                                onPress={handleState}
-                                className="absolute right-3 top-0 h-full justify-center"
-                            >
-                                {showPassword ? (
-                                    <Eye size={20} color="#737373" />
-                                ) : (
-                                    <EyeOff size={20} color="#737373" />
-                                )}
-                            </Pressable>
-                        </Box>
+                                    <Pressable
+                                        onPress={handleState}
+                                        className="h-full justify-center"
+                                        accessibilityRole="button"
+                                    >
+                                        {showPassword ? (
+                                            <Eye size={20} color={colors.muted} />
+                                        ) : (
+                                            <EyeOff size={20} color={colors.muted} />
+                                        )}
+                                    </Pressable>
+                                </Input>
+                            )}
+                        />
                         {errors.password && (
                             <HStack gap={2} className="items-center">
                                 <AlertCircle size={16} color="#EF4444" />

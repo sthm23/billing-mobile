@@ -4,6 +4,7 @@ import {
   Heading,
   Text,
 } from "@/components/base";
+import { useBottomNavInset } from "@/components/navigation/BottomNav";
 import { useAuth } from "@/provider/AuthProvider";
 import { useTranslation } from "react-i18next";
 import { ScrollView } from "react-native";
@@ -15,6 +16,7 @@ const MobileProfilePage = ({ isActive }: any) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { logout } = useAuth();
+  const bottomInset = useBottomNavInset();
   // const router = useRouter();
 
   const handleLogout = () => {
@@ -32,7 +34,7 @@ const MobileProfilePage = ({ isActive }: any) => {
   return (
     <ScrollView
       style={{ display: isActive ? "flex" : "none", height: '100%', width: '100%' }}
-      contentContainerStyle={{ justifyContent: "space-between", height: '100%', width: '100%' }}
+      contentContainerStyle={{ justifyContent: "space-between", flexGrow: 1, width: '100%', paddingBottom: bottomInset }}
     >
       <Box className="flex h-full px-5 py-4">
         <Box className="flex flex-col gap-4">

@@ -543,7 +543,9 @@ const en = {
     "payments": "Payments",
     "attribute": "Attribute",
     "more": "More",
-    "search": "Search"
+    "search": "Search",
+    "cashbox": "Cashbox",
+    "newSale": "New sale — scan"
   },
   "search": {
     "title": "Search",
