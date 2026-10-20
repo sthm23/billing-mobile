@@ -1,12 +1,13 @@
-import { ComingSoonScreen } from "@/components/common";
-import { UserRoundPlus } from "lucide-react-native";
-import { useTranslation } from "react-i18next";
+import { CreateStaffScreen } from "@/screens/profile/CreateStaffScreen";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 /**
- * Staff creation (OWNER only) arrives in redesign stage 4.
+ * New employee (OWNER only). Reached from Profile → Staff.
  */
-export default function CreateStaffScreen() {
-    const { t } = useTranslation();
-
-    return <ComingSoonScreen title={t('user.createTitle')} icon={UserRoundPlus} />;
+export default function CreateStaffRoute() {
+    return (
+        <SafeAreaView edges={['top']} className="flex-1 bg-bg">
+            <CreateStaffScreen />
+        </SafeAreaView>
+    );
 }

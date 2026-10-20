@@ -118,7 +118,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen` |
 | `(orders)` | `index`, `[id]`, `create` | `OrderPage`, `OrderDetailScreen`, `ComingSoonScreen` (new sale — stage 5) |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, `ComingSoonScreen` (staff creation — stage 4), `ComingSoonScreen` |
+| `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen` |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
@@ -252,7 +252,12 @@ Endpoint reference: [`../docs/api-map.md`](../docs/api-map.md) (verify against t
 
 Pattern per domain in `src/services/<domain>/`:
 - `<domain>.service.ts` — object with axios calls (`orderService`, `productService`, `cashboxService`).
-- `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, …).
+- `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
+- `<domain>.types.ts` — request/response types (`cashbox`, `store`).
+
+Domains: `auth`, `cashbox`, `order`, `product`, `store` (owner's store + `POST /store/staff`).
+
+API errors: NestJS returns `{ message: string | string[] }` — show `message` to the user (see `getApiErrorMessage` in `CreateStaffScreen`).
 
 ```tsx
 const { data, isLoading, isError, refetch } = useOrders(params);
@@ -270,6 +275,9 @@ Always handle loading / error / empty states (`components/common/LoadingState`, 
 `useAuth()` → `{ isAuthenticated, authStatus, user, login(data), logout() }`. On start it reads the token and loads `GET /auth/me`.
 
 Role checks in the UI are UX only — the backend enforces permissions.
+
+- Owner = `user.role === UserRole.OWNER` (not `staff.role`). The owner's store is `user.staff.storeId`.
+- Owner-only UI: Profile → «Сотрудники» (new employee). The screen also shows «нет доступа» for non-owners.
 
 ---
 
@@ -327,7 +335,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - Client-side totals that belong to the backend: order subtotal/discount (`OrderDetailScreen`), cashbox income/expense and per-method breakdown (`CashboxDetailsPage`, `PaymentBreakdownDialog`). To be replaced by backend values (redesign stage 7).
-- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, order create, customer selection, open cashbox, cashbox filters, staff creation. Order detail actions (hold, place order, item quantity/delete) and product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
+- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, order create, customer selection, open cashbox, cashbox filters. Staff creation has no «comment» field (not stored by the backend). Order detail actions (hold, place order, item quantity/delete) and product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
 - Service paths that don't match the backend: `searchProductsForOrder` (sends orderId, backend expects warehouseId), `addPaymentToOrder` (`/payments` vs `/payment`), `updateProductVariant` (POST vs PUT).
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
