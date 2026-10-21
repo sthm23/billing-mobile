@@ -82,7 +82,13 @@ export function BottomNav({ state, navigation }: BottomTabBarProps) {
   const keyboardVisible = useKeyboardVisible();
 
   const focusedRoute = state.routes[state.index];
-  const isNestedScreen = (focusedRoute?.state?.index ?? 0) > 0;
+  // Active screen of the tab's stack: from its state, or — before the stack has
+  // state (navigated straight to a nested screen, e.g. on web) — from params.
+  const nestedState = focusedRoute?.state;
+  const activeScreen = nestedState
+    ? nestedState.routes[nestedState.index ?? 0]?.name
+    : (focusedRoute?.params as { screen?: string } | undefined)?.screen;
+  const isNestedScreen = activeScreen !== undefined && activeScreen !== 'index';
 
   if (isNestedScreen || keyboardVisible) {
     return null;

@@ -53,7 +53,8 @@ export function LoginPage() {
             if (!error.response) {
                 return t('errors.networkUnavailable');
             }
-            if (error.response.status === 401) {
+            // The backend answers wrong credentials with 404 (LocalStrategy) or 401
+            if (error.response.status === 401 || error.response.status === 404) {
                 return t('errors.invalidCredentials');
             }
             const apiMessage = error.response.data?.message;
@@ -191,6 +192,20 @@ export function LoginPage() {
                 >
                     {loading ? t('login.pleaseWait') : t('login.loginButton')}
                 </Button>
+            </View>
+
+            {/* Self-registration (admin approval + Telegram bot) is a future flow — shown disabled */}
+            <View className="mt-auto pt-2 flex-row flex-wrap items-center justify-center gap-1">
+                <Text className="font-onest text-sm text-muted">{t('login.signUptext')}</Text>
+                <Pressable
+                    disabled
+                    accessibilityRole="link"
+                    accessibilityState={{ disabled: true }}
+                    accessibilityHint={t('common.comingSoon')}
+                    className="py-1 opacity-50"
+                >
+                    <Text className="font-onest-bold text-sm text-ink">{t('signUp.signin')}</Text>
+                </Pressable>
             </View>
         </ScrollView>
     )

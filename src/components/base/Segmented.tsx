@@ -11,6 +11,11 @@ export interface SegmentedProps<T extends string> extends Omit<ViewProps, 'child
   options: SegmentedOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  /**
+   * `track` — on the screen background (default), `sunken` — inside a card
+   * (in dark mode `track` equals `card` and would disappear)
+   */
+  variant?: 'track' | 'sunken';
   className?: string;
 }
 
@@ -28,10 +33,17 @@ export interface SegmentedProps<T extends string> extends Omit<ViewProps, 'child
  *   onChange={setFilter}
  * />
  */
-export function Segmented<T extends string>({ options, value, onChange, className, ...props }: SegmentedProps<T>) {
+export function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+  variant = 'track',
+  className,
+  ...props
+}: SegmentedProps<T>) {
   return (
     <View
-      className={cn('flex-row gap-1 p-1 bg-track rounded-pill', className)}
+      className={cn('flex-row gap-1 p-1 rounded-pill', variant === 'sunken' ? 'bg-sunken' : 'bg-track', className)}
       accessibilityRole="tablist"
       {...props}
     >

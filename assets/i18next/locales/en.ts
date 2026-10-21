@@ -320,7 +320,7 @@ const en = {
       "CARD": "Card",
       "DEBT": "Debt",
       "TRANSFER": "Transfer",
-      "ONLINE": "Online"
+      "ONLINE": "Click"
     },
     "channel": {
       "name": "Channel",

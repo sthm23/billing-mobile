@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Appearance } from 'react-native';
+import { Appearance, Platform } from 'react-native';
 import { createContext, useContext } from 'react';
 
 export enum ThemeMode {
@@ -56,11 +56,16 @@ export function getModeForGlueStack(themeMode: ThemeMode): ModeType {
 }
 
 export function applyThemeMode(mode: ThemeMode): void {
-  const actualMode = getModeForGlueStack(mode);
-  if (actualMode === ThemeMode.AUTO) {
-    // Reset to system default - GlueStack will handle this automatically
-    // We don't need to call Appearance.setColorScheme when mode is 'system'
+  if (Platform.OS === 'web') {
+    // react-native-web has no Appearance.setColorScheme: global.css switches the
+    // tokens by a `dark` / `light` class on <html>; no class = follow the system.
+    if (typeof document !== 'undefined') {
+      const root = document.documentElement;
+      root.classList.remove(ThemeMode.DARK, ThemeMode.LIGHT);
+      if (mode !== ThemeMode.AUTO) root.classList.add(mode);
+    }
     return;
   }
-  Appearance.setColorScheme(actualMode);
+  // 'unspecified' hands the scheme back to the system (after a forced light/dark).
+  Appearance.setColorScheme(mode === ThemeMode.AUTO ? 'unspecified' : mode);
 }

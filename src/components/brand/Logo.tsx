@@ -1,4 +1,4 @@
-import { useColorScheme } from 'react-native';
+import { useIsDarkMode } from '@/hooks/use-theme';
 import { SvgXml } from 'react-native-svg';
 import { APP_ICON, LOGO_HORIZONTAL, LOGO_HORIZONTAL_ON_DARK } from './logo-sources';
 
@@ -31,7 +31,7 @@ export interface LogoProps {
  * <Logo variant="icon" width={112} />
  */
 export function Logo({ variant = 'horizontal', width, onDark, accessibilityLabel = 'STHM' }: LogoProps) {
-  const isDarkScheme = useColorScheme() === 'dark';
+  const isDarkScheme = useIsDarkMode();
 
   if (variant === 'icon') {
     return <SvgXml xml={APP_ICON} width={width} height={width} accessibilityLabel={accessibilityLabel} />;

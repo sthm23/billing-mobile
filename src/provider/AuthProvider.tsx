@@ -74,9 +74,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [])
 
 
+    // No global Loading status here: the root layout would swap the login
+    // screen for the splash and its error message would be lost. The login
+    // button shows its own spinner.
     const login = async (data: AuthRequest) => {
-        setAuthStatus(AuthStatusEnum.Loading);
-
         try {
             const response = await loginAuth(data)
             await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.TOKEN, response.accessToken);
@@ -94,7 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setAuthenticated(false);
             setAuthStatus(AuthStatusEnum.Unauthenticated);
             setUser(null);
-            console.error("Failed to login:", error);
+            // Expected case (wrong login/password) — the login screen shows it, so no console.error.
             throw error; // Rethrow the error so that the caller can handle it
         }
     };

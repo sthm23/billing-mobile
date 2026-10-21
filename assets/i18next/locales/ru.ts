@@ -317,8 +317,8 @@ const ru = {
       "CASH": "Наличные",
       "CARD": "Карта",
       "DEBT": "Долг",
-      "TRANSFER": "Перечесления",
-      "ONLINE": "Клик"
+      "TRANSFER": "Перечисление",
+      "ONLINE": "Click"
     },
     "channel": {
       "name": "Способ оплаты",

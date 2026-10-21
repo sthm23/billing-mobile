@@ -346,7 +346,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 ## Known Issues
 
-- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`), cashbox income/expense and per-method breakdown (`CashboxDetailsPage`, `PaymentBreakdownDialog`). To be replaced by backend values (redesign stage 7).
+- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`), cashbox income/expense and per-method tiles (`CashboxDetailsPage`, `PaymentMethodTiles` — income − expense per method). To be replaced by backend values (redesign stage 7).
 - Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, open cashbox, cashbox filters, order-level discount, debt repayment (stage 8). Staff creation has no «comment» field (not stored by the backend). Product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
 - `costAtSale` of a new order line is taken from the latest stock receipt on the client (same as the web) — the backend trusts it.
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.

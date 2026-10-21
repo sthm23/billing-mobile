@@ -71,7 +71,7 @@ Filter / option chip.
 
 ### Segmented
 
-Single choice on a track. Generic over the value type.
+Single choice on a track. Generic over the value type. `variant`: `track` (default, on the screen background) or `sunken` (inside a card — in dark mode `track` equals `card`).
 
 ```tsx
 <Segmented

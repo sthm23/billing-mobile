@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   Modal as RNModal,
+  View,
   type ModalProps as RNModalProps,
 } from 'react-native';
 
@@ -100,18 +101,20 @@ export function Modal({
       statusBarTranslucent
       {...props}
     >
-      <Pressable
-        className="flex-1 bg-scrim items-center justify-center p-4"
-        onPress={handleBackdropPress}
-        accessibilityRole="button"
-        accessibilityLabel={t('common.close')}
-      >
+      <View className="flex-1 items-center justify-center p-4">
+        {/* Backdrop is a sibling behind the content, not its parent: nested
+            pressables render as <button> inside <button> on web. */}
         <Pressable
+          className="absolute inset-0 bg-scrim"
+          onPress={handleBackdropPress}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
+        />
+        <View
           className={cn(
             'bg-card rounded-2xl p-6 w-full max-w-md',
             className,
           )}
-          onPress={(e) => e.stopPropagation()}
         >
           {showCloseButton && onClose && (
             <Pressable
@@ -124,8 +127,8 @@ export function Modal({
             </Pressable>
           )}
           {children}
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </RNModal>
   );
 }

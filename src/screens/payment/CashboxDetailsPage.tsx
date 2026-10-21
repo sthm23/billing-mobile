@@ -4,13 +4,13 @@ import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ArrowDownRight, ArrowUpRight, ChevronLeft, CircleAlert, Lock, PieChart, Receipt } from "lucide-react-native";
+import { ArrowDownRight, ArrowUpRight, ChevronLeft, CircleAlert, Lock, Receipt } from "lucide-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, ScrollView, View } from "react-native";
 import { AddTransactionSheet } from "./AddTransactionSheet";
 import { AllTransactionsSheet } from "./AllTransactionsSheet";
-import { PaymentBreakdownDialog } from "./PaymentBreakdownDialog";
+import { PaymentMethodTiles } from "./PaymentMethodTiles";
 import { TransactionCard } from "./TransactionCard";
 
 const PREVIEW_COUNT = 5;
@@ -23,7 +23,6 @@ export default function CashboxDetailsPage() {
   const [sheetVisible, setSheetVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
   const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
-  const [breakdownVisible, setBreakdownVisible] = useState(false);
 
   const { data: cashbox, isLoading, isError } = useCashboxById(id, {
     // refetchInterval: 30000,
@@ -131,32 +130,26 @@ export default function CashboxDetailsPage() {
             { label: t('payment.totalExpense'), value: -totalExpense, tone: 'err' },
           ]}
         >
-          <View className="flex-row gap-2">
-            {isOpen ? (
-              <>
-                <Button variant="accent" icon={ArrowDownRight} className="flex-1" onPress={handleAddIncome}>
-                  {t('payment.type.INCOME')}
-                </Button>
-                <Button variant="hero" icon={ArrowUpRight} className="flex-1" onPress={handleAddExpense}>
-                  {t('payment.type.EXPENSE')}
-                </Button>
-                <IconButton
-                  icon={Lock}
-                  variant="danger"
-                  accessibilityLabel={t('payment.closeCashbox')}
-                  onPress={handleCloseCashbox}
-                  disabled={closeCashboxMutation.isPending}
-                />
-              </>
-            ) : null}
-            <IconButton
-              icon={PieChart}
-              accessibilityLabel={t('payment.paymentBreakdown')}
-              variant="hero"
-              onPress={() => setBreakdownVisible(true)}
-            />
-          </View>
+          {isOpen ? (
+            <View className="flex-row gap-2">
+              <Button variant="accent" icon={ArrowDownRight} className="flex-1" onPress={handleAddIncome}>
+                {t('payment.type.INCOME')}
+              </Button>
+              <Button variant="hero" icon={ArrowUpRight} className="flex-1" onPress={handleAddExpense}>
+                {t('payment.type.EXPENSE')}
+              </Button>
+              <IconButton
+                icon={Lock}
+                variant="danger"
+                accessibilityLabel={t('payment.closeCashbox')}
+                onPress={handleCloseCashbox}
+                disabled={closeCashboxMutation.isPending}
+              />
+            </View>
+          ) : null}
         </HeroCard>
+
+        <PaymentMethodTiles transactions={cashbox.transactions} />
 
         {/* Transactions */}
         <View className="bg-card rounded-xl px-4 pt-3 pb-1">
@@ -183,14 +176,6 @@ export default function CashboxDetailsPage() {
           )}
         </View>
       </ScrollView>
-
-      {/* Payment Breakdown Dialog */}
-      <PaymentBreakdownDialog
-        isOpen={breakdownVisible}
-        onClose={() => setBreakdownVisible(false)}
-        transactions={cashbox.transactions}
-        balance={cashbox.balance}
-      />
 
       {/* All Transactions Sheet */}
       <AllTransactionsSheet

@@ -47,6 +47,7 @@ const SettingItems = () => {
                     ]}
                     value={themeMode}
                     onChange={setThemeMode}
+                    variant="sunken"
                 />
             </View>
             <View className="gap-2.5">
@@ -60,6 +61,7 @@ const SettingItems = () => {
                     ]}
                     value={language}
                     onChange={handleLanguageChange}
+                    variant="sunken"
                 />
             </View>
         </View>

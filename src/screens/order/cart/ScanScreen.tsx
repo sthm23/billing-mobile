@@ -37,6 +37,16 @@ export function ScanScreen() {
   const last = useRef<{ code: string; at: number } | null>(null);
   const totals = cartTotals(cart);
 
+  // Leaving the scanner with an empty new order (Scan button, nothing scanned):
+  // there is no order to return to — go to the order list instead.
+  const leave = () => {
+    if (!cart.orderId && cart.lines.length === 0) {
+      router.dismissTo('/(tabs)/(orders)');
+    } else {
+      router.back();
+    }
+  };
+
   const handleScan = async ({ data }: BarcodeScanningResult) => {
     const code = data.trim();
     const now = Date.now();
@@ -81,7 +91,7 @@ export function ScanScreen() {
 
   const header = (
     <View className="flex-row items-center gap-2 px-4" style={{ paddingTop: insets.top + 8 }}>
-      <IconButton icon={ChevronLeft} variant="hero" accessibilityLabel={t('order.back')} onPress={() => router.back()} />
+      <IconButton icon={ChevronLeft} variant="hero" accessibilityLabel={t('order.back')} onPress={leave} />
       <Text className="flex-1 type-heading text-hero-ink" accessibilityRole="header">{t('sale.scan.title')}</Text>
       {permission?.granted && (
         <IconButton
@@ -159,7 +169,7 @@ export function ScanScreen() {
             <Text className="font-onest text-xs text-hero-muted">{t('sale.search.inOrder', { count: totals.quantity })}</Text>
             <Money value={totals.total} className="text-[17px] text-hero-ink" currencyClassName="text-xs text-hero-muted" />
           </View>
-          <Button variant="accent" size="lg" onPress={() => router.back()}>
+          <Button variant="accent" size="lg" onPress={leave}>
             {t('sale.search.done')}
           </Button>
         </View>
