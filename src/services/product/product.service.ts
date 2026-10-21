@@ -17,7 +17,6 @@ const ENDPOINTS = {
   LIST: '/',
   BY_ID: (productId: string) => `/${productId}`,
   SEARCH: (warehouseId: string) => `/search/${warehouseId}`,
-  SEARCH_FOR_ORDER: (orderId: string) => `/search/${orderId}`,
   CANCEL: (productId: string) => `/${productId}/cancel`,
   VARIANTS: '/variants',
   VARIANT_BY_ID: (variantId: string) => `/variants/${variantId}`,
@@ -85,20 +84,13 @@ const createProductVariants = async (body: CreateProductVariantPayload): Promise
   return response.data
 }
 
-const searchProducts = (warehouseId: string, text: string) => {
-  const queryParams = new URLSearchParams();
-  queryParams.append('text', text);
-
-  return productsApi.get<BaseListResponse<ProductVariant>>(ENDPOINTS.SEARCH(warehouseId), {
-    params: queryParams
+/** Searches variants by name, SKU or barcode in one of the staff's warehouses. */
+const searchProducts = async (warehouseId: string, text: string): Promise<BaseListResponse<OrderProductVariant>> => {
+  const response = await productsApi.get<BaseListResponse<OrderProductVariant>>(ENDPOINTS.SEARCH(warehouseId), {
+    params: { text }
   })
-}
 
-const searchProductsForOrder = (orderId: string, text: string) => {
-  return productsApi.get<BaseListResponse<OrderProductVariant>>(
-    ENDPOINTS.SEARCH_FOR_ORDER(orderId),
-    { params: { text } }
-  )
+  return response.data
 }
 
 const archiveProduct = (productId: string) => {
@@ -110,7 +102,7 @@ const addInventory = (warehouseId: string, body: InventoryMovementPayload) => {
 }
 
 const updateProductVariant = (productVariantId: string, body: UpdateProductVariantPrice) => {
-  return productsApi.post<ProductVariant>(ENDPOINTS.VARIANT_BY_ID(productVariantId), body)
+  return productsApi.put<ProductVariant>(ENDPOINTS.VARIANT_BY_ID(productVariantId), body)
 }
 
 
@@ -120,7 +112,6 @@ export const productService = {
   getProducts,
   createProductVariants,
   searchProducts,
-  searchProductsForOrder,
   addInventory,
   updateProductVariant,
   archiveProduct,

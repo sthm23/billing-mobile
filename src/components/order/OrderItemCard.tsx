@@ -1,58 +1,82 @@
-import { Money, PhotoPlaceholder, StatusBadge, Stepper, Text } from '@/components/base';
-import { OrderDetailItem } from '@/services/order/order.type';
+import { Money, PhotoPlaceholder, Pressable, StatusBadge, Stepper, Text } from '@/components/base';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
-interface OrderItemCardProps {
-  item: OrderDetailItem;
-  index: number;
-  showDivider: boolean;
-  onQuantityChange?: (itemId: string, delta: number) => void;
+export interface OrderItemCardProps {
+  name: string;
+  /** Attribute values or SKU */
+  variantLabel: string;
+  /** Unit price after the discount */
+  price: number;
+  /** Catalogue price, shown struck through when the price was changed */
+  basePrice?: number;
+  quantity: number;
+  /** Stock hint; omit to hide the badge (read-only orders) */
+  stock?: number;
+  /** Opens the price sheet */
+  onPress?: () => void;
+  /** Shows the quantity stepper */
+  onQuantityChange?: (quantity: number) => void;
 }
 
+const LOW_STOCK = 5;
+
 /**
- * Order line: photo, SKU and barcode, stock, prices and quantity stepper.
+ * Order line: photo, name, variant, stock badge, price and quantity.
  */
-export function OrderItemCard({ item, onQuantityChange }: OrderItemCardProps) {
+export function OrderItemCard({
+  name,
+  variantLabel,
+  price,
+  basePrice,
+  quantity,
+  stock,
+  onPress,
+  onQuantityChange,
+}: OrderItemCardProps) {
   const { t } = useTranslation();
-  const hasDiscount = item.sale > 0;
-  const maxStock = item.variant.quantity;
+  const changed = basePrice !== undefined && basePrice !== price;
+
+  const stockBadge =
+    stock === undefined
+      ? null
+      : quantity > stock
+        ? { label: t('sale.cart.overStock', { count: stock }), tone: 'err' as const }
+        : stock <= LOW_STOCK
+          ? { label: t('sale.cart.stockLow', { count: stock }), tone: 'warn' as const }
+          : { label: t('sale.cart.inStock', { count: stock }), tone: 'ok' as const };
 
   return (
-    <View className="flex-row items-center gap-3 bg-card rounded-xl p-2.5 pr-3">
-      <PhotoPlaceholder size="lg" />
-
-      <View className="flex-1 min-w-0 gap-1">
-        <Text className="type-body-strong text-ink" numberOfLines={1}>
-          {item.variant.sku}
-        </Text>
-        <Text className="font-onest text-xs text-muted tabular-nums" numberOfLines={1}>
-          {item.variant.barCode}
-        </Text>
-        <StatusBadge
-          label={`${t('product.inStockLabel')}: ${maxStock}`}
-          tone={maxStock === 0 ? 'err' : 'ok'}
-          size="sm"
-        />
-        <View className="flex-row items-baseline flex-wrap gap-x-2">
-          <Money value={item.costAtSale} currency={null} className="text-[15px]" />
-          {hasDiscount && (
-            <Money
-              value={item.retailPrice}
-              currency={null}
-              className="font-onest-medium text-xs text-muted line-through"
-            />
-          )}
+    <View className="flex-row items-center gap-2.5 bg-card rounded-lg p-2.5">
+      <Pressable
+        onPress={onPress}
+        disabled={!onPress}
+        accessibilityRole={onPress ? 'button' : undefined}
+        accessibilityLabel={onPress ? `${name}, ${t('sale.price.title')}` : undefined}
+        className="flex-1 min-w-0 flex-row items-center gap-3"
+      >
+        <PhotoPlaceholder size="lg" />
+        <View className="flex-1 min-w-0 gap-1">
+          <Text className="font-onest-semibold text-[15px] text-ink" numberOfLines={2}>{name}</Text>
+          <View className="flex-row items-center flex-wrap gap-1.5">
+            <Text className="font-onest text-xs text-muted" numberOfLines={1}>{variantLabel}</Text>
+            {stockBadge && <StatusBadge label={stockBadge.label} tone={stockBadge.tone} size="sm" />}
+          </View>
+          <View className="flex-row items-baseline flex-wrap gap-x-1.5">
+            <Money value={price} currency={null} className="text-[15px]" />
+            {changed && (
+              <Money value={basePrice} currency={null} className="font-onest text-xs text-muted line-through" />
+            )}
+            {!onQuantityChange && (
+              <Text className="font-onest text-xs text-muted">× {quantity}</Text>
+            )}
+          </View>
         </View>
-      </View>
+      </Pressable>
 
-      <Stepper
-        value={item.quantity}
-        onChange={(next) => onQuantityChange?.(item.id, next - item.quantity)}
-        max={maxStock}
-        vertical
-        size="sm"
-      />
+      {onQuantityChange && (
+        <Stepper value={quantity} onChange={onQuantityChange} min={1} vertical size="sm" />
+      )}
     </View>
   );
 }

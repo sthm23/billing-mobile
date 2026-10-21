@@ -6,9 +6,11 @@
  */
 
 import { BaseListResponse } from '@/models/app.models'
+import { cashboxQueryKeys } from '@/services/cashbox/cashbox.queries'
 import {
   useMutation,
   useQuery,
+  useQueryClient,
   type MutationOptions,
   type UseMutationResult,
   type UseQueryOptions,
@@ -17,7 +19,9 @@ import {
 import { type AxiosError } from 'axios'
 import { orderService } from './order.service'
 import type {
+  CreateOrderItemPayload,
   CreateOrderPayload,
+  CreateOrderPaymentPayload,
   Order,
   OrderDetail,
   OrderParams,
@@ -122,6 +126,60 @@ export const useOrders = (params: OrderParams = {}): UseQueryResult<BaseListResp
   }
 
   return useQuery(queryOptions)
+}
+
+export interface SaveOrderInput {
+  /** Existing order; when absent a new POS order is created first */
+  orderId?: string
+  /** Needed only to create a new order */
+  create?: CreateOrderPayload
+  items: Omit<CreateOrderItemPayload, 'orderId'>
+  /** Called as soon as a new order exists, so a failed items save is not retried as a second order */
+  onCreated?: (orderId: string) => void
+}
+
+/**
+ * Saves the cart: creates the order when needed (`POST /orders`), then
+ * replaces its content (`POST /orders/items`, status → HOLD).
+ * Resolves with the order id.
+ */
+export const useSaveOrder = (): UseMutationResult<string, AxiosError<{ message?: string | string[] }>, SaveOrderInput> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ orderId, create, items, onCreated }: SaveOrderInput): Promise<string> => {
+      let id = orderId
+      if (!id) {
+        if (!create) throw new Error('Order data is required to create an order')
+        id = (await orderService.createOrder(create)).id
+        onCreated?.(id)
+      }
+      await orderService.createOrderItems({ ...items, orderId: id })
+      return id
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
+    },
+  })
+}
+
+/**
+ * Pays an order (`POST /orders/payment/:id`). Refreshes orders and cashboxes.
+ */
+export const useCreateOrderPayment = (): UseMutationResult<
+  { message: string },
+  AxiosError<{ message?: string | string[] }>,
+  { orderId: string; body: CreateOrderPaymentPayload }
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ orderId, body }) => orderService.createOrderPayment(orderId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
+      queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() })
+    },
+  })
 }
 
 /**

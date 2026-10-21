@@ -1,20 +1,12 @@
-import { ListCard, type StatusTone } from '@/components/base';
-import { Order, OrderStatus } from '@/services/order/order.type';
+import { ListCard } from '@/components/base';
+import { Order } from '@/services/order/order.type';
 import { TFunction } from 'i18next';
+import { ORDER_STATUS_TONE } from './order-status';
 
 type OrderCardProps = {
     order: Order;
     onPress: (orderId: string) => void;
     t: TFunction;
-};
-
-const STATUS_TONE: Record<OrderStatus, StatusTone> = {
-    [OrderStatus.CREATED]: 'info',
-    [OrderStatus.HOLD]: 'warn',
-    [OrderStatus.DEBT]: 'err',
-    [OrderStatus.COMPLETED]: 'ok',
-    [OrderStatus.CANCELLED]: 'neutral',
-    [OrderStatus.REFUNDED]: 'neutral',
 };
 
 function getInitials(name: string): string {
@@ -45,7 +37,7 @@ export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
             title={cashierName}
             subtitle={`${order.warehouse.name} · ${createdAt}`}
             amount={order.totalAmount}
-            badge={{ label: t(`order.status.${order.status}`), tone: STATUS_TONE[order.status] ?? 'neutral' }}
+            badge={{ label: t(`order.status.${order.status}`), tone: ORDER_STATUS_TONE[order.status] ?? 'neutral' }}
             onPress={() => onPress(order.id)}
         />
     );

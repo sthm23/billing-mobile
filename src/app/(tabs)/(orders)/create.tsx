@@ -1,13 +1,16 @@
-import { ComingSoonScreen } from "@/components/common";
-import { ScanBarcode } from "lucide-react-native";
-import { useTranslation } from "react-i18next";
+import { OrderCartScreen } from '@/screens/order/cart/OrderCartScreen';
+import { useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
- * New sale — target of the BottomNav scan button.
- * Order creation with barcode scanning arrives in redesign stage 5.
+ * New sale. `?scan=1` (BottomNav scan button) opens the scanner right away.
  */
-export default function CreateOrderScreen() {
-    const { t } = useTranslation();
+export default function CreateOrderPage() {
+  const { scan } = useLocalSearchParams<{ scan?: string }>();
 
-    return <ComingSoonScreen title={t('navigation.newSale')} icon={ScanBarcode} />;
+  return (
+    <SafeAreaView edges={['top']} className="flex-1 bg-bg">
+      <OrderCartScreen startScan={scan === '1'} />
+    </SafeAreaView>
+  );
 }

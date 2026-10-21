@@ -1,4 +1,6 @@
+export { CustomerPickerSheet } from './CustomerPickerSheet';
 export { OrderItemCard } from './OrderItemCard';
-export { ProductSearchSheet } from './ProductSearchSheet';
-export type { ProductSearchSheetRef } from './ProductSearchSheet';
+export type { OrderItemCardProps } from './OrderItemCard';
+export { PriceSheet } from './PriceSheet';
+export type { PriceSheetLine, PriceSheetResult } from './PriceSheet';
 export { SwipeableOrderItemCard } from './SwipeableOrderItemCard';

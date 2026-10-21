@@ -15,7 +15,6 @@ import type {
   Product,
   ProductDetail,
   ProductParams,
-  ProductVariantSearchParams,
 } from '@/models/product.model'
 
 export const productQueryKeys = {
@@ -121,31 +120,21 @@ export const useProducts = (params: ProductParams = {}): UseQueryResult<BaseList
 }
 
 
-export const useProductVariantSearch = (params: ProductVariantSearchParams) => {
-  const { text, warehouseId } = params
-  const isSearchActive = text.length > 0
-
-  const searchQuery = useQuery({
-    queryKey: ['product-search', warehouseId, text],
-    queryFn: () => productService.searchProducts(warehouseId, text),
-    enabled: Boolean(isSearchActive && warehouseId),
-    refetchOnWindowFocus: false,
-  })
-
-  return searchQuery
-}
-
-export const useOrderProductSearch = (
-  orderId: string,
+/**
+ * Searches variants of a staff warehouse by name, SKU or barcode
+ * (`GET /product/search/:warehouseId?text=`). Disabled until 2+ characters.
+ */
+export const useProductVariantSearch = (
+  warehouseId: string | undefined,
   text: string
 ): UseQueryResult<BaseListResponse<OrderProductVariant>> => {
+  const query = text.trim()
+
   return useQuery({
-    queryKey: ['order-product-search', orderId, text],
-    queryFn: async () => {
-      const response = await productService.searchProductsForOrder(orderId, text)
-      return response.data
-    },
-    enabled: Boolean(orderId) && text.length >= 2,
+    queryKey: [...productQueryKeys.all(), 'search', warehouseId, query],
+    queryFn: () => productService.searchProducts(warehouseId!, query),
+    enabled: Boolean(warehouseId) && query.length >= 2,
+    placeholderData: (previous) => previous,
     refetchOnWindowFocus: false,
     staleTime: 30_000,
   })

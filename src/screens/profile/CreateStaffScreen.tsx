@@ -15,6 +15,7 @@ import {
 import type { ButtonIconComponent } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useTheme } from '@/hooks/use-theme';
+import { getApiErrorMessage } from '@/libs/api-error';
 import { cn } from '@/libs/utils';
 import { StaffRole, UserRole } from '@/models/user.model';
 import { useAuth } from '@/provider/AuthProvider';
@@ -25,7 +26,6 @@ import {
   useStoreById,
 } from '@/services/store';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { isAxiosError } from 'axios';
 import { router } from 'expo-router';
 import {
   Briefcase,
@@ -62,16 +62,6 @@ function formatNationalPhone(digits: string): string {
   return [digits.slice(0, 2), digits.slice(2, 5), digits.slice(5, 7), digits.slice(7, 9)]
     .filter(Boolean)
     .join(' ');
-}
-
-function getApiErrorMessage(error: unknown, fallback: string): string {
-  if (isAxiosError<{ message?: string | string[] }>(error)) {
-    const message = error.response?.data?.message;
-    if (Array.isArray(message)) return message.join('\n');
-    if (typeof message === 'string' && message.trim()) return message;
-  }
-
-  return fallback;
 }
 
 /**

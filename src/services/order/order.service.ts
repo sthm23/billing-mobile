@@ -94,14 +94,17 @@ const searchOrders = (search: string) => {
   })
 }
 
-const createOrderPayment = (orderId: string, body: CreateOrderPaymentPayload) => {
-  return ordersApi.post<{ message: string }>(ENDPOINTS.ADD_PAYMENT(orderId), body)
+/** Pays a HOLD order (`POST /orders/payment/:id`); stock is deducted here. */
+const createOrderPayment = async (orderId: string, body: CreateOrderPaymentPayload): Promise<{ message: string }> => {
+  const response = await ordersApi.post<{ message: string }>(ENDPOINTS.ADD_PAYMENT(orderId), body)
+  return response.data
 }
 
 const returnOrder = (returnOrderPayload: ReturnOrderItemPayload) => {
   return ordersApi.post<{ message: string }>(ENDPOINTS.RETURN, returnOrderPayload)
 }
 
+/** Repays a DEBT order (`POST /payment`) — no stock movement. */
 const addPaymentToOrder = (body: CreateOrderPaymentPayload) => {
   return paymentsApi.post<{ message: string }>(ENDPOINTS.BASE, body)
 }

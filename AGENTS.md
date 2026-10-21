@@ -38,7 +38,9 @@ Verify the SDK in `package.json` (`expo`) before relying on any doc.
 
 `app.json` enables `typedRoutes`, `reactCompiler` and `userInterfaceStyle: automatic`.
 
-**Not installed yet** (planned): `expo-camera` (barcode scanning), a test runner, ESLint config.
+Barcode scanning: `expo-camera` (`CameraView` + `useCameraPermissions`, config plugin in `app.json` with the camera permission text — needs a native rebuild / new dev client).
+
+**Not installed yet**: a test runner, ESLint config (`npm run lint` tries to install ESLint and fails on the private registry).
 
 ---
 
@@ -116,13 +118,13 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | Tab | Routes | Renders |
 |---|---|---|
 | `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen` |
-| `(orders)` | `index`, `[id]`, `create` | `OrderPage`, `OrderDetailScreen`, `ComingSoonScreen` (new sale — stage 5) |
+| `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
 | `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen` |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
-- The center **Scan** button starts a new sale: `router.push('/(tabs)/(orders)/create')` (order creation + barcode scan arrive in redesign stage 5).
+- The center **Scan** button starts a new sale: `/(tabs)/(orders)/create?scan=1` — an empty cart that opens the scanner right away (when the seller has one warehouse).
 - The bar is **absolutely positioned** over the content and **hidden** on nested screens (any stack screen above a tab's root) and while the keyboard is open.
 - **Tab root screens must reserve space for it**: `const bottomInset = useBottomNavInset();` → `contentContainerStyle={{ paddingBottom: bottomInset }}` on the scroll container.
 - To add a tab: add the route group, a `Tabs.Screen` in the layout, and an entry in `LEFT_TABS` / `RIGHT_TABS` in `BottomNav.tsx` (lucide icon + i18n key under `navigation.*`).
@@ -255,9 +257,19 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox`, `order`, `product`, `store` (owner's store + `POST /store/staff`).
+Domains: `auth`, `cashbox`, `customer` (search/create customers), `order` (+ `useSaveOrder`, `useCreateOrderPayment`), `product` (+ `useProductVariantSearch(warehouseId, text)`), `store` (owner's store + `POST /store/staff`).
 
-API errors: NestJS returns `{ message: string | string[] }` — show `message` to the user (see `getApiErrorMessage` in `CreateStaffScreen`).
+Prisma `Decimal` fields (`price`, `totalAmount`, `retailPrice`, …) arrive as strings — wrap in `Number()` before arithmetic.
+
+API errors: NestJS returns `{ message: string | string[] }` — show it with `getApiErrorMessage(error, fallback)` from `src/libs/api-error.ts`.
+
+### Order flow (sale)
+
+- **Cart state** lives in `src/screens/order/cart/cart-store.ts` (`cartStore` + `useCart()`, a small `useSyncExternalStore` store) and is shared by the cart, search and scanner screens. One cart at a time; `OrderCartScreen` resets it on mount (`startNew` / `loadOrder`).
+- **Saving**: `useSaveOrder()` creates the order on the first save (`POST /orders`) and then replaces its content (`POST /orders/items`, which deletes lines left out). «Бронь» saves and goes back; «Оплатить» saves and opens `pay/[id]`.
+- **Prices**: lowering = `sale` (absolute per unit), raising = `retailPrice` (`PriceSheet`). Only owner/manager may lower (`canLowerPrice()` in `src/libs/roles.ts` — UX only, the backend enforces it).
+- **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
+- **Warehouse**: the cart's warehouse is one of `user.staff.warehouse` (`useStaffWarehouses`); with several, the seller picks one before adding products.
 
 ```tsx
 const { data, isLoading, isError, refetch } = useOrders(params);
@@ -334,9 +346,9 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 ## Known Issues
 
-- Client-side totals that belong to the backend: order subtotal/discount (`OrderDetailScreen`), cashbox income/expense and per-method breakdown (`CashboxDetailsPage`, `PaymentBreakdownDialog`). To be replaced by backend values (redesign stage 7).
-- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, order create, customer selection, open cashbox, cashbox filters. Staff creation has no «comment» field (not stored by the backend). Order detail actions (hold, place order, item quantity/delete) and product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
-- Service paths that don't match the backend: `searchProductsForOrder` (sends orderId, backend expects warehouseId), `addPaymentToOrder` (`/payments` vs `/payment`), `updateProductVariant` (POST vs PUT).
+- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`), cashbox income/expense and per-method breakdown (`CashboxDetailsPage`, `PaymentBreakdownDialog`). To be replaced by backend values (redesign stage 7).
+- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, open cashbox, cashbox filters, order-level discount, debt repayment (stage 8). Staff creation has no «comment» field (not stored by the backend). Product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
+- `costAtSale` of a new order line is taken from the latest stock receipt on the client (same as the web) — the backend trusts it.
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
 ---
@@ -364,4 +376,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-10-19
+**Last updated**: 2026-10-20

@@ -1,36 +1,27 @@
 import { Text } from '@/components/base';
 import { useTheme } from '@/hooks/use-theme';
-import { OrderDetailItem } from '@/services/order/order.type';
 import { Trash2 } from 'lucide-react-native';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Animated } from 'react-native';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
-import { OrderItemCard } from './OrderItemCard';
+import { OrderItemCard, type OrderItemCardProps } from './OrderItemCard';
 
-interface SwipeableOrderItemCardProps {
-  item: OrderDetailItem;
-  index: number;
-  onDelete?: (itemId: string) => void;
-  onQuantityChange?: (itemId: string, delta: number) => void;
+interface SwipeableOrderItemCardProps extends OrderItemCardProps {
+  onDelete: () => void;
 }
 
 /**
  * Order line with swipe-left to delete.
  */
-export function SwipeableOrderItemCard({
-  item,
-  index,
-  onDelete,
-  onQuantityChange,
-}: SwipeableOrderItemCardProps) {
+export function SwipeableOrderItemCard({ onDelete, ...card }: SwipeableOrderItemCardProps) {
   const swipeableRef = useRef<Swipeable>(null);
   const colors = useTheme();
   const { t } = useTranslation();
 
   const handleDelete = () => {
     swipeableRef.current?.close();
-    onDelete?.(item.id);
+    onDelete();
   };
 
   const renderRightActions = (
@@ -47,7 +38,7 @@ export function SwipeableOrderItemCard({
       <Animated.View style={{ width: 92, paddingLeft: 8, transform: [{ scale }] }}>
         <RectButton
           onPress={handleDelete}
-          style={{ flex: 1, borderRadius: 24, backgroundColor: colors.errBg, alignItems: 'center', justifyContent: 'center', gap: 4 }}
+          style={{ flex: 1, borderRadius: 20, backgroundColor: colors.errBg, alignItems: 'center', justifyContent: 'center', gap: 4 }}
         >
           <Trash2 size={20} color={colors.errFg} strokeWidth={2} />
           <Text className="font-onest-semibold text-xs text-err-fg">{t('order.delete')}</Text>
@@ -64,12 +55,7 @@ export function SwipeableOrderItemCard({
       renderRightActions={renderRightActions}
       overshootRight={false}
     >
-      <OrderItemCard
-        item={item}
-        index={index}
-        showDivider={false}
-        onQuantityChange={onQuantityChange}
-      />
+      <OrderItemCard {...card} />
     </Swipeable>
   );
 }

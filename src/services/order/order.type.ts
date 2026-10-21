@@ -98,21 +98,34 @@ export interface OrderPayment {
     paidAt: string | null
     type: PaymentType
 }
+/** Variant attribute as returned by `GET /orders/:id` (Prisma relation). */
+export interface OrderVariantAttribute {
+    value: {
+        valueString: string | null
+        valueNumber: string | number | null
+        valueBool: boolean | null
+        attribute: { name: string }
+    }
+}
+
+/** Decimal fields arrive as strings ("120000") — convert with Number() before use. */
 export interface OrderDetailItem {
-    costAtSale: number
+    costAtSale: number | string
     id: string
     orderId: string
-    quantity: 2
-    retailPrice: number
-    sale: number
+    quantity: number
+    retailPrice: number | string
+    sale: number | string
     variant: {
         id: string,
-        barCode: string
-        price: number
+        barCode: string | null
+        price: number | string
         productId: string
         sku: string
         storeId: string
         quantity: number
+        product?: { id: string, name: string }
+        attributes?: OrderVariantAttribute[]
     }
     variantId: string
 }
@@ -129,6 +142,8 @@ export interface OrderItemCard {
 
 
 export interface OrderItemPayload {
+    /** Existing order item id; omitted for new lines */
+    itemId?: string
     variantId: string
     quantity: number
     retailPrice: number
@@ -138,19 +153,22 @@ export interface OrderItemPayload {
 export interface OrderAdditionalServicePayload {
     id?: string
     name: string
-    price: number
-    description: string
+    price: number | string
+    description: string | null
 }
 
 export interface OrderAdditionalService extends OrderAdditionalServicePayload {
     id: string
     orderId: string
 }
+/** `POST /orders/items` replaces the whole order content: omitted items are deleted. */
 export interface CreateOrderItemPayload {
     orderId: string
-    customerId: string | null
+    /** null clears the customer, omitted keeps it */
+    customerId?: string | null
     items: OrderItemPayload[]
-    additionalServices?: OrderAdditionalServicePayload[]
+    /** Required by the backend — send [] when the order has none */
+    additionalServices: OrderAdditionalServicePayload[]
 }
 
 export interface ReturnOrderItemPayload {
@@ -170,11 +188,15 @@ export interface CreateOrderPayload {
 export interface OrderPaymentPayload {
     type: PaymentType
     amount: number
-    paidAt?: Date
+    paidAt?: Date | null
 }
+/**
+ * The backend rejects overpayment and, when part of the total is left
+ * unpaid, requires a customer (from this payload or already on the order).
+ */
 export interface CreateOrderPaymentPayload {
     orderId: string
-    customerId: string | null
+    customerId?: string | null
     payments: OrderPaymentPayload[]
 }
 
@@ -250,11 +272,16 @@ export interface OrderProductStockMovement {
     warehouseId: string
 }
 
+/** Result row of `GET /product/search/:warehouseId?text=` (staff warehouse only). */
 export interface OrderProductVariant {
-    barCode: number
+    barCode: string | null
     id: string
-    price: number
+    price: number | string
+    /** Stock in the searched warehouse */
     quantity: number
     sku: string
+    productId: string
+    productName: string
+    attributes: { name: string, value: string | null }[]
     stockMovements: OrderProductStockMovement[]
 }

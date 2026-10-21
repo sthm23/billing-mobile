@@ -17,7 +17,8 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
     if (value === 'active') {
         return [OrderStatus.CREATED, OrderStatus.HOLD];
     } else {
-        return [OrderStatus.COMPLETED];
+        // Sold orders, including those left partly unpaid as debt
+        return [OrderStatus.COMPLETED, OrderStatus.DEBT];
     }
 };
 export default function OrderPage() {
@@ -66,8 +67,7 @@ export default function OrderPage() {
             <View className="px-4 pt-2 pb-3 gap-3">
                 <View className="flex-row items-center justify-between">
                     <Text className="type-title text-ink" accessibilityRole="header">{t('navigation.orders')}</Text>
-                    {/* Order creation arrives with the new order flow (redesign stage 5) */}
-                    <Button variant="primary" icon={Plus} disabled>
+                    <Button variant="primary" icon={Plus} onPress={() => router.push('/(tabs)/(orders)/create')}>
                         {t('order.create')}
                     </Button>
                 </View>

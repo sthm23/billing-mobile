@@ -29,7 +29,7 @@ const API_CONFIG = {
   USERS_URL: `${BASE_URL}/users`,
   PRODUCTS_URL: `${BASE_URL}/product`,
   ORDERS_URL: `${BASE_URL}/orders`,
-  PAYMENTS_URL: `${BASE_URL}/payments`,
+  PAYMENTS_URL: `${BASE_URL}/payment`,
   WAREHOUSE_URL: `${BASE_URL}/warehouse`,
 }
 

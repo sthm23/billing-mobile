@@ -139,7 +139,7 @@ export function BottomNav({ state, navigation }: BottomTabBarProps) {
     >
       {LEFT_TABS.map(renderTab)}
       <Pressable
-        onPress={() => router.push('/(tabs)/(orders)/create')}
+        onPress={() => router.push({ pathname: '/(tabs)/(orders)/create', params: { scan: '1' } })}
         className="w-[52px] h-[52px] rounded-full bg-accent items-center justify-center active:opacity-80"
         accessibilityRole="button"
         accessibilityLabel={t('navigation.newSale')}
