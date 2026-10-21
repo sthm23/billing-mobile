@@ -292,7 +292,10 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
                   placeholder="0"
                   placeholderTextColor={colors.muted}
                   accessibilityLabel={t('sale.pay.amountFor', { method: t(`sale.pay.method.${type}`) })}
-                  className="flex-1 font-onest-bold text-lg text-ink text-right tabular-nums"
+                  // textAlign as a prop, not `text-right`: react-native-css's TextInput
+                  // wrapper crashes on text-align classes on native ("undefined is not a function").
+                  textAlign="right"
+                  className="flex-1 font-onest-bold text-lg text-ink tabular-nums"
                 />
                 <Button
                   variant="ghost"
