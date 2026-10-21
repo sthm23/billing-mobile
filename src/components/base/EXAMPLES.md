@@ -67,173 +67,21 @@ function MyScreen() {
 
 ---
 
-## BottomSheet
+## Sheet
 
-**Official `@expo/ui` BottomSheet with controlled pattern.**
-
-### Basic Usage
+Use the base `Sheet` (`@gorhom/bottom-sheet`) — see `AGENTS.md` → Sheet. `@expo/ui` `BottomSheet` shows empty on Android.
 
 ```tsx
-import { BottomSheet } from '@expo/ui';
-import { Box, Button, Text } from '@/components/base';
-import { useState } from 'react';
+import { Sheet, SheetScrollView, SheetTextInput } from '@/components/base/Sheet';
 
-function MyScreen() {
-  const [isPresented, setIsPresented] = useState(false);
-  
-  return (
-    <>
-      <Button onPress={() => setIsPresented(true)}>
-        Open Sheet
-      </Button>
+const [open, setOpen] = useState(false);
 
-      <BottomSheet
-        isPresented={isPresented}
-        onDismiss={() => setIsPresented(false)}
-        snapPoints={['half', 'full']}
-      >
-        <Box className="flex-1 p-4">
-          <Text className="text-xl font-bold mb-4">Bottom Sheet Title</Text>
-          <Text>Bottom sheet content goes here.</Text>
-        </Box>
-      </BottomSheet>
-    </>
-  );
-}
+<Sheet isOpen={open} onClose={() => setOpen(false)}>
+  <SheetScrollView className="flex-1" contentContainerClassName="px-4 pt-2 pb-8 gap-4">
+    <SheetTextInput className="h-[52px] px-4 rounded-md bg-sunken" />
+  </SheetScrollView>
+</Sheet>
 ```
-
-### With Scrollable Content
-
-```tsx
-import { ScrollView } from 'react-native';
-
-<BottomSheet
-  isPresented={isPresented}
-  onDismiss={() => setIsPresented(false)}
-  snapPoints={['half', 'full']}
->
-  <Box className="flex-1 p-4">
-    <Text className="text-xl font-bold mb-4">Scrollable Content</Text>
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <Text>Long content here...</Text>
-      {/* More content */}
-    </ScrollView>
-  </Box>
-</BottomSheet>
-```
-
-### Without Drag Indicator
-
-```tsx
-<BottomSheet
-  isPresented={isPresented}
-  onDismiss={() => setIsPresented(false)}
-  snapPoints={['half']}
-  showDragIndicator={false}
->
-  <Box className="flex-1 p-4">
-    <Text>Bottom sheet without drag indicator</Text>
-  </Box>
-</BottomSheet>
-```
-
-### Product Search Example (Real Usage)
-
-```tsx
-import { BottomSheet } from '@expo/ui';
-import { Box, Button, Input, InputField, Text } from '@/components/base';
-import { useState } from 'react';
-import { FlatList } from 'react-native';
-
-function ProductSearchExample() {
-  const [isPresented, setIsPresented] = useState(false);
-  const [products, setProducts] = useState([]);
-
-  return (
-    <>
-      <Button onPress={() => setIsPresented(true)}>
-        Search Products
-      </Button>
-
-      <BottomSheet
-        isPresented={isPresented}
-        onDismiss={() => setIsPresented(false)}
-        snapPoints={['half', 'full']}
-      >
-        <Box className="flex-1 p-4">
-          <Input className="mb-4">
-            <InputField placeholder="Search..." />
-          </Input>
-          <FlatList
-            data={products}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Box className="p-3 border-b border-border">
-                <Text>{item.name}</Text>
-              </Box>
-            )}
-          />
-        </Box>
-      </BottomSheet>
-    </>
-  );
-}
-```
-
-### With forwardRef (Imperative Control)
-
-```tsx
-import { BottomSheet } from '@expo/ui';
-import { Box } from '@/components/base';
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { ScrollView } from 'react-native';
-
-interface SheetRef {
-  open: () => void;
-  close: () => void;
-}
-
-export const MySheet = forwardRef<SheetRef, { children: React.ReactNode }>(
-  function MySheet({ children }, ref) {
-    const [isPresented, setIsPresented] = useState(false);
-
-    useImperativeHandle(ref, () => ({
-      open: () => setIsPresented(true),
-      close: () => setIsPresented(false),
-    }));
-
-    return (
-      <BottomSheet
-        isPresented={isPresented}
-        onDismiss={() => setIsPresented(false)}
-        snapPoints={['half', 'full']}
-      >
-        <Box className="flex-1">
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {children}
-          </ScrollView>
-        </Box>
-      </BottomSheet>
-    );
-  }
-);
-
-// Usage
-function ParentComponent() {
-  const sheetRef = useRef<SheetRef>(null);
-  
-  return (
-    <>
-      <Button onPress={() => sheetRef.current?.open()}>Open</Button>
-      <MySheet ref={sheetRef}>
-        <Text>Content</Text>
-      </MySheet>
-    </>
-  );
-}
-```
-
----
 
 ## Notes
 
@@ -244,22 +92,12 @@ function ParentComponent() {
 - Default animation: fade
 - Content is centered with max-width for better UX on tablets
 
-### BottomSheet
-- Uses official `@expo/ui` BottomSheet with **controlled pattern**
-- Visibility managed via `isPresented` prop (boolean state)
-- Dismissal handled through `onDismiss` callback
-- Automatically adapts to light/dark theme
-- Default backdrop (dismissible by tapping)
-- Supports swipe-down to dismiss gesture
-- Drag indicator included by default (`showDragIndicator={true}`)
-- **IMPORTANT**: Wrap content in `<Box className="flex-1 p-4">` for proper layout
-- For scrollable content, add `<ScrollView>` inside the Box
-- **Snap points**: Use `'half'` and `'full'` for best cross-platform compatibility
-  - `'half'` — Approximately half-screen ✅ **Recommended**
-  - `'full'` — Fully expanded ✅ **Recommended**
-  - `{ fraction: 0.6 }` — May not work on Android ⚠️
-  - `{ height: 400 }` — May not work on Android ⚠️
-- Versioned docs: https://docs.expo.dev/versions/v57.0.0/sdk/ui/
+### Sheet
+- Base `Sheet` on `@gorhom/bottom-sheet`, controlled by `isOpen` / `onClose`
+- Backdrop tap, swipe down and back button close it
+- `size`: `'full'` (default) / `'half'` — children fill it (`flex-1`); `'auto'` — fits content (no `flex-1`)
+- Scroll and inputs inside: `SheetScrollView`, `SheetFlatList`, `SheetTextInput`
+- Don't use `@expo/ui` `BottomSheet` — empty on Android
 
 ### When to Use Which
 
@@ -269,7 +107,7 @@ function ParentComponent() {
 - Content should be in the middle of screen
 - Blocking user interaction with rest of app
 
-**Use BottomSheet when:**
+**Use Sheet when:**
 - Showing lists or scrollable content
 - Native mobile feel (slides from bottom)
 - Multiple snap points needed

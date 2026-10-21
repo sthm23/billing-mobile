@@ -229,7 +229,7 @@ Native picker (`@react-native-picker/picker`) in a filled `sunken` box. Props: `
 
 - **Modal** — `visible`, `onClose`, `showCloseButton`, `closeOnBackdropPress`, `animationType`. `scrim` backdrop, `bg-card rounded-2xl p-6`.
 - **AlertDialog** — `isOpen`, `onClose`, `size: 'sm' | 'md' | 'lg' | 'full'` + `AlertDialogContent/Header/Body/Footer`.
-- **BottomSheet** — use `@expo/ui` directly (controlled `isPresented` / `onDismiss`, snap points `'half'` / `'full'`). The native sheet can't be styled with className — build its content from the components above on a `bg-card` view.
+- **Sheet** (`components/base/Sheet.tsx`, `@gorhom/bottom-sheet`) — `isOpen` / `onClose`, `size` `'full'` | `'half'` | `'auto'`. Inside it use `SheetScrollView`, `SheetFlatList`, `SheetTextInput`. Don't use `@expo/ui` `BottomSheet` (empty on Android).
 
 ---
 

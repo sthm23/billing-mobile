@@ -2,11 +2,11 @@ import { Button, IconButton, PhotoPlaceholder, Pressable, Stepper, Text } from '
 import { useTheme } from '@/hooks/use-theme';
 import { formatMoney } from '@/libs/format';
 import { cn } from '@/libs/utils';
-import { BottomSheet } from '@expo/ui';
+import { Sheet, SheetScrollView, SheetTextInput } from '@/components/base/Sheet';
 import { ArrowDown, ArrowRight, ArrowUp, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, TextInput, View } from 'react-native';
+import { View } from 'react-native';
 
 export interface PriceSheetLine {
   key: string;
@@ -93,8 +93,8 @@ export function PriceSheet({ line, canLower, onClose, onApply }: PriceSheetProps
   const quick = unit === 'pct' ? QUICK_PCT : QUICK_SUM;
 
   return (
-    <BottomSheet isPresented={line !== null} onDismiss={onClose} snapPoints={['full']}>
-      <ScrollView className="flex-1 bg-card" keyboardShouldPersistTaps="handled" contentContainerClassName="px-4 pt-2 pb-8 gap-4">
+    <Sheet isOpen={line !== null} onClose={onClose}>
+      <SheetScrollView className="flex-1" keyboardShouldPersistTaps="handled" contentContainerClassName="px-4 pt-2 pb-8 gap-4">
         <View className="flex-row items-center justify-between">
           <Text className="type-title text-ink" accessibilityRole="header">
             {t('sale.price.title')}
@@ -166,7 +166,7 @@ export function PriceSheet({ line, canLower, onClose, onApply }: PriceSheetProps
             <View className="gap-2.5">
               <View className="flex-row items-center gap-2 h-[60px] pl-[18px] pr-1.5 bg-sunken rounded-lg">
                 <Text className={cn('font-onest-bold text-2xl', direction === 'down' ? 'text-err-fg' : 'text-ok-fg')}>{sign}</Text>
-                <TextInput
+                <SheetTextInput
                   value={amount}
                   onChangeText={(text) => {
                     const digits = digitsOf(text);
@@ -252,7 +252,7 @@ export function PriceSheet({ line, canLower, onClose, onApply }: PriceSheetProps
             </Button>
           </>
         )}
-      </ScrollView>
-    </BottomSheet>
+      </SheetScrollView>
+    </Sheet>
   );
 }

@@ -25,7 +25,7 @@ import {
 } from '@/components/base';
 import { EmptyState } from '@/components/common';
 import { ThemeMode, useThemeControl } from '@/hooks/use-theme-control';
-import { BottomSheet } from '@expo/ui';
+import { Sheet } from '@/components/base/Sheet';
 import { router } from 'expo-router';
 import { Check, ChevronLeft, Pencil, Plus, ScanBarcode, Search, SlidersHorizontal, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -203,7 +203,7 @@ export default function ComponentDemoScreen() {
           <EmptyState card icon={Search} message="Ничего не найдено" description="Проверьте название или отсканируйте штрихкод товара" />
           <View className="flex-row gap-2.5">
             <Button variant="secondary" onPress={() => setModalVisible(true)}>Modal</Button>
-            <Button variant="secondary" onPress={() => setSheetVisible(true)}>BottomSheet</Button>
+            <Button variant="secondary" onPress={() => setSheetVisible(true)}>Sheet</Button>
           </View>
         </Section>
       </ScrollView>
@@ -219,8 +219,8 @@ export default function ComponentDemoScreen() {
         </View>
       </Modal>
 
-      <BottomSheet isPresented={sheetVisible} onDismiss={() => setSheetVisible(false)} snapPoints={['half']}>
-        <View className="flex-1 bg-card p-4 gap-3">
+      <Sheet isOpen={sheetVisible} onClose={() => setSheetVisible(false)} size="auto">
+        <View className="bg-card p-4 gap-3">
           <Text className="type-subhead text-ink">Изменить цену</Text>
           <Card variant="sunken" className="flex-row items-center justify-between">
             <Text className="type-body-strong text-ink">Количество</Text>
@@ -228,7 +228,7 @@ export default function ComponentDemoScreen() {
           </Card>
           <Button variant="accent" size="lg" full onPress={() => setSheetVisible(false)}>Применить</Button>
         </View>
-      </BottomSheet>
+      </Sheet>
     </SafeAreaView>
   );
 }

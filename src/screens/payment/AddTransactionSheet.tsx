@@ -3,10 +3,10 @@ import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/libs/utils";
 import { CashTransactionType } from "@/models/payment.model";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
-import { BottomSheet } from "@expo/ui";
+import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 import { ArrowDownRight, ArrowUpRight } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { TransactionForm } from "./TransactionForm";
 
 type Props = {
@@ -34,12 +34,8 @@ export const AddTransactionSheet = ({
   const typeLabel = isIncome ? t('payment.addIncome') : t('payment.addExpense');
 
   return (
-    <BottomSheet
-      isPresented={isOpen}
-      onDismiss={onClose}
-      snapPoints={['full']}
-    >
-      <View className="flex-1 bg-card px-4 pt-2 pb-6">
+    <Sheet isOpen={isOpen} onClose={onClose}>
+      <View className="flex-1 px-4 pt-2 pb-6">
         <View className="flex-row items-center gap-3 pb-4">
           <View className={cn('w-10 h-10 rounded-full items-center justify-center', isIncome ? 'bg-ok-bg' : 'bg-err-bg')}>
             <Icon size={18} color={isIncome ? colors.okFg : colors.errFg} strokeWidth={2} />
@@ -47,7 +43,7 @@ export const AddTransactionSheet = ({
           <Text className="type-heading text-ink">{typeLabel}</Text>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="flex-1">
+        <SheetScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="flex-1">
           <TransactionForm
             cashboxId={cashboxId}
             transactionType={transactionType}
@@ -55,8 +51,8 @@ export const AddTransactionSheet = ({
             onCancel={onClose}
             isLoading={isLoading}
           />
-        </ScrollView>
+        </SheetScrollView>
       </View>
-    </BottomSheet>
+    </Sheet>
   );
 };

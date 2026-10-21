@@ -5,11 +5,11 @@ import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { cn } from '@/libs/utils';
 import { type OrderCustomer, useCreateCustomer, useCustomerSearch } from '@/services/customer';
-import { BottomSheet } from '@expo/ui';
+import { Sheet, SheetFlatList, SheetTextInput } from '@/components/base/Sheet';
 import { Check, UserPlus, UserRound, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, TextInput, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 
 const PHONE_PREFIX = '+998';
 const PHONE_DIGITS = 9;
@@ -90,8 +90,8 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
   };
 
   return (
-    <BottomSheet isPresented={isOpen} onDismiss={onClose} snapPoints={['full']}>
-      <View className="flex-1 bg-card px-4 pt-2 gap-3">
+    <Sheet isOpen={isOpen} onClose={onClose}>
+      <View className="flex-1 px-4 pt-2 gap-3">
         <View className="flex-row items-center justify-between">
           <Text className="type-title text-ink" accessibilityRole="header">
             {creating ? t('sale.customer.newTitle') : t('sale.customer.title')}
@@ -103,7 +103,7 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
           <View className="gap-3">
             <View className="gap-1.5">
               <Text className="font-onest-semibold text-[13px] text-soft">{t('sale.customer.fullName')}</Text>
-              <TextInput
+              <SheetTextInput
                 value={fullName}
                 onChangeText={setFullName}
                 placeholder={t('sale.customer.fullNamePlaceholder')}
@@ -116,7 +116,7 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
               <Text className="font-onest-semibold text-[13px] text-soft">{t('sale.customer.phone')}</Text>
               <View className="flex-row items-center h-[52px] px-4 rounded-2xl bg-sunken gap-2">
                 <Text className="font-onest-semibold text-base text-ink">{PHONE_PREFIX}</Text>
-                <TextInput
+                <SheetTextInput
                   value={phone}
                   onChangeText={(text) => setPhone(text.replace(/\D/g, '').slice(0, PHONE_DIGITS))}
                   keyboardType="phone-pad"
@@ -156,7 +156,8 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
                 <EmptyState icon={UserRound} message={t('sale.customer.notFound')} />
               )
             ) : (
-              <FlatList
+              <SheetFlatList
+                className="flex-1"
                 data={customers}
                 keyExtractor={(item) => item.id}
                 keyboardShouldPersistTaps="handled"
@@ -187,6 +188,6 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
           </>
         )}
       </View>
-    </BottomSheet>
+    </Sheet>
   );
 }

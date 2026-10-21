@@ -79,3 +79,4 @@ export {
   CloseIcon, type IconProps
 } from './icon';
 export { SafeAreaView, type SafeAreaViewProps } from './SafeAreaView';
+export { Sheet, SheetFlatList, SheetScrollView, SheetTextInput, type SheetProps } from './Sheet';

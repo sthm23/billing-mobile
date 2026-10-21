@@ -30,7 +30,8 @@ Verify the SDK in `package.json` (`expo`) before relying on any doc.
 | Styling | NativeWind **5 (preview)** + `react-native-css` + **Tailwind CSS v4** | 5.0.0-preview.2 / 3.0.4 / 4.2.0 |
 | Font | Onest via `@expo-google-fonts/onest` | 0.4.2 |
 | Icons | `lucide-react-native` (UI), `CustomIcon` (SF Symbols / Material Symbols) | 1.45.0 |
-| Native UI | `@expo/ui` (BottomSheet) | ~57.0.20 |
+| Native UI | `@expo/ui` (`CustomIcon`; not for sheets) | ~57.0.20 |
+| Sheets | `@gorhom/bottom-sheet` (base `Sheet`) | ^5.2.14 |
 | Data | `@tanstack/react-query` + `axios` | 5.101.2 / 1.18.1 |
 | Forms | `react-hook-form` + `zod` | 7.81 / 4.4 |
 | i18n | `i18next` + `react-i18next` + `expo-localization` (en, ru, uz) | 26 / 17 |
@@ -223,20 +224,24 @@ Gotchas:
 - Icon-only buttons need `accessibilityLabel` (use `t('common.*')`).
 - There is no `ThemedView` / `ThemedText`.
 
-### BottomSheet (`@expo/ui`)
+### Sheet (`@gorhom/bottom-sheet`)
 
-Controlled pattern only:
+Use the base `Sheet` (`src/components/base/Sheet.tsx`) — never `@expo/ui` `BottomSheet`: on Android that is a Compose sheet where React Native children get no height and it shows empty.
 
 ```tsx
-import { BottomSheet } from '@expo/ui';
+import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 
-<BottomSheet isPresented={open} onDismiss={() => setOpen(false)} snapPoints={['half', 'full']}>
-  <Box className="flex-1 p-4">…</Box>
-</BottomSheet>
+<Sheet isOpen={open} onClose={() => setOpen(false)}>          {/* size: 'full' (default) | 'half' | 'auto' */}
+  <SheetScrollView className="flex-1" contentContainerClassName="px-4 gap-3">…</SheetScrollView>
+</Sheet>
 ```
 
-- Prefer `'half'` / `'full'` snap points (`{ fraction }` / `{ height }` are unreliable on Android).
-- No ref methods; drive it with state. Versioned docs: https://docs.expo.dev/versions/v57.0.0/sdk/ui/
+- Controlled by `isOpen`; `onClose` fires on swipe down, backdrop tap and back button.
+- Inside a sheet use `SheetScrollView`, `SheetFlatList`, `SheetTextInput` (gorhom's, with `className` support) instead of the RN ones — they cooperate with the sheet's gesture and keyboard.
+- `BottomSheetModalProvider` is in the root layout, inside the query/auth providers.
+- `size="auto"` fits the content: its children must not use `flex-1`.
+- Give `SheetScrollView` / `SheetFlatList` `className="flex-1"` in `full` / `half` sheets so the list is bounded by the sheet.
+- Never wrap a `SheetScrollView` / `SheetFlatList` in gorhom's `BottomSheetView`: on focus it marks the sheet content as a plain view (its effect runs after the child's) and the list stops scrolling. `Sheet` uses `BottomSheetView` only for `size="auto"` — so an `auto` sheet must not contain a scrollable.
 
 ### Icons
 
