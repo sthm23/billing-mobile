@@ -11,7 +11,7 @@ export default function ProductDetailRoute() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data: product, isLoading, isError } = useProductById(id);
+  const { data: product, isLoading, isError, refetch } = useProductById(id);
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-bg">
@@ -27,7 +27,7 @@ export default function ProductDetailRoute() {
           </Button>
         </EmptyState>
       ) : (
-        <ProductDetailScreen product={product} />
+        <ProductDetailScreen product={product} onRefresh={refetch} />
       )}
     </SafeAreaView>
   );

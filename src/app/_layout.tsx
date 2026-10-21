@@ -1,4 +1,5 @@
 import '@/assets/i18next/i18next';
+import { ToastHost } from '@/components/base/Toast';
 import { SplashView } from '@/components/brand/SplashView';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
 import {
@@ -128,6 +129,8 @@ export default function RootLayout() {
             <BottomSheetModalProvider>
               <InitiallyLayout />
             </BottomSheetModalProvider>
+            {/* After the sheets so a toast shows above an open sheet */}
+            <ToastHost />
           </QueryClientProvider>
         </AuthProvider>
       </ThemeControlContext.Provider>

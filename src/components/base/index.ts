@@ -59,6 +59,7 @@ export { Modal, type ModalProps } from './Modal';
 
 // Feedback
 export { Spinner, type SpinnerProps } from './Spinner';
+export { toast, ToastHost, type ToastTone } from './Toast';
 
 // Display
 export {

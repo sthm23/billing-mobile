@@ -103,7 +103,7 @@ billing-mobile/
 ### Root (`src/app/_layout.tsx`)
 
 - Loads i18n and the Onest fonts; keeps the native splash (`expo-splash-screen`) until fonts and the saved theme are ready. On font error it falls back to the system font.
-- Provider order: `GestureHandlerRootView` → `ThemeControlContext.Provider` → `StatusBar` → `AuthProvider` → `QueryClientProvider`.
+- Provider order: `GestureHandlerRootView` → `ThemeControlContext.Provider` → `StatusBar` → `AuthProvider` → `QueryClientProvider`. `<ToastHost />` is mounted once after `BottomSheetModalProvider`, so toasts show above sheets.
 - QueryClient: `staleTime` 60 s; no retry for axios responses with status < 500, otherwise up to 2 retries.
 - While the session is being restored it renders `SplashView` (`components/brand`).
 - `Stack.Protected`: `(tabs)` when authenticated, `login` when unauthenticated.
@@ -126,7 +126,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 
 | Tab | Routes | Renders |
 |---|---|---|
-| `(products)` | `index`, `[id]`, `create` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen` |
+| `(products)` | `index`, `[id]`, `create`, `history/[variantId]` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen`, `StockHistoryScreen` (params `title`, `subtitle`, `stock`) |
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
 | `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen` |
@@ -217,13 +217,15 @@ Quick reference with exact props: [`COMPONENTS.md`](./COMPONENTS.md). Import fro
 import { Button, Input, InputField, Text, VStack } from '@/components/base';
 ```
 
-STHM components: `Button`, `IconButton`, `Chip`, `Segmented`, `Stepper`, `SearchField`, `HeroCard`, `ListCard`, `StatusBadge`, `Money`, `Card`, `PhotoPlaceholder`, `Avatar`, `Input`/`InputField`, `TextArea`, `Select`, `FormControl`, `Modal`, `AlertDialog`. Live showcase with a theme switch: `/component-demo`. Build screens from these before writing custom views.
+STHM components: `Button`, `IconButton`, `Chip`, `Segmented`, `Stepper`, `SearchField`, `HeroCard`, `ListCard`, `StatusBadge`, `Money`, `Card`, `PhotoPlaceholder`, `Avatar`, `Input`/`InputField`, `TextArea`, `Select`, `FormControl`, `Modal`, `AlertDialog`, `Toast` (`toast.show`). Live showcase with a theme switch: `/component-demo`. Build screens from these before writing custom views.
 
 Gotchas:
 - `Button` variants: `primary | accent | secondary | danger | ghost | hero` (`hero` — on the dark hero block); sizes `sm` 36 / `md` 44 (default) / `lg` 56; `icon`, `full`, `loading`. `IconButton` has the same `hero` variant.
 - `Input` is a **container View**; text-input props go on `InputField`: `<Input invalid={…}><InputField placeholder="…" /></Input>`.
 - Amounts: `<Money value={…} />` or `formatMoney()` from `src/libs/format.ts` — display only, never compute totals on the client.
 - Icon-only buttons need `accessibilityLabel` (use `t('common.*')`).
+- Short success/error feedback that needs no confirmation: `toast.show(message, 'success' | 'error')` from `@/components/base` — not `Alert`. Keep `Alert` / `AlertDialog` for confirmations (e.g. archive).
+- Pull to refresh: `refreshControl={useRefreshControl(refetch)}` from `@/hooks/use-refresh-control` on the screen's FlatList/ScrollView (theme colours; spins only during a pull). Paginated lists reset to page 1 and invalidate their query keys. Not on the cart — it holds unsaved edits.
 - There is no `ThemedView` / `ThemedText`.
 
 ### Sheet (`@gorhom/bottom-sheet`)
@@ -257,7 +259,7 @@ import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 
 `src/api/axios-instance.ts`:
 - `BASE_URL` is chosen with `Platform.select`. **It currently points to a LAN dev server** (`http://<lan-ip>:4000/api`, `localhost` for web); production is `https://sthm23.uz/api` (commented). Check it before building a release.
-- Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payments`), `warehouseApi` (`/warehouse`). Timeout 30 s, `withCredentials: true`.
+- Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payments`), `warehouseApi` (`/warehouse`), `categoryApi` (`/category`). Timeout 30 s, `withCredentials: true`.
 - Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup`, `/refresh`, `/logout`.
 - On 401: one shared `GET /refresh` (httpOnly cookie) → save new token → retry once. If refresh fails: `POST /logout` and clear stored token/user.
 
@@ -270,7 +272,7 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox`, `customer` (search/create customers), `order` (+ `useSaveOrder`, `useCreateOrderPayment`), `product` (+ `useProductVariantSearch(warehouseId, text)`), `store` (owner's store + `POST /store/staff`).
+Domains: `auth`, `cashbox`, `customer` (search/create customers), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store + `POST /store/staff`).
 
 Prisma `Decimal` fields (`price`, `totalAmount`, `retailPrice`, …) arrive as strings — wrap in `Number()` before arithmetic.
 
@@ -284,13 +286,21 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 - **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
 - **Warehouse**: the cart's warehouse is one of `user.staff.warehouse` (`useStaffWarehouses`); with several, the seller picks one before adding products.
 
+### Product flow
+
+- **List** (`ProductListScreen`): search + chips «Все · N», store top categories (`GET /category/:storeId/categories`), «Мало · N» (toggle, combines with a category). Filtering, counts and the low-stock threshold come from `GET /product` (`search`, `categoryId`, `lowStock`; `counts`, `lowStockThreshold`). `ProductCard` badge is `err` when the total ≤ `lowStockThreshold`, else `ok`.
+- **Card** (`ProductDetailScreen`): «В заказ · {sum}» opens `AddToOrderSheet` — «Новый заказ» fills the cart (`cartStore.startNew(product.warehouseId)` + `addVariant(variant, quantity)`) and opens `/(tabs)/(orders)/create?keep=1` (`OrderCartScreen` `keepCart` keeps the prefilled cart); an open CREATED/HOLD order of the product's warehouse → `useAddToOrder` (GET order → add to the variant's line, keeping its price → `POST /orders/items`) + toast «Товар добавлен в заказ».
+- «Приход / Списание» (`StockMovementSheet` → `POST /warehouse/:id/inventory`) and archive (`DELETE /product/:id`) are shown only to owner/manager (`canManageProducts()` in `libs/roles.ts` — UX only). «История» (`StockHistoryScreen`, `GET /product/variants/:id/stock-movements`) — all staff.
+- Margin «Продажа · маржа N%» is display-only. Edit (pencil) is disabled.
+- `libs/product-utils.ts`: `getVariantLabel`, `getLatestCostPrice` (skips movements without a cost; the cart's `latestReceiptCost` too).
+
 ```tsx
 const { data, isLoading, isError, refetch } = useOrders(params);
 ```
 
 Always handle loading / error / empty states (`components/common/LoadingState`, `EmptyState`).
 
-`toast.service.ts` currently exports **types only** (no working toast function).
+`services/toast.service.ts` exports **types only** — use `toast` from `components/base/Toast`.
 
 ---
 
@@ -360,7 +370,8 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`), cashbox income/expense and per-method tiles (`CashboxDetailsPage`, `PaymentMethodTiles` — income − expense per method). To be replaced by backend values (redesign stage 7).
-- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit/filters, open cashbox, cashbox filters, order-level discount, debt repayment (stage 8). Staff creation has no «comment» field (not stored by the backend). Product actions (buy, history, stock movement, delete) are still no-ops (`console.log`).
+- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox, cashbox filters, order-level discount, debt repayment (stage 8). Staff creation has no «comment» field (not stored by the backend).
+- Backend: `GET /category/:storeId/categories` has no auth guard and takes `storeId` from the URL (not fixed).
 - `costAtSale` of a new order line is taken from the latest stock receipt on the client (same as the web) — the backend trusts it.
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
@@ -389,4 +400,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-10-20
+**Last updated**: 2026-10-21

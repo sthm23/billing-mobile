@@ -6,26 +6,19 @@ import { ProductImage } from './ProductImage';
 
 interface ProductCardProps {
   product: Product;
+  /** «Мало» at or below this total stock (from `GET /product`) */
+  lowStockThreshold: number;
   onPress: (productId: string) => void;
-}
-
-// Display thresholds for the stock badge (same as before the redesign).
-const LOW_STOCK_BELOW = 9;
-
-function getStockTone(quantity: number): StatusTone {
-  if (quantity === 0) return 'err';
-  if (quantity < LOW_STOCK_BELOW) return 'warn';
-
-  return 'ok';
 }
 
 /**
  * Product row in the list: photo, name, category · brand · warehouse,
  * «от» price and stock badge.
  */
-export function ProductCard({ product, onPress }: ProductCardProps) {
+export function ProductCard({ product, lowStockThreshold, onPress }: ProductCardProps) {
   const { t } = useTranslation();
   const totalQuantity = getTotalQuantity(product);
+  const stockTone: StatusTone = totalQuantity <= lowStockThreshold ? 'err' : 'ok';
 
   // Get translated category or fallback to original
   const category = t(`category.${product.category}`, { defaultValue: product.category });
@@ -39,7 +32,7 @@ export function ProductCard({ product, onPress }: ProductCardProps) {
       amount={product.priceRange?.min ?? 0}
       amountPrefix={t('product.from')}
       amountCurrency={t('common.currency')}
-      badge={{ label: `${totalQuantity} ${t('product.unit')}`, tone: getStockTone(totalQuantity) }}
+      badge={{ label: `${totalQuantity} ${t('product.unit')}`, tone: stockTone }}
       onPress={() => onPress(product.id)}
       className="pl-2.5"
     />

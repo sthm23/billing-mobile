@@ -1,8 +1,10 @@
 import { BaseListResponse } from '@/models/app.models'
 import { OrderProductVariant } from '@/services/order/order.type'
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery,
+  useQueryClient,
   type MutationOptions,
   type UseMutationResult,
   type UseQueryOptions,
@@ -11,10 +13,14 @@ import {
 import { type AxiosError } from 'axios'
 import { productService } from './product.service'
 import type {
+  Category,
   CreateProduct,
+  InventoryMovementPayload,
   Product,
   ProductDetail,
+  ProductListResponse,
   ProductParams,
+  StockMovementHistoryItem,
 } from '@/models/product.model'
 
 export const productQueryKeys = {
@@ -22,6 +28,7 @@ export const productQueryKeys = {
   list: (params?: ProductParams) =>
     [...productQueryKeys.all(), 'list', params ?? {}] as const,
   byId: (productId: string) => [...productQueryKeys.all(), 'byId', productId] as const,
+  stockMovements: (variantId: string) => [...productQueryKeys.all(), 'stockMovements', variantId] as const,
   create: () => [...productQueryKeys.all(), 'create'] as const,
 
 
@@ -100,16 +107,11 @@ export const useProductById = (
 
 
 /**
- * Hook to fetch a paginated list of products with optional filters.
- *
- * Calls backend `GET /products` endpoint with configurable query parameters such as currentPage, pageSize,
- * fromDate, toDate, and search filters.
- *
- * @param params - Query parameters (currentPage, pageSize, fromDate, toDate, and search)
- * @returns Query result with products and pagination metadata
+ * Paginated product list (`GET /product`) with search, category and «Мало»
+ * filters; the response also carries the chip counts.
  */
-export const useProducts = (params: ProductParams = {}): UseQueryResult<BaseListResponse<Product>> => {
-  const queryOptions: UseQueryOptions<BaseListResponse<Product>> = {
+export const useProducts = (params: ProductParams = {}): UseQueryResult<ProductListResponse> => {
+  const queryOptions: UseQueryOptions<ProductListResponse> = {
     queryKey: productQueryKeys.list(params),
     queryFn: () => productService.getProducts(params),
     placeholderData: (previous) => previous,
@@ -119,6 +121,61 @@ export const useProducts = (params: ProductParams = {}): UseQueryResult<BaseList
   return useQuery(queryOptions)
 }
 
+/** Top categories of the store for the filter chips. */
+export const useStoreCategories = (storeId: string | undefined): UseQueryResult<Category[]> =>
+  useQuery({
+    queryKey: ['category', 'store', storeId],
+    queryFn: () => productService.getStoreCategories(storeId!),
+    enabled: Boolean(storeId),
+    staleTime: 10 * 60_000,
+    refetchOnWindowFocus: false,
+  })
+
+const HISTORY_PAGE_SIZE = 20
+
+/** Stock movement history of a variant, loaded page by page. */
+export const useStockMovements = (variantId: string) =>
+  useInfiniteQuery({
+    queryKey: productQueryKeys.stockMovements(variantId),
+    queryFn: ({ pageParam }) => productService.getStockMovements(variantId, pageParam, HISTORY_PAGE_SIZE),
+    initialPageParam: 1,
+    getNextPageParam: (last: BaseListResponse<StockMovementHistoryItem>) =>
+      last.currentPage * last.pageSize < last.total ? Number(last.currentPage) + 1 : undefined,
+    enabled: Boolean(variantId),
+    refetchOnWindowFocus: false,
+  })
+
+/** Stock receipt / write-off; refreshes products and history. */
+export const useInventoryMovement = (): UseMutationResult<
+  unknown,
+  AxiosError<{ message?: string | string[] }>,
+  { warehouseId: string; body: InventoryMovementPayload }
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ warehouseId, body }) => productService.addInventory(warehouseId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productQueryKeys.all() })
+    },
+  })
+}
+
+/** Archives a product; refreshes the product list. */
+export const useArchiveProduct = (): UseMutationResult<
+  unknown,
+  AxiosError<{ message?: string | string[] }>,
+  string
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (productId) => productService.archiveProduct(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productQueryKeys.all() })
+    },
+  })
+}
 
 /**
  * Searches variants of a staff warehouse by name, SKU or barcode

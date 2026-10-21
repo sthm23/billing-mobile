@@ -250,8 +250,8 @@ const uz = {
     "stockRemaining": "Omborda qoldiq:",
     "unit": "dona",
     "buy": "Sotib olish",
-    "staffPanel": "Xodimlar paneli",
-    "adminAccess": "Admin kirish",
+    "staffPanel": "Qoldiq va narxlar",
+    "adminAccess": "Faqat xodimlarga ko‘rinadi",
     "history": "Tarix",
     "stockMovementButton": "Kirim / Chiqim",
     "costPrice": "Sotib olish narxi",
@@ -260,7 +260,66 @@ const uz = {
     "notFoundProducts": "Tovarlar topilmadi",
     "errorLoadingProducts": "Tovarlarni yuklashda xato",
     "available": "Omborda bor",
-    "notAvailable": "Omborda yo'q"
+    "notAvailable": "Omborda yo'q",
+    "searchPlaceholder": "Nomi, artikul yoki shtrixkod",
+    "filters": {
+      "all": "Hammasi",
+      "low": "Kam"
+    },
+    "toOrder": "Buyurtmaga · {{amount}} {{currency}}",
+    "chooseVariant": "Variantni tanlang",
+    "retailWithMargin": "Sotuv · marja {{margin}}%",
+    "addToOrder": {
+      "title": "Buyurtmaga qo‘shish",
+      "newOrder": "Yangi buyurtma",
+      "openOrders": "Ochiq buyurtmalar",
+      "noCustomer": "Mijozsiz",
+      "noOpenOrders": "Bu omborda ochiq buyurtmalar yo‘q",
+      "loadFailed": "Buyurtmalarni yuklab bo‘lmadi",
+      "added": "Mahsulot buyurtmaga qo‘shildi",
+      "failed": "Mahsulotni buyurtmaga qo‘shib bo‘lmadi",
+      "noStock": "Omborda yetarli mahsulot yo‘q"
+    },
+    "archive": {
+      "title": "Mahsulot o‘chirilsinmi?",
+      "text": "«{{name}}» ro‘yxat va qidiruvdan yo‘qoladi. Sotuv va harakatlar tarixi saqlanadi.",
+      "confirm": "O‘chirish",
+      "done": "Mahsulot o‘chirildi",
+      "failed": "Mahsulotni o‘chirib bo‘lmadi"
+    },
+    "movement": {
+      "inStock": "Omborda",
+      "receipt": "Kirim",
+      "writeOff": "Hisobdan chiqarish",
+      "quantity": "Miqdor",
+      "unitCost": "Bir dona xarid narxi",
+      "newPrice": "Yangi sotuv narxi",
+      "newPriceHint": "Ixtiyoriy. Hozir {{price}}",
+      "writeOffHint": "Nuqson, buzilish yoki kamomad. Qoldiq noldan kam bo‘lmaydi.",
+      "stockNow": "Hozir",
+      "stockAfter": "Bo‘ladi",
+      "purchaseSum": "Xarid summasi",
+      "submitReceipt": "Kirim qilish",
+      "submitWriteOff": "Hisobdan chiqarish",
+      "overStock": "Omborda faqat {{count}} dona",
+      "receivedToast": "{{count}} dona kirim qilindi",
+      "writtenOffToast": "{{count}} dona hisobdan chiqarildi",
+      "failed": "Harakatni saqlab bo‘lmadi"
+    },
+    "historyScreen": {
+      "title": "Tarix",
+      "inStock": "omborda",
+      "empty": "Hozircha harakatlar yo‘q",
+      "loadFailed": "Tarixni yuklab bo‘lmadi",
+      "perUnit": "{{amount}} dan",
+      "reason": {
+        "PURCHASE": "Kirim",
+        "SALE": "Sotuv",
+        "RETURN": "Qaytarish",
+        "ADJUSTMENT_IN": "Tuzatish",
+        "ADJUSTMENT_OUT": "Hisobdan chiqarish"
+      }
+    }
   },
   "organization": {
     "noFound": "Do'kon topilmadi.",

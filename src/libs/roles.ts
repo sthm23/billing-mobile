@@ -14,3 +14,9 @@ export function canLowerPrice(user: CurrentUserType | null | undefined): boolean
     user.staff?.role === StaffRole.MANAGER
   );
 }
+
+/**
+ * Owner or manager: stock receipt / write-off and archiving products.
+ * UX only — the backend enforces it (`POST /warehouse/:id/inventory`, `DELETE /product/:id`).
+ */
+export const canManageProducts = canLowerPrice;

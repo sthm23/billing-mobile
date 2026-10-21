@@ -236,6 +236,13 @@ Native picker (`@react-native-picker/picker`) in a filled `sunken` box. Props: `
 ## Feedback
 
 - **Spinner** — `size: 'sm' | 'md' | 'lg'` (`md`/`lg` → native `large`), `color` (default theme `ink`).
+- **Toast** — imperative: `toast.show(message, tone?: 'success' | 'error')`, `toast.hide(id?)`. `<ToastHost />` is mounted once in `app/_layout.tsx` (after `BottomSheetModalProvider`, so it shows above sheets). Top of the screen under the safe area, `bg-nav` pill with an accent check / `err` icon; hides after 2.6 s or on tap; announced for accessibility. Use for short success/error feedback instead of `Alert` when no confirmation is needed.
+
+```tsx
+import { toast } from '@/components/base';
+toast.show(t('product.addToOrder.added'));
+toast.show(getApiErrorMessage(error, t('common.error')), 'error');
+```
 - `components/common`: **EmptyState** (`message`, `description?`, `icon?`, `card?`, `children` for actions), **LoadingState** (`message?`).
 
 ---
@@ -245,11 +252,11 @@ Native picker (`@react-native-picker/picker`) in a filled `sunken` box. Props: `
 - `components/brand`: **Logo** (`variant: 'horizontal' | 'icon'`, `width`, `onDark?` — official SVGs via `react-native-svg`), **SplashView** (in-app splash while the session is restored).
 - `components/navigation`: **BottomNav** (floating tab bar) + `useBottomNavInset()`.
 - `components/common`: **ComingSoonScreen** (`title`, `description?`, `icon?`) — header with back + «Скоро будет доступно» for routes whose feature isn't built yet.
-- `components/product`: `ProductCard` (ListCard row), `ProductCardSkeleton`, `ProductImage` (thumbnail with placeholder fallback), `ImageCarousel` (photo gallery, `overlay` for back/edit buttons), `ProductVariantCard`.
-- `components/order`: `OrderItemCard`, `SwipeableOrderItemCard` (swipe left → delete), `ProductSearchSheet`.
+- `components/product`: `ProductCard` (ListCard row), `ProductCardSkeleton`, `ProductImage` (thumbnail with placeholder fallback), `ImageCarousel` (photo gallery, `overlay` for back/edit buttons), `ProductVariantCard`, `StockMovementSheet` («Приход / Списание»: `Segmented` receipt / write-off, quantity, unit cost prefilled with the last receipt cost, optional new price, hero preview «Сейчас → Станет», API error inline, toast on success).
+- `components/order`: `OrderItemCard`, `SwipeableOrderItemCard` (swipe left → delete), `ProductSearchSheet`, `AddToOrderSheet` (half sheet: «Новый заказ» + open CREATED/HOLD orders of the product's warehouse).
 - `components/cashbox`: `FilterSheet` (placeholder), type `CashboxStatusFilter`.
 - `src/icons/custom-icon.tsx`: `CustomIcon({ name, size?, color? })` — SF Symbols / Material Symbols.
 
 ---
 
-**Last Updated**: 2026-10-19 (redesign stage 3)
+**Last Updated**: 2026-10-21 (redesign stage 6)

@@ -5,6 +5,8 @@ import { EmptyState, LoadingState } from '@/components/common';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
 import { CashboxStatus, Payment } from '@/models/payment.model';
 import { useCashboxList } from '@/services/cashbox';
+import { cashboxQueryKeys } from '@/services/cashbox/cashbox.queries';
+import { useQueryClient } from '@tanstack/react-query';
 import { CashboxParams } from '@/services/cashbox/cashbox.types';
 import { useRouter } from 'expo-router';
 import { CircleAlert, Plus, SlidersHorizontal, Wallet } from 'lucide-react-native';
@@ -12,6 +14,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
 import { CashboxCard } from './CashboxCard';
+import { useRefreshControl } from '@/hooks/use-refresh-control';
 
 export default function CashboxListPage() {
   const { t } = useTranslation();
@@ -35,6 +38,11 @@ export default function CashboxListPage() {
   );
 
   const { data, isLoading, isFetching, isError } = useCashboxList(listParams);
+  const queryClient = useQueryClient();
+  const refreshControl = useRefreshControl(async () => {
+    setPage(1);
+    await queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() });
+  });
 
   useEffect(() => {
     if (!data?.data) {
@@ -111,6 +119,7 @@ export default function CashboxListPage() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: bottomInset, gap: 8 }}
           ListEmptyComponent={<EmptyState icon={Wallet} message={t('payment.noFound')} />}
+          refreshControl={refreshControl}
           ListFooterComponent={
             hasMore ? (
               <Button variant="secondary" full onPress={handleLoadMore} loading={isFetching} className="mt-2">

@@ -250,8 +250,8 @@ const ru = {
     "stockRemaining": "Остаток на складе:",
     "unit": "шт.",
     "buy": "Купить",
-    "staffPanel": "Панель сотрудника",
-    "adminAccess": "Админ-доступ",
+    "staffPanel": "Остатки и цены",
+    "adminAccess": "Видно только сотрудникам",
     "history": "История",
     "stockMovementButton": "Приход / Списание",
     "costPrice": "Закупочная цена",
@@ -260,7 +260,66 @@ const ru = {
     "notFoundProducts": "Товары не найдены",
     "errorLoadingProducts": "Ошибка загрузки продуктов",
     "available": "В наличии",
-    "notAvailable": "Нет в наличии"
+    "notAvailable": "Нет в наличии",
+    "searchPlaceholder": "Название, артикул или штрихкод",
+    "filters": {
+      "all": "Все",
+      "low": "Мало"
+    },
+    "toOrder": "В заказ · {{amount}} {{currency}}",
+    "chooseVariant": "Выберите вариант",
+    "retailWithMargin": "Продажа · маржа {{margin}}%",
+    "addToOrder": {
+      "title": "Добавить в заказ",
+      "newOrder": "Новый заказ",
+      "openOrders": "Открытые заказы",
+      "noCustomer": "Без клиента",
+      "noOpenOrders": "Открытых заказов на этом складе нет",
+      "loadFailed": "Не удалось загрузить заказы",
+      "added": "Товар добавлен в заказ",
+      "failed": "Не удалось добавить товар в заказ",
+      "noStock": "Недостаточно товара на складе"
+    },
+    "archive": {
+      "title": "Удалить товар?",
+      "text": "«{{name}}» пропадёт из списка и поиска. История продаж и движений сохранится.",
+      "confirm": "Удалить",
+      "done": "Товар удалён",
+      "failed": "Не удалось удалить товар"
+    },
+    "movement": {
+      "inStock": "На складе",
+      "receipt": "Приход",
+      "writeOff": "Списание",
+      "quantity": "Количество",
+      "unitCost": "Закупочная цена за шт.",
+      "newPrice": "Новая цена продажи",
+      "newPriceHint": "Необязательно. Сейчас {{price}}",
+      "writeOffHint": "Брак, порча или недостача. Остаток не может стать меньше нуля.",
+      "stockNow": "Сейчас",
+      "stockAfter": "Станет",
+      "purchaseSum": "Сумма закупки",
+      "submitReceipt": "Оприходовать",
+      "submitWriteOff": "Списать",
+      "overStock": "На складе только {{count}} шт.",
+      "receivedToast": "Оприходовано {{count}} шт.",
+      "writtenOffToast": "Списано {{count}} шт.",
+      "failed": "Не удалось сохранить движение"
+    },
+    "historyScreen": {
+      "title": "История",
+      "inStock": "на складе",
+      "empty": "Движений пока нет",
+      "loadFailed": "Не удалось загрузить историю",
+      "perUnit": "по {{amount}}",
+      "reason": {
+        "PURCHASE": "Приход",
+        "SALE": "Продажа",
+        "RETURN": "Возврат",
+        "ADJUSTMENT_IN": "Корректировка",
+        "ADJUSTMENT_OUT": "Списание"
+      }
+    }
   },
   "organization": {
     "noFound": "Магазин не найден.",

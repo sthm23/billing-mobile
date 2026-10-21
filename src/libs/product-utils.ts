@@ -1,5 +1,5 @@
 import { formatMoney } from '@/libs/format';
-import { Product } from '@/models/product.model';
+import { Product, ProductVariant, StockMovementType } from '@/models/product.model';
 
 /**
  * Formats price with thousands separator
@@ -36,4 +36,19 @@ export function getMainImageUrl(images?: { url: string; id: string; isMain: bool
   // Find main image or return first image
   const mainImage = images.find(img => img.isMain) || images[0];
   return mainImage?.url || null;
+}
+
+/** Variant name for lists: attribute values («11×25 · Сосна») or the SKU. */
+export function getVariantLabel(variant: Pick<ProductVariant, 'attributes' | 'sku'>): string {
+  const attrs = variant.attributes ?? [];
+  if (attrs.length === 0) return variant.sku;
+  return attrs.map((a) => String(a.value)).join(' · ');
+}
+
+/** Unit cost of the latest stock receipt that has a cost (0 when none). */
+export function getLatestCostPrice(variant: Pick<ProductVariant, 'stockMovements'>): number {
+  const lastIn = (variant.stockMovements ?? [])
+    .filter((m) => m.type === StockMovementType.IN && m.unitCost !== null)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  return lastIn ? Number(lastIn.unitCost) : 0;
 }

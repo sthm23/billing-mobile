@@ -40,7 +40,7 @@ export interface Order {
         createdAt: string
         createdBy: string
     },
-    warehouseId: string
+    /** `GET /orders` returns only this object — use `warehouse.id` */
     warehouse: {
         id: string
         storeId: string
@@ -82,6 +82,8 @@ export interface Order {
 }
 
 export interface OrderDetail extends Order {
+    /** Only in `GET /orders/:id` */
+    warehouseId: string
     payments: OrderPayment[]
     items: OrderDetailItem[]
     services: OrderAdditionalService[]
@@ -268,7 +270,8 @@ export interface OrderProductStockMovement {
     quantity: number
     reason: string
     type: 'OUT' | 'IN'
-    unitCost: number
+    /** Decimal as a string; null when no cost was recorded */
+    unitCost: number | string | null
     warehouseId: string
 }
 

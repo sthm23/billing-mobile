@@ -24,6 +24,7 @@ import type {
   CreateOrderPaymentPayload,
   Order,
   OrderDetail,
+  OrderItemPayload,
   OrderParams,
 } from './order.type'
 
@@ -156,6 +157,56 @@ export const useSaveOrder = (): UseMutationResult<string, AxiosError<{ message?:
       }
       await orderService.createOrderItems({ ...items, orderId: id })
       return id
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
+    },
+  })
+}
+
+export interface AddToOrderInput {
+  orderId: string
+  variantId: string
+  quantity: number
+  /** Catalogue price of the variant (no discount) */
+  retailPrice: number
+  costAtSale: number
+}
+
+/**
+ * Adds a variant to a saved CREATED/HOLD order: reloads the order, adds the
+ * quantity (to the existing line of that variant, keeping its price) and
+ * saves the whole content (`POST /orders/items`). The backend checks stock,
+ * prices and access again.
+ */
+export const useAddToOrder = (): UseMutationResult<OrderDetail, AxiosError<{ message?: string | string[] }>, AddToOrderInput> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ orderId, variantId, quantity, retailPrice, costAtSale }: AddToOrderInput) => {
+      const order = await orderService.getOrderById(orderId)
+      const items: OrderItemPayload[] = order.items.map((item) => ({
+        itemId: item.id,
+        variantId: item.variantId,
+        quantity: item.quantity + (item.variantId === variantId ? quantity : 0),
+        retailPrice: Number(item.retailPrice),
+        sale: Number(item.sale),
+        costAtSale: Number(item.costAtSale),
+      }))
+      if (!items.some((item) => item.variantId === variantId)) {
+        items.push({ variantId, quantity, retailPrice, sale: 0, costAtSale })
+      }
+      await orderService.createOrderItems({
+        orderId,
+        items,
+        additionalServices: (order.services ?? []).map((s) => ({
+          id: s.id,
+          name: s.name,
+          price: Number(s.price),
+          description: s.description ?? null,
+        })),
+      })
+      return order
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })

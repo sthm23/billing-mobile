@@ -1,14 +1,17 @@
-import { productsApi, warehouseApi } from '@/api/axios-instance'
+import { categoryApi, productsApi, warehouseApi } from '@/api/axios-instance'
 import { BaseListResponse } from '@/models/app.models'
 import { OrderProductVariant } from '@/services/order/order.type'
 import type {
+  Category,
   CreateProduct,
   CreateProductVariantPayload,
   InventoryMovementPayload,
   Product,
   ProductDetail,
+  ProductListResponse,
   ProductParams,
   ProductVariant,
+  StockMovementHistoryItem,
   UpdateProductVariantPrice
 } from '@/models/product.model'
 
@@ -20,6 +23,7 @@ const ENDPOINTS = {
   CANCEL: (productId: string) => `/${productId}/cancel`,
   VARIANTS: '/variants',
   VARIANT_BY_ID: (variantId: string) => `/variants/${variantId}`,
+  STOCK_MOVEMENTS: (variantId: string) => `/variants/${variantId}/stock-movements`,
   INVENTORY: (warehouseID: string) => `/${warehouseID}/inventory`,
 
 } as const
@@ -45,32 +49,43 @@ const getProductById = async (productId: string): Promise<Product> => {
   return response.data;
 }
 
-const getProducts = async (params: ProductParams = {}): Promise<BaseListResponse<Product>> => {
+/** `GET /product`: the staff's products (non-archived) with search and filters. */
+const getProducts = async (params: ProductParams = {}): Promise<ProductListResponse> => {
+  const { currentPage = 1, pageSize = 10, search, categoryId, lowStock } = params;
 
-  const { currentPage = 1, pageSize = 10, fromDate, toDate, search } = params;
-
-  const queryParams = new URLSearchParams();
-  queryParams.append('currentPage', currentPage.toString());
-  queryParams.append('pageSize', pageSize.toString());
-
-  if (fromDate) {
-    queryParams.append('fromDate', fromDate.toISOString());
-  }
-  if (toDate) {
-    queryParams.append('toDate', toDate.toISOString());
-  }
-  if (search) {
-    queryParams.append('search', search);
-  }
-
-  const response = await productsApi.get<BaseListResponse<Product>>(ENDPOINTS.BASE, {
-    params: queryParams,
+  const response = await productsApi.get<ProductListResponse>(ENDPOINTS.BASE, {
+    params: {
+      currentPage,
+      pageSize,
+      ...(search ? { search } : {}),
+      ...(categoryId ? { categoryId } : {}),
+      ...(lowStock ? { lowStock: true } : {}),
+    },
   })
 
   if (!response.data.data) {
     throw new Error(response.data.data || 'Failed to fetch Products')
   }
 
+  return response.data
+}
+
+/** Stock movements of a variant, newest first. */
+const getStockMovements = async (
+  variantId: string,
+  currentPage: number,
+  pageSize = 20
+): Promise<BaseListResponse<StockMovementHistoryItem>> => {
+  const response = await productsApi.get<BaseListResponse<StockMovementHistoryItem>>(
+    ENDPOINTS.STOCK_MOVEMENTS(variantId),
+    { params: { currentPage, pageSize } }
+  )
+  return response.data
+}
+
+/** Top categories of the store (filter chips). */
+const getStoreCategories = async (storeId: string): Promise<Category[]> => {
+  const response = await categoryApi.get<Category[]>(`/${storeId}/categories`)
   return response.data
 }
 
@@ -93,10 +108,12 @@ const searchProducts = async (warehouseId: string, text: string): Promise<BaseLi
   return response.data
 }
 
+/** Archives the product (`DELETE /product/:id`): hidden everywhere, history kept. */
 const archiveProduct = (productId: string) => {
   return productsApi.delete<{ message: string }>(ENDPOINTS.BY_ID(productId))
 }
 
+/** Stock receipt or write-off in the variant's warehouse. */
 const addInventory = (warehouseId: string, body: InventoryMovementPayload) => {
   return warehouseApi.post<{ message: string }>(ENDPOINTS.INVENTORY(warehouseId), body)
 }
@@ -110,6 +127,8 @@ export const productService = {
   createProduct,
   getProductById,
   getProducts,
+  getStockMovements,
+  getStoreCategories,
   createProductVariants,
   searchProducts,
   addInventory,

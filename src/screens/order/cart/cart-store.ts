@@ -71,9 +71,10 @@ function attributeValue({ value }: OrderVariantAttribute): string | null {
 }
 
 /** Cost of the latest stock receipt — same source the web uses for `costAtSale`. */
-function latestReceiptCost(variant: OrderProductVariant): number {
+export function latestReceiptCost(variant: Pick<OrderProductVariant, 'stockMovements'>): number {
+  // Adjustments may have no cost — skip them.
   const receipts = variant.stockMovements
-    .filter((m) => m.type === 'IN')
+    .filter((m) => m.type === 'IN' && m.unitCost !== null)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return Number(receipts[0]?.unitCost ?? 0);
 }
@@ -141,15 +142,16 @@ export const cartStore = {
     setState({ ...state, customer });
   },
 
-  /** Adds one unit of a found variant (a new line or +1 on the existing one). */
-  addVariant(variant: OrderProductVariant): AddResult {
+  /** Adds units of a found variant (a new line or more on the existing one); default one. */
+  addVariant(variant: OrderProductVariant, quantity = 1): AddResult {
     const existing = state.lines.find((l) => l.variantId === variant.id);
     if (existing) {
-      if (existing.quantity >= variant.quantity) return 'maxReached';
-      updateLine(existing.key, { quantity: existing.quantity + 1, stock: variant.quantity });
+      if (existing.quantity + quantity > variant.quantity) return 'maxReached';
+      updateLine(existing.key, { quantity: existing.quantity + quantity, stock: variant.quantity });
       return 'added';
     }
     if (variant.quantity <= 0) return 'outOfStock';
+    if (quantity > variant.quantity) return 'maxReached';
 
     const price = Number(variant.price);
     setState({
@@ -166,7 +168,7 @@ export const cartStore = {
           retailPrice: price,
           sale: 0,
           costAtSale: latestReceiptCost(variant),
-          quantity: 1,
+          quantity,
           stock: variant.quantity,
         },
       ],

@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OrderCartScreen } from './cart/OrderCartScreen';
 import { variantLabel } from './cart/cart-store';
 import { ORDER_STATUS_TONE } from './order-status';
+import { useRefreshControl } from '@/hooks/use-refresh-control';
 
 interface OrderDetailScreenProps {
   orderId: string;
@@ -25,7 +26,8 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   const { t } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: order, isLoading, isError } = useOrderById(orderId);
+  const { data: order, isLoading, isError, refetch } = useOrderById(orderId);
+  const refreshControl = useRefreshControl(refetch);
 
   if (isLoading) {
     return <LoadingState message={t('common.loading')} />;
@@ -93,6 +95,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           />
         )}
         ListEmptyComponent={<EmptyState icon={ShoppingCart} message={t('order.noItems')} />}
+        refreshControl={refreshControl}
         contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 16, gap: 8 }}
       />
 

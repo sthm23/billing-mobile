@@ -12,6 +12,7 @@ import { AddTransactionSheet } from "./AddTransactionSheet";
 import { AllTransactionsSheet } from "./AllTransactionsSheet";
 import { PaymentMethodTiles } from "./PaymentMethodTiles";
 import { TransactionCard } from "./TransactionCard";
+import { useRefreshControl } from '@/hooks/use-refresh-control';
 
 const PREVIEW_COUNT = 5;
 
@@ -24,9 +25,10 @@ export default function CashboxDetailsPage() {
   const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
   const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
 
-  const { data: cashbox, isLoading, isError } = useCashboxById(id, {
+  const { data: cashbox, isLoading, isError, refetch } = useCashboxById(id, {
     // refetchInterval: 30000,
   });
+  const refreshControl = useRefreshControl(refetch);
   const closeCashboxMutation = useCloseCashbox();
   const createTransactionMutation = useCreateTransaction();
 
@@ -119,7 +121,7 @@ export default function CashboxDetailsPage() {
     <View className="flex-1 bg-bg">
       {header}
 
-      <ScrollView className="flex-1" contentContainerClassName="px-4 pb-10 gap-3">
+      <ScrollView className="flex-1" contentContainerClassName="px-4 pb-10 gap-3" refreshControl={refreshControl}>
         <HeroCard
           label={t('payment.balanceInCashbox')}
           chip={t(`payment.cashboxStatus.${cashbox.status}`)}

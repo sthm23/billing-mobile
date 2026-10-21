@@ -1,3 +1,4 @@
+import { BaseListResponse } from "./app.models"
 import { Warehouse } from "./store.model"
 
 export interface BaseProduct {
@@ -57,7 +58,8 @@ export interface StockMovement {
   reason: StockMovementReason
   warehouseId: string
   quantity: number
-  unitCost: string
+  /** Decimal as a string; null for write-offs and adjustments without a cost */
+  unitCost: string | null
   createdAt: string
   createdBy: {
     role: 'OWNER' | 'STAFF'
@@ -186,14 +188,39 @@ export interface AttributeValuePayload {
   value: string | number | boolean;
 }
 
+/**
+ * `POST /warehouse/:id/inventory`. Allowed: IN + PURCHASE (costPrice required),
+ * IN/OUT + ADJUSTMENT. A write-off never takes stock below zero.
+ */
 export interface InventoryMovementPayload {
   type: StockMovementType,
   reason: StockMovementReason,
-  warehouseId: string;
   variantId: string;
   quantity: number;
-  costPrice: number;
-  price: number;
+  /** Unit purchase cost */
+  costPrice?: number;
+  /** New sale price; omitted keeps the current one */
+  price?: number;
+}
+
+/** Row of `GET /product/variants/:id/stock-movements` (newest first). */
+export interface StockMovementHistoryItem {
+  id: string
+  type: StockMovementType
+  reason: StockMovementReason
+  quantity: number
+  /** Decimal as a string; null when no cost was recorded */
+  unitCost: string | null
+  createdAt: string
+  /** Full name of the employee */
+  createdBy: string | null
+}
+
+/** `GET /product` response: the page plus counts for the «Все» / «Мало» chips. */
+export interface ProductListResponse extends BaseListResponse<Product> {
+  counts: { all: number, lowStock: number }
+  /** Total stock at or below this is «Мало» */
+  lowStockThreshold: number
 }
 
 export interface UpdateProductVariantPrice {
@@ -203,9 +230,12 @@ export interface UpdateProductVariantPrice {
 export interface ProductParams {
   currentPage?: number;
   pageSize?: number;
-  fromDate?: Date;
-  toDate?: Date;
+  /** Product name, SKU or barcode */
   search?: string;
+  /** Top category (includes its subcategories) */
+  categoryId?: string;
+  /** Only «Мало» products */
+  lowStock?: boolean;
 }
 
 export interface ProductVariantSearchParams {

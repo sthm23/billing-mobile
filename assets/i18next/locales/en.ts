@@ -250,8 +250,8 @@ const en = {
     "stockRemaining": "Stock remaining:",
     "unit": "pcs",
     "buy": "Buy",
-    "staffPanel": "Staff panel",
-    "adminAccess": "Admin access",
+    "staffPanel": "Stock and prices",
+    "adminAccess": "Visible to staff only",
     "history": "History",
     "stockMovementButton": "Stock In / Write Off",
     "costPrice": "Purchase price",
@@ -260,7 +260,66 @@ const en = {
     "notFoundProducts": "No products found",
     "errorLoadingProducts": "Error loading products",
     "available": "Available",
-    "notAvailable": "Out of stock"
+    "notAvailable": "Out of stock",
+    "searchPlaceholder": "Name, SKU or barcode",
+    "filters": {
+      "all": "All",
+      "low": "Low"
+    },
+    "toOrder": "Add to order · {{amount}} {{currency}}",
+    "chooseVariant": "Choose a variant",
+    "retailWithMargin": "Sale · margin {{margin}}%",
+    "addToOrder": {
+      "title": "Add to order",
+      "newOrder": "New order",
+      "openOrders": "Open orders",
+      "noCustomer": "No customer",
+      "noOpenOrders": "No open orders in this warehouse",
+      "loadFailed": "Could not load orders",
+      "added": "Product added to the order",
+      "failed": "Could not add the product to the order",
+      "noStock": "Not enough stock"
+    },
+    "archive": {
+      "title": "Delete product?",
+      "text": "\"{{name}}\" will disappear from the list and search. Sales and stock history is kept.",
+      "confirm": "Delete",
+      "done": "Product deleted",
+      "failed": "Could not delete the product"
+    },
+    "movement": {
+      "inStock": "In stock",
+      "receipt": "Receipt",
+      "writeOff": "Write-off",
+      "quantity": "Quantity",
+      "unitCost": "Purchase price per unit",
+      "newPrice": "New sale price",
+      "newPriceHint": "Optional. Now {{price}}",
+      "writeOffHint": "Defect, damage or shortage. Stock cannot go below zero.",
+      "stockNow": "Now",
+      "stockAfter": "After",
+      "purchaseSum": "Purchase total",
+      "submitReceipt": "Receive",
+      "submitWriteOff": "Write off",
+      "overStock": "Only {{count}} pcs in stock",
+      "receivedToast": "Received {{count}} pcs",
+      "writtenOffToast": "Written off {{count}} pcs",
+      "failed": "Could not save the movement"
+    },
+    "historyScreen": {
+      "title": "History",
+      "inStock": "in stock",
+      "empty": "No movements yet",
+      "loadFailed": "Could not load the history",
+      "perUnit": "at {{amount}}",
+      "reason": {
+        "PURCHASE": "Receipt",
+        "SALE": "Sale",
+        "RETURN": "Return",
+        "ADJUSTMENT_IN": "Adjustment",
+        "ADJUSTMENT_OUT": "Write-off"
+      }
+    }
   },
   "organization": {
     "noFound": "No organization found.",

@@ -9,6 +9,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
 import { OrderCard } from './OrderCard';
+import { useRefreshControl } from '@/hooks/use-refresh-control';
 
 
 type OrderStatusType = 'active' | 'completed';
@@ -54,7 +55,8 @@ export default function OrderPage() {
         ]
     )
 
-    const { data, isLoading, isError } = useOrders(listParams);
+    const { data, isLoading, isError, refetch } = useOrders(listParams);
+    const refreshControl = useRefreshControl(refetch);
 
     const orders = data?.data ?? []
 
@@ -94,6 +96,7 @@ export default function OrderPage() {
                         />
                     )}
                     ListEmptyComponent={<EmptyState icon={ReceiptText} message={t('order.noOrders')} />}
+                    refreshControl={refreshControl}
                     contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: bottomInset, gap: 8 }}
                 />
             )}

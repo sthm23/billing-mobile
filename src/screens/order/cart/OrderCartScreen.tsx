@@ -20,6 +20,8 @@ interface OrderCartScreenProps {
   order?: OrderDetail;
   /** Open the scanner right away (BottomNav scan button) */
   startScan?: boolean;
+  /** Keep the new-order cart already filled elsewhere (product card «В заказ») */
+  keepCart?: boolean;
 }
 
 /**
@@ -27,7 +29,7 @@ interface OrderCartScreenProps {
  * customer, totals preview, «Бронь» (save as HOLD) and «Оплатить».
  * The order is created on the backend on the first save.
  */
-export function OrderCartScreen({ order, startScan }: OrderCartScreenProps) {
+export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenProps) {
   const { t } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -44,6 +46,8 @@ export function OrderCartScreen({ order, startScan }: OrderCartScreenProps) {
   useEffect(() => {
     if (order) {
       cartStore.loadOrder(order);
+    } else if (keepCart && !cartStore.get().orderId) {
+      // Already filled (product card) — keep it.
     } else {
       cartStore.startNew(warehouses.length === 1 ? warehouses[0].id : undefined);
       // With several warehouses the seller picks one first.
