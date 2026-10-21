@@ -1,5 +1,5 @@
 import ProductListScreen from '@/screens/product/ProductListScreen';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function ProductsScreen() {
   return (

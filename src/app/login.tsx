@@ -1,6 +1,6 @@
 import { LoginPage } from '@/screens/login/LoginPage';
 import { KeyboardAvoidingView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function login() {
   return (

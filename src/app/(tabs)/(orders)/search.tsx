@@ -1,5 +1,5 @@
 import { OrderSearchScreen } from '@/screens/order/cart/OrderSearchScreen';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function OrderSearchPage() {
   return (

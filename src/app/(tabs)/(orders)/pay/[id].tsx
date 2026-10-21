@@ -1,6 +1,6 @@
 import { OrderPayScreen } from '@/screens/order/pay/OrderPayScreen';
 import { useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function OrderPayPage() {
   const { id } = useLocalSearchParams<{ id: string }>();

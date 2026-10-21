@@ -1,5 +1,5 @@
 import { CreateStaffScreen } from "@/screens/profile/CreateStaffScreen";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 /**
  * New employee (OWNER only). Reached from Profile → Staff.

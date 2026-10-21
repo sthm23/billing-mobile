@@ -12,6 +12,12 @@ const twMerge = extendTailwindMerge<'typography'>({
             'font-family': [{ font: ['onest', 'onest-medium', 'onest-semibold', 'onest-bold'] }],
             typography: [{ type: ['display', 'title', 'heading', 'subhead', 'body-strong', 'body', 'label', 'caption'] }],
         },
+        // A type-* style sets font family, size, line height and tracking: it must
+        // drop earlier ones (e.g. Text's default `font-onest text-base`), otherwise
+        // those come later in the stylesheet and win.
+        conflictingClassGroups: {
+            typography: ['font-family', 'font-size', 'font-weight', 'leading', 'tracking'],
+        },
     },
 });
 

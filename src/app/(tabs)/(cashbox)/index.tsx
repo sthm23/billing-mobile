@@ -1,5 +1,5 @@
 import CashboxListPage from '@/screens/payment/CashboxListPage';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function CashboxScreen() {
   return (

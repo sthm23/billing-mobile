@@ -1,6 +1,6 @@
 import { OrderCartScreen } from '@/screens/order/cart/OrderCartScreen';
 import { useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 /**
  * New sale. `?scan=1` (BottomNav scan button) opens the scanner right away.

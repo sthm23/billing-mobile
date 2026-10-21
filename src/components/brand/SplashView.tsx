@@ -2,7 +2,7 @@ import { Text } from '@/components/base';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 import { Logo } from './Logo';
 
 /**

@@ -1,5 +1,5 @@
 import MobileProfilePage from '@/screens/profile/MobileProfilePage';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function ProfileScreen() {
   return (

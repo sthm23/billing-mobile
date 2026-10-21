@@ -27,8 +27,8 @@ const MobileProfilePage = () => {
   return (
     <ScrollView
       className="flex-1 bg-bg"
-      contentContainerClassName="px-4 pt-2 gap-3"
-      contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomInset }}
+      // One prop only: on native contentContainerStyle replaces contentContainerClassName
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingTop: 8, gap: 12, paddingBottom: bottomInset }}
     >
       <Text className="type-title text-ink pb-1" accessibilityRole="header">{t('profile.title')}</Text>
       <ProfileCard user={user} />

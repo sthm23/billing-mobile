@@ -111,6 +111,12 @@ Other root routes: `index.tsx` (redirects by auth state), `login.tsx` (→ `scre
 
 All stacks use `headerShown: false` — screens draw their own header (back `IconButton` + title) inside a `SafeAreaView edges={['top']}`.
 
+**Import `SafeAreaView` from `@/components/base/SafeAreaView`, never from `react-native-safe-area-context`.** On iOS/Android react-native-css gives `className` support only to core components (`View`, `Text`, `ScrollView`, `FlatList`, `Pressable`, `KeyboardAvoidingView`, …) and to `SafeAreaProvider`; the library's `SafeAreaView` silently ignores `className`, so `flex-1` is lost and the screen collapses (works on web, broken on devices). Any other third-party component needs `styled()` from `react-native-css` or a `style` prop.
+
+**Don't pass both `contentContainerClassName` and `contentContainerStyle`** to a `ScrollView`/`FlatList`: on native the style prop replaces the class styles (padding and gap vanish; web merges them). Use one — `contentContainerStyle` when a value is computed (e.g. `useBottomNavInset()`).
+
+**Typography**: `type-*` classes replace font family/size/leading/tracking — `cn()` drops `Text`'s default `font-onest text-base` for them (`conflictingClassGroups` in `src/libs/utils.ts`). A new `@utility type-*` must be added to that list too.
+
 ### Tabs (`src/app/(tabs)/_layout.tsx`)
 
 Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navigation/BottomNav.tsx`) — the floating STHM bar **Products · Orders · [Scan] · Cashbox · Profile**. Each tab has its own Stack:

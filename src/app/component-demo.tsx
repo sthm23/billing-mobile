@@ -30,7 +30,7 @@ import { router } from 'expo-router';
 import { Check, ChevronLeft, Pencil, Plus, ScanBarcode, Search, SlidersHorizontal, Trash2 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 /**
  * Component Demo — живая витрина базовых компонентов STHM

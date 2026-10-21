@@ -1,6 +1,6 @@
 import { OrderDetailScreen } from '@/screens/order/OrderDetailScreen';
 import { useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function OrderDetailPage() {
   const { id } = useLocalSearchParams<{ id: string }>();

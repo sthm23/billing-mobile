@@ -78,3 +78,4 @@ export {
   ChevronUpIcon,
   CloseIcon, type IconProps
 } from './icon';
+export { SafeAreaView, type SafeAreaViewProps } from './SafeAreaView';

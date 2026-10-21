@@ -1,5 +1,5 @@
 import OrderPage from '@/screens/order/OrderPage';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function OrdersScreen() {
   return (

@@ -5,7 +5,7 @@ import { useProductById } from '@/services/product/product.queries';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PackageX } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 export default function ProductDetailRoute() {
   const { t } = useTranslation();
