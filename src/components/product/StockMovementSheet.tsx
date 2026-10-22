@@ -149,7 +149,7 @@ export function StockMovementSheet({ target, onClose }: StockMovementSheetProps)
                 placeholder="0"
                 placeholderTextColor={colors.muted}
                 accessibilityLabel={t('product.movement.quantity')}
-                className="flex-1 font-onest-bold text-xl text-ink tabular-nums"
+                className="flex-1 min-w-0 font-onest-bold text-xl text-ink tabular-nums"
               />
             </Field>
             {overStock && (
@@ -168,7 +168,7 @@ export function StockMovementSheet({ target, onClose }: StockMovementSheetProps)
                     placeholder="0"
                     placeholderTextColor={colors.muted}
                     accessibilityLabel={t('product.movement.unitCost')}
-                    className="flex-1 font-onest-bold text-xl text-ink tabular-nums"
+                    className="flex-1 min-w-0 font-onest-bold text-xl text-ink tabular-nums"
                   />
                 </Field>
                 <Field
@@ -183,7 +183,7 @@ export function StockMovementSheet({ target, onClose }: StockMovementSheetProps)
                     placeholder={formatMoney(target.price)}
                     placeholderTextColor={colors.muted}
                     accessibilityLabel={t('product.movement.newPrice')}
-                    className="flex-1 font-onest-bold text-xl text-ink tabular-nums"
+                    className="flex-1 min-w-0 font-onest-bold text-xl text-ink tabular-nums"
                   />
                 </Field>
               </>

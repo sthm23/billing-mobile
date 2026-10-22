@@ -10,6 +10,18 @@ export function todayRange(now: Date = new Date()): { from: string; to: string }
   return { from: from.toISOString(), to: to.toISOString() };
 }
 
+/** Bounds of the local calendar month as ISO strings. */
+export function monthRange(now: Date = new Date()): { from: string; to: string } {
+  const from = new Date(now.getFullYear(), now.getMonth(), 1);
+  const to = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return { from: from.toISOString(), to: to.toISOString() };
+}
+
+/** «03.09.2026» */
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
 /** «09:00» */
 export function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });

@@ -5,7 +5,9 @@ import {
   CashboxDetailResponse,
   CreateTransactionPayload,
   CloseCashboxResponse,
+  OpenCashbox,
 } from './cashbox.types';
+import type { CashboxOpenPayload, Payment } from '@/models/payment.model';
 
 const CASHBOX_BASE_URL = '/cashbox';
 
@@ -23,6 +25,18 @@ export const cashboxService = {
   createTransaction: async (payload: CreateTransactionPayload): Promise<void> => {
     const { cashboxId, ...transactionData } = payload;
     await api.post(`${CASHBOX_BASE_URL}/${cashboxId}/transaction`, transactionData);
+  },
+
+  /** Open cashboxes of the store. */
+  getOpenCashboxes: async (): Promise<OpenCashbox[]> => {
+    const response = await api.get<OpenCashbox[]>(`${CASHBOX_BASE_URL}/open`);
+    return response.data;
+  },
+
+  /** Opens the employee's own cashbox on one of their warehouses (any role). */
+  openCashbox: async (payload: CashboxOpenPayload): Promise<Payment> => {
+    const response = await api.post<Payment>(CASHBOX_BASE_URL, payload);
+    return response.data;
   },
 
   closeCashbox: async (id: string): Promise<CloseCashboxResponse> => {

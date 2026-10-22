@@ -60,11 +60,11 @@ export enum CashTransactionType {
   EXPENSE = 'EXPENSE',
 }
 
+/** `POST /cashbox` (owner/manager): the store comes from the token, a new cashbox is always OPEN. */
 export interface CashboxOpenPayload {
-  balance: number;
-  status: CashboxStatus;
-  storeId: string;
   warehouseId: string;
+  /** Opening cash, default 0 */
+  balance?: number;
 }
 
 export interface TransactionPayload {

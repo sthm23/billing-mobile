@@ -14,13 +14,37 @@ import type {
   CashboxDetailResponse,
   CreateTransactionPayload,
   CloseCashboxResponse,
+  OpenCashbox,
 } from './cashbox.types';
+import type { CashboxOpenPayload, Payment } from '@/models/payment.model';
 
 export const cashboxQueryKeys = {
   all: () => ['cashbox'] as const,
   list: (params?: CashboxParams) => [...cashboxQueryKeys.all(), 'list', params ?? {}] as const,
   byId: (cashboxId: string) => [...cashboxQueryKeys.all(), 'byId', cashboxId] as const,
   transactions: (cashboxId: string) => [...cashboxQueryKeys.all(), cashboxId, 'transactions'] as const,
+  open: () => [...cashboxQueryKeys.all(), 'open'] as const,
+};
+
+/** Open cashboxes of the store (where a repayment can go). */
+export const useOpenCashboxes = (enabled = true): UseQueryResult<OpenCashbox[]> =>
+  useQuery({
+    queryKey: cashboxQueryKeys.open(),
+    queryFn: () => cashboxService.getOpenCashboxes(),
+    enabled,
+    refetchOnWindowFocus: false,
+  });
+
+/** Opens the employee's own cashbox; refreshes cashboxes. */
+export const useOpenCashbox = (): UseMutationResult<Payment, AxiosError<{ message?: string | string[] }>, CashboxOpenPayload> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload) => cashboxService.openCashbox(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() });
+    },
+  });
 };
 
 /**

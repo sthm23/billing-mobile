@@ -4,9 +4,10 @@ import { useBottomNavInset } from "@/components/navigation/BottomNav";
 import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
+import { useDebtors } from "@/services/debt";
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import { UserRoundX, UsersRound } from "lucide-react-native";
+import { HandCoins, UserRoundX, UsersRound } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import LogoutButton from "./LogoutButton";
@@ -19,6 +20,7 @@ const MobileProfilePage = () => {
   const colors = useTheme();
   const bottomInset = useBottomNavInset();
   const version = Constants.expoConfig?.version ?? '';
+  const debtors = useDebtors();
 
   if (!user) {
     return <EmptyState icon={UserRoundX} message={t('profile.noUser')} />;
@@ -44,6 +46,19 @@ const MobileProfilePage = () => {
           onPress={() => router.push('/(tabs)/(profile)/create')}
         />
       ) : null}
+      {/* Any employee: debts belong to the store */}
+      <ListCard
+        leading={
+          <View className="w-11 h-11 rounded-[14px] bg-err-bg items-center justify-center">
+            <HandCoins size={20} color={colors.errFg} strokeWidth={2} />
+          </View>
+        }
+        title={t('debtors.title')}
+        subtitle={debtors.data ? t('debtors.entrySubtitle', { count: debtors.data.summary.customers }) : undefined}
+        amount={debtors.data?.summary.total}
+        amountTone="err"
+        onPress={() => router.push('/(tabs)/(profile)/debtors')}
+      />
       <SettingItems />
       <View className="flex-1 justify-end gap-3 pt-3">
         <LogoutButton onLogOutPress={logout} />

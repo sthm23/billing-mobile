@@ -176,7 +176,7 @@ export function PriceSheet({ line, canLower, onClose, onApply }: PriceSheetProps
                   placeholder="0"
                   placeholderTextColor={colors.muted}
                   accessibilityLabel={t('sale.price.amountLabel')}
-                  className="flex-1 font-onest-bold text-2xl text-ink tabular-nums"
+                  className="flex-1 min-w-0 font-onest-bold text-2xl text-ink tabular-nums"
                 />
                 <View className="flex-row gap-0.5 p-[3px] bg-card rounded-pill">
                   {(['sum', 'pct'] as const).map((u) => (

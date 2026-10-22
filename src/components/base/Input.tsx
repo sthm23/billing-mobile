@@ -78,7 +78,7 @@ export function InputField({ className, placeholderTextColor, ...props }: InputF
 
   return (
     <TextInput
-      className={cn('flex-1 h-full font-onest-medium text-[15px] text-ink', className)}
+      className={cn('flex-1 min-w-0 h-full font-onest-medium text-[15px] text-ink', className)}
       placeholderTextColor={placeholderTextColor ?? colors.muted}
       {...props}
     />

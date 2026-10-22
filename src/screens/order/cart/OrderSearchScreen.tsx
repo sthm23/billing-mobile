@@ -110,7 +110,7 @@ export function OrderSearchScreen() {
             autoFocus
             returnKeyType="search"
             accessibilityLabel={t('sale.search.placeholder')}
-            className="flex-1 font-onest-medium text-base text-ink"
+            className="flex-1 min-w-0 font-onest-medium text-base text-ink"
           />
           {query.length > 0 && (
             <IconButton icon={X} size="sm" variant="sunken" accessibilityLabel={t('common.clear')} onPress={() => setQuery('')} />

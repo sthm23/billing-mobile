@@ -12,6 +12,9 @@ export default function TabLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="create" />
       <Stack.Screen name="settings" />
+      <Stack.Screen name="debtors/index" />
+      <Stack.Screen name="debtors/[customerId]" />
+      <Stack.Screen name="debtors/pay" />
     </Stack>
   );
 }

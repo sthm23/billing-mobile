@@ -58,6 +58,17 @@ export interface CashboxDetailResponse {
   summary: CashboxSummary
 }
 
+/** `GET /cashbox/open`: an open cashbox of the store (any employee sees all). */
+export interface OpenCashbox {
+  id: string;
+  balance: number;
+  createdAt: string;
+  warehouse: { id: string; name: string };
+  seller: { id: string; fullName: string };
+  /** The current employee's own cashbox */
+  isMine: boolean;
+}
+
 export interface CreateTransactionPayload extends TransactionPayload {
   cashboxId: string;
 }

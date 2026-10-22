@@ -75,7 +75,7 @@ billing-mobile/
 └── src/                          # Alias @/*
     ├── api/axios-instance.ts     # Axios instances, auth + refresh interceptors
     ├── app/                      # Expo Router routes (thin wrappers around screens/)
-    ├── screens/                  # Screen implementations: login, order, payment, product, profile
+    ├── screens/                  # Screen implementations: login, order, payment, product, profile, debt
     ├── components/
     │   ├── base/                 # Design primitives (see COMPONENTS.md)
     │   ├── navigation/           # BottomNav (floating tab bar) + useBottomNavInset
@@ -88,10 +88,10 @@ billing-mobile/
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
-    ├── libs/                     # cn() (utils.ts), product-utils.ts
+    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts
     ├── models/                   # API types (app, auth, order, payment, product, store, user)
     ├── provider/AuthProvider.tsx # Auth context
-    └── services/                 # API services + React Query hooks (auth, cashbox, order, product)
+    └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product)
 ```
 
 `src/app` route files mostly import a component from `src/screens/` — put screen code in `screens/`, keep routes thin.
@@ -116,6 +116,8 @@ All stacks use `headerShown: false` — screens draw their own header (back `Ico
 
 **No `text-left` / `text-center` / `text-right` classes on a `TextInput`** (incl. `InputField`): react-native-css's TextInput wrapper crashes on text-align on native (`undefined is not a function` in `styles/index.js`). Use the `textAlign` prop. On `Text` these classes are fine.
 
+**A `flex-1` `TextInput` in a row also gets `min-w-0`** (`flex-1 min-w-0 …`): on web a flex child has `min-width: auto`, so the `<input>` keeps its intrinsic width (~20 characters) and pushes the buttons after it out of the row. Android ignores this, so it only shows on web.
+
 **Don't pass both `contentContainerClassName` and `contentContainerStyle`** to a `ScrollView`/`FlatList`: on native the style prop replaces the class styles (padding and gap vanish; web merges them). Use one — `contentContainerStyle` when a value is computed (e.g. `useBottomNavInset()`).
 
 **Typography**: `type-*` classes replace font family/size/leading/tracking — `cn()` drops `Text`'s default `font-onest text-base` for them (`conflictingClassGroups` in `src/libs/utils.ts`). A new `@utility type-*` must be added to that list too.
@@ -129,7 +131,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | `(products)` | `index`, `[id]`, `create`, `history/[variantId]` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen`, `StockHistoryScreen` (params `title`, `subtitle`, `stock`) |
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `create`, `settings` | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen` |
+| `(profile)` | `index`, `create`, `settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen`, `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
@@ -259,7 +261,7 @@ import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 
 `src/api/axios-instance.ts`:
 - `BASE_URL` is chosen with `Platform.select`. **It currently points to a LAN dev server** (`http://<lan-ip>:4000/api`, `localhost` for web); production is `https://sthm23.uz/api` (commented). Check it before building a release.
-- Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payments`), `warehouseApi` (`/warehouse`), `categoryApi` (`/category`). Timeout 30 s, `withCredentials: true`.
+- Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payment`), `warehouseApi` (`/warehouse`), `categoryApi` (`/category`). Timeout 30 s, `withCredentials: true`.
 - Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup`, `/refresh`, `/logout`.
 - On 401: one shared `GET /refresh` (httpOnly cookie) → save new token → retry once. If refresh fails: `POST /logout` and clear stored token/user.
 
@@ -272,7 +274,7 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox`, `customer` (search/create customers), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store + `POST /store/staff`).
+Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store + `POST /store/staff`).
 
 Prisma `Decimal` fields (`price`, `totalAmount`, `retailPrice`, …) arrive as strings — wrap in `Number()` before arithmetic.
 
@@ -286,6 +288,17 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 - **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
 - **Warehouse**: the cart's warehouse is one of `user.staff.warehouse` (`useStaffWarehouses`); with several, the seller picks one before adding products.
 - **Types**: list `Order` has only the `warehouse` object (no `warehouseId`); `OrderDetail.warehouseId` exists.
+
+### Debtors flow (stage 8)
+
+A debt is owed to the **store**: every employee (seller, cashier, manager, owner) sees all debtors and may accept a repayment. Business rules: [`../docs/features/debt.md`](../docs/features/debt.md).
+
+- **Profile**: card «Должники» (count + total from `useDebtors().summary`) for every employee → `/(tabs)/(profile)/debtors`.
+- **List** (`screens/debt/DebtorsScreen.tsx`, `GET /debt/debtors`): hero «Общий долг» + chip «Клиентов: N», tiles «Дольше 30 дней» (`over30`) / «Погашено за месяц» (`paidInPeriod` — DEBT_PAYMENT in the month; the app sends `monthRange()` from `libs/date.ts`), search, `Segmented` По сумме / По дате (`sort`). Rows by customer with an age badge: > 30 days `err`, ≥ 21 `warn`, else neutral.
+- **Customer** (`DebtorScreen.tsx`, `GET /debt/debtors/:customerId`): the customer's open debts (ORDER / MANUAL); with a single debt it opens the payment right away (`router.replace`).
+- **Payment of one debt** (`DebtPayScreen.tsx`, design «OrderPay» in debt mode): remaining, progress, method tiles + amounts (`PaymentMethodsInput`, shared with `OrderPayScreen`), cash change, payment history. `useRepayDebt()` → ORDER: `POST /payment` (no stock movement), MANUAL: `POST /debt/payment`. Overpayment is never sent (cash minus change); the backend rejects it anyway.
+- **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox`, warehouse chips if several) or pick another open cashbox of the store → `cashboxId`.
+- i18n: top-level `debtors.*`.
 
 ### Summaries (sales and cashbox)
 
@@ -381,7 +394,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`).
-- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox, cashbox filters, order-level discount, debt repayment (stage 8). Staff creation has no «comment» field (not stored by the backend).
+- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount, creating a manual debt (`POST /debt`). Staff creation has no «comment» field (not stored by the backend).
 - Backend: `GET /category/:storeId/categories` has no auth guard and takes `storeId` from the URL (not fixed).
 - `costAtSale` of a new order line is taken from the latest stock receipt on the client (same as the web) — the backend trusts it.
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
@@ -411,4 +424,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-10-21
+**Last updated**: 2026-10-22

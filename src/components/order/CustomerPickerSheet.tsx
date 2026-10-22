@@ -122,7 +122,7 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
                   keyboardType="phone-pad"
                   placeholder="90 123 45 67"
                   placeholderTextColor={colors.muted}
-                  className="flex-1 font-onest text-base text-ink tabular-nums"
+                  className="flex-1 min-w-0 font-onest text-base text-ink tabular-nums"
                 />
               </View>
             </View>

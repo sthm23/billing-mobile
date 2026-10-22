@@ -1,7 +1,14 @@
 import { Button, IconButton, Money, Pressable, Text } from '@/components/base';
-import type { ButtonIconComponent } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
-import { CustomerPickerSheet } from '@/components/order';
+import {
+  CustomerPickerSheet,
+  EMPTY_PAYMENT_AMOUNTS,
+  PAYMENT_METHODS,
+  PaymentMethodsInput,
+  amountOf as enteredFor,
+  totalEntered,
+  type PaymentAmounts,
+} from '@/components/order';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { formatMoney } from '@/libs/format';
@@ -11,42 +18,12 @@ import { useCreateOrderPayment, useOrderById } from '@/services/order/order.quer
 import { orderService } from '@/services/order/order.service';
 import { OrderStatus, PaymentType, type OrderPaymentPayload } from '@/services/order/order.type';
 import { router } from 'expo-router';
-import {
-  ArrowLeftRight,
-  Banknote,
-  ChevronDown,
-  ChevronLeft,
-  CircleAlert,
-  CreditCard,
-  Plus,
-  Smartphone,
-  UserRound,
-  X,
-} from 'lucide-react-native';
+import { ChevronDown, ChevronLeft, CircleAlert, Plus, UserRound, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { variantLabel } from '../cart/cart-store';
-
-/** Order of the method tiles; «Click» is the ONLINE payment type. */
-const METHODS: { type: PaymentType; icon: ButtonIconComponent }[] = [
-  { type: PaymentType.CASH, icon: Banknote },
-  { type: PaymentType.CARD, icon: CreditCard },
-  { type: PaymentType.ONLINE, icon: Smartphone },
-  { type: PaymentType.TRANSFER, icon: ArrowLeftRight },
-];
-
-type Amounts = Record<PaymentType, string>;
-
-const EMPTY_AMOUNTS: Amounts = {
-  [PaymentType.CASH]: '',
-  [PaymentType.CARD]: '',
-  [PaymentType.ONLINE]: '',
-  [PaymentType.TRANSFER]: '',
-};
-
-const digitsOf = (text: string) => parseInt(text.replace(/\D/g, ''), 10) || 0;
 
 interface OrderPayScreenProps {
   orderId: string;
@@ -64,7 +41,7 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
   const { data: order, isLoading, isError, refetch } = useOrderById(orderId);
   const payOrder = useCreateOrderPayment();
   const [selected, setSelected] = useState<PaymentType[]>([PaymentType.CASH]);
-  const [amounts, setAmounts] = useState<Amounts>(EMPTY_AMOUNTS);
+  const [amounts, setAmounts] = useState<PaymentAmounts>(EMPTY_PAYMENT_AMOUNTS);
   const [customer, setCustomer] = useState<OrderCustomer | null>(null);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [itemsOpen, setItemsOpen] = useState(false);
@@ -107,8 +84,8 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
   const total = Number(order.totalAmount) - Number(order.paidAmount);
   const subtotal = order.items.reduce((acc, i) => acc + Number(i.retailPrice) * i.quantity, 0);
   const discount = order.items.reduce((acc, i) => acc + Number(i.sale) * i.quantity, 0);
-  const amountOf = (type: PaymentType) => (selected.includes(type) ? digitsOf(amounts[type]) : 0);
-  const paid = METHODS.reduce((acc, m) => acc + amountOf(m.type), 0);
+  const amountOf = (type: PaymentType) => enteredFor(selected, amounts, type);
+  const paid = totalEntered(selected, amounts);
   const rest = total - paid;
   const change = rest < 0 ? -rest : 0;
   const cashIn = amountOf(PaymentType.CASH);
@@ -135,20 +112,10 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
     status = { text: t('sale.pay.statusNeedCustomer', { amount: formatMoney(rest) }), tone: 'warn' };
   }
 
-  const toggleMethod = (type: PaymentType) => {
-    setSelected((prev) => (prev.includes(type) ? prev.filter((m) => m !== type) : [...prev, type]));
-  };
-
-  const fillRest = (type: PaymentType) => {
-    const others = paid - amountOf(type);
-    const left = Math.max(0, total - others);
-    setAmounts((prev) => ({ ...prev, [type]: left > 0 ? formatMoney(left) : '' }));
-  };
-
   const submit = async () => {
     if (!canPay || submitting) return;
     // Change is given from cash: send only what stays in the till.
-    const payments: OrderPaymentPayload[] = METHODS.map((m) => ({
+    const payments: OrderPaymentPayload[] = PAYMENT_METHODS.map((m) => ({
       type: m.type,
       amount: m.type === PaymentType.CASH ? amountOf(m.type) - change : amountOf(m.type),
       paidAt: null,
@@ -252,68 +219,13 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
         </View>
 
         {/* Methods */}
-        <View className="bg-card rounded-3xl p-3.5 gap-3">
-          <View className="flex-row items-baseline justify-between px-0.5">
-            <Text className="font-onest-bold text-[15px] text-ink">{t('sale.pay.methods')}</Text>
-            <Text className="font-onest text-xs text-muted">{t('sale.pay.methodsHint')}</Text>
-          </View>
-          <View className="flex-row gap-1.5">
-            {METHODS.map(({ type, icon: Icon }) => {
-              const on = selected.includes(type);
-              return (
-                <Pressable
-                  key={type}
-                  onPress={() => toggleMethod(type)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: on }}
-                  className={cn('flex-1 h-[68px] rounded-2xl items-center justify-center gap-[5px]', on ? 'bg-primary' : 'bg-sunken')}
-                >
-                  <Icon size={22} color={on ? colors.onPrimary : colors.ink} strokeWidth={2} />
-                  <Text className={cn('font-onest-semibold text-xs', on ? 'text-on-primary' : 'text-ink')}>
-                    {t(`sale.pay.method.${type}`)}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          {METHODS.filter((m) => selected.includes(m.type)).map(({ type }) => {
-            const leftForThis = Math.max(0, total - (paid - amountOf(type)));
-            return (
-              <View key={type} className="flex-row items-center gap-2.5 h-14 pl-3.5 pr-1.5 rounded-[18px] bg-sunken">
-                <Text className="w-[84px] font-onest-semibold text-[13px] text-soft">{t(`sale.pay.method.${type}`)}</Text>
-                <TextInput
-                  value={amounts[type]}
-                  onChangeText={(text) => {
-                    const v = digitsOf(text);
-                    setAmounts((prev) => ({ ...prev, [type]: v ? formatMoney(v) : '' }));
-                  }}
-                  keyboardType="number-pad"
-                  placeholder="0"
-                  placeholderTextColor={colors.muted}
-                  accessibilityLabel={t('sale.pay.amountFor', { method: t(`sale.pay.method.${type}`) })}
-                  // textAlign as a prop, not `text-right`: react-native-css's TextInput
-                  // wrapper crashes on text-align classes on native ("undefined is not a function").
-                  textAlign="right"
-                  className="flex-1 font-onest-bold text-lg text-ink tabular-nums"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="bg-card"
-                  onPress={() =>
-                    leftForThis > 0 ? fillRest(type) : setAmounts((prev) => ({ ...prev, [type]: '' }))
-                  }
-                >
-                  {leftForThis > 0 ? t('sale.pay.fillRest') : t('common.clear')}
-                </Button>
-              </View>
-            );
-          })}
-          {selected.length === 0 && (
-            <Text className="font-onest text-[13px] text-muted text-center py-1.5">{t('sale.pay.chooseMethod')}</Text>
-          )}
-        </View>
+        <PaymentMethodsInput
+          selected={selected}
+          amounts={amounts}
+          onSelectedChange={setSelected}
+          onAmountsChange={setAmounts}
+          due={total}
+        />
 
         {/* Items */}
         <View className="bg-card rounded-3xl px-3.5 py-1.5">

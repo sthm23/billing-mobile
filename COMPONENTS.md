@@ -253,10 +253,10 @@ toast.show(getApiErrorMessage(error, t('common.error')), 'error');
 - `components/navigation`: **BottomNav** (floating tab bar) + `useBottomNavInset()`.
 - `components/common`: **ComingSoonScreen** (`title`, `description?`, `icon?`) — header with back + «Скоро будет доступно» for routes whose feature isn't built yet.
 - `components/product`: `ProductCard` (ListCard row), `ProductCardSkeleton`, `ProductImage` (thumbnail with placeholder fallback), `ImageCarousel` (photo gallery, `overlay` for back/edit buttons), `ProductVariantCard`, `StockMovementSheet` («Приход / Списание»: `Segmented` receipt / write-off, quantity, unit cost prefilled with the last receipt cost, optional new price, hero preview «Сейчас → Станет», API error inline, toast on success).
-- `components/order`: `OrderItemCard`, `SwipeableOrderItemCard` (swipe left → delete), `ProductSearchSheet`, `AddToOrderSheet` (half sheet: «Новый заказ» + open CREATED/HOLD orders of the product's warehouse).
-- `components/cashbox`: `FilterSheet` (placeholder), type `CashboxStatusFilter`.
+- `components/order`: `OrderItemCard`, `SwipeableOrderItemCard` (swipe left → delete), `ProductSearchSheet`, `AddToOrderSheet` (half sheet: «Новый заказ» + open CREATED/HOLD orders of the product's warehouse), `PaymentMethodsInput` («Способ оплаты»: method tiles, several allowed, + an amount field per selected method with «Остаток» / «Очистить»; props `selected`, `amounts`, `onSelectedChange`, `onAmountsChange`, `due`; shared by `OrderPayScreen` and `DebtPayScreen`; also exports `PAYMENT_METHODS`, `EMPTY_PAYMENT_AMOUNTS`, `amountOf`, `totalEntered`, `digitsOf`).
+- `components/cashbox`: `FilterSheet` (placeholder), type `CashboxStatusFilter`, `CashboxPickerSheet` («Куда принять деньги» when the employee has no open cashbox: «Открыть свою кассу» with warehouse chips if several (`POST /cashbox`), or a list of other open cashboxes of the store (`GET /cashbox/open`); `onPick(cashboxId | undefined)` — `undefined` = own cashbox just opened).
 - `src/icons/custom-icon.tsx`: `CustomIcon({ name, size?, color? })` — SF Symbols / Material Symbols.
 
 ---
 
-**Last Updated**: 2026-10-21 (redesign stage 6)
+**Last Updated**: 2026-10-22 (redesign stage 8)
