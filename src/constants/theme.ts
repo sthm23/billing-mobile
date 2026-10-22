@@ -1,39 +1,11 @@
 import '@/global.css';
 import { Platform } from 'react-native';
 
-
-export const Colors = {
-    light: {
-        text: '#000000',
-        background: '#ffffff',
-        backgroundElement: '#F0F0F3',
-        backgroundSelected: '#E0E1E6',
-        textSecondary: '#60646C',
-
-        primary: "#111111",
-        secondary: "#666666",
-        surface: "#F7F7F7",
-        accent: "#FF4C3B",
-        border: "#EEEEEE",
-        error: "#FF4444",
-    },
-    dark: {
-        text: '#ffffff',
-        background: '#000000',
-        backgroundElement: '#212225',
-        backgroundSelected: '#2E3135',
-        textSecondary: '#B0B4BA',
-
-        primary: "#FFFFFF",
-        secondary: "#AAAAAA",
-        surface: "#1E1E1E",
-        accent: "#FF4C3B",
-        border: "#e9e9e9",
-        error: "#FF4444",
-    },
-} as const;
-
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+/**
+ * Theme constants for the application.
+ * Colors are now managed through GlueStack UI and NativeWind.
+ * Use Tailwind classes in components instead of these constants.
+ */
 
 export const Fonts = Platform.select({
     ios: {
@@ -70,6 +42,5 @@ export const Spacing = {
     six: 64,
 } as const;
 
-export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
 

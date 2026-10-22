@@ -1,21 +1,271 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "nativewind/theme";
 
-:root {
-  --primary: #111111;
-  --secondary: #666666;
-  --background: #FFFFFF;
-  --surface: #F7F7F7;
-  --accent: #FF4C3B;
-  --border: #EEEEEE;
-  --error: #FF4444;
+/* ─── Theme: STHM design tokens (light / dark) ────────────────────
+   Values come from the STHM design system (tokens.json) and are mirrored
+   for JS in src/constants/tokens.ts — keep both in sync.
+   1. :root              — light defaults (all platforms)
+   2. @media dark :root  — dark defaults; nativewind maps this to
+                           Appearance.getColorScheme() on native.
+   3. :root.dark / :root.light — higher specificity for web class toggle. */
+@layer theme {
+  :root {
+    --bg: 242 242 239;
+    --card: 255 255 255;
+    --sunken: 242 242 239;
+    --ink: 20 20 20;
+    --soft: 85 85 79;
+    --muted: 107 107 102;
+    --line: 240 240 235;
+    --primary: 20 20 20;
+    --on-primary: 255 255 255;
+    --accent: 183 201 160;
+    --on-accent: 20 20 20;
+    --hero: 20 20 20;
+    --hero-ink: 255 255 255;
+    --hero-sub: 38 38 36;
+    --hero-muted: 181 181 174;
+    --hero-line: 46 46 43;
+    --hero-err: 255 155 143;
+    --hero-warn: 240 195 107;
+    --nav: 20 20 20;
+    --nav-ink: 255 255 255;
+    --nav-muted: 154 154 147;
+    --ok-bg: 227 243 223;
+    --ok-fg: 31 107 53;
+    --err-bg: 252 230 226;
+    --err-fg: 180 35 24;
+    --warn-bg: 253 240 213;
+    --warn-fg: 138 83 0;
+    --info-bg: 227 235 252;
+    --info-fg: 38 80 184;
+    --ph-bg: 237 237 232;
+    --ph-fg: 138 138 131;
+    --track: 230 230 224;
+    --seg: 255 255 255;
+    --disabled-bg: 230 230 224;
+    --disabled-fg: 138 138 131;
+    --scrim: 20 20 20 / 0.55;
+  }
 
-  --primary-dark: #FFFFFF;
-  --secondary-dark: #666666;
-    --background-dark: #111111;
-    --surface-dark: #F7F7F7;
-    --accent-dark: #FF4C3B;
-    --border-dark: #EEEEEE;
-    --error-dark: #FF4444;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: 15 15 14;
+      --card: 27 27 25;
+      --sunken: 38 38 36;
+      --ink: 242 242 239;
+      --soft: 181 181 174;
+      --muted: 163 163 156;
+      --line: 42 42 39;
+      --primary: 242 242 239;
+      --on-primary: 20 20 20;
+      --accent: 183 201 160;
+      --on-accent: 20 20 20;
+      --hero: 38 38 36;
+      --hero-ink: 242 242 239;
+      --hero-sub: 51 51 47;
+      --hero-muted: 163 163 156;
+      --hero-line: 58 58 55;
+      --hero-err: 255 155 143;
+      --hero-warn: 240 195 107;
+      --nav: 38 38 36;
+      --nav-ink: 242 242 239;
+      --nav-muted: 142 142 135;
+      --ok-bg: 30 51 36;
+      --ok-fg: 143 212 158;
+      --err-bg: 58 30 27;
+      --err-fg: 255 155 143;
+      --warn-bg: 58 46 20;
+      --warn-fg: 240 195 107;
+      --info-bg: 28 40 64;
+      --info-fg: 157 184 245;
+      --ph-bg: 38 38 36;
+      --ph-fg: 119 119 111;
+      --track: 27 27 25;
+      --seg: 58 58 55;
+      --disabled-bg: 38 38 36;
+      --disabled-fg: 107 107 102;
+      --scrim: 0 0 0 / 0.7;
+    }
+  }
+
+  :root.dark {
+    --bg: 15 15 14;
+    --card: 27 27 25;
+    --sunken: 38 38 36;
+    --ink: 242 242 239;
+    --soft: 181 181 174;
+    --muted: 163 163 156;
+    --line: 42 42 39;
+    --primary: 242 242 239;
+    --on-primary: 20 20 20;
+    --accent: 183 201 160;
+    --on-accent: 20 20 20;
+    --hero: 38 38 36;
+    --hero-ink: 242 242 239;
+    --hero-sub: 51 51 47;
+    --hero-muted: 163 163 156;
+    --hero-line: 58 58 55;
+    --hero-err: 255 155 143;
+    --hero-warn: 240 195 107;
+    --nav: 38 38 36;
+    --nav-ink: 242 242 239;
+    --nav-muted: 142 142 135;
+    --ok-bg: 30 51 36;
+    --ok-fg: 143 212 158;
+    --err-bg: 58 30 27;
+    --err-fg: 255 155 143;
+    --warn-bg: 58 46 20;
+    --warn-fg: 240 195 107;
+    --info-bg: 28 40 64;
+    --info-fg: 157 184 245;
+    --ph-bg: 38 38 36;
+    --ph-fg: 119 119 111;
+    --track: 27 27 25;
+    --seg: 58 58 55;
+    --disabled-bg: 38 38 36;
+    --disabled-fg: 107 107 102;
+    --scrim: 0 0 0 / 0.7;
+  }
+
+  :root.light {
+    --bg: 242 242 239;
+    --card: 255 255 255;
+    --sunken: 242 242 239;
+    --ink: 20 20 20;
+    --soft: 85 85 79;
+    --muted: 107 107 102;
+    --line: 240 240 235;
+    --primary: 20 20 20;
+    --on-primary: 255 255 255;
+    --accent: 183 201 160;
+    --on-accent: 20 20 20;
+    --hero: 20 20 20;
+    --hero-ink: 255 255 255;
+    --hero-sub: 38 38 36;
+    --hero-muted: 181 181 174;
+    --hero-line: 46 46 43;
+    --hero-err: 255 155 143;
+    --hero-warn: 240 195 107;
+    --nav: 20 20 20;
+    --nav-ink: 255 255 255;
+    --nav-muted: 154 154 147;
+    --ok-bg: 227 243 223;
+    --ok-fg: 31 107 53;
+    --err-bg: 252 230 226;
+    --err-fg: 180 35 24;
+    --warn-bg: 253 240 213;
+    --warn-fg: 138 83 0;
+    --info-bg: 227 235 252;
+    --info-fg: 38 80 184;
+    --ph-bg: 237 237 232;
+    --ph-fg: 138 138 131;
+    --track: 230 230 224;
+    --seg: 255 255 255;
+    --disabled-bg: 230 230 224;
+    --disabled-fg: 138 138 131;
+    --scrim: 20 20 20 / 0.55;
+  }
+}
+
+@theme inline {
+  /* Colors — STHM tokens */
+  --color-bg: rgb(var(--bg));
+  --color-card: rgb(var(--card));
+  --color-sunken: rgb(var(--sunken));
+  --color-ink: rgb(var(--ink));
+  --color-soft: rgb(var(--soft));
+  --color-muted: rgb(var(--muted));
+  --color-line: rgb(var(--line));
+  --color-primary: rgb(var(--primary));
+  --color-on-primary: rgb(var(--on-primary));
+  --color-accent: rgb(var(--accent));
+  --color-on-accent: rgb(var(--on-accent));
+  --color-hero: rgb(var(--hero));
+  --color-hero-ink: rgb(var(--hero-ink));
+  --color-hero-sub: rgb(var(--hero-sub));
+  --color-hero-muted: rgb(var(--hero-muted));
+  --color-hero-line: rgb(var(--hero-line));
+  --color-hero-err: rgb(var(--hero-err));
+  --color-hero-warn: rgb(var(--hero-warn));
+  --color-nav: rgb(var(--nav));
+  --color-nav-ink: rgb(var(--nav-ink));
+  --color-nav-muted: rgb(var(--nav-muted));
+  --color-ok-bg: rgb(var(--ok-bg));
+  --color-ok-fg: rgb(var(--ok-fg));
+  --color-err-bg: rgb(var(--err-bg));
+  --color-err-fg: rgb(var(--err-fg));
+  --color-warn-bg: rgb(var(--warn-bg));
+  --color-warn-fg: rgb(var(--warn-fg));
+  --color-info-bg: rgb(var(--info-bg));
+  --color-info-fg: rgb(var(--info-fg));
+  --color-ph-bg: rgb(var(--ph-bg));
+  --color-ph-fg: rgb(var(--ph-fg));
+  --color-track: rgb(var(--track));
+  --color-seg: rgb(var(--seg));
+  --color-disabled-bg: rgb(var(--disabled-bg));
+  --color-disabled-fg: rgb(var(--disabled-fg));
+  --color-scrim: rgb(var(--scrim));
+
+  /* Radius — STHM scale */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  /* Onest — one family per weight (React Native can't pick weights
+     from a single custom family). */
+  --font-onest: Onest_400Regular;
+  --font-onest-medium: Onest_500Medium;
+  --font-onest-semibold: Onest_600SemiBold;
+  --font-onest-bold: Onest_700Bold;
+}
+
+/* ─── Typography — STHM text styles ──────────────────────────────
+   Named type-* (not text-*) so tailwind-merge in cn() doesn't treat
+   them as text colors and drop them next to text-ink etc. */
+@utility type-display {
+  font-family: Onest_700Bold;
+  font-size: 32px;
+  letter-spacing: -0.64px;
+}
+
+@utility type-title {
+  font-family: Onest_700Bold;
+  font-size: 26px;
+}
+
+@utility type-heading {
+  font-family: Onest_700Bold;
+  font-size: 22px;
+}
+
+@utility type-subhead {
+  font-family: Onest_700Bold;
+  font-size: 18px;
+}
+
+@utility type-body-strong {
+  font-family: Onest_600SemiBold;
+  font-size: 15px;
+}
+
+@utility type-body {
+  font-family: Onest_500Medium;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+@utility type-label {
+  font-family: Onest_600SemiBold;
+  font-size: 13px;
+}
+
+@utility type-caption {
+  font-family: Onest_600SemiBold;
+  font-size: 12px;
 }

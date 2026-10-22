@@ -1,5 +1,25 @@
 import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+// Teach tailwind-merge the STHM-only class names from global.css so they
+// override each other like built-in ones (`rounded-xl` vs `rounded-pill`).
+const twMerge = extendTailwindMerge<'typography'>({
+    extend: {
+        theme: {
+            radius: ['pill'],
+        },
+        classGroups: {
+            'font-family': [{ font: ['onest', 'onest-medium', 'onest-semibold', 'onest-bold'] }],
+            typography: [{ type: ['display', 'title', 'heading', 'subhead', 'body-strong', 'body', 'label', 'caption'] }],
+        },
+        // A type-* style sets font family, size, line height and tracking: it must
+        // drop earlier ones (e.g. Text's default `font-onest text-base`), otherwise
+        // those come later in the stylesheet and win.
+        conflictingClassGroups: {
+            typography: ['font-family', 'font-size', 'font-weight', 'leading', 'tracking'],
+        },
+    },
+});
 
 /**
  * Merges Tailwind CSS classes with proper precedence
