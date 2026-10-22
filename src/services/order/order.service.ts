@@ -7,12 +7,13 @@
 
 import { ordersApi, paymentsApi, usersApi } from '@/api/axios-instance'
 import { BaseListResponse } from '@/models/app.models'
-import type { CreateOrderItemPayload, CreateOrderPayload, CreateOrderPaymentPayload, Order, OrderDetail, OrderParams, ReturnOrderItemPayload } from './order.type'
+import type { CreateOrderItemPayload, CreateOrderPayload, CreateOrderPaymentPayload, Order, OrderDetail, OrderParams, OrdersSummary, ReturnOrderItemPayload } from './order.type'
 
 const ENDPOINTS = {
   BASE: '/',
   LIST: '/',
   SEARCH: '/search',
+  SUMMARY: '/summary',
   ITEMS: '/items',
   RETURN: '/return',
   BY_ID: (orderId: string) => `/${orderId}`,
@@ -75,6 +76,12 @@ const getOrders = async (params: OrderParams = {}): Promise<BaseListResponse<Ord
   return response.data
 }
 
+/** Sales summary for `[from, to)` (local day bounds). */
+const getSummary = async (range: { from: string; to: string }): Promise<OrdersSummary> => {
+  const response = await ordersApi.get<OrdersSummary>(ENDPOINTS.SUMMARY, { params: range })
+  return response.data
+}
+
 const createOrderItems = async (body: CreateOrderItemPayload): Promise<{ message: string }> => {
   const response = await ordersApi.post<{ message: string }>(ENDPOINTS.ITEMS, body)
 
@@ -126,6 +133,7 @@ export const orderService = {
   createOrder,
   getOrderById,
   getOrders,
+  getSummary,
   returnOrder,
   createOrderItems,
   searchOrders,

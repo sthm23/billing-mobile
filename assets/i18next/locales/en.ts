@@ -347,6 +347,12 @@ const en = {
     "cancel": "Cancel"
   },
   "order": {
+    "summary": {
+      "today": "Sales today",
+      "count": "Orders: {{count}}",
+      "paid": "Paid",
+      "debt": "On credit"
+    },
     "itemsCount": "{{count}} items",
     "addProduct": "Add product",
     "activeTab": "Active",
@@ -516,6 +522,21 @@ const en = {
     "returnedAt": "Returned at"
   },
   "payment": {
+    "today": {
+      "title": "Today in open cashboxes",
+      "openCount": "Open: {{count}}",
+      "income": "Income today",
+      "expense": "Expense today",
+      "allClosed": "All cashboxes closed",
+      "noneTitle": "No open cashboxes",
+      "noneText": "Open a cashbox to accept payments.",
+      "lastClosedToday": "The last one closed today at {{time}}.",
+      "lastClosedYesterday": "The last one closed yesterday at {{time}}.",
+      "lastClosedOn": "The last one closed on {{date}} at {{time}}."
+    },
+    "shiftTotal": "Shift total",
+    "shift": "Shift",
+    "since": "since {{time}}",
     "noFound": "No payment found.",
     "detail": "Payment detail",
     "closeCashbox": "Close cashbox",

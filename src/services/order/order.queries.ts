@@ -26,13 +26,16 @@ import type {
   OrderDetail,
   OrderItemPayload,
   OrderParams,
+  OrdersSummary,
 } from './order.type'
+import { todayRange } from '@/libs/date'
 
 export const orderQueryKeys = {
   all: () => ['order'] as const,
   list: (params?: OrderParams) =>
     [...orderQueryKeys.all(), 'list', params ?? {}] as const,
   byId: (orderId: string) => [...orderQueryKeys.all(), 'byId', orderId] as const,
+  summary: (from: string) => [...orderQueryKeys.all(), 'summary', from] as const,
   create: () => [...orderQueryKeys.all(), 'create'] as const,
 
 
@@ -127,6 +130,20 @@ export const useOrders = (params: OrderParams = {}): UseQueryResult<BaseListResp
   }
 
   return useQuery(queryOptions)
+}
+
+/**
+ * «Продажи сегодня» (`GET /orders/summary`) for the local day. Refreshed with
+ * every order mutation (they invalidate `orderQueryKeys.all()`).
+ */
+export const useTodaySalesSummary = (): UseQueryResult<OrdersSummary> => {
+  const range = todayRange()
+
+  return useQuery({
+    queryKey: orderQueryKeys.summary(range.from),
+    queryFn: () => orderService.getSummary(range),
+    refetchOnWindowFocus: false,
+  })
 }
 
 export interface SaveOrderInput {

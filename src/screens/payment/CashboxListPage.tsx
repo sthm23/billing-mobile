@@ -14,6 +14,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
 import { CashboxCard } from './CashboxCard';
+import { CashboxTodayHero } from './CashboxTodayHero';
+import { todayRange } from '@/libs/date';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 
 export default function CashboxListPage() {
@@ -30,9 +32,8 @@ export default function CashboxListPage() {
     () => ({
       currentPage: page,
       pageSize: pageSize,
-      search: undefined,
-      fromDate: undefined,
-      toDate: undefined,
+      // Local day for the «today» totals
+      ...todayRange(),
     }),
     [page]
   );
@@ -103,6 +104,7 @@ export default function CashboxListPage() {
             {t('payment.openCashbox')}
           </Button>
         </View>
+        {data?.today && <CashboxTodayHero today={data.today} />}
         <Segmented options={filterOptions} value={statusFilter} onChange={setStatusFilter} />
       </View>
 

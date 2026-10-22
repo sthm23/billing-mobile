@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Alert, ScrollView, View } from "react-native";
 import { AddTransactionSheet } from "./AddTransactionSheet";
 import { AllTransactionsSheet } from "./AllTransactionsSheet";
+import { formatDayMonth, formatTime } from '@/libs/date';
 import { PaymentMethodTiles } from "./PaymentMethodTiles";
 import { TransactionCard } from "./TransactionCard";
 import { useRefreshControl } from '@/hooks/use-refresh-control';
@@ -102,14 +103,11 @@ export default function CashboxDetailsPage() {
     );
   }
 
-  // Pre-existing client-side totals; to be replaced by backend values (redesign stage 7).
-  const totalIncome = cashbox.transactions
-    .filter(tx => tx.type === CashTransactionType.INCOME)
-    .reduce((sum, tx) => +sum + +tx.amount, 0);
-
-  const totalExpense = cashbox.transactions
-    .filter(tx => tx.type === CashTransactionType.EXPENSE)
-    .reduce((sum, tx) => +sum + +tx.amount, 0);
+  const { summary } = cashbox;
+  // «16.10 · 09:00 – 19:30»; without a closing time only the start
+  const shift = `${formatDayMonth(cashbox.createdAt)} · ${formatTime(cashbox.createdAt)}${
+    cashbox.closedAt ? ` – ${formatTime(cashbox.closedAt)}` : ''
+  }`;
 
   const sortedTransactions = [...cashbox.transactions]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -123,13 +121,13 @@ export default function CashboxDetailsPage() {
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 pb-10 gap-3" refreshControl={refreshControl}>
         <HeroCard
-          label={t('payment.balanceInCashbox')}
+          label={isOpen ? t('payment.balanceInCashbox') : t('payment.shiftTotal')}
           chip={t(`payment.cashboxStatus.${cashbox.status}`)}
           chipTone={isOpen ? 'accent' : 'neutral'}
           amount={cashbox.balance}
           tiles={[
-            { label: t('payment.totalIncome'), value: totalIncome, tone: 'accent', signed: true },
-            { label: t('payment.totalExpense'), value: -totalExpense, tone: 'err' },
+            { label: t('payment.type.INCOME'), value: summary.income, tone: 'accent', signed: true },
+            { label: t('payment.type.EXPENSE'), value: -summary.expense, tone: 'err' },
           ]}
         >
           {isOpen ? (
@@ -148,10 +146,15 @@ export default function CashboxDetailsPage() {
                 disabled={closeCashboxMutation.isPending}
               />
             </View>
-          ) : null}
+          ) : (
+            <View className="flex-row items-center justify-between bg-hero-sub rounded-lg px-3.5 py-3">
+              <Text className="font-onest text-[13px] text-hero-muted">{t('payment.shift')}</Text>
+              <Text className="font-onest-semibold text-[13px] text-hero-ink tabular-nums">{shift}</Text>
+            </View>
+          )}
         </HeroCard>
 
-        <PaymentMethodTiles transactions={cashbox.transactions} />
+        <PaymentMethodTiles byMethod={summary.byMethod} />
 
         {/* Transactions */}
         <View className="bg-card rounded-xl px-4 pt-3 pb-1">

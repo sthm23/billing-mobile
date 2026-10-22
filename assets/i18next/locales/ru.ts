@@ -347,6 +347,12 @@ const ru = {
     "cancel": "Отмена"
   },
   "order": {
+    "summary": {
+      "today": "Продажи сегодня",
+      "count": "Заказов: {{count}}",
+      "paid": "Оплачено",
+      "debt": "В долг"
+    },
     "itemsCount": "{{count}} поз.",
     "addProduct": "Добавить товар",
     "activeTab": "Активные",
@@ -516,6 +522,21 @@ const ru = {
     "returnedAt": "Дата возврата"
   },
   "payment": {
+    "today": {
+      "title": "Сегодня в открытых кассах",
+      "openCount": "Открыто: {{count}}",
+      "income": "Приход за сегодня",
+      "expense": "Расход за сегодня",
+      "allClosed": "Все кассы закрыты",
+      "noneTitle": "Нет открытых касс",
+      "noneText": "Откройте кассу, чтобы принимать оплаты.",
+      "lastClosedToday": "Последняя закрыта сегодня в {{time}}.",
+      "lastClosedYesterday": "Последняя закрыта вчера в {{time}}.",
+      "lastClosedOn": "Последняя закрыта {{date}} в {{time}}."
+    },
+    "shiftTotal": "Итог смены",
+    "shift": "Смена",
+    "since": "с {{time}}",
     "noFound": "Платеж не найден.",
     "detail": "Детали платежа.",
     "closeCashbox": "Закрыть кассу",

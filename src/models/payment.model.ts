@@ -19,11 +19,9 @@ export interface Payment {
     name: string
   }
   balance: number
-  totalIncome?: number
-  totalExpense?: number
   createdAt: string
-  updatedAt?: string
-  closedAt?: string
+  /** Set when the cashbox is closed; null for cashboxes closed before it was recorded */
+  closedAt?: string | null
 }
 
 export enum CashboxStatus {

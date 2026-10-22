@@ -285,6 +285,17 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 - **Prices**: lowering = `sale` (absolute per unit), raising = `retailPrice` (`PriceSheet`). Only owner/manager may lower (`canLowerPrice()` in `src/libs/roles.ts` — UX only, the backend enforces it).
 - **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
 - **Warehouse**: the cart's warehouse is one of `user.staff.warehouse` (`useStaffWarehouses`); with several, the seller picks one before adding products.
+- **Types**: list `Order` has only the `warehouse` object (no `warehouseId`); `OrderDetail.warehouseId` exists.
+
+### Summaries (sales and cashbox)
+
+All totals come from the backend; the client sends its local day bounds from `todayRange()` (`libs/date.ts`, also `formatTime`, `formatDayMonth`, `isSameDay`), because the server time zone may differ.
+
+- **Orders screen**: HeroCard «Продажи сегодня» — `useTodaySalesSummary()` (`services/order/order.queries.ts`, `GET /orders/summary`, type `OrdersSummary`): chip «Заказов: N», tiles Оплачено / В долг. Scope by role is decided by the backend.
+- **Cashbox list**: `CashboxTodayHero` from `GET /cashbox` → `today` (`CashboxTodaySummary`): «Сегодня в открытых кассах» (chip «Открыто: N», Приход/Расход за сегодня) or «Нет открытых касс» + «Последняя закрыта сегодня/вчера/DD.MM в HH:MM». Rows show the shift: open «с 09:00» (another day «с 20.10, 09:00»), closed «16.10, 09:00–19:30» (`closedAt`).
+- **Cashbox details**: hero Приход/Расход and `PaymentMethodTiles` (`byMethod`) from `GET /cashbox/:id` → `summary` (`CashboxSummary`). A closed cashbox: label «Итог смены», «Смена 16.10 · 09:00 – 19:30».
+- Balances and shift totals include all payment methods (CASH, CARD, Click, Перечисление).
+- i18n: `order.summary.*`, `payment.today.*`, `payment.shiftTotal`, `payment.shift`, `payment.since`.
 
 ### Product flow
 
@@ -369,7 +380,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 ## Known Issues
 
-- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`), cashbox income/expense and per-method tiles (`CashboxDetailsPage`, `PaymentMethodTiles` — income − expense per method). To be replaced by backend values (redesign stage 7).
+- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`).
 - Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox, cashbox filters, order-level discount, debt repayment (stage 8). Staff creation has no «comment» field (not stored by the backend).
 - Backend: `GET /category/:storeId/categories` has no auth guard and takes `storeId` from the URL (not fixed).
 - `costAtSale` of a new order line is taken from the latest stock receipt on the client (same as the web) — the backend trusts it.

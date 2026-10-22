@@ -23,6 +23,19 @@ export enum OrderStatus {
     REFUNDED = 'REFUNDED'
 }
 
+/**
+ * `GET /orders/summary`: orders sold (COMPLETED/DEBT) in the period —
+ * the staff's own sales, a manager's warehouses or the whole store (owner).
+ */
+export interface OrdersSummary {
+    from: string
+    to: string
+    count: number
+    total: number
+    paid: number
+    debt: number
+}
+
 export interface OrderParams {
     currentPage?: number
     pageSize?: number

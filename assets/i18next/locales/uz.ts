@@ -347,6 +347,12 @@ const uz = {
     "cancel": "Bekor qilmoq"
   },
   "order": {
+    "summary": {
+      "today": "Bugungi sotuvlar",
+      "count": "Buyurtmalar: {{count}}",
+      "paid": "To‘langan",
+      "debt": "Qarzga"
+    },
     "itemsCount": "{{count}} ta",
     "addProduct": "Mahsulot qo'shish",
     "activeTab": "Faol",
@@ -516,6 +522,21 @@ const uz = {
     "returnedAt": "Qaytarish sanasi"
   },
   "payment": {
+    "today": {
+      "title": "Bugun ochiq kassalarda",
+      "openCount": "Ochiq: {{count}}",
+      "income": "Bugungi kirim",
+      "expense": "Bugungi chiqim",
+      "allClosed": "Barcha kassalar yopiq",
+      "noneTitle": "Ochiq kassa yo‘q",
+      "noneText": "To‘lov qabul qilish uchun kassani oching.",
+      "lastClosedToday": "Oxirgisi bugun {{time}} da yopilgan.",
+      "lastClosedYesterday": "Oxirgisi kecha {{time}} da yopilgan.",
+      "lastClosedOn": "Oxirgisi {{date}} kuni {{time}} da yopilgan."
+    },
+    "shiftTotal": "Smena yakuni",
+    "shift": "Smena",
+    "since": "{{time}} dan",
     "noFound": "To'lov topilmadi.",
     "detail": "To'lov tafsilotlari.",
     "closeCashbox": "Kassani yopish",

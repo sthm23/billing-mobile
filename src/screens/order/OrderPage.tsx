@@ -1,7 +1,7 @@
-import { Button, IconButton, Segmented, Text } from '@/components/base';
+import { Button, HeroCard, IconButton, Segmented, Text } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
-import { useOrders } from '@/services/order/order.queries';
+import { useOrders, useTodaySalesSummary } from '@/services/order/order.queries';
 import { OrderParams, OrderStatus } from '@/services/order/order.type';
 import { router } from 'expo-router';
 import { CircleAlert, Plus, ReceiptText, SlidersHorizontal } from 'lucide-react-native';
@@ -56,7 +56,8 @@ export default function OrderPage() {
     )
 
     const { data, isLoading, isError, refetch } = useOrders(listParams);
-    const refreshControl = useRefreshControl(refetch);
+    const summary = useTodaySalesSummary();
+    const refreshControl = useRefreshControl(() => Promise.all([refetch(), summary.refetch()]));
 
     const orders = data?.data ?? []
 
@@ -73,6 +74,19 @@ export default function OrderPage() {
                         {t('order.create')}
                     </Button>
                 </View>
+                {/* Hidden until loaded and on error — the list stays usable */}
+                {summary.data && (
+                    <HeroCard
+                        label={t('order.summary.today')}
+                        chip={t('order.summary.count', { count: summary.data.count })}
+                        amount={summary.data.total}
+                        currency={t('common.currency')}
+                        tiles={[
+                            { label: t('order.summary.paid'), value: summary.data.paid, tone: 'accent' },
+                            { label: t('order.summary.debt'), value: summary.data.debt, tone: 'err' },
+                        ]}
+                    />
+                )}
                 <View className="flex-row items-center gap-2">
                     <Segmented options={tabOptions} value={status} onChange={setStatus} className="flex-1" />
                     {/* Filters are not available yet */}
