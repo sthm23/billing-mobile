@@ -748,6 +748,8 @@ const en = {
       "phone": "Phone",
       "create": "Create",
       "searchPlaceholder": "Name or phone",
+      "searchHint": "Customers of other stores are found by the full phone number",
+      "phoneExists": "A customer with this phone already exists — showing them in the search",
       "add": "New customer",
       "loadFailed": "Could not load customers",
       "notFound": "No customers found",

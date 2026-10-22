@@ -749,6 +749,8 @@ const uz = {
       "phone": "Telefon",
       "create": "Yaratish",
       "searchPlaceholder": "Ism yoki telefon",
+      "searchHint": "Boshqa do‘konlar mijozlari to‘liq telefon raqami bo‘yicha topiladi",
+      "phoneExists": "Bu raqamli mijoz allaqachon bor — u qidiruvda ko‘rsatildi",
       "add": "Yangi mijoz",
       "loadFailed": "Mijozlarni yuklab bo'lmadi",
       "notFound": "Mijozlar topilmadi",

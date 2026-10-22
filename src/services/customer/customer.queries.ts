@@ -16,7 +16,8 @@ export const customerQueryKeys = {
 };
 
 /**
- * Hook to search customers by name or phone (empty text lists the latest ones)
+ * Customer search: the store's own customers by part of the name or phone
+ * (empty text lists them); customers of other stores only by the full phone
  */
 export const useCustomerSearch = (
   search: string,

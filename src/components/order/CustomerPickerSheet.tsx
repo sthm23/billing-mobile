@@ -1,4 +1,4 @@
-import { Button, IconButton, Pressable, SearchField, Text } from '@/components/base';
+import { Button, IconButton, Pressable, SearchField, Text, toast } from '@/components/base';
 import { EmptyState } from '@/components/common';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useTheme } from '@/hooks/use-theme';
@@ -84,7 +84,16 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
           if (!created.customer) return;
           onSelect({ id: created.customer.id, fullName: created.fullName, phone: created.phone });
         },
-        onError: (err) => setError(getApiErrorMessage(err, t('sale.customer.createFailed'))),
+        onError: (err) => {
+          // The phone is taken — usually a customer of another store: find them by the full number.
+          if (err.response?.status === 409) {
+            setCreating(false);
+            setSearch(`${PHONE_PREFIX}${phone}`);
+            toast.show(t('sale.customer.phoneExists'), 'error');
+            return;
+          }
+          setError(getApiErrorMessage(err, t('sale.customer.createFailed')));
+        },
       }
     );
   };
@@ -144,6 +153,7 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
               placeholder={t('sale.customer.searchPlaceholder')}
               variant="sunken"
             />
+            <Text className="font-onest text-xs text-muted -mt-1 px-1">{t('sale.customer.searchHint')}</Text>
             <Button variant="secondary" icon={UserPlus} onPress={startCreate}>
               {t('sale.customer.add')}
             </Button>
