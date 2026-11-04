@@ -84,7 +84,6 @@ export interface AuthAccount {
   id: string
   userId: string
   login: string   // e.g. email or username or phone
-  passwordHash: string
   isActive: boolean
   createdAt: string
   user?: User
