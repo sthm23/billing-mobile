@@ -125,7 +125,8 @@ export interface OrderVariantAttribute {
 
 /** Decimal fields arrive as strings ("120000") — convert with Number() before use. */
 export interface OrderDetailItem {
-    costAtSale: number | string
+    /** Owner/manager only — absent for other roles */
+    costAtSale?: number | string
     id: string
     orderId: string
     quantity: number
@@ -151,7 +152,6 @@ export interface OrderItemCard {
     stock: number
     quantity: number
     price: number
-    costAtSale: number
     sale: number
 }
 
@@ -163,7 +163,6 @@ export interface OrderItemPayload {
     quantity: number
     retailPrice: number
     sale: number
-    costAtSale: number
 }
 export interface OrderAdditionalServicePayload {
     id?: string
@@ -188,9 +187,8 @@ export interface CreateOrderItemPayload {
 
 export interface ReturnOrderItemPayload {
     orderId: string,
-    items: (Omit<OrderItemPayload, 'variantId'> & {
-        itemId: string;
-    })[]
+    /** Prices and cost come from the order line on the backend */
+    items: { itemId: string; quantity: number }[]
     returnPayments: OrderPaymentPayload[]
 }
 export interface CreateOrderPayload {

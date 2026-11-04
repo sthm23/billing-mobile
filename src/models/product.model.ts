@@ -58,7 +58,7 @@ export interface StockMovement {
   reason: StockMovementReason
   warehouseId: string
   quantity: number
-  /** Decimal as a string; null for write-offs and adjustments without a cost */
+  /** Decimal as a string; null for write-offs, adjustments without a cost and roles below manager */
   unitCost: string | null
   createdAt: string
   createdBy: {

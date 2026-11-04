@@ -35,7 +35,8 @@ export interface OrderItem {
   variantId: string;
   quantity: number;
   retailPrice: number;
-  costAtSale: number;
+  /** Owner/manager only — absent for other roles */
+  costAtSale?: number;
   sale: number;
 }
 

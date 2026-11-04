@@ -68,7 +68,8 @@ export interface UserStockMovement {
   quantity: number
   reason: "PURCHASE" | "SALE" | "ADJUSTMENT"
   type: "IN" | "OUT"
-  unitCost: number
+  /** Owner/manager only */
+  unitCost?: number
   variantId: string
   warehouseId: string
   variant: {

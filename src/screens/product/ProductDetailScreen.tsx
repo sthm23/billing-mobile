@@ -170,7 +170,6 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
         variantId: selectedVariant.id,
         quantity: buyQty,
         retailPrice: Number(selectedVariant.price),
-        costAtSale: getLatestCostPrice(selectedVariant),
       },
       {
         onSuccess: () => {

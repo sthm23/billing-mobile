@@ -26,7 +26,6 @@ export interface CartLine {
   basePrice: number;
   retailPrice: number;
   sale: number;
-  costAtSale: number;
   quantity: number;
   /** Stock known from the last search / order load (hint only) */
   stock: number;
@@ -68,15 +67,6 @@ function attributeValue({ value }: OrderVariantAttribute): string | null {
   if (value.valueNumber !== null && value.valueNumber !== undefined) return String(value.valueNumber);
   if (value.valueBool !== null && value.valueBool !== undefined) return String(value.valueBool);
   return null;
-}
-
-/** Cost of the latest stock receipt — same source the web uses for `costAtSale`. */
-export function latestReceiptCost(variant: Pick<OrderProductVariant, 'stockMovements'>): number {
-  // Adjustments may have no cost — skip them.
-  const receipts = variant.stockMovements
-    .filter((m) => m.type === 'IN' && m.unitCost !== null)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return Number(receipts[0]?.unitCost ?? 0);
 }
 
 export const cartStore = {
@@ -121,7 +111,6 @@ export const cartStore = {
         basePrice: Number(item.variant.price),
         retailPrice: Number(item.retailPrice),
         sale: Number(item.sale),
-        costAtSale: Number(item.costAtSale),
         quantity: item.quantity,
         stock: item.variant.quantity,
       })),
@@ -167,7 +156,6 @@ export const cartStore = {
           basePrice: price,
           retailPrice: price,
           sale: 0,
-          costAtSale: latestReceiptCost(variant),
           quantity,
           stock: variant.quantity,
         },
@@ -231,7 +219,6 @@ export function cartToPayload(cart: CartState): Omit<CreateOrderItemPayload, 'or
       quantity: l.quantity,
       retailPrice: l.retailPrice,
       sale: l.sale,
-      costAtSale: l.costAtSale,
     })),
     additionalServices: cart.services,
   };

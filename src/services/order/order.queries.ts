@@ -187,7 +187,6 @@ export interface AddToOrderInput {
   quantity: number
   /** Catalogue price of the variant (no discount) */
   retailPrice: number
-  costAtSale: number
 }
 
 /**
@@ -200,7 +199,7 @@ export const useAddToOrder = (): UseMutationResult<OrderDetail, AxiosError<{ mes
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ orderId, variantId, quantity, retailPrice, costAtSale }: AddToOrderInput) => {
+    mutationFn: async ({ orderId, variantId, quantity, retailPrice }: AddToOrderInput) => {
       const order = await orderService.getOrderById(orderId)
       const items: OrderItemPayload[] = order.items.map((item) => ({
         itemId: item.id,
@@ -208,10 +207,9 @@ export const useAddToOrder = (): UseMutationResult<OrderDetail, AxiosError<{ mes
         quantity: item.quantity + (item.variantId === variantId ? quantity : 0),
         retailPrice: Number(item.retailPrice),
         sale: Number(item.sale),
-        costAtSale: Number(item.costAtSale),
       }))
       if (!items.some((item) => item.variantId === variantId)) {
-        items.push({ variantId, quantity, retailPrice, sale: 0, costAtSale })
+        items.push({ variantId, quantity, retailPrice, sale: 0 })
       }
       await orderService.createOrderItems({
         orderId,
