@@ -1,4 +1,4 @@
-import { ListCard, Text } from "@/components/base";
+import { ListCard, Pressable, Text } from "@/components/base";
 import { EmptyState } from "@/components/common";
 import { useBottomNavInset } from "@/components/navigation/BottomNav";
 import { useTheme } from "@/hooks/use-theme";
@@ -7,6 +7,7 @@ import { useAuth } from "@/provider/AuthProvider";
 import { useDebtors } from "@/services/debt";
 import Constants from "expo-constants";
 import { router } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import { HandCoins, UserRoundX, UsersRound } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
@@ -14,8 +15,16 @@ import LogoutButton from "./LogoutButton";
 import ProfileCard from "./ProfileCard";
 import SettingItems from "./SettingItems";
 
+// Static pages in billing_ui/public; Russian is the default version.
+const PRIVACY_POLICY_URLS: Record<string, string> = {
+  ru: 'https://sthm23.uz/privacy.html',
+  uz: 'https://sthm23.uz/privacy.uz.html',
+  en: 'https://sthm23.uz/privacy.en.html',
+};
+
 const MobileProfilePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const privacyPolicyUrl = PRIVACY_POLICY_URLS[i18n.language] ?? PRIVACY_POLICY_URLS.ru;
   const { user, logout } = useAuth();
   const colors = useTheme();
   const bottomInset = useBottomNavInset();
@@ -62,6 +71,13 @@ const MobileProfilePage = () => {
       <SettingItems />
       <View className="flex-1 justify-end gap-3 pt-3">
         <LogoutButton onLogOutPress={logout} />
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => void openBrowserAsync(privacyPolicyUrl)}
+          className="self-center py-1"
+        >
+          <Text className="font-onest text-xs text-muted text-center underline">{t('app.privacyPolicy')}</Text>
+        </Pressable>
         {version ? (
           <Text className="font-onest text-xs text-muted text-center">STHM · {t('app.version', { version })}</Text>
         ) : null}

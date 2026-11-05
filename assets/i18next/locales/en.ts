@@ -681,7 +681,8 @@ const en = {
   },
   "app": {
     "tagline": "Sotuv · Toʻlov · Hisobot · Mahsulot",
-    "version": "version {{version}}"
+    "version": "version {{version}}",
+    "privacyPolicy": "Privacy policy"
   },
   "staffCreate": {
     "entryTitle": "Staff",

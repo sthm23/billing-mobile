@@ -682,7 +682,8 @@ const uz = {
   },
   "app": {
     "tagline": "Sotuv · Toʻlov · Hisobot · Mahsulot",
-    "version": "versiya {{version}}"
+    "version": "versiya {{version}}",
+    "privacyPolicy": "Maxfiylik siyosati"
   },
   "staffCreate": {
     "entryTitle": "Xodimlar",
