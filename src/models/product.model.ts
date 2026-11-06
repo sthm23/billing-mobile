@@ -40,6 +40,14 @@ export interface ProductVariant {
   quantity: number
   stockMovements: StockMovement[]
   attributes: AttributeItem[]
+  /** Sold in the shop (GET /product/:id) */
+  canSell?: boolean
+  /** Rented out; needs rentPricePerDay > 0 */
+  canRent?: boolean
+  /** Decimal as a string */
+  rentPricePerDay?: string | number | null
+  /** Dry-cleaning days suggested on return */
+  defaultCleaningDays?: number
 }
 
 export enum StockMovementType {
@@ -223,8 +231,13 @@ export interface ProductListResponse extends BaseListResponse<Product> {
   lowStockThreshold: number
 }
 
+/** `PUT /product/variants/:id` (OWNER/MANAGER): omitted fields stay unchanged, except `price` */
 export interface UpdateProductVariantPrice {
   price: number;
+  canSell?: boolean;
+  canRent?: boolean;
+  rentPricePerDay?: number;
+  defaultCleaningDays?: number;
 }
 
 export interface ProductParams {

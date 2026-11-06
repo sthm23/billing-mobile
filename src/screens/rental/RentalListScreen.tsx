@@ -163,7 +163,7 @@ export function RentalListScreen() {
           <IconButton
             icon={CalendarDays}
             accessibilityLabel={t('rental.calendar')}
-            onPress={() => router.push({ pathname: '/(tabs)/(rentals)/soon', params: { kind: 'calendar' } })}
+            onPress={() => router.push('/(tabs)/(rentals)/calendar')}
           />
         </View>
         <SearchField

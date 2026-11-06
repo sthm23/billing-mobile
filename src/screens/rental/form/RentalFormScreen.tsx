@@ -8,7 +8,9 @@ import { canLowerPrice } from '@/libs/roles';
 import { distributeSetDiscount } from '@/libs/set-discount';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
+import { getVariantLabel } from '@/libs/product-utils';
 import { useStaffWarehouses } from '@/screens/order/cart/use-staff-warehouses';
+import { useProductById } from '@/services/product/product.queries';
 import type { OrderCustomer } from '@/services/customer';
 import {
   RentalErrorCode,
@@ -57,6 +59,14 @@ function attrsLabel(values: (string | null | undefined)[], sku: string): string 
 interface RentalFormScreenProps {
   /** Edit this booking; omitted — a new one */
   rentalId?: string;
+  /** New booking started from an item card: this variant (of this product) is added */
+  preset?: { productId: string; variantId: string };
+}
+
+/** First line and warehouse of a booking started from an item card */
+interface BookingPreset {
+  warehouseId: string;
+  line: BookingLine;
 }
 
 /**
@@ -65,11 +75,12 @@ interface RentalFormScreenProps {
  * over the lines (`libs/set-discount.ts`). Totals here are a preview — the
  * backend prices the booking and checks availability and the discount role.
  */
-export function RentalFormScreen({ rentalId }: RentalFormScreenProps) {
+export function RentalFormScreen({ rentalId, preset }: RentalFormScreenProps) {
   const { t } = useTranslation();
   const existing = useRental(rentalId);
+  const product = useProductById(preset?.productId ?? '', { enabled: !!preset });
 
-  if (rentalId && existing.isLoading) {
+  if ((rentalId && existing.isLoading) || (preset && product.isLoading)) {
     return <LoadingState />;
   }
   if (rentalId && (existing.isError || !existing.data)) {
@@ -86,10 +97,25 @@ export function RentalFormScreen({ rentalId }: RentalFormScreenProps) {
       </EmptyState>
     );
   }
-  return <RentalForm rental={existing.data} />;
+  const variant = preset ? product.data?.variants.find((v) => v.id === preset.variantId) : undefined;
+  const start: BookingPreset | undefined =
+    product.data && variant
+      ? {
+          warehouseId: product.data.warehouseId,
+          line: {
+            variantId: variant.id,
+            name: product.data.name,
+            meta: getVariantLabel(variant),
+            rentPricePerDay: Number(variant.rentPricePerDay ?? 0),
+            quantity: 1,
+            sale: 0,
+          },
+        }
+      : undefined;
+  return <RentalForm rental={existing.data} preset={start} />;
 }
 
-function RentalForm({ rental }: { rental?: RentalDetail }) {
+function RentalForm({ rental, preset }: { rental?: RentalDetail; preset?: BookingPreset }) {
   const { t, i18n } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -99,7 +125,12 @@ function RentalForm({ rental }: { rental?: RentalDetail }) {
   const isEdit = !!rental;
 
   const [warehouseId, setWarehouseId] = useState<string | undefined>(
-    rental?.warehouseId ?? (warehouses.length === 1 ? warehouses[0].id : undefined),
+    rental?.warehouseId ??
+      (preset && warehouses.some((w) => w.id === preset.warehouseId)
+        ? preset.warehouseId
+        : warehouses.length === 1
+          ? warehouses[0].id
+          : undefined),
   );
   const [customer, setCustomer] = useState<OrderCustomer | null>(() => {
     const c = rental?.order.customer;
@@ -109,7 +140,7 @@ function RentalForm({ rental }: { rental?: RentalDetail }) {
     rental ? { start: salonDate(rental.startDate), end: salonDate(rental.endDate) } : null,
   );
   const [lines, setLines] = useState<BookingLine[]>(() =>
-    (rental?.order.items ?? []).map((item) => ({
+    preset && !rental ? [preset.line] : (rental?.order.items ?? []).map((item) => ({
       variantId: item.variantId,
       name: item.variant.product.name,
       meta: attrsLabel(

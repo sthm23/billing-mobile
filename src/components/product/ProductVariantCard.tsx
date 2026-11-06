@@ -1,4 +1,9 @@
 import { Button, Money, Text } from '@/components/base';
+import { useStoreMode } from '@/hooks/use-store-mode';
+import { formatMoney } from '@/libs/format';
+import { Pressable } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
+import { useTheme } from '@/hooks/use-theme';
 import { getLatestCostPrice, getVariantLabel } from '@/libs/product-utils';
 import { ProductVariant } from '@/models/product.model';
 import { useTranslation } from 'react-i18next';
@@ -10,14 +15,17 @@ interface ProductVariantCardProps {
   canManage?: boolean;
   onHistory?: (variantId: string) => void;
   onMovement?: (variantId: string) => void;
+  /** Opens the rented item card (store with rental enabled) */
+  onRental?: (variantId: string) => void;
 }
 
 /**
  * Variant block for staff: attributes, SKU, stock, purchase and sale price
  * with margin, «История» and «Приход / Списание».
  */
-export function ProductVariantCard({ variant, canManage = false, onHistory, onMovement }: ProductVariantCardProps) {
+export function ProductVariantCard({ variant, canManage = false, onHistory, onMovement, onRental }: ProductVariantCardProps) {
   const { t } = useTranslation();
+  const { rentalEnabled } = useStoreMode();
   const costPrice = getLatestCostPrice(variant);
   const retailPrice = Number(variant.price);
   const outOfStock = variant.quantity === 0;
@@ -56,6 +64,8 @@ export function ProductVariantCard({ variant, canManage = false, onHistory, onMo
         </View>
       </View>
 
+      {rentalEnabled && onRental ? <RentalPriceRow variant={variant} onPress={() => onRental(variant.id)} /> : null}
+
       <View className="flex-row gap-2">
         <Button variant="secondary" className="flex-1" onPress={() => onHistory?.(variant.id)}>
           {t('product.history')}
@@ -67,5 +77,28 @@ export function ProductVariantCard({ variant, canManage = false, onHistory, onMo
         )}
       </View>
     </View>
+  );
+}
+
+/** «Аренда · 200 000 UZS / день» (or «Не сдаётся») — opens the rented item card */
+export function RentalPriceRow({ variant, onPress }: { variant: ProductVariant; onPress: () => void }) {
+  const { t } = useTranslation();
+  const colors = useTheme();
+  const rentPrice = Number(variant.rentPricePerDay ?? 0);
+  const rented = !!variant.canRent && rentPrice > 0;
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      className="flex-row items-center gap-2 bg-sunken rounded-[14px] px-3 py-2.5 active:opacity-80"
+    >
+      <View className="flex-1 gap-0.5">
+        <Text className="font-onest text-xs text-muted">{t('rental.item.rentRow')}</Text>
+        <Text className="font-onest-semibold text-[15px] text-ink">
+          {rented ? `${formatMoney(rentPrice)} ${t('rental.item.perDay')}` : t('rental.item.notRented')}
+        </Text>
+      </View>
+      <ChevronRight size={18} color={colors.muted} strokeWidth={2} />
+    </Pressable>
   );
 }

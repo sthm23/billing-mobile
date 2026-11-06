@@ -17,7 +17,7 @@ export default function RentalsLayout() {
       <Stack.Screen name="pay/[id]" />
       <Stack.Screen name="issue/[id]" />
       <Stack.Screen name="return/[id]" />
-      <Stack.Screen name="soon" />
+      <Stack.Screen name="calendar" />
     </Stack>
   );
 }

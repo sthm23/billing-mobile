@@ -940,7 +940,26 @@ const uz = {
       "returnedOf": "{{total}} dan {{returned}} qaytdi",
       "cleaningUntil": "{{date}} gacha kimyoviy tozalashda",
       "returnedOn": "{{date}} qaytarilgan",
-      "returned": "Qaytarilgan"
+      "returned": "Qaytarilgan",
+      "rentRow": "Ijara",
+      "rented": "Ijara",
+      "notRented": "Ijaraga berilmaydi",
+      "perDay": "UZS / kun",
+      "edit": "Narx va ijara",
+      "today": "Bugungi mavjudlik",
+      "total": "Jami",
+      "freeToday": "Bugun bo‘sh",
+      "busyToday": "Band",
+      "busyHint": "Band — mijozlarda, bugungi bronlarda yoki kimyoviy tozalashda",
+      "occupancy": "Bandlik · {{month}}",
+      "ofUnits": "{{count}} donadan",
+      "dayA11y": "{{date}}: bo‘sh {{free}} / {{total}}",
+      "partlyBusy": "qisman band",
+      "allBusy": "hammasi band",
+      "upcoming": "Yaqin bronlar",
+      "noUpcoming": "Bronlar yo‘q",
+      "book": "Bron qilish",
+      "cantBook": "Buyum ijaraga berilmaydi — «Narx va ijara»da ijara va narxni yoqing"
     },
     "collateral": {
       "title": "Garov",
@@ -975,11 +994,6 @@ const uz = {
       "penalty": "Jarima",
       "earlyRefund": "Foydalanilmagan kunlar uchun qaytarish",
       "cancelRefund": "Bekor qilishda qaytarish"
-    },
-    "action": {
-      "pay": "To'lov qabul qilish",
-      "edit": "Bronni o'zgartirish",
-      "calendar": "Ijara kalendari"
     },
     "form": {
       "datesSummary": "{{from}} → {{to}} · {{days}}",
@@ -1196,6 +1210,45 @@ const uz = {
       "success": "Qaytarish qabul qilindi",
       "successPartial": "{{back}} / {{total}} qaytarildi — qolgani hali mijozda",
       "failed": "Qaytarishni qabul qilib bo‘lmadi"
+    },
+    "agenda": {
+      "title": "Kalendar",
+      "month": "Oy",
+      "week": "Hafta",
+      "prev": "Oldingi davr",
+      "next": "Keyingi davr",
+      "legendIssue": "berish",
+      "legendReturn": "qaytarish",
+      "legendToday": "bugun",
+      "dayA11y": "{{date}}: berish {{issues}}, qaytarish {{returns}}",
+      "daySummary": "berish {{issues}} · qaytarish {{returns}}",
+      "toIssue": "Berish",
+      "toReturn": "Qaytarish",
+      "noIssues": "Berish yo‘q",
+      "noReturns": "Qaytarish yo‘q",
+      "items": "{{count}} dona",
+      "until": "{{date}} gacha",
+      "wasDue": "{{date}} da qaytishi kerak edi",
+      "loadFailed": "Kalendarni yuklab bo‘lmadi"
+    },
+    "itemForm": {
+      "title": "Narx va ijara",
+      "noAccess": "Narxlarni egasi yoki menejer o‘zgartiradi",
+      "canRent": "Ijaraga beriladi",
+      "canRentHint": "Buyum bronlarda chiqadi, narx kunlar bo‘yicha hisoblanadi",
+      "dayPrice": "Kunlik narx",
+      "needPrice": "Kunlik narxni kiriting",
+      "units": "Nusxalar",
+      "unitsHint": "Salonda nechta bir xil buyum bor. «Kirim / Hisobdan chiqarish» orqali o‘zgaradi",
+      "cleaning": "Qaytgandan keyin tozalash",
+      "cleaningHint": "Buyum yana {{days}} band — qaytarishda qo‘yiladi",
+      "noCleaning": "Tozalashsiz — darhol bo‘sh",
+      "salePrice": "Sotuv narxi",
+      "salePriceLabel": "Narx",
+      "salesOff": "Do‘kon sozlamalarida sotuv o‘chirilgan",
+      "save": "Saqlash",
+      "saved": "Saqlandi",
+      "failed": "Saqlab bo‘lmadi"
     }
   },
   "storeSettings": {

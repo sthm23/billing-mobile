@@ -17,6 +17,7 @@ import { rentalService } from './rental.service';
 import type {
   CleaningConflict,
   RentalApiError,
+  RentalAgenda,
   RentalBookingPayload,
   RentalCalendar,
   RentalCancelPayload,
@@ -43,6 +44,7 @@ export const rentalQueryKeys = {
   detail: (id: string) => [...rentalQueryKeys.all(), 'detail', id] as const,
   availability: (params: object) => [...rentalQueryKeys.all(), 'availability', params] as const,
   calendar: (params: object) => [...rentalQueryKeys.all(), 'calendar', params] as const,
+  agenda: (from: string, to: string) => [...rentalQueryKeys.all(), 'agenda', from, to] as const,
   similar: (params: object) => [...rentalQueryKeys.all(), 'similar', params] as const,
   conflicts: (id: string, params: object) => [...rentalQueryKeys.all(), 'conflicts', id, params] as const,
   returnPreview: (id: string, body: RentalReturnPayload) => [...rentalQueryKeys.all(), 'return-preview', id, body] as const,
@@ -167,6 +169,14 @@ export const useRentalCalendar = (params: {
     enabled: Boolean(params.warehouseId),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
+  });
+
+/** Issues and returns per day for the rentals calendar */
+export const useRentalAgenda = (from: string, to: string): UseQueryResult<RentalAgenda> =>
+  useQuery({
+    queryKey: rentalQueryKeys.agenda(from, to),
+    queryFn: () => rentalService.getAgenda(from, to),
+    placeholderData: keepPreviousData,
   });
 
 /** Replacements for a variant busy on the dates */

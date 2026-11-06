@@ -142,3 +142,47 @@ export function itemAttributes(item: RentalOrderItem): string {
     .join(' · ');
   return attrs || item.variant.sku;
 }
+
+/** «Пн … Вс» in the app language, Monday first */
+export function weekDayLabels(language: string): string[] {
+  return Array.from({ length: 7 }, (_, i) =>
+    new Date(2024, 0, 1 + i).toLocaleDateString(locale(language), { weekday: 'short' }),
+  );
+}
+
+/** First day of the month of a YYYY-MM-DD */
+export function monthStart(value: string): string {
+  return `${value.slice(0, 7)}-01`;
+}
+
+/** Last day of the month of a YYYY-MM-DD */
+export function monthEnd(value: string): string {
+  const d = fromLocalDate(monthStart(value));
+  return toLocalDate(new Date(d.getFullYear(), d.getMonth() + 1, 0));
+}
+
+/** Monday of the week of a YYYY-MM-DD */
+export function weekStart(value: string): string {
+  return addLocalDays(value, -((fromLocalDate(value).getDay() + 6) % 7));
+}
+
+/** Monday-first grid of the month: YYYY-MM-DD days padded with nulls to full weeks */
+export function monthGrid(value: string): (string | null)[] {
+  const first = monthStart(value);
+  const lead = (fromLocalDate(first).getDay() + 6) % 7;
+  const cells: (string | null)[] = Array.from({ length: lead }, () => null);
+  for (let day = first; day <= monthEnd(value); day = addLocalDays(day, 1)) cells.push(day);
+  while (cells.length % 7) cells.push(null);
+  return cells;
+}
+
+/** «Май 2026» */
+export function formatMonth(value: string, language: string): string {
+  const text = fromLocalDate(value).toLocaleDateString(locale(language), { month: 'long', year: 'numeric' });
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** «14 мая, четверг» of a YYYY-MM-DD */
+export function formatLongDay(value: string, language: string): string {
+  return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long', weekday: 'long' });
+}

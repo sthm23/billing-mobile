@@ -21,6 +21,7 @@ import type {
   ProductListResponse,
   ProductParams,
   StockMovementHistoryItem,
+  UpdateProductVariantPrice,
 } from '@/models/product.model'
 
 export const productQueryKeys = {
@@ -157,6 +158,26 @@ export const useInventoryMovement = (): UseMutationResult<
     mutationFn: ({ warehouseId, body }) => productService.addInventory(warehouseId, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productQueryKeys.all() })
+    },
+  })
+}
+
+/**
+ * Prices and rental settings of a variant (`PUT /product/variants/:id`,
+ * OWNER/MANAGER); refreshes products and rentals (search, calendars).
+ */
+export const useUpdateVariant = (): UseMutationResult<
+  unknown,
+  AxiosError<{ message?: string | string[] }>,
+  { variantId: string; body: UpdateProductVariantPrice }
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ variantId, body }) => productService.updateProductVariant(variantId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: productQueryKeys.all() })
+      queryClient.invalidateQueries({ queryKey: ['rental'] })
     },
   })
 }

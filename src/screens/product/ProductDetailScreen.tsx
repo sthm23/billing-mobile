@@ -1,7 +1,8 @@
 import { Button, Chip, IconButton, Money, StatusBadge, Stepper, Text, toast } from '@/components/base';
 import { AddToOrderSheet } from '@/components/order';
 import { ImageCarousel } from '@/components/product/ImageCarousel';
-import { ProductVariantCard } from '@/components/product/ProductVariantCard';
+import { ProductVariantCard, RentalPriceRow } from '@/components/product/ProductVariantCard';
+import { useStoreMode } from '@/hooks/use-store-mode';
 import { StockMovementSheet, type StockMovementTarget } from '@/components/product/StockMovementSheet';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { formatMoney } from '@/libs/format';
@@ -102,6 +103,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
   const refreshControl = useRefreshControl(onRefresh);
   const { user } = useAuth();
   const canManage = canManageProducts(user);
+  const { rentalEnabled } = useStoreMode();
   const addToOrder = useAddToOrder();
   const archive = useArchiveProduct();
   const [addOpen, setAddOpen] = useState(false);
@@ -215,6 +217,9 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
     });
   };
 
+  const openRental = (variantId: string) =>
+    router.push({ pathname: '/(tabs)/(products)/rental/[variantId]', params: { variantId, productId: product.id } });
+
   const openHistory = (variantId: string) => {
     const variant = product.variants.find((v) => v.id === variantId);
     if (!variant) return;
@@ -243,8 +248,20 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
         overlay={
           <>
             <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
-            {/* Product editing is not available on mobile yet */}
-            <IconButton icon={Pencil} accessibilityLabel={t('common.edit')} disabled />
+            {/* Product editing is not built on mobile; in a renting store the pencil opens
+                «Цена и аренда» of the picked variant (OWNER/MANAGER) */}
+            <IconButton
+              icon={Pencil}
+              accessibilityLabel={t('rental.item.edit')}
+              disabled={!(rentalEnabled && canManage && selectedVariant)}
+              onPress={() =>
+                selectedVariant &&
+                router.push({
+                  pathname: '/(tabs)/(products)/rental-form/[variantId]',
+                  params: { variantId: selectedVariant.id, productId: product.id },
+                })
+              }
+            />
           </>
         }
       />
@@ -296,6 +313,10 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
             );
           })}
 
+          {rentalEnabled && selectedVariant ? (
+            <RentalPriceRow variant={selectedVariant} onPress={() => openRental(selectedVariant.id)} />
+          ) : null}
+
           <View className="flex-row items-center justify-between pt-1">
             <View className="gap-0.5">
               <Text className="type-body-strong text-ink">{t('product.quantity')}</Text>
@@ -344,6 +365,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
           canManage={canManage}
           onHistory={openHistory}
           onMovement={openMovement}
+          onRental={openRental}
         />
       ))}
 

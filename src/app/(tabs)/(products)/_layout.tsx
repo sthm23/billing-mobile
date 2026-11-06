@@ -13,6 +13,8 @@ export default function TabLayout() {
       <Stack.Screen name="create" />
       <Stack.Screen name="[id]" />
       <Stack.Screen name="history/[variantId]" />
+      <Stack.Screen name="rental/[variantId]" />
+      <Stack.Screen name="rental-form/[variantId]" />
     </Stack>
   );
 }

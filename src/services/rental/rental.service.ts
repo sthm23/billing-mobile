@@ -2,6 +2,7 @@ import { api } from '@/api/axios-instance';
 import type {
   CleaningConflict,
   RentalBookingPayload,
+  RentalAgenda,
   RentalCalendar,
   RentalCancelPayload,
   RentalDetail,
@@ -66,6 +67,12 @@ export const rentalService = {
     const response = await api.get<VariantAvailability[]>(`${RENTAL_BASE_URL}/availability`, {
       params: { ...params, variantIds: params.variantIds.join(',') },
     });
+    return response.data;
+  },
+
+  /** Issues and returns per salon day, at most 93 days */
+  getAgenda: async (from: string, to: string): Promise<RentalAgenda> => {
+    const response = await api.get<RentalAgenda>(`${RENTAL_BASE_URL}/agenda`, { params: { from, to } });
     return response.data;
   },
 

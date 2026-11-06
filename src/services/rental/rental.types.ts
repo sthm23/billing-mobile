@@ -244,6 +244,18 @@ export interface RentalListItem extends Rental {
 
 export type RentalListResponse = BaseListResponse<RentalListItem>;
 
+/** GET /rental/agenda: issues and returns per salon day (closed rentals not listed) */
+export interface RentalAgenda {
+  from: string;
+  to: string;
+  /** Salon today, YYYY-MM-DD */
+  today: string;
+  /** Only days with something to do */
+  days: { date: string; issues: number; returns: number }[];
+  /** A booking to issue (start day, or today once started) / a rental to take back (end day, overdue — today) */
+  events: { date: string; kind: 'ISSUE' | 'RETURN'; rental: RentalListItem }[];
+}
+
 export interface RentalListParams {
   currentPage?: number;
   pageSize?: number;

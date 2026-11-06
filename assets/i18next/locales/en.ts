@@ -939,7 +939,26 @@ const en = {
       "returnedOf": "{{returned}} of {{total}} back",
       "cleaningUntil": "Dry cleaning until {{date}}",
       "returnedOn": "Returned {{date}}",
-      "returned": "Returned"
+      "returned": "Returned",
+      "rentRow": "Rental",
+      "rented": "Rental",
+      "notRented": "Not rented",
+      "perDay": "UZS / day",
+      "edit": "Price and rental",
+      "today": "Availability today",
+      "total": "Total",
+      "freeToday": "Free today",
+      "busyToday": "Busy",
+      "busyHint": "Busy: with customers, booked for today or in dry cleaning",
+      "occupancy": "Occupancy · {{month}}",
+      "ofUnits": "of {{count}} pcs",
+      "dayA11y": "{{date}}: {{free}} of {{total}} free",
+      "partlyBusy": "partly busy",
+      "allBusy": "all busy",
+      "upcoming": "Nearest bookings",
+      "noUpcoming": "No bookings",
+      "book": "Book",
+      "cantBook": "Not rented: turn on rental and set a price in «Price and rental»"
     },
     "collateral": {
       "title": "Collateral",
@@ -974,11 +993,6 @@ const en = {
       "penalty": "Penalty",
       "earlyRefund": "Refund for unused days",
       "cancelRefund": "Refund on cancellation"
-    },
-    "action": {
-      "pay": "Accept payment",
-      "edit": "Edit booking",
-      "calendar": "Rental calendar"
     },
     "form": {
       "datesSummary": "{{from}} → {{to}} · {{days}}",
@@ -1195,6 +1209,45 @@ const en = {
       "success": "Return accepted",
       "successPartial": "{{back}} of {{total}} returned, the rest is still with the customer",
       "failed": "Failed to accept the return"
+    },
+    "agenda": {
+      "title": "Calendar",
+      "month": "Month",
+      "week": "Week",
+      "prev": "Previous period",
+      "next": "Next period",
+      "legendIssue": "issue",
+      "legendReturn": "return",
+      "legendToday": "today",
+      "dayA11y": "{{date}}: {{issues}} to issue, {{returns}} to return",
+      "daySummary": "{{issues}} to issue · {{returns}} to return",
+      "toIssue": "To issue",
+      "toReturn": "To return",
+      "noIssues": "Nothing to issue",
+      "noReturns": "Nothing to return",
+      "items": "{{count}} pcs",
+      "until": "until {{date}}",
+      "wasDue": "was due {{date}}",
+      "loadFailed": "Failed to load the calendar"
+    },
+    "itemForm": {
+      "title": "Price and rental",
+      "noAccess": "Prices are changed by an owner or a manager",
+      "canRent": "Rented out",
+      "canRentHint": "The item shows up in bookings, priced per day",
+      "dayPrice": "Price per day",
+      "needPrice": "Set the price per day",
+      "units": "Units",
+      "unitsHint": "How many identical items the salon has. Changed with «Stock in / Write-off»",
+      "cleaning": "Dry cleaning after return",
+      "cleaningHint": "Busy for {{days}} more, suggested on return",
+      "noCleaning": "No dry cleaning: free right away",
+      "salePrice": "Sale price",
+      "salePriceLabel": "Price",
+      "salesOff": "Sales are turned off in the store settings",
+      "save": "Save",
+      "saved": "Saved",
+      "failed": "Failed to save"
     }
   },
   "storeSettings": {
