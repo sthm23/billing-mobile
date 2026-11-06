@@ -130,12 +130,14 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 |---|---|---|
 | `(products)` | `index`, `[id]`, `create`, `history/[variantId]` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen`, `StockHistoryScreen` (params `title`, `subtitle`, `stock`) |
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
+| `(rentals)` | `index`, `create` | Rental mode only (see «Rental» below). Placeholders until phases 6.2–6.3 |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `create`, `settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen`, `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
+| `(profile)` | `index`, `create`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
 - The center **Scan** button starts a new sale: `/(tabs)/(orders)/create?scan=1` — an empty cart that opens the scanner right away (when the seller has one warehouse).
+- **Store mode** (`useStoreMode()`, `src/hooks/use-store-mode.ts`): in rental mode the second tab is **Rentals** (`(rentals)`) instead of Orders and the center button opens `/(tabs)/(rentals)/create` (new booking). A store with only one mode always shows it; a store with both uses the menu choice saved on the device — switched by `NavModeSwitch` («Заказы | Аренды», `components/navigation/NavModeSwitch.tsx`) on top of both lists, or in Profile → «Нижнее меню».
 - The bar is **absolutely positioned** over the content and **hidden** on nested screens (any stack screen above a tab's root) and while the keyboard is open.
 - **Tab root screens must reserve space for it**: `const bottomInset = useBottomNavInset();` → `contentContainerStyle={{ paddingBottom: bottomInset }}` on the scroll container.
 - To add a tab: add the route group, a `Tabs.Screen` in the layout, and an entry in `LEFT_TABS` / `RIGHT_TABS` in `BottomNav.tsx` (lucide icon + i18n key under `navigation.*`).
@@ -299,6 +301,16 @@ A debt is owed to the **store**: every employee (seller, cashier, manager, owner
 - **Payment of one debt** (`DebtPayScreen.tsx`, design «OrderPay» in debt mode): remaining, progress, method tiles + amounts (`PaymentMethodsInput`, shared with `OrderPayScreen`), cash change, payment history. `useRepayDebt()` → ORDER: `POST /payment` (no stock movement), MANUAL: `POST /debt/payment`. Overpayment is never sent (cash minus change); the backend rejects it anyway.
 - **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox`, warehouse chips if several) or pick another open cashbox of the store → `cashboxId`.
 - i18n: top-level `debtors.*`.
+
+### Rental (phase 6, in progress)
+
+Wedding-salon rental: business rules [`../docs/features/rental.md`](../docs/features/rental.md), API [`../billing/docs/rental/03_RENTAL_API.md`](../billing/docs/rental/03_RENTAL_API.md), plan `../billing/docs/rental/04_RENTAL_IMPLEMENTATION_PLAN.md` (phase 6). UI source: the STHM screens artifact, pages «Аренда · …».
+
+- **Store modes**: `Store.salesEnabled` / `rentalEnabled` come with the profile (`user.staff.store`). `useStoreMode()` → `{ salesEnabled, rentalEnabled, isMixed, navMode, setNavMode }` — UX only, the backend rejects what the store has turned off.
+- **Store settings** (`screens/profile/StoreSettingsScreen.tsx`, OWNER): two switches; turning off the only enabled mode switches to the other (both off is impossible; the backend rejects it too). `PUT /store/:id` needs `attributeIds`/`brandIds`, so the current ones are sent back (`useUpdateStoreModes`). After saving: a newly enabled rental sets the menu to rental on this device, and `useAuth().refreshUser()` reloads the profile so the menu follows at once.
+- **API**: `services/rental/` — `rentalService` (every `/rental` endpoint), hooks in `rental.queries.ts` (`useRentals`, `useRentalSummary`, `useRental`, `useRentalAvailability`, `useRentalCalendar`, `useSimilarVariants`, `useCleaningConflicts`, mutations). Every mutation stores the returned details and invalidates rentals, cashboxes, orders and debts. Money fields are Decimal strings — display only.
+- **Set discount**: `libs/set-discount.ts` — an exact copy of `billing_ui/src/app/shared/utils/set-discount.ts` (algorithm in `docs/features/rental.md#set-discount-distribution`). Change both or neither.
+- i18n: `rental.*`, `storeSettings.*`, `navigation.rentals` / `navigation.newBooking`.
 
 ### Summaries (sales and cashbox)
 

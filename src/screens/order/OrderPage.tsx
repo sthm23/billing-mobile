@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
 import { OrderCard } from './OrderCard';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
+import { NavModeSwitch } from '@/components/navigation/NavModeSwitch';
 
 
 type OrderStatusType = 'active' | 'completed';
@@ -68,6 +69,8 @@ export default function OrderPage() {
     return (
         <View className="flex-1 bg-bg">
             <View className="px-4 pt-2 pb-3 gap-3">
+                {/* Store with sales and rental: switch to the bookings */}
+                <NavModeSwitch />
                 <View className="flex-row items-center justify-between">
                     <Text className="type-title text-ink" accessibilityRole="header">{t('navigation.orders')}</Text>
                     <Button variant="primary" icon={Plus} onPress={() => router.push('/(tabs)/(orders)/create')}>

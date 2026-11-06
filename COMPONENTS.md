@@ -93,6 +93,20 @@ Quantity control. UI bounds only — the backend validates stock.
 | `size` | `'sm'` 34 · `'md'` 40 | `'md'` |
 | `disabled` | `boolean` | `false` |
 
+### Switch
+
+On/off toggle (48×28): black track + white knob when on, `track` grey when off. `accessibilityRole="switch"`.
+
+| Prop | Type | Default |
+|---|---|---|
+| `value` / `onValueChange` | `boolean` / `(v) => void` | — |
+| `accessibilityLabel` | `string` — required, the switch has no label of its own | — |
+| `disabled` | `boolean` | `false` |
+
+```tsx
+<Switch value={rent} onValueChange={setRent} accessibilityLabel={t('storeSettings.rental')} />
+```
+
 ### Pressable
 
 RN `Pressable` + `className`, `active:opacity-70`, `opacity-50` when disabled.

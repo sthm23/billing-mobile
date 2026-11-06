@@ -22,3 +22,12 @@ export interface CreateStaffPayload {
 }
 
 export type StoreDetailResponse = Store;
+
+/** PUT /store/:id body for the store modes (at least one stays on) */
+export interface UpdateStoreModesPayload {
+  salesEnabled: boolean;
+  rentalEnabled: boolean;
+  /** Current ones: the endpoint replaces the lists */
+  attributeIds: string[];
+  brandIds: string[];
+}

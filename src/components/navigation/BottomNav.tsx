@@ -2,13 +2,14 @@ import { useTheme } from '@/hooks/use-theme';
 import { cn } from '@/libs/utils';
 import { router } from 'expo-router';
 import type { BottomTabBarProps } from 'expo-router/tabs';
-import { Package, Receipt, ScanBarcode, UserRound, Wallet } from 'lucide-react-native';
+import { CalendarDays, CalendarPlus, Package, Receipt, ScanBarcode, UserRound, Wallet } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/base';
 import type { ButtonIconComponent } from '@/components/base';
+import { useStoreMode, type NavMode } from '@/hooks/use-store-mode';
 
 /** Height of the floating bar (STHM design: 68px). */
 const NAV_HEIGHT = 68;
@@ -25,10 +26,17 @@ interface TabConfig {
   icon: ButtonIconComponent;
 }
 
-const LEFT_TABS: TabConfig[] = [
-  { name: '(products)', label: 'navigation.products', icon: Package },
-  { name: '(orders)', label: 'navigation.orders', icon: Receipt },
-];
+/** The second tab follows the store mode: orders (sale) or bookings (rent) */
+const LEFT_TABS: Record<NavMode, TabConfig[]> = {
+  sale: [
+    { name: '(products)', label: 'navigation.products', icon: Package },
+    { name: '(orders)', label: 'navigation.orders', icon: Receipt },
+  ],
+  rent: [
+    { name: '(products)', label: 'navigation.products', icon: Package },
+    { name: '(rentals)', label: 'navigation.rentals', icon: CalendarDays },
+  ],
+};
 
 const RIGHT_TABS: TabConfig[] = [
   { name: '(cashbox)', label: 'navigation.cashbox', icon: Wallet },
@@ -72,14 +80,17 @@ function useKeyboardVisible(): boolean {
  * BottomNav — floating tab bar (STHM)
  *
  * Products · Orders · [Scan] · Cashbox · Profile. The center button starts a new
- * sale. Hidden on nested screens (details, create) and while the keyboard is open.
- * Used as `tabBar` of the (tabs) layout.
+ * sale. In rental mode (`useStoreMode().navMode`) Orders becomes Rentals and the
+ * center button starts a new booking. Hidden on nested screens (details, create)
+ * and while the keyboard is open. Used as `tabBar` of the (tabs) layout.
  */
 export function BottomNav({ state, navigation }: BottomTabBarProps) {
   const colors = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const keyboardVisible = useKeyboardVisible();
+  const { navMode } = useStoreMode();
+  const isRent = navMode === 'rent';
 
   const focusedRoute = state.routes[state.index];
   // Active screen of the tab's stack: from its state, or — before the stack has
@@ -143,14 +154,22 @@ export function BottomNav({ state, navigation }: BottomTabBarProps) {
       style={{ bottom: getBottomOffset(insets.bottom) }}
       accessibilityRole="tablist"
     >
-      {LEFT_TABS.map(renderTab)}
+      {LEFT_TABS[navMode].map(renderTab)}
       <Pressable
-        onPress={() => router.push({ pathname: '/(tabs)/(orders)/create', params: { scan: '1' } })}
+        onPress={() =>
+          isRent
+            ? router.push('/(tabs)/(rentals)/create')
+            : router.push({ pathname: '/(tabs)/(orders)/create', params: { scan: '1' } })
+        }
         className="w-[52px] h-[52px] rounded-full bg-accent items-center justify-center active:opacity-80"
         accessibilityRole="button"
-        accessibilityLabel={t('navigation.newSale')}
+        accessibilityLabel={t(isRent ? 'navigation.newBooking' : 'navigation.newSale')}
       >
-        <ScanBarcode size={24} color={colors.onAccent} strokeWidth={2.2} />
+        {isRent ? (
+          <CalendarPlus size={24} color={colors.onAccent} strokeWidth={2.2} />
+        ) : (
+          <ScanBarcode size={24} color={colors.onAccent} strokeWidth={2.2} />
+        )}
       </Pressable>
       {RIGHT_TABS.map(renderTab)}
     </View>

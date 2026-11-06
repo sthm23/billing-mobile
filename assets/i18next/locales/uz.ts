@@ -848,11 +848,42 @@ const uz = {
       "show": "Ko'rsatish"
     }
   },
+  "rental": {
+    "title": "Ijaralar",
+    "newBooking": "Yangi bron"
+  },
+  "storeSettings": {
+    "title": "Do'kon sozlamalari",
+    "subtitle": "{{store}} · faqat egasi",
+    "entrySubtitle": "Rejim: sotuv yoki ijara",
+    "noAccess": "Do'kon sozlamalari faqat egasiga ochiq",
+    "loadFailed": "Do'konni yuklab bo'lmadi",
+    "modeSection": "Ish rejimi",
+    "sales": "Sotuv",
+    "salesDesc": "Buyurtmalar, skaner, ombordagi tovarlarni sotish",
+    "rental": "Ijara",
+    "rentalDesc": "Bronlar, berish va qaytarish, bandlik kalendari",
+    "atLeastOne": "Kamida bitta rejim yoqilgan bo'lishi kerak. Birini o'chirsangiz, ikkinchisi yoqiladi.",
+    "effectsSection": "Xodimlar nimani ko'radi",
+    "effectRentOnly1": "«Buyurtmalar» bo'limi «Ijaralar»ga aylanadi, markaziy tugma bron yaratadi",
+    "effectRentOnly2": "Sotuv ekranlari va sotuv narxi yashiriladi",
+    "effectRentOnly3": "Tovarlarda kunlik narx va bandlik kalendari paydo bo'ladi",
+    "effectBoth1": "Buyurtmalar ham, bronlar ham ko'rinadi — pastki menyu Profilda almashtiriladi",
+    "effectBoth2": "Tovarga sotuv narxi ham, kunlik narx ham ko'rsatish mumkin",
+    "effectSaleOnly1": "Oddiy do'kon: buyurtmalar, skaner, kassa",
+    "effectSaleOnly2": "Bronlar va kalendar yashirilgan",
+    "save": "Saqlash",
+    "saved": "Ish rejimi saqlandi",
+    "saveFailed": "Sozlamalarni saqlab bo'lmadi",
+    "menuMode": "Pastki menyu"
+  },
   "navigation": {
     "dashboard": "Xisobot",
     "stores": "Do'konlar",
     "products": "Mahsulotlar",
     "orders": "Zakazlar",
+    "rentals": "Ijaralar",
+    "newBooking": "Yangi bron",
     "users": "Foydalanuvchilar",
     "usersSubtitle": "Xodimlar va ruxsatlarni boshqarish",
     "reports": "Hisobotlar",

@@ -27,6 +27,7 @@ export { IconButton, type IconButtonProps } from './IconButton';
 export { Pressable, type PressableProps } from './Pressable';
 export { Segmented, type SegmentedOption, type SegmentedProps } from './Segmented';
 export { Stepper, type StepperProps } from './Stepper';
+export { Switch, type SwitchProps } from './Switch';
 
 // Forms
 export {

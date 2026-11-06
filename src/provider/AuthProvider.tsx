@@ -16,6 +16,8 @@ interface AuthContextType {
     user: CurrentUserType | null;
     login: (data: AuthRequest) => Promise<void>;
     logout: () => Promise<void>;
+    /** Reloads the profile (e.g. after the owner changed the store modes) */
+    refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -123,8 +125,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const refreshUser = async () => {
+        const profile = await profileAuth();
+        setUser(profile);
+        await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, authStatus, user, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, authStatus, user, login, logout, refreshUser }}>
             {children}
         </AuthContext.Provider>
     )

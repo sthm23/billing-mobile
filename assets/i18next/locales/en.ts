@@ -847,11 +847,42 @@ const en = {
       "show": "Show"
     }
   },
+  "rental": {
+    "title": "Rentals",
+    "newBooking": "New booking"
+  },
+  "storeSettings": {
+    "title": "Store settings",
+    "subtitle": "{{store}} · owner only",
+    "entrySubtitle": "Mode: sales or rental",
+    "noAccess": "Store settings are available to the owner only",
+    "loadFailed": "Failed to load the store",
+    "modeSection": "Store mode",
+    "sales": "Sales",
+    "salesDesc": "Orders, scanner, selling goods from the warehouse",
+    "rental": "Rental",
+    "rentalDesc": "Bookings, pick-up and return, occupancy calendar",
+    "atLeastOne": "At least one mode stays on. Turn one off and the other turns on.",
+    "effectsSection": "What staff will see",
+    "effectRentOnly1": "The Orders tab becomes Rentals, the center button creates a booking",
+    "effectRentOnly2": "Sales screens and the sale price are hidden",
+    "effectRentOnly3": "Products get a price per day and an occupancy calendar",
+    "effectBoth1": "Both orders and bookings are available — the bottom menu is switched in Profile",
+    "effectBoth2": "A product can have both a sale price and a price per day",
+    "effectSaleOnly1": "A regular store: orders, scanner, cashbox",
+    "effectSaleOnly2": "Bookings and the calendar are hidden",
+    "save": "Save",
+    "saved": "Store mode saved",
+    "saveFailed": "Failed to save the settings",
+    "menuMode": "Bottom menu"
+  },
   "navigation": {
     "dashboard": "Dashboard",
     "stores": "Stores",
     "products": "Products",
     "orders": "Orders",
+    "rentals": "Rentals",
+    "newBooking": "New booking",
     "users": "Users",
     "usersSubtitle": "Manage staff accounts and permissions",
     "reports": "Reports",

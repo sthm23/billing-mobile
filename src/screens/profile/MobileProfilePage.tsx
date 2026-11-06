@@ -1,6 +1,7 @@
-import { ListCard, Pressable, Text } from "@/components/base";
+import { ListCard, Pressable, Segmented, Text } from "@/components/base";
 import { EmptyState } from "@/components/common";
 import { useBottomNavInset } from "@/components/navigation/BottomNav";
+import { useStoreMode, type NavMode } from "@/hooks/use-store-mode";
 import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
@@ -8,7 +9,7 @@ import { useDebtors } from "@/services/debt";
 import Constants from "expo-constants";
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
-import { HandCoins, UserRoundX, UsersRound } from "lucide-react-native";
+import { HandCoins, Store, UserRoundX, UsersRound } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import LogoutButton from "./LogoutButton";
@@ -30,6 +31,7 @@ const MobileProfilePage = () => {
   const bottomInset = useBottomNavInset();
   const version = Constants.expoConfig?.version ?? '';
   const debtors = useDebtors();
+  const storeMode = useStoreMode();
 
   if (!user) {
     return <EmptyState icon={UserRoundX} message={t('profile.noUser')} />;
@@ -54,6 +56,33 @@ const MobileProfilePage = () => {
           subtitle={t('staffCreate.entrySubtitle')}
           onPress={() => router.push('/(tabs)/(profile)/create')}
         />
+      ) : null}
+      {user.role === UserRole.OWNER ? (
+        <ListCard
+          leading={
+            <View className="w-11 h-11 rounded-full bg-sunken items-center justify-center">
+              <Store size={20} color={colors.ink} strokeWidth={2} />
+            </View>
+          }
+          title={t('storeSettings.title')}
+          subtitle={t('storeSettings.entrySubtitle')}
+          onPress={() => router.push('/(tabs)/(profile)/store-settings')}
+        />
+      ) : null}
+      {/* Store with sales and rental: which one the bottom menu shows */}
+      {storeMode.isMixed ? (
+        <View className="bg-card rounded-xl p-4 gap-2.5">
+          <Text className="type-label text-soft">{t('storeSettings.menuMode')}</Text>
+          <Segmented<NavMode>
+            options={[
+              { value: 'sale', label: t('storeSettings.sales') },
+              { value: 'rent', label: t('storeSettings.rental') },
+            ]}
+            value={storeMode.navMode}
+            onChange={(mode) => void storeMode.setNavMode(mode)}
+            variant="sunken"
+          />
+        </View>
       ) : null}
       {/* Any employee: debts belong to the store */}
       <ListCard

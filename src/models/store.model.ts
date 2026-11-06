@@ -15,6 +15,10 @@ export interface Store {
   ownerId: string
   createdAt: string
   createdBy: string // adminId
+  /** Store sells goods (default true); at least one mode stays on */
+  salesEnabled?: boolean
+  /** Store rents goods out (default false) */
+  rentalEnabled?: boolean
   creator: User
   warehouse: Warehouse[]
   categories: { category: Category[], categoryId: string, storeId: string }[]
