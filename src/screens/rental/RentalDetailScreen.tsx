@@ -39,13 +39,14 @@ import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatDay, formatDayTime, initials, itemAttributes, OUT_STATUSES, rentalBadges, returnedUnits } from './rental-format';
 
-/** Next steps of a rental opened as screens; return and calendar are placeholders until 6.5–6.6 */
+/** Next steps of a rental opened as screens; the calendar is a placeholder until 6.6 */
 export type RentalActionKind = 'issue' | 'pay' | 'return' | 'edit' | 'calendar';
 
 function openAction(kind: RentalActionKind, id: string) {
   if (kind === 'edit') router.push({ pathname: '/(tabs)/(rentals)/edit/[id]', params: { id } });
   else if (kind === 'pay') router.push({ pathname: '/(tabs)/(rentals)/pay/[id]', params: { id } });
   else if (kind === 'issue') router.push({ pathname: '/(tabs)/(rentals)/issue/[id]', params: { id } });
+  else if (kind === 'return') router.push({ pathname: '/(tabs)/(rentals)/return/[id]', params: { id } });
   else router.push({ pathname: '/(tabs)/(rentals)/soon', params: { kind, id } });
 }
 

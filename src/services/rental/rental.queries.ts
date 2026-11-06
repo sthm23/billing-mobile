@@ -45,6 +45,7 @@ export const rentalQueryKeys = {
   calendar: (params: object) => [...rentalQueryKeys.all(), 'calendar', params] as const,
   similar: (params: object) => [...rentalQueryKeys.all(), 'similar', params] as const,
   conflicts: (id: string, params: object) => [...rentalQueryKeys.all(), 'conflicts', id, params] as const,
+  returnPreview: (id: string, body: RentalReturnPayload) => [...rentalQueryKeys.all(), 'return-preview', id, body] as const,
 };
 
 /**
@@ -177,6 +178,24 @@ export const useSimilarVariants = (
     queryFn: () => rentalService.getSimilar(params as NonNullable<typeof params>),
     enabled: Boolean(params),
     refetchOnWindowFocus: false,
+  });
+
+/**
+ * Live return preview (`POST /rental/:id/returns/preview`, writes nothing):
+ * recomputed whenever the body changes; the previous numbers stay on screen
+ * while the next ones load. `null` body — nothing to compute.
+ */
+export const useRentalReturnPreview = (
+  id: string,
+  body: RentalReturnPayload | null,
+): UseQueryResult<RentalReturnPreview, RentalMutationError> =>
+  useQuery({
+    queryKey: rentalQueryKeys.returnPreview(id, body ?? { items: [] }),
+    queryFn: () => rentalService.previewReturn(id, body as RentalReturnPayload),
+    enabled: Boolean(id) && body !== null,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
 /** Bookings short of units while returned items are in dry cleaning (warning only) */
