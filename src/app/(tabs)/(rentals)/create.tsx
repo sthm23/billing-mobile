@@ -1,10 +1,11 @@
-import { ComingSoonScreen } from '@/components/common';
-import { CalendarPlus } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
+import { SafeAreaView } from '@/components/base/SafeAreaView';
+import { RentalFormScreen } from '@/screens/rental/form/RentalFormScreen';
 
-/** New booking — built in phase 6.3 */
+/** New booking */
 export default function CreateRentalPage() {
-  const { t } = useTranslation();
-
-  return <ComingSoonScreen title={t('rental.newBooking')} icon={CalendarPlus} />;
+  return (
+    <SafeAreaView edges={['top']} className="flex-1 bg-bg">
+      <RentalFormScreen />
+    </SafeAreaView>
+  );
 }

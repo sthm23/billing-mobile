@@ -12,6 +12,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
+import { productService } from '@/services/product/product.service';
 import { rentalService } from './rental.service';
 import type {
   CleaningConflict,
@@ -27,6 +28,7 @@ import type {
   RentalReturnPayload,
   RentalReturnPreview,
   RentalSummary,
+  RentableVariant,
   SimilarVariants,
   VariantAvailability,
 } from './rental.types';
@@ -78,6 +80,28 @@ export const useRentalsInfinite = (params: Omit<RentalListParams, 'currentPage'>
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
+
+/**
+ * Variants that can be booked in a warehouse: the product search, keeping only
+ * rentable ones with a day price (the backend checks it again on save).
+ */
+export const useRentableVariantSearch = (warehouseId: string | undefined, text: string): UseQueryResult<RentableVariant[]> => {
+  const query = text.trim();
+  return useQuery({
+    queryKey: [...rentalQueryKeys.all(), 'variantSearch', warehouseId, query],
+    queryFn: async () => {
+      const response = await productService.searchProducts(warehouseId as string, query);
+      // The search row carries the rent fields too (OrderProductVariant does not declare them)
+      return (response.data as unknown as RentableVariant[]).filter(
+        (v) => v.canRent && Number(v.rentPricePerDay ?? 0) > 0,
+      );
+    },
+    enabled: Boolean(warehouseId) && query.length >= 2,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    staleTime: 30_000,
+  });
+};
 
 /** Counters of the quick list filters */
 export const useRentalSummary = (enabled = true): UseQueryResult<RentalSummary> =>

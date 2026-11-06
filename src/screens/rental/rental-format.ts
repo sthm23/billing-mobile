@@ -39,12 +39,51 @@ export function formatDayTime(iso: string, language: string): string {
   });
 }
 
-/** Local calendar day, e.g. «2026-05-14» — to group rows by day */
-export function dayKey(iso: string): string {
-  const d = new Date(iso);
+/** YYYY-MM-DD of a device calendar day */
+export function toLocalDate(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${d.getFullYear()}-${m}-${day}`;
+}
+
+/** Local calendar day, e.g. «2026-05-14» — to group rows by day */
+export function dayKey(iso: string): string {
+  return toLocalDate(new Date(iso));
+}
+
+/** Device Date (midnight) of a YYYY-MM-DD string */
+export function fromLocalDate(value: string): Date {
+  const [y, m, d] = value.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/** YYYY-MM-DD shifted by whole days */
+export function addLocalDays(value: string, days: number): string {
+  const d = fromLocalDate(value);
+  return toLocalDate(new Date(d.getFullYear(), d.getMonth(), d.getDate() + days));
+}
+
+/** Salon time zone Asia/Tashkent: UTC+5 all year (no daylight saving) */
+const SALON_UTC_OFFSET_MS = 5 * 60 * 60 * 1000;
+
+/**
+ * Salon local date (YYYY-MM-DD) of a booking boundary from the backend (12:00
+ * there). By the fixed offset: Hermes may lack time zone data for Intl.
+ */
+export function salonDate(iso: string): string {
+  return new Date(Date.parse(iso) + SALON_UTC_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+/** Days a booking is priced for: calendar days between the dates. Preview only — the backend prices it */
+export function bookingDays(startDate: string, endDate: string): number {
+  const [ys, ms, ds] = startDate.split('-').map(Number);
+  const [ye, me, de] = endDate.split('-').map(Number);
+  return Math.max(1, Math.round((Date.UTC(ye, me - 1, de) - Date.UTC(ys, ms - 1, ds)) / 86_400_000));
+}
+
+/** «14 мая, чт» of a YYYY-MM-DD */
+export function formatLocalDate(value: string, language: string): string {
+  return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long', weekday: 'short' });
 }
 
 export function initials(name: string | null | undefined): string {

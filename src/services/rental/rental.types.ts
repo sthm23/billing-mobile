@@ -296,6 +296,20 @@ export interface SimilarVariant {
   available: number;
 }
 
+/** Row of the product search (`GET /product/search/:warehouseId`) with the rent fields */
+export interface RentableVariant {
+  id: string;
+  sku: string;
+  barCode: string | null;
+  productId: string;
+  productName: string;
+  canRent: boolean;
+  rentPricePerDay: Money | null;
+  attributes: { name: string; value: string | null }[];
+  /** Units in the warehouse (owned) */
+  quantity: number;
+}
+
 export interface SimilarVariants {
   sameProduct: SimilarVariant[];
   sameCategory: SimilarVariant[];

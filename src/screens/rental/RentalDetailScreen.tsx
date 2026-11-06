@@ -25,15 +25,18 @@ import {
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linking, Modal, Pressable, ScrollView, View } from 'react-native';
+import { Sheet } from '@/components/base/Sheet';
+import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatDay, formatDayTime, initials, OUT_STATUSES, rentalBadges, returnedUnits } from './rental-format';
 
-/** Next steps of a rental, placeholders until phases 6.3–6.5 */
+/** Next steps of a rental; issue, return, cancel, collateral and calendar are placeholders until 6.4–6.6 */
 export type RentalActionKind = 'issue' | 'pay' | 'return' | 'edit' | 'cancel' | 'collateral' | 'calendar';
 
-function openAction(kind: RentalActionKind, id?: string) {
-  router.push({ pathname: '/(tabs)/(rentals)/soon', params: id ? { kind, id } : { kind } });
+function openAction(kind: RentalActionKind, id: string) {
+  if (kind === 'edit') router.push({ pathname: '/(tabs)/(rentals)/edit/[id]', params: { id } });
+  else if (kind === 'pay') router.push({ pathname: '/(tabs)/(rentals)/pay/[id]', params: { id } });
+  else router.push({ pathname: '/(tabs)/(rentals)/soon', params: { kind, id } });
 }
 
 interface RentalDetailScreenProps {
@@ -152,9 +155,8 @@ export function RentalDetailScreen({ rentalId }: RentalDetailScreenProps) {
         </View>
       ) : null}
 
-      <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
-        <Pressable className="flex-1 bg-scrim" onPress={() => setMenuOpen(false)} accessibilityLabel={t('common.close')}>
-          <View className="absolute right-4 w-[230px] bg-card rounded-lg p-1.5" style={{ top: insets.top + 60 }} accessibilityRole="menu">
+      <Sheet isOpen={menuOpen} onClose={() => setMenuOpen(false)} size="auto">
+        <View className="px-3 pt-1 pb-3 gap-1" accessibilityRole="menu">
             <MenuItem
               icon={Pencil}
               label={t('rental.card.edit')}
@@ -174,9 +176,8 @@ export function RentalDetailScreen({ rentalId }: RentalDetailScreenProps) {
                 }}
               />
             ) : null}
-          </View>
-        </Pressable>
-      </Modal>
+        </View>
+      </Sheet>
     </View>
   );
 }
@@ -196,7 +197,7 @@ function MenuItem({
   return (
     <Pressable
       onPress={onPress}
-      className="h-12 px-3 rounded-[14px] flex-row items-center gap-2.5 active:bg-sunken"
+      className="h-14 px-3 rounded-md flex-row items-center gap-3 active:bg-sunken"
       accessibilityRole="menuitem"
     >
       <Icon size={18} color={danger ? colors.errFg : colors.ink} strokeWidth={2} />

@@ -13,6 +13,8 @@ export default function RentalsLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="create" />
       <Stack.Screen name="[id]" />
+      <Stack.Screen name="edit/[id]" />
+      <Stack.Screen name="pay/[id]" />
       <Stack.Screen name="soon" />
     </Stack>
   );
