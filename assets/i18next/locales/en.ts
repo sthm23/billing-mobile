@@ -849,7 +849,132 @@ const en = {
   },
   "rental": {
     "title": "Rentals",
-    "newBooking": "New booking"
+    "newBooking": "New booking",
+    "calendar": "Rental calendar",
+    "noCustomer": "No customer",
+    "days": "{{count}} d",
+    "returnBy": "Return by 12:00",
+    "overdue": "Overdue",
+    "paidInFull": "Paid in full",
+    "notPaid": "Not paid · {{amount}}",
+    "leftToPay": "{{amount}} left",
+    "status": {
+      "BOOKED": "Booked",
+      "ISSUED": "With customer",
+      "PARTIALLY_RETURNED": "Partly returned",
+      "RETURNED": "Returned",
+      "CANCELLED": "Cancelled"
+    },
+    "view": {
+      "issueToday": "Issue today",
+      "returnToday": "Return today",
+      "overdue": "Overdue",
+      "booked": "Bookings",
+      "out": "With customer",
+      "all": "All"
+    },
+    "group": {
+      "overdue": "Overdue",
+      "today": "Today · {{date}}",
+      "tomorrow": "Tomorrow · {{date}}",
+      "yesterday": "Yesterday · {{date}}",
+      "toIssue": "issue {{count}}",
+      "toReturn": "return {{count}}",
+      "closed": "closed {{count}}"
+    },
+    "list": {
+      "searchPlaceholder": "Customer, phone or booking no.",
+      "emptyTitle": "No bookings yet",
+      "emptyText": "Create the first booking — customer, dates and items. It will show here and in the calendar.",
+      "create": "Create booking",
+      "errorTitle": "Failed to load rentals",
+      "errorText": "Check the connection and try again. Bookings are saved, nothing is lost.",
+      "retry": "Retry",
+      "notFoundTitle": "Nothing found",
+      "notFoundQuery": "No bookings for «{{query}}» in «{{filter}}». Check the phone number or reset the search.",
+      "notFoundFilter": "«{{filter}}» is empty now.",
+      "reset": "Reset search"
+    },
+    "card": {
+      "titleShort": "Booking",
+      "title": "Booking №{{code}}",
+      "back": "Back to rentals",
+      "more": "More",
+      "loadFailed": "Failed to load the booking",
+      "total": "Total",
+      "paid": "Paid",
+      "left": "Left",
+      "debt": "Debt",
+      "discount": "discount {{amount}}",
+      "withPenalty": "incl. penalty {{amount}}",
+      "call": "Call the customer",
+      "overdueSince": "Overdue — was due back {{date}}",
+      "issue": "Issue",
+      "acceptReturn": "Accept return",
+      "acceptPayment": "Accept payment",
+      "acceptPaymentAmount": "Accept payment · {{amount}} UZS",
+      "edit": "Edit",
+      "cancel": "Cancel booking"
+    },
+    "stage": {
+      "booked": "Booked",
+      "issue": "Issue",
+      "return": "Return",
+      "cancelled": "Cancelled",
+      "returnedOf": "{{returned}} of {{total}}",
+      "wasDue": "due {{date}}"
+    },
+    "items": {
+      "title": "Items · {{count}}",
+      "issueOn": "issue {{date}}",
+      "withCustomer": "with customer",
+      "returnedOf": "{{returned}} of {{total}} back",
+      "allReturned": "all returned",
+      "service": "Service"
+    },
+    "item": {
+      "inSalon": "In salon",
+      "withCustomer": "With customer",
+      "returnedOf": "{{returned}} of {{total}} back",
+      "cleaningUntil": "Dry cleaning until {{date}}",
+      "returnedOn": "Returned {{date}}",
+      "returned": "Returned"
+    },
+    "collateral": {
+      "title": "Collateral",
+      "held": "{{what}} — held",
+      "receivedAt": "Received {{date}}",
+      "returnedAt": "Returned {{date}}",
+      "notTaken": "Not taken",
+      "takeOnIssue": "Take a passport or jewellery on issue",
+      "issuedWithout": "Issued without collateral",
+      "issuedWithoutHint": "Items issued, no collateral taken",
+      "none": "No collateral taken",
+      "return": "Return collateral",
+      "afterPayment": "Available after full payment"
+    },
+    "collateralType": {
+      "PASSPORT": "Passport",
+      "GOLD": "Gold",
+      "OTHER": "Collateral"
+    },
+    "payments": {
+      "title": "Payments",
+      "none": "No payments yet",
+      "payment": "Payment",
+      "penalty": "Penalty",
+      "earlyRefund": "Refund for unused days",
+      "cancelRefund": "Refund on cancellation"
+    },
+    "action": {
+      "issue": "Issue",
+      "pay": "Accept payment",
+      "return": "Return",
+      "edit": "Edit booking",
+      "cancel": "Cancel booking",
+      "collateral": "Return collateral",
+      "calendar": "Rental calendar"
+    }
   },
   "storeSettings": {
     "title": "Store settings",

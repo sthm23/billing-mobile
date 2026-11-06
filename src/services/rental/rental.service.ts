@@ -32,6 +32,7 @@ function listQuery(params: RentalListParams): Record<string, string | number> {
   if (params.q?.trim()) query.q = params.q.trim();
   if (params.variantId) query.variantId = params.variantId;
   if (params.sort) query.sort = params.sort;
+  if (params.sortBy) query.sortBy = params.sortBy;
   return query;
 }
 

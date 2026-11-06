@@ -163,7 +163,7 @@ export interface RentalOrderItem {
     /** Dry-cleaning days suggested on return */
     defaultCleaningDays: number;
     product: { id: string; name: string };
-    attributes: { value: { valueString: string | null; attribute: { name: string } } }[];
+    attributes: { value: { valueString: string | null; valueNumber: Money | null; attribute: { name: string } } }[];
   };
 }
 
@@ -257,6 +257,8 @@ export interface RentalListParams {
   q?: string;
   variantId?: string;
   sort?: 'asc' | 'desc';
+  /** Default startDate */
+  sortBy?: 'startDate' | 'endDate';
 }
 
 export interface RentalCalendar {

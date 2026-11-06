@@ -850,7 +850,132 @@ const uz = {
   },
   "rental": {
     "title": "Ijaralar",
-    "newBooking": "Yangi bron"
+    "newBooking": "Yangi bron",
+    "calendar": "Ijara kalendari",
+    "noCustomer": "Mijozsiz",
+    "days": "{{count}} kun",
+    "returnBy": "Soat 12:00 gacha qaytarish",
+    "overdue": "Muddati o'tgan",
+    "paidInFull": "To'liq to'langan",
+    "notPaid": "To'lanmagan · {{amount}}",
+    "leftToPay": "Qoldi {{amount}}",
+    "status": {
+      "BOOKED": "Bron",
+      "ISSUED": "Mijozda",
+      "PARTIALLY_RETURNED": "Qisman qaytarilgan",
+      "RETURNED": "Qaytarilgan",
+      "CANCELLED": "Bekor qilingan"
+    },
+    "view": {
+      "issueToday": "Bugun berish",
+      "returnToday": "Bugun qaytarish",
+      "overdue": "Muddati o'tgan",
+      "booked": "Bronlar",
+      "out": "Mijozda",
+      "all": "Hammasi"
+    },
+    "group": {
+      "overdue": "Muddati o'tgan",
+      "today": "Bugun · {{date}}",
+      "tomorrow": "Ertaga · {{date}}",
+      "yesterday": "Kecha · {{date}}",
+      "toIssue": "berish {{count}}",
+      "toReturn": "qaytarish {{count}}",
+      "closed": "yopilgan {{count}}"
+    },
+    "list": {
+      "searchPlaceholder": "Mijoz, telefon yoki bron raqami",
+      "emptyTitle": "Hozircha bronlar yo'q",
+      "emptyText": "Birinchi bronni yarating — mijoz, sanalar va kiyimlar. U shu yerda va kalendarda ko'rinadi.",
+      "create": "Bron yaratish",
+      "errorTitle": "Ijaralarni yuklab bo'lmadi",
+      "errorText": "Internetni tekshirib, qayta urinib ko'ring. Bronlar saqlangan, hech narsa yo'qolmaydi.",
+      "retry": "Qayta urinish",
+      "notFoundTitle": "Hech narsa topilmadi",
+      "notFoundQuery": "«{{filter}}» filtrida «{{query}}» bo'yicha bron yo'q. Telefon raqamini tekshiring yoki qidiruvni tozalang.",
+      "notFoundFilter": "«{{filter}}» filtri hozircha bo'sh.",
+      "reset": "Qidiruvni tozalash"
+    },
+    "card": {
+      "titleShort": "Bron",
+      "title": "Bron №{{code}}",
+      "back": "Ijaralarga qaytish",
+      "more": "Yana",
+      "loadFailed": "Bronni yuklab bo'lmadi",
+      "total": "Jami",
+      "paid": "To'langan",
+      "left": "Qoldi",
+      "debt": "Qarz",
+      "discount": "chegirma {{amount}}",
+      "withPenalty": "jarima {{amount}} bilan",
+      "call": "Mijozga qo'ng'iroq qilish",
+      "overdueSince": "Muddati o'tgan — {{date}} qaytarilishi kerak edi",
+      "issue": "Berish",
+      "acceptReturn": "Qaytarishni qabul qilish",
+      "acceptPayment": "To'lov qabul qilish",
+      "acceptPaymentAmount": "To'lov qabul qilish · {{amount}} UZS",
+      "edit": "O'zgartirish",
+      "cancel": "Bronni bekor qilish"
+    },
+    "stage": {
+      "booked": "Bron",
+      "issue": "Berish",
+      "return": "Qaytarish",
+      "cancelled": "Bekor qilingan",
+      "returnedOf": "{{total}} dan {{returned}}",
+      "wasDue": "{{date}} edi"
+    },
+    "items": {
+      "title": "Kiyimlar · {{count}}",
+      "issueOn": "berish {{date}}",
+      "withCustomer": "mijozda",
+      "returnedOf": "{{total}} dan {{returned}} qaytdi",
+      "allReturned": "hammasi qaytdi",
+      "service": "Xizmat"
+    },
+    "item": {
+      "inSalon": "Salonda",
+      "withCustomer": "Mijozda",
+      "returnedOf": "{{total}} dan {{returned}} qaytdi",
+      "cleaningUntil": "{{date}} gacha kimyoviy tozalashda",
+      "returnedOn": "{{date}} qaytarilgan",
+      "returned": "Qaytarilgan"
+    },
+    "collateral": {
+      "title": "Garov",
+      "held": "{{what}} — bizda",
+      "receivedAt": "Qabul qilingan {{date}}",
+      "returnedAt": "Qaytarilgan {{date}}",
+      "notTaken": "Qabul qilinmagan",
+      "takeOnIssue": "Berishda pasport yoki taqinchoq oling",
+      "issuedWithout": "Garovsiz berilgan",
+      "issuedWithoutHint": "Kiyimlar berilgan, garov olinmagan",
+      "none": "Garov olinmagan",
+      "return": "Garovni qaytarish",
+      "afterPayment": "To'liq to'lovdan keyin mumkin bo'ladi"
+    },
+    "collateralType": {
+      "PASSPORT": "Pasport",
+      "GOLD": "Oltin",
+      "OTHER": "Garov"
+    },
+    "payments": {
+      "title": "To'lovlar",
+      "none": "Hozircha to'lovlar yo'q",
+      "payment": "To'lov",
+      "penalty": "Jarima",
+      "earlyRefund": "Foydalanilmagan kunlar uchun qaytarish",
+      "cancelRefund": "Bekor qilishda qaytarish"
+    },
+    "action": {
+      "issue": "Berish",
+      "pay": "To'lov qabul qilish",
+      "return": "Qaytarish",
+      "edit": "Bronni o'zgartirish",
+      "cancel": "Bronni bekor qilish",
+      "collateral": "Garovni qaytarish",
+      "calendar": "Ijara kalendari"
+    }
   },
   "storeSettings": {
     "title": "Do'kon sozlamalari",

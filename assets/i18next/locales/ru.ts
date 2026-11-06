@@ -850,7 +850,132 @@ const ru = {
   },
   "rental": {
     "title": "Аренды",
-    "newBooking": "Новая бронь"
+    "newBooking": "Новая бронь",
+    "calendar": "Календарь аренд",
+    "noCustomer": "Без клиента",
+    "days": "{{count}} дн.",
+    "returnBy": "Возврат до 12:00",
+    "overdue": "Просрочено",
+    "paidInFull": "Оплачено полностью",
+    "notPaid": "Не оплачено · {{amount}}",
+    "leftToPay": "Осталось {{amount}}",
+    "status": {
+      "BOOKED": "Бронь",
+      "ISSUED": "У клиента",
+      "PARTIALLY_RETURNED": "Частично возвращено",
+      "RETURNED": "Возвращено",
+      "CANCELLED": "Отменена"
+    },
+    "view": {
+      "issueToday": "Выдать сегодня",
+      "returnToday": "Вернуть сегодня",
+      "overdue": "Просрочено",
+      "booked": "Брони",
+      "out": "У клиента",
+      "all": "Все"
+    },
+    "group": {
+      "overdue": "Просрочено",
+      "today": "Сегодня · {{date}}",
+      "tomorrow": "Завтра · {{date}}",
+      "yesterday": "Вчера · {{date}}",
+      "toIssue": "выдать {{count}}",
+      "toReturn": "вернуть {{count}}",
+      "closed": "закрыто {{count}}"
+    },
+    "list": {
+      "searchPlaceholder": "Клиент, телефон или № брони",
+      "emptyTitle": "Броней пока нет",
+      "emptyText": "Создайте первую бронь — клиент, даты и вещи. Её будет видно здесь и в календаре.",
+      "create": "Создать бронь",
+      "errorTitle": "Не удалось загрузить аренды",
+      "errorText": "Проверьте интернет и попробуйте ещё раз. Брони сохранены, ничего не потеряется.",
+      "retry": "Повторить",
+      "notFoundTitle": "Ничего не найдено",
+      "notFoundQuery": "Нет броней по запросу «{{query}}» в фильтре «{{filter}}». Проверьте номер телефона или сбросьте поиск.",
+      "notFoundFilter": "В фильтре «{{filter}}» сейчас пусто.",
+      "reset": "Сбросить поиск"
+    },
+    "card": {
+      "titleShort": "Бронь",
+      "title": "Бронь №{{code}}",
+      "back": "Назад к арендам",
+      "more": "Ещё",
+      "loadFailed": "Не удалось загрузить бронь",
+      "total": "Итого",
+      "paid": "Оплачено",
+      "left": "Осталось",
+      "debt": "Долг",
+      "discount": "скидка {{amount}}",
+      "withPenalty": "включая штраф {{amount}}",
+      "call": "Позвонить клиенту",
+      "overdueSince": "Просрочено — вернуть нужно было {{date}}",
+      "issue": "Выдать",
+      "acceptReturn": "Принять возврат",
+      "acceptPayment": "Принять оплату",
+      "acceptPaymentAmount": "Принять оплату · {{amount}} UZS",
+      "edit": "Изменить",
+      "cancel": "Отменить бронь"
+    },
+    "stage": {
+      "booked": "Бронь",
+      "issue": "Выдача",
+      "return": "Возврат",
+      "cancelled": "Отменена",
+      "returnedOf": "{{returned}} из {{total}}",
+      "wasDue": "был {{date}}"
+    },
+    "items": {
+      "title": "Вещи · {{count}}",
+      "issueOn": "выдать {{date}}",
+      "withCustomer": "у клиента",
+      "returnedOf": "вернули {{returned}} из {{total}}",
+      "allReturned": "всё вернули",
+      "service": "Услуга"
+    },
+    "item": {
+      "inSalon": "В салоне",
+      "withCustomer": "У клиента",
+      "returnedOf": "Вернули {{returned}} из {{total}}",
+      "cleaningUntil": "В химчистке до {{date}}",
+      "returnedOn": "Возвращено {{date}}",
+      "returned": "Возвращено"
+    },
+    "collateral": {
+      "title": "Залог",
+      "held": "{{what}} — у нас",
+      "receivedAt": "Принят {{date}}",
+      "returnedAt": "Возвращён {{date}}",
+      "notTaken": "Не принят",
+      "takeOnIssue": "Возьмите паспорт или украшение при выдаче",
+      "issuedWithout": "Выдано без залога",
+      "issuedWithoutHint": "Вещи выданы, залог не брали",
+      "none": "Залог не принимали",
+      "return": "Вернуть залог",
+      "afterPayment": "Станет доступно после полной оплаты"
+    },
+    "collateralType": {
+      "PASSPORT": "Паспорт",
+      "GOLD": "Золото",
+      "OTHER": "Залог"
+    },
+    "payments": {
+      "title": "Платежи",
+      "none": "Платежей пока нет",
+      "payment": "Оплата",
+      "penalty": "Штраф",
+      "earlyRefund": "Возврат за неиспользованные дни",
+      "cancelRefund": "Возврат при отмене"
+    },
+    "action": {
+      "issue": "Выдача",
+      "pay": "Принять оплату",
+      "return": "Возврат",
+      "edit": "Изменить бронь",
+      "cancel": "Отменить бронь",
+      "collateral": "Вернуть залог",
+      "calendar": "Календарь аренд"
+    }
   },
   "storeSettings": {
     "title": "Настройки магазина",

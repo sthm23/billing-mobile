@@ -130,7 +130,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 |---|---|---|
 | `(products)` | `index`, `[id]`, `create`, `history/[variantId]` | `ProductListScreen`, `ProductDetailScreen`, `ComingSoonScreen`, `StockHistoryScreen` (params `title`, `subtitle`, `stock`) |
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
-| `(rentals)` | `index`, `create` | Rental mode only (see «Rental» below). Placeholders until phases 6.2–6.3 |
+| `(rentals)` | `index`, `[id]`, `create`, `soon` (`?kind&id`) | Rental mode only (see «Rental» below). `RentalListScreen`, `RentalDetailScreen`; `create` and `soon` (actions of later phases) are placeholders |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
 | `(profile)` | `index`, `create`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
 
@@ -310,6 +310,8 @@ Wedding-salon rental: business rules [`../docs/features/rental.md`](../docs/feat
 - **Store settings** (`screens/profile/StoreSettingsScreen.tsx`, OWNER): two switches; turning off the only enabled mode switches to the other (both off is impossible; the backend rejects it too). `PUT /store/:id` needs `attributeIds`/`brandIds`, so the current ones are sent back (`useUpdateStoreModes`). After saving: a newly enabled rental sets the menu to rental on this device, and `useAuth().refreshUser()` reloads the profile so the menu follows at once.
 - **API**: `services/rental/` — `rentalService` (every `/rental` endpoint), hooks in `rental.queries.ts` (`useRentals`, `useRentalSummary`, `useRental`, `useRentalAvailability`, `useRentalCalendar`, `useSimilarVariants`, `useCleaningConflicts`, mutations). Every mutation stores the returned details and invalidates rentals, cashboxes, orders and debts. Money fields are Decimal strings — display only.
 - **Set discount**: `libs/set-discount.ts` — an exact copy of `billing_ui/src/app/shared/utils/set-discount.ts` (algorithm in `docs/features/rental.md#set-discount-distribution`). Change both or neither.
+- **List** (`screens/rental/RentalListScreen.tsx`): search `q` (debounced), quick filters `view` with counters from `GET /rental/summary`, pages via `useRentalsInfinite`. Order per filter (`viewSort` in `rental-format.ts`): bookings by `startDate` asc, rentals out by `endDate` asc, «Все» by `startDate` desc. Rows are grouped by the day they are about (booking — issue day, out — return day) with overdue ones (backend `overdue` flag) in «Просрочено»; group counts are of the loaded rows only.
+- **Card** (`screens/rental/RentalDetailScreen.tsx`): totals (`HeroCard`), stages, customer (call), dates, items with per-line state (in salon / with customer / returned / dry cleaning until — from `returns[].items[].availableFrom`), collateral, payments (payments, penalties, early-return and cancel refunds), bottom actions by status and `dueAmount`, «⋯» menu for a booking (cancel — OWNER/MANAGER). Actions open `(rentals)/soon` until their phases.
 - i18n: `rental.*`, `storeSettings.*`, `navigation.rentals` / `navigation.newBooking`.
 
 ### Summaries (sales and cashbox)

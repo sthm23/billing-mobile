@@ -3,6 +3,7 @@ import { debtQueryKeys } from '@/services/debt/debt.queries';
 import { orderQueryKeys } from '@/services/order/order.queries';
 import {
   keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
@@ -62,6 +63,18 @@ export const useRentals = (params: RentalListParams): UseQueryResult<RentalListR
   useQuery({
     queryKey: rentalQueryKeys.list(params),
     queryFn: () => rentalService.getRentals(params),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+/** The rental list loaded page by page (the list screen) */
+export const useRentalsInfinite = (params: Omit<RentalListParams, 'currentPage'>) =>
+  useInfiniteQuery({
+    queryKey: [...rentalQueryKeys.lists(), 'infinite', params] as const,
+    queryFn: ({ pageParam }) => rentalService.getRentals({ ...params, currentPage: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (last: RentalListResponse) =>
+      last.currentPage * last.pageSize < last.total ? Number(last.currentPage) + 1 : undefined,
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
