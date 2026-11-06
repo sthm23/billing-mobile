@@ -1,13 +1,21 @@
-import { Button, HeroCard, IconButton, Money, PhotoPlaceholder, StatusBadge, Text } from '@/components/base';
+import { Button, HeroCard, IconButton, Money, PhotoPlaceholder, StatusBadge, Text, toast } from '@/components/base';
 import type { HeroCardTile, StatusTone } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { useTheme } from '@/hooks/use-theme';
+import { getApiErrorMessage } from '@/libs/api-error';
 import { formatMoney } from '@/libs/format';
 import { canLowerPrice } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
-import { RentalStatus, useRental, type RentalDetail, type RentalOrderItem } from '@/services/rental';
+import {
+  RentalStatus,
+  useRental,
+  useReturnCollateral,
+  type RentalCollateral,
+  type RentalDetail,
+  type RentalOrderItem,
+} from '@/services/rental';
 import { router } from 'expo-router';
 import {
   CalendarDays,
@@ -26,16 +34,18 @@ import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sheet } from '@/components/base/Sheet';
+import { CancelRentalSheet } from './CancelRentalSheet';
 import { Linking, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { formatDay, formatDayTime, initials, OUT_STATUSES, rentalBadges, returnedUnits } from './rental-format';
+import { formatDay, formatDayTime, initials, itemAttributes, OUT_STATUSES, rentalBadges, returnedUnits } from './rental-format';
 
-/** Next steps of a rental; issue, return, cancel, collateral and calendar are placeholders until 6.4–6.6 */
-export type RentalActionKind = 'issue' | 'pay' | 'return' | 'edit' | 'cancel' | 'collateral' | 'calendar';
+/** Next steps of a rental opened as screens; return and calendar are placeholders until 6.5–6.6 */
+export type RentalActionKind = 'issue' | 'pay' | 'return' | 'edit' | 'calendar';
 
 function openAction(kind: RentalActionKind, id: string) {
   if (kind === 'edit') router.push({ pathname: '/(tabs)/(rentals)/edit/[id]', params: { id } });
   else if (kind === 'pay') router.push({ pathname: '/(tabs)/(rentals)/pay/[id]', params: { id } });
+  else if (kind === 'issue') router.push({ pathname: '/(tabs)/(rentals)/issue/[id]', params: { id } });
   else router.push({ pathname: '/(tabs)/(rentals)/soon', params: { kind, id } });
 }
 
@@ -55,6 +65,7 @@ export function RentalDetailScreen({ rentalId }: RentalDetailScreenProps) {
   const { data: rental, isLoading, isError, refetch } = useRental(rentalId);
   const refreshControl = useRefreshControl(refetch);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const back = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)/(rentals)'));
 
@@ -172,12 +183,16 @@ export function RentalDetailScreen({ rentalId }: RentalDetailScreenProps) {
                 danger
                 onPress={() => {
                   setMenuOpen(false);
-                  openAction('cancel', rental.id);
+                  setCancelOpen(true);
                 }}
               />
             ) : null}
         </View>
       </Sheet>
+
+      {canCancel && rental.status === RentalStatus.BOOKED ? (
+        <CancelRentalSheet rental={rental} isOpen={cancelOpen} onClose={() => setCancelOpen(false)} />
+      ) : null}
     </View>
   );
 }
@@ -447,11 +462,7 @@ function ItemsCard({ rental }: { rental: RentalDetail }) {
   return (
     <Section title={t('rental.items.title', { count: total })} note={note}>
       {rental.order.items.map((item) => {
-        const attrs = item.variant.attributes
-          .map((a) => a.value.valueString ?? (a.value.valueNumber != null ? String(a.value.valueNumber) : null))
-          .filter(Boolean)
-          .join(' · ');
-        const meta = [attrs || item.variant.sku, `${formatMoney(item.retailPrice)} × ${item.quantity}`].join(' · ');
+        const meta = [itemAttributes(item), `${formatMoney(item.retailPrice)} × ${item.quantity}`].join(' · ');
         const badge = itemBadge(rental, item, t, lang);
 
         return (
@@ -512,9 +523,17 @@ function CollateralCard({ rental }: { rental: RentalDetail }) {
   const given = rental.collaterals.filter((c) => c.returnedAt);
   // Same rule as the backend (it decides): returned after full payment, or when cancelled
   const canReturn = rental.status === RentalStatus.CANCELLED || Number(rental.order.dueAmount) <= 0;
+  const [target, setTarget] = useState<RentalCollateral | null>(null);
 
-  const rows: { key: string; title: string; sub: string; tone: 'warn' | 'ok' | 'neutral' }[] = [
+  const rows: {
+    key: string;
+    title: string;
+    sub: string;
+    tone: 'warn' | 'ok' | 'neutral';
+    collateral?: RentalCollateral;
+  }[] = [
     ...held.map((c) => ({
+      collateral: c,
       key: c.id,
       title: t('rental.collateral.held', { what: [t(`rental.collateralType.${c.type}`), c.description].join(' ') }),
       sub: t('rental.collateral.receivedAt', { date: formatDayTime(c.receivedAt, lang) }),
@@ -552,16 +571,22 @@ function CollateralCard({ rental }: { rental: RentalDetail }) {
             <Text className="font-onest-bold text-[15px] text-ink">{row.title}</Text>
             {row.sub ? <Text className="font-onest text-xs text-muted">{row.sub}</Text> : null}
           </View>
+          {/* Several held: each is returned on its own */}
+          {held.length > 1 && canReturn && row.collateral ? (
+            <Button variant="secondary" size="sm" onPress={() => setTarget(row.collateral ?? null)}>
+              {t('rental.collateral.returnShort')}
+            </Button>
+          ) : null}
         </View>
       ))}
-      {held.length > 0 ? (
+      {held.length === 1 || (held.length > 1 && !canReturn) ? (
         <>
           <Button
             variant={canReturn ? 'primary' : 'secondary'}
             icon={canReturn ? undefined : Lock}
             disabled={!canReturn}
             full
-            onPress={() => openAction('collateral', rental.id)}
+            onPress={() => setTarget(held[0])}
           >
             {t('rental.collateral.return')}
           </Button>
@@ -570,7 +595,71 @@ function CollateralCard({ rental }: { rental: RentalDetail }) {
           ) : null}
         </>
       ) : null}
+      <ReturnCollateralSheet rental={rental} collateral={target} onClose={() => setTarget(null)} />
     </Section>
+  );
+}
+
+/** Confirmation «Вернуть залог клиенту?» (design «Аренда · залог»); warns about items still out */
+function ReturnCollateralSheet({
+  rental,
+  collateral,
+  onClose,
+}: {
+  rental: RentalDetail;
+  collateral: RentalCollateral | null;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const returnCollateral = useReturnCollateral();
+  const what = collateral ? [t(`rental.collateralType.${collateral.type}`), collateral.description].join(' ') : '';
+  const customerName = rental.order.customer?.user.fullName ?? t('rental.noCustomer');
+  const notBack = OUT_STATUSES.includes(rental.status)
+    ? rental.order.items.filter((item) => item.returnedQuantity < item.quantity).map((item) => item.variant.product.name)
+    : [];
+
+  const confirm = () => {
+    if (!collateral) return;
+    returnCollateral.mutate(
+      { id: rental.id, collateralId: collateral.id },
+      {
+        onSuccess: () => {
+          toast.show(t('rental.collateral.returned'), 'success');
+          onClose();
+        },
+        onError: (err) => toast.show(getApiErrorMessage(err, t('rental.collateral.returnFailed')), 'error'),
+      },
+    );
+  };
+
+  return (
+    <Sheet isOpen={!!collateral} onClose={onClose} size="auto">
+      <View className="px-4 pt-1 pb-3 gap-3">
+        <View className="gap-1">
+          <Text className="type-title text-ink" accessibilityRole="header">
+            {t('rental.collateral.confirmTitle', { what })}
+          </Text>
+          <Text className="font-onest text-[13px] leading-[18px] text-muted">
+            {t('rental.collateral.confirmText', { name: customerName, code: rental.code })}
+          </Text>
+        </View>
+        {notBack.length > 0 ? (
+          <View className="bg-warn-bg rounded-md px-3.5 py-3" accessibilityRole="alert">
+            <Text className="font-onest-semibold text-[13px] leading-[18px] text-warn-fg">
+              {t('rental.collateral.itemsOut', { items: notBack.join(', ') })}
+            </Text>
+          </View>
+        ) : null}
+        <View className="flex-row gap-2.5 pt-1">
+          <Button variant="secondary" size="lg" className="flex-1" onPress={onClose}>
+            {t('rental.collateral.keep')}
+          </Button>
+          <Button variant="primary" size="lg" className="flex-1" loading={returnCollateral.isPending} onPress={confirm}>
+            {t('rental.collateral.confirm')}
+          </Button>
+        </View>
+      </View>
+    </Sheet>
   );
 }
 
@@ -585,7 +674,7 @@ function PaymentsCard({ rental }: { rental: RentalDetail }) {
     key: p.id,
     at: p.createdAt,
     title: t('rental.payments.payment'),
-    sub: `${formatDay(p.createdAt, lang)} · ${t(`sale.channel.method.${p.type}`, { defaultValue: p.type })}`,
+    sub: `${formatDay(p.createdAt, lang)} · ${t(`sale.pay.method.${p.type}`, { defaultValue: p.type })}`,
     amount: Number(p.amount),
     kind: 'in',
   }));

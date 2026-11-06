@@ -646,7 +646,8 @@ const en = {
       "name": "Category",
       "SALE": "Sale",
       "DEBT_PAYMENT": "Debt payment",
-      "RENT": "Rent",
+      "RENT": "Premises rent",
+      "RENTAL": "Rental income",
       "DELIVERY": "Delivery",
       "SALARY": "Salary",
       "PURCHASE": "Purchase",
@@ -951,7 +952,15 @@ const en = {
       "issuedWithoutHint": "Items issued, no collateral taken",
       "none": "No collateral taken",
       "return": "Return collateral",
-      "afterPayment": "Available after full payment"
+      "afterPayment": "Available after full payment",
+      "returnShort": "Return",
+      "confirmTitle": "Return {{what}} to the customer?",
+      "confirmText": "{{name}} · booking #{{code}}. The collateral is marked as returned today.",
+      "itemsOut": "Not returned yet: {{items}}",
+      "keep": "Cancel",
+      "confirm": "Return",
+      "returned": "Collateral returned",
+      "returnFailed": "Failed to return the collateral"
     },
     "collateralType": {
       "PASSPORT": "Passport",
@@ -967,12 +976,9 @@ const en = {
       "cancelRefund": "Refund on cancellation"
     },
     "action": {
-      "issue": "Issue",
       "pay": "Accept payment",
       "return": "Return",
       "edit": "Edit booking",
-      "cancel": "Cancel booking",
-      "collateral": "Return collateral",
       "calendar": "Rental calendar"
     },
     "form": {
@@ -1089,9 +1095,45 @@ const en = {
       "submitAmount": "Accept · {{amount}} UZS",
       "submitCollateral": "Accept collateral",
       "success": "Accepted",
-      "successChange": "Accepted · change {{amount}} UZS",
       "failed": "Failed to accept the payment",
-      "later": "Later"
+      "later": "Later",
+      "withChange": "{{text}} · change {{amount}} UZS"
+    },
+    "issue": {
+      "title": "Issue",
+      "subtitle": "Booking #{{code}} · {{name}}",
+      "notBooked": "The booking is already issued or closed",
+      "leftToPay": "Left to pay",
+      "ofTotal": "of {{amount}}",
+      "units": "Checked {{checked}} of {{total}}",
+      "returnBy": "Return {{date}} by 12:00",
+      "items": "Items",
+      "checkTogether": "check them with the customer",
+      "allIssued": "All items of the booking are issued. If one is missing, change the booking first.",
+      "noDeposit": "No collateral",
+      "noDepositNote": "Issued without collateral, on the seller’s responsibility. It is noted in the booking history.",
+      "extraPayment": "Extra payment",
+      "checkAll": "Check every item: the whole booking is issued",
+      "needCollateral": "Add a collateral or turn on «No collateral»",
+      "submit": "Hand over",
+      "success": "Handed over",
+      "failed": "Failed to issue"
+    },
+    "cancel": {
+      "title": "Cancel booking #{{code}}",
+      "paid": "Paid",
+      "refund": "Give back",
+      "all": "All",
+      "half": "Half",
+      "method": "Refund by",
+      "reason": "Reason",
+      "reasonPlaceholder": "Why the booking is cancelled",
+      "submit": "Cancel booking",
+      "kept": "{{amount}} UZS kept stays in the cashbox",
+      "allBack": "The whole prepayment goes back to the customer",
+      "tooMuch": "More than paid: at most {{amount}} UZS",
+      "success": "Booking cancelled",
+      "failed": "Failed to cancel the booking"
     }
   },
   "storeSettings": {

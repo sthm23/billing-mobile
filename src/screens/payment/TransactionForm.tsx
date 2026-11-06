@@ -83,7 +83,8 @@ export const TransactionForm = ({
     }
   };
 
-  const categoryOptions = Object.values(CashTransactionCategory);
+  // Rental income comes from rental payments only, not from a manual transaction
+  const categoryOptions = Object.values(CashTransactionCategory).filter((c) => c !== CashTransactionCategory.RENTAL);
   const paymentTypeOptions = Object.values(PaymentType);
 
   return (

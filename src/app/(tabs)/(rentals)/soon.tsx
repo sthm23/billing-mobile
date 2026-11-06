@@ -4,12 +4,12 @@ import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 /**
- * Placeholder for rental actions built in later phases (6.4 issue / cancel /
- * collateral, 6.5 return, 6.6 calendar). Removed with 6.6.
+ * Placeholder for rental actions built in later phases (6.5 return,
+ * 6.6 calendar). Removed with 6.6.
  */
 export default function RentalActionSoonPage() {
   const { t } = useTranslation();
   const { kind } = useLocalSearchParams<{ kind?: RentalActionKind }>();
 
-  return <ComingSoonScreen title={t(`rental.action.${kind ?? 'issue'}`)} />;
+  return <ComingSoonScreen title={t(`rental.action.${kind ?? 'return'}`)} />;
 }

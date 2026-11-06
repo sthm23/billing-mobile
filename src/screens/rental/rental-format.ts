@@ -1,5 +1,5 @@
 import type { StatusTone } from '@/components/base';
-import { RentalStatus, type Rental, type RentalDetail, type RentalView } from '@/services/rental';
+import { RentalStatus, type Rental, type RentalDetail, type RentalOrderItem, type RentalView } from '@/services/rental';
 import type { TFunction } from 'i18next';
 
 /**
@@ -132,4 +132,13 @@ export function returnedUnits(rental: RentalDetail): { returned: number; total: 
     (acc, item) => ({ returned: acc.returned + item.returnedQuantity, total: acc.total + item.quantity }),
     { returned: 0, total: 0 },
   );
+}
+
+/** Attribute values of a rented line («White · XL»); the SKU when it has none */
+export function itemAttributes(item: RentalOrderItem): string {
+  const attrs = item.variant.attributes
+    .map((a) => a.value.valueString ?? (a.value.valueNumber != null ? String(a.value.valueNumber) : null))
+    .filter(Boolean)
+    .join(' · ');
+  return attrs || item.variant.sku;
 }

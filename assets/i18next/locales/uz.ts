@@ -647,7 +647,8 @@ const uz = {
       "name": "Kategoriya",
       "SALE": "Savdo",
       "DEBT_PAYMENT": "Qarz to'lovi",
-      "RENT": "Ijaraga olish",
+      "RENT": "Bino ijarasi",
+      "RENTAL": "Ijaradan daromad",
       "DELIVERY": "Yetkazib berish",
       "SALARY": "Maosh",
       "PURCHASE": "Sotib olish",
@@ -952,7 +953,15 @@ const uz = {
       "issuedWithoutHint": "Kiyimlar berilgan, garov olinmagan",
       "none": "Garov olinmagan",
       "return": "Garovni qaytarish",
-      "afterPayment": "To'liq to'lovdan keyin mumkin bo'ladi"
+      "afterPayment": "To'liq to'lovdan keyin mumkin bo'ladi",
+      "returnShort": "Qaytarish",
+      "confirmTitle": "{{what}} mijozga qaytarilsinmi?",
+      "confirmText": "{{name}} · bron №{{code}}. Garov bugun qaytarilgan deb belgilanadi.",
+      "itemsOut": "Hali qaytarilmagan: {{items}}",
+      "keep": "Bekor qilish",
+      "confirm": "Qaytarish",
+      "returned": "Garov qaytarildi",
+      "returnFailed": "Garovni qaytarib bo‘lmadi"
     },
     "collateralType": {
       "PASSPORT": "Pasport",
@@ -968,12 +977,9 @@ const uz = {
       "cancelRefund": "Bekor qilishda qaytarish"
     },
     "action": {
-      "issue": "Berish",
       "pay": "To'lov qabul qilish",
       "return": "Qaytarish",
       "edit": "Bronni o'zgartirish",
-      "cancel": "Bronni bekor qilish",
-      "collateral": "Garovni qaytarish",
       "calendar": "Ijara kalendari"
     },
     "form": {
@@ -1090,9 +1096,45 @@ const uz = {
       "submitAmount": "Qabul qilish · {{amount}} UZS",
       "submitCollateral": "Garovni qabul qilish",
       "success": "Qabul qilindi",
-      "successChange": "Qabul qilindi · qaytim {{amount}} UZS",
       "failed": "To'lovni qabul qilib bo'lmadi",
-      "later": "Keyinroq"
+      "later": "Keyinroq",
+      "withChange": "{{text}} · qaytim {{amount}} UZS"
+    },
+    "issue": {
+      "title": "Berish",
+      "subtitle": "Bron №{{code}} · {{name}}",
+      "notBooked": "Bron allaqachon berilgan yoki yopilgan",
+      "leftToPay": "To‘lash qoldi",
+      "ofTotal": "{{amount}} dan",
+      "units": "Belgilangan {{checked}} / {{total}}",
+      "returnBy": "{{date}} soat 12:00 gacha qaytarish",
+      "items": "Buyumlar",
+      "checkTogether": "mijoz bilan birga tekshiring",
+      "allIssued": "Bronning barcha buyumlari beriladi. Biror buyum yo‘q bo‘lsa — avval bronni o‘zgartiring.",
+      "noDeposit": "Garovsiz",
+      "noDepositNote": "Garovsiz beramiz — sotuvchi javobgarligida. Bron tarixida qayd etiladi.",
+      "extraPayment": "Qo‘shimcha to‘lov",
+      "checkAll": "Barcha buyumlarni belgilang — bron to‘liq beriladi",
+      "needCollateral": "Garov qo‘shing yoki «Garovsiz»ni yoqing",
+      "submit": "Mijozga berish",
+      "success": "Mijozga berildi",
+      "failed": "Berib bo‘lmadi"
+    },
+    "cancel": {
+      "title": "Bron №{{code}} ni bekor qilish",
+      "paid": "To‘langan",
+      "refund": "Mijozga qaytarish",
+      "all": "Hammasi",
+      "half": "Yarmi",
+      "method": "Qanday qaytarish",
+      "reason": "Sabab",
+      "reasonPlaceholder": "Bron nima uchun bekor qilinmoqda",
+      "submit": "Bronni bekor qilish",
+      "kept": "Ushlab qolingan {{amount}} UZS kassada qoladi",
+      "allBack": "Butun oldindan to‘lov mijozga qaytariladi",
+      "tooMuch": "To‘langandan ko‘p — eng ko‘pi {{amount}} UZS",
+      "success": "Bron bekor qilindi",
+      "failed": "Bronni bekor qilib bo‘lmadi"
     }
   },
   "storeSettings": {
