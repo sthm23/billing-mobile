@@ -2,7 +2,7 @@ import { CreateStaffScreen } from "@/screens/profile/CreateStaffScreen";
 import { SafeAreaView } from '@/components/base/SafeAreaView';
 
 /**
- * New employee (OWNER only). Reached from Profile → Staff.
+ * New employee (OWNER only). Reached from Profile → Сотрудники → «Добавить».
  */
 export default function CreateStaffRoute() {
     return (

@@ -10,7 +10,10 @@ export default function TabLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Screen name="create" />
+      <Stack.Screen name="staff/index" />
+      <Stack.Screen name="staff/create" />
+      <Stack.Screen name="staff/[id]" />
+      <Stack.Screen name="staff/edit/[id]" />
       <Stack.Screen name="settings" />
       <Stack.Screen name="store-settings" />
       <Stack.Screen name="debtors/index" />

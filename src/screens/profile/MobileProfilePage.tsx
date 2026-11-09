@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
 import { useDebtors } from "@/services/debt";
+import { useStaffList } from "@/services/store";
 import Constants from "expo-constants";
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
@@ -32,6 +33,7 @@ const MobileProfilePage = () => {
   const version = Constants.expoConfig?.version ?? '';
   const debtors = useDebtors();
   const storeMode = useStoreMode();
+  const staffList = useStaffList({}, { enabled: user?.role === UserRole.OWNER });
 
   if (!user) {
     return <EmptyState icon={UserRoundX} message={t('profile.noUser')} />;
@@ -52,9 +54,9 @@ const MobileProfilePage = () => {
               <UsersRound size={20} color={colors.ink} strokeWidth={2} />
             </View>
           }
-          title={t('staffCreate.entryTitle')}
-          subtitle={t('staffCreate.entrySubtitle')}
-          onPress={() => router.push('/(tabs)/(profile)/create')}
+          title={t('staff.title')}
+          subtitle={staffList.data ? t('staff.entrySubtitle', { count: staffList.data.counts.total }) : undefined}
+          onPress={() => router.push('/(tabs)/(profile)/staff')}
         />
       ) : null}
       {user.role === UserRole.OWNER ? (

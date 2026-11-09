@@ -12,23 +12,15 @@ import {
   Pressable,
   Text,
 } from '@/components/base';
-import type { ButtonIconComponent } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
-import { cn } from '@/libs/utils';
 import { StaffRole, UserRole } from '@/models/user.model';
 import { useAuth } from '@/provider/AuthProvider';
-import {
-  ASSIGNABLE_STAFF_ROLES,
-  type AssignableStaffRole,
-  useCreateStaff,
-  useStoreById,
-} from '@/services/store';
+import { ASSIGNABLE_STAFF_ROLES, useCreateStaff, useStoreById } from '@/services/store';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import {
-  Briefcase,
   ChevronLeft,
   CircleAlert,
   Eye,
@@ -36,33 +28,17 @@ import {
   Lock,
   Phone,
   ShieldX,
-  ShoppingBag,
   User,
-  Wallet,
   Warehouse as WarehouseIcon,
 } from 'lucide-react-native';
+import { StaffRolePicker } from './staff/StaffRolePicker';
+import { formatNationalPhone, PHONE_DIGITS, PHONE_PREFIX, STAFF_LOGIN_PATTERN } from './staff/staff-format';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import * as z from 'zod';
 
-const PHONE_PREFIX = '+998';
-const PHONE_DIGITS = 9;
-const LOGIN_PATTERN = /^[A-Za-z0-9._-]+$/;
-
-const ROLE_ICON: Record<AssignableStaffRole, ButtonIconComponent> = {
-  [StaffRole.MANAGER]: Briefcase,
-  [StaffRole.SELLER]: ShoppingBag,
-  [StaffRole.CASHIER]: Wallet,
-};
-
-/** "901234567" → "90 123 45 67" (display only). */
-function formatNationalPhone(digits: string): string {
-  return [digits.slice(0, 2), digits.slice(2, 5), digits.slice(5, 7), digits.slice(7, 9)]
-    .filter(Boolean)
-    .join(' ');
-}
 
 /**
  * New employee form (OWNER only). The employee is created in the owner's own
@@ -91,7 +67,7 @@ export function CreateStaffScreen() {
           .string()
           .trim()
           .min(3, t('staffCreate.loginMin'))
-          .regex(LOGIN_PATTERN, t('staffCreate.loginInvalid')),
+          .regex(STAFF_LOGIN_PATTERN, t('staffCreate.loginInvalid')),
         password: z.string().min(8, t('staffCreate.passwordMin')),
         warehouseId: z.string().min(1, t('staffCreate.warehouseRequired')),
       }),
@@ -204,32 +180,7 @@ export function CreateStaffScreen() {
           <Controller
             control={control}
             name="role"
-            render={({ field: { value, onChange } }) => (
-              <View className="flex-row gap-2" accessibilityRole="radiogroup">
-                {ASSIGNABLE_STAFF_ROLES.map((role) => {
-                  const selected = value === role;
-                  const Icon = ROLE_ICON[role];
-
-                  return (
-                    <Pressable
-                      key={role}
-                      onPress={() => onChange(role)}
-                      className={cn('flex-1 min-h-24 rounded-[18px] p-3 gap-1.5', selected ? 'bg-primary' : 'bg-sunken')}
-                      accessibilityRole="radio"
-                      accessibilityState={{ checked: selected }}
-                    >
-                      <Icon size={22} color={selected ? colors.onPrimary : colors.ink} strokeWidth={2} />
-                      <Text className={cn('font-onest-bold text-[15px]', selected ? 'text-on-primary' : 'text-ink')}>
-                        {t(`user.staff.${role.toLowerCase()}`)}
-                      </Text>
-                      <Text className={cn('font-onest text-xs leading-4', selected ? 'text-on-primary opacity-70' : 'text-muted')}>
-                        {t(`staffCreate.roleDesc${role}`)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </View>
-            )}
+            render={({ field: { value, onChange } }) => <StaffRolePicker value={value} onChange={onChange} />}
           />
         </View>
 
