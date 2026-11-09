@@ -249,6 +249,8 @@ export interface ProductParams {
   categoryId?: string;
   /** Only «Мало» products */
   lowStock?: boolean;
+  /** The working warehouse */
+  warehouseId?: string;
 }
 
 export interface ProductVariantSearchParams {

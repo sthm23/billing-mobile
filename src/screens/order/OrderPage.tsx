@@ -1,3 +1,4 @@
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { Button, HeroCard, IconButton, Segmented, Text } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
@@ -39,6 +40,7 @@ export default function OrderPage() {
             { value: 'completed', label: t('order.completedTab') },
         ];
 
+    const working = useWorkingWarehouse();
     const listParams = useMemo<OrderParams>(
         () => ({
             currentPage: page,
@@ -47,17 +49,19 @@ export default function OrderPage() {
             fromDate: undefined,
             toDate: undefined,
             status: getStatus(status),
+            warehouseId: working.warehouseId,
         }),
         [
             page,
             pageSize,
             searchText,
             status,
+            working.warehouseId,
         ]
     )
 
-    const { data, isLoading, isError, refetch } = useOrders(listParams);
-    const summary = useTodaySalesSummary();
+    const { data, isLoading, isError, refetch } = useOrders(listParams, working.isReady);
+    const summary = useTodaySalesSummary(working.warehouseId, working.isReady);
     const refreshControl = useRefreshControl(() => Promise.all([refetch(), summary.refetch()]));
 
     const orders = data?.data ?? []

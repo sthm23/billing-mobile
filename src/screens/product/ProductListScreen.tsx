@@ -1,3 +1,4 @@
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { Chip, IconButton, SearchField, Spinner, Text } from '@/components/base';
 import { EmptyState } from '@/components/common';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
@@ -39,19 +40,24 @@ export default function ProductListScreen() {
     await queryClient.invalidateQueries({ queryKey: productQueryKeys.all() });
   });
 
-  const { data, isLoading, isFetching, isPlaceholderData } = useProducts({
-    currentPage,
-    pageSize: PAGE_SIZE,
-    search: debouncedSearch.trim() || undefined,
-    categoryId,
-    lowStock,
-  });
+  const working = useWorkingWarehouse();
+  const { data, isLoading, isFetching, isPlaceholderData } = useProducts(
+    {
+      currentPage,
+      pageSize: PAGE_SIZE,
+      search: debouncedSearch.trim() || undefined,
+      categoryId,
+      lowStock,
+      warehouseId: working.warehouseId,
+    },
+    working.isReady
+  );
 
-  // Reset the list when the search or a filter changes
+  // Reset the list when the search, a filter or the working warehouse changes
   useEffect(() => {
     setCurrentPage(1);
     setAllProducts([]);
-  }, [debouncedSearch, categoryId, lowStock]);
+  }, [debouncedSearch, categoryId, lowStock, working.warehouseId]);
 
   // Accumulate fresh pages into the list
   useEffect(() => {

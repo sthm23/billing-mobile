@@ -786,6 +786,18 @@ const en = {
       "warehouseRequired": "Pick at least one warehouse"
     }
   },
+  "workingWarehouse": {
+    "title": "Working warehouse",
+    "hint": "Products, orders and cashboxes of this warehouse only",
+    "change": "Change",
+    "none": "No warehouses available",
+    "sheetOwner": "Warehouses in the store: {{count}}",
+    "sheetStaff": "Warehouses available: {{count}}",
+    "noteOwner": "After switching, products, orders, rentals and cashboxes show this warehouse only. Debtors are shared by the whole store.",
+    "noteStaff": "Warehouses are assigned by the owner. Ask them for access to another warehouse.",
+    "pick": "Choose: {{name}}",
+    "changed": "Working warehouse: {{name}}"
+  },
   "staffCreate": {
     "entryTitle": "Staff",
     "entrySubtitle": "Add an employee to the store",

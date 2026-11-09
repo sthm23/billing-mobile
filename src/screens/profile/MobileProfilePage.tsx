@@ -2,6 +2,7 @@ import { ListCard, Pressable, Segmented, Text } from "@/components/base";
 import { EmptyState } from "@/components/common";
 import { useBottomNavInset } from "@/components/navigation/BottomNav";
 import { useStoreMode, type NavMode } from "@/hooks/use-store-mode";
+import { useWorkingWarehouse } from "@/hooks/use-working-warehouse";
 import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
@@ -16,6 +17,7 @@ import { ScrollView, View } from "react-native";
 import LogoutButton from "./LogoutButton";
 import ProfileCard from "./ProfileCard";
 import SettingItems from "./SettingItems";
+import { WorkingWarehouseCard } from "./WorkingWarehouseCard";
 
 // Static pages in billing_ui/public; Russian is the default version.
 const PRIVACY_POLICY_URLS: Record<string, string> = {
@@ -33,7 +35,11 @@ const MobileProfilePage = () => {
   const version = Constants.expoConfig?.version ?? '';
   const debtors = useDebtors();
   const storeMode = useStoreMode();
-  const staffList = useStaffList({}, { enabled: user?.role === UserRole.OWNER });
+  const working = useWorkingWarehouse();
+  const staffList = useStaffList(
+    { warehouseId: working.warehouseId },
+    { enabled: user?.role === UserRole.OWNER && working.isReady }
+  );
 
   if (!user) {
     return <EmptyState icon={UserRoundX} message={t('profile.noUser')} />;
@@ -47,6 +53,7 @@ const MobileProfilePage = () => {
     >
       <Text className="type-title text-ink pb-1" accessibilityRole="header">{t('profile.title')}</Text>
       <ProfileCard user={user} />
+      <WorkingWarehouseCard />
       {user.role === UserRole.OWNER ? (
         <ListCard
           leading={

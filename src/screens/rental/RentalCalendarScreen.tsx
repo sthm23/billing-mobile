@@ -1,3 +1,4 @@
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { Button, IconButton, Segmented, StatusBadge, Text } from '@/components/base';
 import { EmptyState } from '@/components/common';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
@@ -45,7 +46,13 @@ export function RentalCalendarScreen() {
 
   const from = view === 'month' ? monthStart(anchor) : weekStart(anchor);
   const to = view === 'month' ? monthEnd(anchor) : addLocalDays(from, 6);
-  const { data, isLoading, isError, isFetching, refetch } = useRentalAgenda(from, to);
+  const working = useWorkingWarehouse();
+  const { data, isLoading, isError, isFetching, refetch } = useRentalAgenda(
+    from,
+    to,
+    working.warehouseId,
+    working.isReady
+  );
   const refreshControl = useRefreshControl(refetch);
   const today = data?.today ?? toLocalDate(new Date());
 

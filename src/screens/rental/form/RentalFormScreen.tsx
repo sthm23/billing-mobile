@@ -1,4 +1,4 @@
-import { Button, Chip, IconButton, Money, PhotoPlaceholder, Pressable, StatusBadge, Stepper, Text, toast } from '@/components/base';
+import { Button, IconButton, Money, PhotoPlaceholder, Pressable, StatusBadge, Stepper, Text, toast } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { CustomerPickerSheet, digitsOf } from '@/components/order';
 import { useTheme } from '@/hooks/use-theme';
@@ -9,7 +9,7 @@ import { distributeSetDiscount } from '@/libs/set-discount';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
 import { getVariantLabel } from '@/libs/product-utils';
-import { useStaffWarehouses } from '@/screens/order/cart/use-staff-warehouses';
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { useProductById } from '@/services/product/product.queries';
 import type { OrderCustomer } from '@/services/customer';
 import {
@@ -125,18 +125,17 @@ function RentalForm({ rental, preset }: { rental?: RentalDetail; preset?: Bookin
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  const warehouses = useStaffWarehouses();
+  const working = useWorkingWarehouse();
+  const warehouses = working.warehouses;
   const canDiscount = canLowerPrice(user);
   const isEdit = !!rental;
 
-  const [warehouseId, setWarehouseId] = useState<string | undefined>(
+  // Edit: the booking's warehouse; from an item card: the item's one; else the working warehouse
+  const [pickedWarehouseId] = useState<string | undefined>(
     rental?.warehouseId ??
-      (preset && warehouses.some((w) => w.id === preset.warehouseId)
-        ? preset.warehouseId
-        : warehouses.length === 1
-          ? warehouses[0].id
-          : undefined),
+      (preset && warehouses.some((w) => w.id === preset.warehouseId) ? preset.warehouseId : undefined),
   );
+  const warehouseId = pickedWarehouseId ?? working.warehouseId;
   const [customer, setCustomer] = useState<OrderCustomer | null>(() => {
     const c = rental?.order.customer;
     return c ? { id: c.id, fullName: c.user.fullName, phone: c.user.phone } : null;
@@ -372,24 +371,6 @@ function RentalForm({ rental, preset }: { rental?: RentalDetail; preset?: Bookin
             <Text className="font-onest-semibold text-sm text-ok-fg">
               {t('rental.form.paidSoFar', { amount: formatMoney(paid) })}
             </Text>
-          </View>
-        ) : null}
-
-        {!isEdit && warehouses.length > 1 ? (
-          <View className="flex-row flex-wrap gap-2">
-            {warehouses.map((w) => (
-              <Chip
-                key={w.id}
-                label={w.name}
-                selected={w.id === warehouseId}
-                onPress={() => {
-                  if (w.id === warehouseId) return;
-                  setWarehouseId(w.id);
-                  // Items belong to a warehouse
-                  setLines([]);
-                }}
-              />
-            ))}
           </View>
         ) : null}
 

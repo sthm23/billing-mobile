@@ -1,3 +1,4 @@
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { Button, IconButton, SearchField, Spinner, Text } from '@/components/base';
 import type { ButtonIconComponent } from '@/components/base';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
@@ -41,9 +42,14 @@ export function RentalListScreen() {
   const [query, setQuery] = useState('');
   const q = useDebounce(query.trim(), SEARCH_DEBOUNCE_MS);
 
-  const params = useMemo(() => ({ pageSize: PAGE_SIZE, view, q: q || undefined, ...viewSort(view) }), [view, q]);
-  const list = useRentalsInfinite(params);
-  const summary = useRentalSummary();
+  const working = useWorkingWarehouse();
+  const warehouseId = working.warehouseId;
+  const params = useMemo(
+    () => ({ pageSize: PAGE_SIZE, view, q: q || undefined, warehouseId, ...viewSort(view) }),
+    [view, q, warehouseId]
+  );
+  const list = useRentalsInfinite(params, working.isReady);
+  const summary = useRentalSummary(working.isReady, warehouseId);
   const refreshControl = useRefreshControl(() => Promise.all([list.refetch(), summary.refetch()]));
 
   const rentals = useMemo(() => list.data?.pages.flatMap((page) => page.data) ?? [], [list.data]);

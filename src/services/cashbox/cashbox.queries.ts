@@ -51,13 +51,15 @@ export const useOpenCashbox = (): UseMutationResult<Payment, AxiosError<{ messag
  * Hook to fetch paginated list of cashboxes
  */
 export const useCashboxList = (
-  params: CashboxParams
+  params: CashboxParams,
+  enabled = true
 ): UseQueryResult<CashboxListResponse> => {
   const queryOptions: UseQueryOptions<CashboxListResponse> = {
     queryKey: cashboxQueryKeys.list(params),
     queryFn: () => cashboxService.getCashboxList(params),
     placeholderData: (previous) => previous,
     refetchOnWindowFocus: false,
+    enabled,
   };
 
   return useQuery(queryOptions);

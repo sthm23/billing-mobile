@@ -8,6 +8,8 @@ export interface CashboxParams {
   /** Local day bounds for the `today` block */
   from?: string;
   to?: string;
+  /** The working warehouse */
+  warehouseId?: string;
 }
 
 /** Open cashboxes in the user's scope; amounts in all payment methods. */

@@ -339,6 +339,8 @@ export interface RentalAgenda {
 }
 
 export interface RentalListParams {
+  /** The working warehouse */
+  warehouseId?: string;
   currentPage?: number;
   pageSize?: number;
   status?: RentalStatus[];

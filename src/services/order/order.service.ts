@@ -64,6 +64,9 @@ const getOrders = async (params: OrderParams = {}): Promise<BaseListResponse<Ord
   if (search) {
     queryParams.append('search', search);
   }
+  if (params.warehouseId) {
+    queryParams.append('warehouseId', params.warehouseId);
+  }
 
   const response = await ordersApi.get<BaseListResponse<Order>>(ENDPOINTS.BASE, {
     params: queryParams,
@@ -77,8 +80,8 @@ const getOrders = async (params: OrderParams = {}): Promise<BaseListResponse<Ord
 }
 
 /** Sales summary for `[from, to)` (local day bounds). */
-const getSummary = async (range: { from: string; to: string }): Promise<OrdersSummary> => {
-  const response = await ordersApi.get<OrdersSummary>(ENDPOINTS.SUMMARY, { params: range })
+const getSummary = async (params: { from: string; to: string; warehouseId?: string }): Promise<OrdersSummary> => {
+  const response = await ordersApi.get<OrdersSummary>(ENDPOINTS.SUMMARY, { params })
   return response.data
 }
 

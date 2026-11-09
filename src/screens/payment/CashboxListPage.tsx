@@ -1,3 +1,4 @@
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { Button, IconButton, Segmented, Text } from '@/components/base';
 import { type CashboxStatusFilter } from '@/components/cashbox';
 import { FilterSheet } from '@/components/cashbox/FilterSheet';
@@ -28,17 +29,19 @@ export default function CashboxListPage() {
   const [statusFilter, setStatusFilter] = useState<CashboxStatusFilter>('all');
   const pageSize = 10;
 
+  const working = useWorkingWarehouse();
   const listParams = useMemo<CashboxParams>(
     () => ({
       currentPage: page,
       pageSize: pageSize,
       // Local day for the «today» totals
       ...todayRange(),
+      warehouseId: working.warehouseId,
     }),
-    [page]
+    [page, working.warehouseId]
   );
 
-  const { data, isLoading, isFetching, isError } = useCashboxList(listParams);
+  const { data, isLoading, isFetching, isError } = useCashboxList(listParams, working.isReady);
   const queryClient = useQueryClient();
   const refreshControl = useRefreshControl(async () => {
     setPage(1);

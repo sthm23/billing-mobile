@@ -43,6 +43,8 @@ export interface OrderParams {
     fromDate?: Date
     toDate?: Date
     search?: string
+    /** The working warehouse */
+    warehouseId?: string
 }
 export interface Order {
     id: string

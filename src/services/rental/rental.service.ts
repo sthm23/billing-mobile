@@ -37,6 +37,7 @@ function listQuery(params: RentalListParams): Record<string, string | number> {
   if (params.variantId) query.variantId = params.variantId;
   if (params.sort) query.sort = params.sort;
   if (params.sortBy) query.sortBy = params.sortBy;
+  if (params.warehouseId) query.warehouseId = params.warehouseId;
   return query;
 }
 
@@ -50,8 +51,10 @@ export const rentalService = {
     return response.data;
   },
 
-  getSummary: async (): Promise<RentalSummary> => {
-    const response = await api.get<RentalSummary>(`${RENTAL_BASE_URL}/summary`);
+  getSummary: async (warehouseId?: string): Promise<RentalSummary> => {
+    const response = await api.get<RentalSummary>(`${RENTAL_BASE_URL}/summary`, {
+      params: warehouseId ? { warehouseId } : undefined,
+    });
     return response.data;
   },
 
@@ -80,8 +83,10 @@ export const rentalService = {
   },
 
   /** Issues and returns per salon day, at most 93 days */
-  getAgenda: async (from: string, to: string): Promise<RentalAgenda> => {
-    const response = await api.get<RentalAgenda>(`${RENTAL_BASE_URL}/agenda`, { params: { from, to } });
+  getAgenda: async (from: string, to: string, warehouseId?: string): Promise<RentalAgenda> => {
+    const response = await api.get<RentalAgenda>(`${RENTAL_BASE_URL}/agenda`, {
+      params: warehouseId ? { from, to, warehouseId } : { from, to },
+    });
     return response.data;
   },
 

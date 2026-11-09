@@ -787,6 +787,18 @@ const uz = {
       "warehouseRequired": "Kamida bitta omborni tanlang"
     }
   },
+  "workingWarehouse": {
+    "title": "Ishchi ombor",
+    "hint": "Faqat shu omborning tovarlari, buyurtmalari va kassalari",
+    "change": "Almashtirish",
+    "none": "Mavjud omborlar yo'q",
+    "sheetOwner": "Do'kondagi omborlar: {{count}}",
+    "sheetStaff": "Mavjud omborlar: {{count}}",
+    "noteOwner": "Ombor almashtirilgach tovarlar, buyurtmalar, ijaralar va kassalar faqat shu ombor bo'yicha ko'rsatiladi. Qarzdorlar butun do'kon uchun umumiy.",
+    "noteStaff": "Omborlarni do'kon egasi biriktiradi. Boshqa omborga kirish uchun unga murojaat qiling.",
+    "pick": "Tanlash: {{name}}",
+    "changed": "Ishchi ombor: {{name}}"
+  },
   "staffCreate": {
     "entryTitle": "Xodimlar",
     "entrySubtitle": "Do'konga xodim qo'shish",

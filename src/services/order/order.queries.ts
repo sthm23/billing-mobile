@@ -35,7 +35,8 @@ export const orderQueryKeys = {
   list: (params?: OrderParams) =>
     [...orderQueryKeys.all(), 'list', params ?? {}] as const,
   byId: (orderId: string) => [...orderQueryKeys.all(), 'byId', orderId] as const,
-  summary: (from: string) => [...orderQueryKeys.all(), 'summary', from] as const,
+  summary: (from: string, warehouseId?: string) =>
+    [...orderQueryKeys.all(), 'summary', from, warehouseId ?? 'all'] as const,
   create: () => [...orderQueryKeys.all(), 'create'] as const,
 
 
@@ -121,12 +122,13 @@ export const useOrderById = (
  * @param params - Query parameters (currentPage, pageSize, status, fromDate, toDate, and search)
  * @returns Query result with orders and pagination metadata
  */
-export const useOrders = (params: OrderParams = {}): UseQueryResult<BaseListResponse<Order>> => {
+export const useOrders = (params: OrderParams = {}, enabled = true): UseQueryResult<BaseListResponse<Order>> => {
   const queryOptions: UseQueryOptions<BaseListResponse<Order>> = {
     queryKey: orderQueryKeys.list(params),
     queryFn: () => orderService.getOrders(params),
     placeholderData: (previous) => previous,
     refetchOnWindowFocus: false,
+    enabled,
   }
 
   return useQuery(queryOptions)
@@ -136,13 +138,14 @@ export const useOrders = (params: OrderParams = {}): UseQueryResult<BaseListResp
  * «Продажи сегодня» (`GET /orders/summary`) for the local day. Refreshed with
  * every order mutation (they invalidate `orderQueryKeys.all()`).
  */
-export const useTodaySalesSummary = (): UseQueryResult<OrdersSummary> => {
+export const useTodaySalesSummary = (warehouseId?: string, enabled = true): UseQueryResult<OrdersSummary> => {
   const range = todayRange()
 
   return useQuery({
-    queryKey: orderQueryKeys.summary(range.from),
-    queryFn: () => orderService.getSummary(range),
+    queryKey: orderQueryKeys.summary(range.from, warehouseId),
+    queryFn: () => orderService.getSummary({ ...range, ...(warehouseId ? { warehouseId } : {}) }),
     refetchOnWindowFocus: false,
+    enabled,
   })
 }
 

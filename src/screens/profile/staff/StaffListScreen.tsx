@@ -2,6 +2,7 @@ import { Avatar, AvatarFallbackText, Button, Chip, IconButton, ListCard, SearchF
 import { EmptyState, LoadingState } from '@/components/common';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { cn } from '@/libs/utils';
 import { StaffRole, UserRole } from '@/models/user.model';
 import { useAuth } from '@/provider/AuthProvider';
@@ -33,9 +34,10 @@ export function StaffListScreen() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState<StaffRole | undefined>(undefined);
   const debouncedSearch = useDebounce(search, DEBOUNCE_TIME_MS);
+  const working = useWorkingWarehouse();
   const query = useStaffList(
-    { search: debouncedSearch.trim() || undefined, role },
-    { enabled: isOwner }
+    { search: debouncedSearch.trim() || undefined, role, warehouseId: working.warehouseId },
+    { enabled: isOwner && working.isReady }
   );
   const { data: store } = useStoreById(isOwner ? storeId : undefined);
   const refreshControl = useRefreshControl(query.refetch);
@@ -48,7 +50,9 @@ export function StaffListScreen() {
         <Text className="type-heading text-ink" accessibilityRole="header">{t('staff.title')}</Text>
         {store ? (
           <Text className="font-onest text-[13px] text-muted" numberOfLines={1}>
-            {t('staff.storeSubtitle', { store: store.name, count: store.warehouse.filter((w) => w.isActive).length })}
+            {working.warehouse
+              ? `${store.name} · ${working.warehouse.name}`
+              : t('staff.storeSubtitle', { store: store.name, count: store.warehouse.filter((w) => w.isActive).length })}
           </Text>
         ) : null}
       </View>

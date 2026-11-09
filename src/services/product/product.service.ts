@@ -51,7 +51,7 @@ const getProductById = async (productId: string): Promise<Product> => {
 
 /** `GET /product`: the staff's products (non-archived) with search and filters. */
 const getProducts = async (params: ProductParams = {}): Promise<ProductListResponse> => {
-  const { currentPage = 1, pageSize = 10, search, categoryId, lowStock } = params;
+  const { currentPage = 1, pageSize = 10, search, categoryId, lowStock, warehouseId } = params;
 
   const response = await productsApi.get<ProductListResponse>(ENDPOINTS.BASE, {
     params: {
@@ -60,6 +60,7 @@ const getProducts = async (params: ProductParams = {}): Promise<ProductListRespo
       ...(search ? { search } : {}),
       ...(categoryId ? { categoryId } : {}),
       ...(lowStock ? { lowStock: true } : {}),
+      ...(warehouseId ? { warehouseId } : {}),
     },
   })
 

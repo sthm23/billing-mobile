@@ -1,6 +1,7 @@
-import { Button, Chip, IconButton, Money, Pressable, Text } from '@/components/base';
+import { Button, IconButton, Money, Pressable, Text } from '@/components/base';
 import { CustomerPickerSheet, PriceSheet, SwipeableOrderItemCard } from '@/components/order';
 import { useTheme } from '@/hooks/use-theme';
+import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { canLowerPrice } from '@/libs/roles';
 import { useAuth } from '@/provider/AuthProvider';
@@ -8,12 +9,11 @@ import { useSaveOrder } from '@/services/order/order.queries';
 import { OrderChannel, type OrderDetail } from '@/services/order/order.type';
 import { router } from 'expo-router';
 import { ChevronLeft, CircleAlert, ScanBarcode, Search, ShoppingCart, UserRound, X } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cartStore, cartToPayload, cartTotals, linePrice, useCart } from './cart-store';
-import { useStaffWarehouses } from './use-staff-warehouses';
 
 interface OrderCartScreenProps {
   /** Saved CREATED/HOLD order to edit; omitted for a new order */
@@ -35,32 +35,45 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const cart = useCart();
-  const warehouses = useStaffWarehouses();
+  const working = useWorkingWarehouse();
   const saveOrder = useSaveOrder();
   const [priceKey, setPriceKey] = useState<string | null>(null);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const scanOpened = useRef(false);
   const canLower = canLowerPrice(user);
 
-  // Fresh cart per screen: the saved order, or an empty one.
+  // Fresh cart per screen: the saved order, or an empty one on the working warehouse.
   useEffect(() => {
     if (order) {
       cartStore.loadOrder(order);
     } else if (keepCart && !cartStore.get().orderId) {
       // Already filled (product card) — keep it.
     } else {
-      cartStore.startNew(warehouses.length === 1 ? warehouses[0].id : undefined);
-      // With several warehouses the seller picks one first.
-      if (startScan && warehouses.length === 1) router.push('/(tabs)/(orders)/scan');
+      cartStore.startNew(working.warehouseId);
     }
     // Only on mount — later refetches must not drop unsaved edits.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // The working warehouse may load after the screen opened (the owner's list).
+  useEffect(() => {
+    if (!order && !cart.orderId && !cart.warehouseId && working.warehouseId) {
+      cartStore.setWarehouse(working.warehouseId);
+    }
+  }, [order, cart.orderId, cart.warehouseId, working.warehouseId]);
+
+  // Scan button: open the scanner once the new cart has its warehouse.
+  useEffect(() => {
+    if (startScan && !order && cart.warehouseId && !scanOpened.current) {
+      scanOpened.current = true;
+      router.push('/(tabs)/(orders)/scan');
+    }
+  }, [startScan, order, cart.warehouseId]);
+
   const totals = cartTotals(cart);
   const isEmpty = cart.lines.length === 0;
-  const warehouseName = warehouses.find((w) => w.id === cart.warehouseId)?.name ?? order?.warehouse?.name;
-  const canPickWarehouse = !cart.orderId && warehouses.length > 1;
+  const warehouseName = working.warehouses.find((w) => w.id === cart.warehouseId)?.name ?? order?.warehouse?.name;
   const priceLine = cart.lines.find((l) => l.key === priceKey) ?? null;
 
   const openSearch = () => {
@@ -147,19 +160,6 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
           />
         )}
       </View>
-
-      {canPickWarehouse && (
-        <View className="flex-row flex-wrap gap-2 px-4 pb-3">
-          {warehouses.map((w) => (
-            <Chip
-              key={w.id}
-              label={w.name}
-              selected={w.id === cart.warehouseId}
-              onPress={() => cartStore.setWarehouse(w.id)}
-            />
-          ))}
-        </View>
-      )}
 
       {/* Add product */}
       <View className="px-4 pb-3">

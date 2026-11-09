@@ -111,12 +111,13 @@ export const useProductById = (
  * Paginated product list (`GET /product`) with search, category and «Мало»
  * filters; the response also carries the chip counts.
  */
-export const useProducts = (params: ProductParams = {}): UseQueryResult<ProductListResponse> => {
+export const useProducts = (params: ProductParams = {}, enabled = true): UseQueryResult<ProductListResponse> => {
   const queryOptions: UseQueryOptions<ProductListResponse> = {
     queryKey: productQueryKeys.list(params),
     queryFn: () => productService.getProducts(params),
     placeholderData: (previous) => previous,
     refetchOnWindowFocus: false,
+    enabled,
   }
 
   return useQuery(queryOptions)

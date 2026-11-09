@@ -43,11 +43,12 @@ export const rentalQueryKeys = {
   all: () => ['rental'] as const,
   lists: () => [...rentalQueryKeys.all(), 'list'] as const,
   list: (params: RentalListParams) => [...rentalQueryKeys.lists(), params] as const,
-  summary: () => [...rentalQueryKeys.all(), 'summary'] as const,
+  summary: (warehouseId?: string) => [...rentalQueryKeys.all(), 'summary', warehouseId ?? 'all'] as const,
   detail: (id: string) => [...rentalQueryKeys.all(), 'detail', id] as const,
   availability: (params: object) => [...rentalQueryKeys.all(), 'availability', params] as const,
   calendar: (params: object) => [...rentalQueryKeys.all(), 'calendar', params] as const,
-  agenda: (from: string, to: string) => [...rentalQueryKeys.all(), 'agenda', from, to] as const,
+  agenda: (from: string, to: string, warehouseId?: string) =>
+    [...rentalQueryKeys.all(), 'agenda', from, to, warehouseId ?? 'all'] as const,
   similar: (params: object) => [...rentalQueryKeys.all(), 'similar', params] as const,
   conflicts: (id: string, params: object) => [...rentalQueryKeys.all(), 'conflicts', id, params] as const,
   returnPreview: (id: string, body: RentalReturnPayload) => [...rentalQueryKeys.all(), 'return-preview', id, body] as const,
@@ -78,8 +79,9 @@ export const useRentals = (params: RentalListParams): UseQueryResult<RentalListR
   });
 
 /** The rental list loaded page by page (the list screen) */
-export const useRentalsInfinite = (params: Omit<RentalListParams, 'currentPage'>) =>
+export const useRentalsInfinite = (params: Omit<RentalListParams, 'currentPage'>, enabled = true) =>
   useInfiniteQuery({
+    enabled,
     queryKey: [...rentalQueryKeys.lists(), 'infinite', params] as const,
     queryFn: ({ pageParam }) => rentalService.getRentals({ ...params, currentPage: pageParam }),
     initialPageParam: 1,
@@ -112,10 +114,10 @@ export const useRentableVariantSearch = (warehouseId: string | undefined, text: 
 };
 
 /** Counters of the quick list filters */
-export const useRentalSummary = (enabled = true): UseQueryResult<RentalSummary> =>
+export const useRentalSummary = (enabled = true, warehouseId?: string): UseQueryResult<RentalSummary> =>
   useQuery({
-    queryKey: rentalQueryKeys.summary(),
-    queryFn: () => rentalService.getSummary(),
+    queryKey: rentalQueryKeys.summary(warehouseId),
+    queryFn: () => rentalService.getSummary(warehouseId),
     enabled,
     refetchOnWindowFocus: false,
   });
@@ -180,11 +182,17 @@ export const useRentalCalendar = (params: {
   });
 
 /** Issues and returns per day for the rentals calendar */
-export const useRentalAgenda = (from: string, to: string): UseQueryResult<RentalAgenda> =>
+export const useRentalAgenda = (
+  from: string,
+  to: string,
+  warehouseId?: string,
+  enabled = true,
+): UseQueryResult<RentalAgenda> =>
   useQuery({
-    queryKey: rentalQueryKeys.agenda(from, to),
-    queryFn: () => rentalService.getAgenda(from, to),
+    queryKey: rentalQueryKeys.agenda(from, to, warehouseId),
+    queryFn: () => rentalService.getAgenda(from, to, warehouseId),
     placeholderData: keepPreviousData,
+    enabled,
   });
 
 /** Replacements for a variant busy on the dates */
