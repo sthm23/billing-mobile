@@ -59,14 +59,18 @@ function attrsLabel(values: (string | null | undefined)[], sku: string): string 
 interface RentalFormScreenProps {
   /** Edit this booking; omitted — a new one */
   rentalId?: string;
-  /** New booking started from an item card: this variant (of this product) is added */
-  preset?: { productId: string; variantId: string };
+  /**
+   * New booking started from an item card: this variant (of this product) is
+   * added; `range` — the dates picked on the card
+   */
+  preset?: { productId: string; variantId: string; range?: DateRange };
 }
 
-/** First line and warehouse of a booking started from an item card */
+/** First line, warehouse and dates of a booking started from an item card */
 interface BookingPreset {
   warehouseId: string;
   line: BookingLine;
+  range?: DateRange;
 }
 
 /**
@@ -110,6 +114,7 @@ export function RentalFormScreen({ rentalId, preset }: RentalFormScreenProps) {
             quantity: 1,
             sale: 0,
           },
+          range: preset?.range,
         }
       : undefined;
   return <RentalForm rental={existing.data} preset={start} />;
@@ -137,7 +142,7 @@ function RentalForm({ rental, preset }: { rental?: RentalDetail; preset?: Bookin
     return c ? { id: c.id, fullName: c.user.fullName, phone: c.user.phone } : null;
   });
   const [range, setRange] = useState<DateRange | null>(() =>
-    rental ? { start: salonDate(rental.startDate), end: salonDate(rental.endDate) } : null,
+    rental ? { start: salonDate(rental.startDate), end: salonDate(rental.endDate) } : (preset?.range ?? null),
   );
   const [lines, setLines] = useState<BookingLine[]>(() =>
     preset && !rental ? [preset.line] : (rental?.order.items ?? []).map((item) => ({

@@ -66,9 +66,15 @@ export const rentalService = {
     endDate: string;
     variantIds: string[];
     excludeRentalId?: string;
+    /** Also return `nextFreeStart` per variant */
+    nextFree?: boolean;
   }): Promise<VariantAvailability[]> => {
     const response = await api.get<VariantAvailability[]>(`${RENTAL_BASE_URL}/availability`, {
-      params: { ...params, variantIds: params.variantIds.join(',') },
+      params: {
+        ...params,
+        variantIds: params.variantIds.join(','),
+        nextFree: params.nextFree ? 'true' : undefined,
+      },
     });
     return response.data;
   },

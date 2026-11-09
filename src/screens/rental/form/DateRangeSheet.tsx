@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
-import { addLocalDays, bookingDays, formatLocalDate, fromLocalDate, toLocalDate } from '../rental-format';
+import { bookingDays, effectiveEnd, formatLocalDate, fromLocalDate, pickRangeDay, toLocalDate } from '../rental-format';
 
 const LOCALES: Record<string, string> = { ru: 'ru-RU', uz: 'uz-UZ', en: 'en-GB' };
 /** A Monday, to name the week days */
@@ -75,25 +75,18 @@ export function DateRangeSheet({ isOpen, value, minDate, onClose, onChange }: Da
   const canGoBack = !minDate || month > thisMonth;
 
   const pick = (day: string) => {
-    if (!start || end) {
-      setStart(day);
-      setEnd(null);
-    } else if (day > start) {
-      setEnd(day);
-    } else if (day === start) {
-      setEnd(addLocalDays(day, 1));
-    } else {
-      setStart(day);
-    }
+    const next = pickRangeDay({ start, end }, day);
+    setStart(next.start);
+    setEnd(next.end);
   };
 
   const done = () => {
     if (!start) return;
-    onChange({ start, end: end && end > start ? end : addLocalDays(start, 1) });
+    onChange({ start, end: effectiveEnd(start, end) });
     onClose();
   };
 
-  const shownEnd = start ? (end && end > start ? end : addLocalDays(start, 1)) : null;
+  const shownEnd = start ? effectiveEnd(start, end) : null;
   const summary = start && shownEnd
     ? t('rental.form.datesSummary', {
         from: formatLocalDate(start, i18n.language),

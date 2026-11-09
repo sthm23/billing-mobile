@@ -193,6 +193,12 @@ export interface VariantAvailability {
   variantId: string;
   owned: number;
   available: number;
+  /**
+   * Only when asked with `nextFree`: the asked start if a unit is free, else
+   * the earliest start of a booking of the same length with a free unit (up
+   * to 93 days ahead); `null` — none (e.g. the only unit is overdue).
+   */
+  nextFreeStart?: string | null;
 }
 
 export interface RentalCollateral {
@@ -366,6 +372,10 @@ export interface RentalCalendar {
   }[];
   rentals: {
     id: string;
+    /** Short code shown to people */
+    code: string;
+    /** With the customer past the end date (from the backend) */
+    overdue: boolean;
     orderId: string;
     status: RentalStatus;
     startDate: string;

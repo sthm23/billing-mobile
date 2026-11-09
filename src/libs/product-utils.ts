@@ -1,5 +1,5 @@
 import { formatMoney } from '@/libs/format';
-import { Product, ProductVariant, StockMovementType } from '@/models/product.model';
+import { Attribute, AttributeItem, Product, ProductVariant, StockMovementType } from '@/models/product.model';
 
 /**
  * Formats price with thousands separator
@@ -51,4 +51,57 @@ export function getLatestCostPrice(variant: Pick<ProductVariant, 'stockMovements
     .filter((m) => m.type === StockMovementType.IN && m.unitCost !== null)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   return lastIn ? Number(lastIn.unitCost) : 0;
+}
+
+/** Attribute name by id, for variant attributes that carry only the id */
+export function buildNameById(attributes: Attribute[]): Record<string, string> {
+  const map: Record<string, string> = {};
+  attributes.forEach((a) => (map[a.id] = a.name));
+  return map;
+}
+
+function attributeName(attr: AttributeItem, nameById: Record<string, string>): string {
+  return nameById[attr.attributeId] ?? attr.attributeName ?? attr.attributeId;
+}
+
+/** Values of each attribute across the variants, in first-seen order («Размер» → ['44', '46']) */
+export function buildAttributeMap(
+  variants: ProductVariant[],
+  nameById: Record<string, string>
+): Record<string, string[]> {
+  const map: Record<string, string[]> = {};
+  variants.forEach((variant) => {
+    (variant.attributes ?? []).forEach((attr) => {
+      const name = attributeName(attr, nameById);
+      if (!map[name]) map[name] = [];
+      const val = String(attr.value);
+      if (!map[name].includes(val)) map[name].push(val);
+    });
+  });
+  return map;
+}
+
+/** Attribute values of a variant by attribute name */
+export function getVariantAttrs(
+  variant: ProductVariant | undefined,
+  nameById: Record<string, string>
+): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  (variant?.attributes ?? []).forEach((attr) => {
+    attrs[attributeName(attr, nameById)] = String(attr.value);
+  });
+  return attrs;
+}
+
+/** The variant whose attributes all match the selection, or null */
+export function findVariantByAttrs(
+  variants: ProductVariant[],
+  selected: Record<string, string>,
+  nameById: Record<string, string>
+): ProductVariant | null {
+  return (
+    variants.find((v) =>
+      (v.attributes ?? []).every((a) => selected[attributeName(a, nameById)] === String(a.value))
+    ) ?? null
+  );
 }

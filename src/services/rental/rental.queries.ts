@@ -135,13 +135,15 @@ export const useRentalAvailability = (params: {
   endDate?: string;
   variantIds: string[];
   excludeRentalId?: string;
+  /** Also ask for `nextFreeStart` (item card: «Освободится …») */
+  nextFree?: boolean;
 }): UseQueryResult<VariantAvailability[]> => {
-  const { warehouseId, startDate, endDate, variantIds, excludeRentalId } = params;
+  const { warehouseId, startDate, endDate, variantIds, excludeRentalId, nextFree } = params;
   const ready = Boolean(warehouseId && startDate && endDate && startDate < endDate && variantIds.length > 0);
   const sortedIds = [...variantIds].sort();
 
   return useQuery({
-    queryKey: rentalQueryKeys.availability({ warehouseId, startDate, endDate, variantIds: sortedIds, excludeRentalId }),
+    queryKey: rentalQueryKeys.availability({ warehouseId, startDate, endDate, variantIds: sortedIds, excludeRentalId, nextFree }),
     queryFn: () =>
       rentalService.getAvailability({
         warehouseId: warehouseId as string,
@@ -149,6 +151,7 @@ export const useRentalAvailability = (params: {
         endDate: endDate as string,
         variantIds: sortedIds,
         excludeRentalId,
+        nextFree,
       }),
     enabled: ready,
     placeholderData: keepPreviousData,

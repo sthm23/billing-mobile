@@ -197,3 +197,39 @@ export function formatMonth(value: string, language: string): string {
 export function formatLongDay(value: string, language: string): string {
   return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long', weekday: 'long' });
 }
+
+/**
+ * Range picking on a month grid: the first tap is the issue day, the second
+ * the return day; a tap on the issue day again or before it restarts. `end`
+ * null — only the issue day is picked (see `effectiveEnd`).
+ */
+export function pickRangeDay(
+  current: { start: string | null; end: string | null },
+  day: string,
+): { start: string; end: string | null } {
+  const { start, end } = current;
+  if (!start || end) return { start: day, end: null };
+  if (day > start) return { start, end: day };
+  if (day === start) return { start, end: addLocalDays(day, 1) };
+  return { start: day, end: null };
+}
+
+/** Return day of a picked range: one day picked — back the next day by 12:00 (no same-day bookings) */
+export function effectiveEnd(start: string, end: string | null): string {
+  return end && end > start ? end : addLocalDays(start, 1);
+}
+
+const LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * Booking dates passed in route params (`startDate`, `endDate`, YYYY-MM-DD);
+ * undefined when missing, malformed, empty or starting in the past.
+ */
+export function parseRangeParams(
+  startDate: string | undefined,
+  endDate: string | undefined,
+): { start: string; end: string } | undefined {
+  if (!startDate || !endDate || !LOCAL_DATE.test(startDate) || !LOCAL_DATE.test(endDate)) return undefined;
+  if (startDate >= endDate || startDate < toLocalDate(new Date())) return undefined;
+  return { start: startDate, end: endDate };
+}

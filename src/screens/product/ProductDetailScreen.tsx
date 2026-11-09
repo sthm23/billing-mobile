@@ -6,14 +6,16 @@ import { useStoreMode } from '@/hooks/use-store-mode';
 import { StockMovementSheet, type StockMovementTarget } from '@/components/product/StockMovementSheet';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { formatMoney } from '@/libs/format';
-import { getLatestCostPrice, getVariantLabel } from '@/libs/product-utils';
-import { canManageProducts } from '@/libs/roles';
 import {
-  Attribute,
-  ProductDetail,
-  ProductVariant,
-  StockMovementType,
-} from '@/models/product.model';
+  buildAttributeMap,
+  buildNameById,
+  findVariantByAttrs,
+  getLatestCostPrice,
+  getVariantAttrs,
+  getVariantLabel,
+} from '@/libs/product-utils';
+import { canManageProducts } from '@/libs/roles';
+import { ProductDetail, ProductVariant, StockMovementType } from '@/models/product.model';
 import { useAuth } from '@/provider/AuthProvider';
 import { cartStore } from '@/screens/order/cart/cart-store';
 import { useAddToOrder } from '@/services/order/order.queries';
@@ -30,42 +32,6 @@ interface ProductDetailScreenProps {
   product: ProductDetail;
   /** Reloads the product (pull to refresh) */
   onRefresh: () => Promise<unknown>;
-}
-
-function buildNameById(attributes: Attribute[]): Record<string, string> {
-  const map: Record<string, string> = {};
-  attributes.forEach((a) => (map[a.id] = a.name));
-  return map;
-}
-
-function buildAttributeMap(
-  variants: ProductVariant[],
-  nameById: Record<string, string>
-): Record<string, string[]> {
-  const map: Record<string, string[]> = {};
-  variants.forEach((variant) => {
-    (variant.attributes ?? []).forEach((attr) => {
-      const name = nameById[attr.attributeId] ?? attr.attributeName ?? attr.attributeId;
-      if (!map[name]) map[name] = [];
-      const val = String(attr.value);
-      if (!map[name].includes(val)) map[name].push(val);
-    });
-  });
-  return map;
-}
-
-function getDefaultAttrs(
-  variants: ProductVariant[],
-  nameById: Record<string, string>
-): Record<string, string> {
-  const defaults: Record<string, string> = {};
-  if (variants.length > 0) {
-    (variants[0].attributes ?? []).forEach((attr) => {
-      const name = nameById[attr.attributeId] ?? attr.attributeName ?? attr.attributeId;
-      defaults[name] = String(attr.value);
-    });
-  }
-  return defaults;
 }
 
 /** Variant of the product card in the shape the order cart takes. */
@@ -117,20 +83,14 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
   );
 
   const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>(
-    () => getDefaultAttrs(product.variants, nameById)
+    () => getVariantAttrs(product.variants[0], nameById)
   );
   const [buyQty, setBuyQty] = useState(1);
 
-  const selectedVariant = useMemo(() => {
-    return (
-      product.variants.find((v) =>
-        (v.attributes ?? []).every((a) => {
-          const name = nameById[a.attributeId] ?? a.attributeName ?? a.attributeId;
-          return selectedAttrs[name] === String(a.value);
-        })
-      ) ?? null
-    );
-  }, [product.variants, selectedAttrs, nameById]);
+  const selectedVariant = useMemo(
+    () => findVariantByAttrs(product.variants, selectedAttrs, nameById),
+    [product.variants, selectedAttrs, nameById]
+  );
 
   const displayPrice = useMemo(() => {
     if (selectedVariant) return parseFloat(String(selectedVariant.price));
