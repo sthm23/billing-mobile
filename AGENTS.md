@@ -132,11 +132,11 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(rentals)` | `index`, `[id]`, `create`, `edit/[id]`, `pay/[id]` (`?created=1`), `issue/[id]`, `return/[id]`, `calendar`; `create?productId&variantId[&startDate&endDate]` — booking started from an item card (with its dates) | Rental mode only (see «Rental» below). `RentalListScreen`, `RentalDetailScreen`, `RentalFormScreen` (new / edit / preset item), `RentalPayScreen` (`pay`, and `mode="issue"` for `issue/[id]`), `RentalReturnScreen`, `RentalCalendarScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `create`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `CreateStaffScreen` (new employee, OWNER only), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
+| `(profile)` | `index`, `staff/index`, `staff/create`, `staff/[id]`, `staff/edit/[id]`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `StaffListScreen` / `CreateStaffScreen` / `StaffCardScreen` / `StaffEditScreen` (OWNER only, see «Staff»), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
-- The center **Scan** button starts a new sale: `/(tabs)/(orders)/create?scan=1` — an empty cart that opens the scanner right away (when the seller has one warehouse).
+- The center **Scan** button starts a new sale: `/(tabs)/(orders)/create?scan=1` — an empty cart on the working warehouse that opens the scanner as soon as the cart has its warehouse.
 - **Store mode** (`useStoreMode()`, `src/hooks/use-store-mode.ts`): in rental mode the second tab is **Rentals** (`(rentals)`) instead of Orders and the center button opens `/(tabs)/(rentals)/create` (new booking). A store with only one mode always shows it; a store with both uses the menu choice saved on the device — switched by `NavModeSwitch` («Заказы | Аренды», `components/navigation/NavModeSwitch.tsx`) on top of both lists, or in Profile → «Нижнее меню».
 - The bar is **absolutely positioned** over the content and **hidden** on nested screens (any stack screen above a tab's root) and while the keyboard is open.
 - **Tab root screens must reserve space for it**: `const bottomInset = useBottomNavInset();` → `contentContainerStyle={{ paddingBottom: bottomInset }}` on the scroll container.
@@ -276,7 +276,9 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store + `POST /store/staff`).
+Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`).
+
+List hooks of the working warehouse take `warehouseId` in their params and an `enabled` flag: `useProducts(params, enabled)`, `useOrders(params, enabled)`, `useTodaySalesSummary(warehouseId, enabled)`, `useCashboxList(params, enabled)`, `useRentalsInfinite(params, enabled)`, `useRentalSummary(enabled, warehouseId)`, `useRentalAgenda(from, to, warehouseId, enabled)` — pass `useWorkingWarehouse().isReady` as `enabled`.
 
 Prisma `Decimal` fields (`price`, `totalAmount`, `retailPrice`, …) arrive as strings — wrap in `Number()` before arithmetic.
 
@@ -288,7 +290,7 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 - **Saving**: `useSaveOrder()` creates the order on the first save (`POST /orders`) and then replaces its content (`POST /orders/items`, which deletes lines left out). «Бронь» saves and goes back; «Оплатить» saves and opens `pay/[id]`.
 - **Prices**: lowering = `sale` (absolute per unit), raising = `retailPrice` (`PriceSheet`). Only owner/manager may lower (`canLowerPrice()` in `src/libs/roles.ts` — UX only, the backend enforces it).
 - **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
-- **Warehouse**: the cart's warehouse is one of `user.staff.warehouse` (`useStaffWarehouses`); with several, the seller picks one before adding products.
+- **Warehouse**: a new cart uses the working warehouse (`useWorkingWarehouse`, see below; filled in when it loads after the screen opened). There is no warehouse choice in the cart. A cart prefilled from a product card keeps the product's warehouse.
 - **Types**: list `Order` has only the `warehouse` object (no `warehouseId`); `OrderDetail.warehouseId` exists.
 
 ### Debtors flow (stage 8)
@@ -299,7 +301,7 @@ A debt is owed to the **store**: every employee (seller, cashier, manager, owner
 - **List** (`screens/debt/DebtorsScreen.tsx`, `GET /debt/debtors`): hero «Общий долг» + chip «Клиентов: N», tiles «Дольше 30 дней» (`over30`) / «Погашено за месяц» (`paidInPeriod` — DEBT_PAYMENT in the month; the app sends `monthRange()` from `libs/date.ts`), search, `Segmented` По сумме / По дате (`sort`). Rows by customer with an age badge: > 30 days `err`, ≥ 21 `warn`, else neutral.
 - **Customer** (`DebtorScreen.tsx`, `GET /debt/debtors/:customerId`): the customer's open debts (ORDER / MANUAL); with a single debt it opens the payment right away (`router.replace`).
 - **Payment of one debt** (`DebtPayScreen.tsx`, design «OrderPay» in debt mode): remaining, progress, method tiles + amounts (`PaymentMethodsInput`, shared with `OrderPayScreen`), cash change, payment history. `useRepayDebt()` → ORDER: `POST /payment` (no stock movement), MANUAL: `POST /debt/payment`. Overpayment is never sent (cash minus change); the backend rejects it anyway.
-- **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox`, warehouse chips if several) or pick another open cashbox of the store → `cashboxId`.
+- **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox` on the working warehouse) or pick another open cashbox of the store → `cashboxId`.
 - i18n: top-level `debtors.*`.
 
 ### Rental (phase 6, in progress)
@@ -312,7 +314,7 @@ Wedding-salon rental: business rules [`../docs/features/rental.md`](../docs/feat
 - **Set discount**: `libs/set-discount.ts` — an exact copy of `billing_ui/src/app/shared/utils/set-discount.ts` (algorithm in `docs/features/rental.md#set-discount-distribution`). Change both or neither.
 - **List** (`screens/rental/RentalListScreen.tsx`): search `q` (debounced), quick filters `view` with counters from `GET /rental/summary`, pages via `useRentalsInfinite`. Order per filter (`viewSort` in `rental-format.ts`): bookings by `startDate` asc, rentals out by `endDate` asc, «Все» by `startDate` desc. Rows are grouped by the day they are about (booking — issue day, out — return day) with overdue ones (backend `overdue` flag) in «Просрочено»; group counts are of the loaded rows only.
 - **Card** (`screens/rental/RentalDetailScreen.tsx`): totals (`HeroCard`), stages, customer (call), dates, items with per-line state (in salon / with customer / returned / dry cleaning until — from `returns[].items[].availableFrom`), collateral, payments (payments, penalties, early-return and cancel refunds), bottom actions by status and `dueAmount`, «⋯» menu for a booking (a `Sheet`, not an RN `Modal`): «Изменить» → `edit/[id]`, «Отменить бронь» (OWNER/MANAGER) → `CancelRentalSheet`. «Выдать» → `issue/[id]`, «Принять оплату» → `pay/[id]`, «Вернуть залог» → confirmation sheet (`POST /rental/:id/collaterals/:cid/return`; enabled after full payment or on a cancelled booking, warns about items still out; several held — one button per collateral). «Принять возврат» → `return/[id]`.
-- **Booking form** (`screens/rental/form/RentalFormScreen.tsx`, new and `edit/[id]` — BOOKED only): warehouse chips (several warehouses), customer (`CustomerPickerSheet`), dates (`DateRangeSheet` — own month grid, no date-picker package; one day → back next day by 12:00), items from `useRentableVariantSearch` (product search filtered to `canRent` + day price) with free units from `useRentalAvailability` («Свободно N из M» / «Занято» + «Заменить» → `ReplaceItemSheet`, `GET /rental/similar`), services (`ServiceSheet`), total with a set discount: OWNER/MANAGER type the agreed total and `distributeSetDiscount` spreads it over the lines (sellers keep saved discounts only — the backend enforces it). Totals are a preview. Booking dates are salon dates: `salonDate()` in `rental-format.ts` converts backend boundaries by the fixed UTC+5 offset (Hermes may lack time zone data). A new booking opens `pay/[id]?created=1`.
+- **Booking form** (`screens/rental/form/RentalFormScreen.tsx`, new and `edit/[id]` — BOOKED only): warehouse — the booking's (edit), the item's (started from an item card) or the working warehouse; no warehouse chips; customer (`CustomerPickerSheet`), dates (`DateRangeSheet` — own month grid, no date-picker package; one day → back next day by 12:00), items from `useRentableVariantSearch` (product search filtered to `canRent` + day price) with free units from `useRentalAvailability` («Свободно N из M» / «Занято» + «Заменить» → `ReplaceItemSheet`, `GET /rental/similar`), services (`ServiceSheet`), total with a set discount: OWNER/MANAGER type the agreed total and `distributeSetDiscount` spreads it over the lines (sellers keep saved discounts only — the backend enforces it). Totals are a preview. Booking dates are salon dates: `salonDate()` in `rental-format.ts` converts backend boundaries by the fixed UTC+5 offset (Hermes may lack time zone data). A new booking opens `pay/[id]?created=1`.
 - **Payment and collateral** (`screens/rental/RentalPayScreen.tsx`, `POST /rental/:id/payments`): `PaymentMethodsInput` (cash change as in debt payments) + collaterals (Паспорт / Золото / Другое, several). Money needs a cashbox — own open one or `CashboxPickerSheet`; a collateral alone does not. Also opened by «Принять оплату» on the card.
 - **Issue** (`RentalPayScreen mode="issue"`, `POST /rental/:id/issue`, design «Аренда · выдача»): «Осталось оплатить», a checklist of the lines (the backend issues the whole booking — every line must be ticked, the checklist is UX only), collateral: a held one is shown; without one — add one or confirm the «Без залога» switch (the backend records `issuedWithoutCollateral`), optional extra payment (cashbox as in payments). Date and stock checks are the backend's (errors shown on the screen).
 - **Cancel** (`screens/rental/CancelRentalSheet.tsx`, `POST /rental/:id/cancel`, OWNER/MANAGER, BOOKED): «Внесено», refund 0 … paid (chips Всё / Половина / 0), refund method when > 0, reason. A refund needs a cashbox (own or `CashboxPickerSheet`); the rest stays as income.
@@ -358,7 +360,33 @@ Always handle loading / error / empty states (`components/common/LoadingState`, 
 Role checks in the UI are UX only — the backend enforces permissions.
 
 - Owner = `user.role === UserRole.OWNER` (not `staff.role`). The owner's store is `user.staff.storeId`.
-- Owner-only UI: Profile → «Сотрудники» (new employee). The screen also shows «нет доступа» for non-owners.
+- Owner-only UI: Profile → «Сотрудники» (list, card, edit, new employee). The screens also show «нет доступа» for non-owners.
+- A deactivated employee gets 401 on every request (backend, 2026-11-09): the refresh fails and the app logs out.
+
+---
+
+## Working warehouse
+
+`src/hooks/use-working-warehouse.ts` → `useWorkingWarehouse()` → `{ warehouseId, warehouse, warehouses, isReady, setWarehouseId }`. Business rules: [`../docs/features/stores-warehouses.md`](../docs/features/stores-warehouses.md) → «Working warehouse».
+
+- One warehouse at a time, chosen in Profile → «Рабочий склад» (`screens/profile/WorkingWarehouseCard.tsx`: card + `Sheet`). Saved on the device (`sthm23-working-warehouse`); a saved warehouse the user can no longer use falls back to the first available one.
+- Available: the owner — every active warehouse of the store (`useStoreById`; the owner's own `staff.warehouse` rows hold only the first one), others — `useStaffWarehouses()` (`/auth/me`).
+- Filtered by it (`warehouseId` query param): products, orders + «Продажи сегодня», cashboxes, rentals (list, counters, calendar), the staff list and its count in Profile. Created on it: new cart, new booking, own cashbox. **Debtors are not filtered** (store-wide).
+- Lists wait for `isReady` (saved choice + the owner's store loaded), so nothing is fetched unfiltered first. `warehouseId` is part of the query keys — switching refetches.
+- The backend checks access to the warehouse (403 otherwise); the client choice is UX only.
+
+---
+
+## Staff (OWNER)
+
+Screens in `src/screens/profile/staff/`, design «Профиль» page of the STHM screens artifact (Сотрудники / Сотрудник — карточка / Деактивировать — шит / Неактивен / Изменить данные). API: `/store/staff/*` ([`../docs/api-map.md`](../docs/api-map.md)).
+
+- **List** (`StaffListScreen`, `(profile)/staff`): «Магазин · склад» subtitle, «+ Добавить» → `staff/create` (`CreateStaffScreen`), hero «всего / активны», search (debounced), role chips with counts from the backend (`counts.byRole`), rows: initials (`Avatar`, owner `accent`), «роль · Склад 1, Склад 2» (owner «все склады»), badge Активен / Неактивен (inactive rows `opacity-70`). Filtered by the working warehouse.
+- **Card** (`StaffCardScreen`, `staff/[id]`): hero with role + status and tiles «продаж за месяц» (`compactAmount`), orders, time in the team (`stats` from the backend for `monthRange()`), rows phone (call) / login / warehouses. Active: «Изменить данные», «Сбросить пароль» (**disabled**, not built), «Деактивировать» → `DeactivateStaffSheet` (reason chips). Inactive: «Доступ закрыт {date} · Деактивировал … · причина …» + «Восстановить доступ». The owner's card and your own are read-only.
+- **Edit** (`StaffEditScreen`, `staff/edit/[id]`): name, phone (`+998` + 9 digits), login, role (`StaffRolePicker`, shared with the create form), warehouses (several, «новый» badge), «изменено» marks, «Изменено: …» note; sends only changed fields; button disabled without changes. No photo yet — initials.
+- Helpers: `staff-format.ts` (`formatPhone`, `formatNationalPhone`, `PHONE_PREFIX`/`PHONE_DIGITS`/`STAFF_LOGIN_PATTERN`, `roleLabel`, `warehousesLabel`, `compactAmount`, `tenureLabel`).
+- Not built: password reset, photo, «на смене», «последний вход».
+- i18n: `staff.*`, `workingWarehouse.*` (`staffCreate.*` — the create form).
 
 ---
 
@@ -369,6 +397,8 @@ Role checks in the UI are UX only — the backend enforces permissions.
 | `my_billing_access_token` | `LOCALE_STORAGE_KEYS.TOKEN` (`models/app.models.ts`) | Access token |
 | `my_billing_current_user` | `LOCALE_STORAGE_KEYS.USER` | Cached user |
 | `sthm23-theme-mode` | `ThemeStorageKey.THEME_MODE` (`hooks/use-theme-control.ts`) | Theme mode |
+| `sthm23-nav-mode` | `hooks/use-store-mode.ts` | Bottom menu mode (sale / rent) |
+| `sthm23-working-warehouse` | `hooks/use-working-warehouse.ts` | Working warehouse id |
 | `sthm23_app-language` | `assets/i18next/i18next.ts` | Language |
 
 ---
@@ -444,4 +474,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-10-22
+**Last updated**: 2026-11-09
