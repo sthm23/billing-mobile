@@ -21,6 +21,9 @@ import type {
   RentalBookingPayload,
   RentalCalendar,
   RentalCancelPayload,
+  RentalCleaning,
+  RentalCleaningCheck,
+  RentalCleaningPayload,
   RentalDetail,
   RentalListParams,
   RentalListResponse,
@@ -48,6 +51,8 @@ export const rentalQueryKeys = {
   similar: (params: object) => [...rentalQueryKeys.all(), 'similar', params] as const,
   conflicts: (id: string, params: object) => [...rentalQueryKeys.all(), 'conflicts', id, params] as const,
   returnPreview: (id: string, body: RentalReturnPayload) => [...rentalQueryKeys.all(), 'return-preview', id, body] as const,
+  cleanings: (params: object) => [...rentalQueryKeys.all(), 'cleanings', params] as const,
+  cleaningCheck: (params: object) => [...rentalQueryKeys.all(), 'cleaning-check', params] as const,
 };
 
 /**
@@ -221,7 +226,62 @@ export const useCleaningConflicts = (
     refetchOnWindowFocus: false,
   });
 
+/** Planned dry cleanings of a warehouse (optionally one variant) not finished yet */
+export const useRentalCleanings = (params: {
+  warehouseId?: string;
+  variantId?: string;
+}): UseQueryResult<RentalCleaning[]> =>
+  useQuery({
+    queryKey: rentalQueryKeys.cleanings(params),
+    queryFn: () => rentalService.getCleanings({ warehouseId: params.warehouseId as string, variantId: params.variantId }),
+    enabled: Boolean(params.warehouseId),
+    refetchOnWindowFocus: false,
+  });
+
+/**
+ * Live check of a planned dry cleaning (writes nothing). The caller debounces
+ * the inputs; `null` — not enough to check yet. The previous answer stays on
+ * screen while the next one loads.
+ */
+export const useCleaningCheck = (
+  params: { warehouseId: string; variantId: string; startDate: string; days: number } | null,
+): UseQueryResult<RentalCleaningCheck, RentalMutationError> =>
+  useQuery({
+    queryKey: rentalQueryKeys.cleaningCheck(params ?? {}),
+    queryFn: () => rentalService.checkCleaning(params as NonNullable<typeof params>),
+    enabled: Boolean(params),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
 // ------------------------------------------------------------------ mutations
+
+/** Occupancy, cleanings and the cashboxes (the expense / its storno) change */
+function onCleaningChanged(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: rentalQueryKeys.all() });
+  queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() });
+}
+
+export const useCreateCleaning = (): UseMutationResult<RentalCleaning, RentalMutationError, RentalCleaningPayload> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body) => rentalService.createCleaning(body),
+    onSuccess: () => onCleaningChanged(queryClient),
+  });
+};
+
+export const useCancelCleaning = (): UseMutationResult<
+  RentalCleaning,
+  RentalMutationError,
+  { id: string; cashboxId?: string }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, cashboxId }) => rentalService.cancelCleaning(id, cashboxId),
+    onSuccess: () => onCleaningChanged(queryClient),
+  });
+};
 
 export const useCreateRental = (): UseMutationResult<RentalDetail, RentalMutationError, RentalBookingPayload> => {
   const queryClient = useQueryClient();

@@ -5,6 +5,9 @@ import type {
   RentalAgenda,
   RentalCalendar,
   RentalCancelPayload,
+  RentalCleaning,
+  RentalCleaningCheck,
+  RentalCleaningPayload,
   RentalDetail,
   RentalListParams,
   RentalListResponse,
@@ -150,6 +153,43 @@ export const rentalService = {
 
   cancel: async (id: string, body: RentalCancelPayload): Promise<RentalDetail> => {
     const response = await api.post<RentalDetail>(`${RENTAL_BASE_URL}/${id}/cancel`, body);
+    return response.data;
+  },
+
+  /** Planned dry cleaning (R13): does one unit fit on these days? Saves nothing */
+  checkCleaning: async (params: {
+    warehouseId: string;
+    variantId: string;
+    startDate: string;
+    days: number;
+  }): Promise<RentalCleaningCheck> => {
+    const response = await api.get<RentalCleaningCheck>(`${RENTAL_BASE_URL}/cleanings/check`, { params });
+    return response.data;
+  },
+
+  /** Active cleanings not finished before `from` (default today) */
+  getCleanings: async (params: {
+    warehouseId: string;
+    variantId?: string;
+    from?: string;
+    to?: string;
+  }): Promise<RentalCleaning[]> => {
+    const response = await api.get<RentalCleaning[]>(`${RENTAL_BASE_URL}/cleanings`, { params });
+    return response.data;
+  },
+
+  /** OWNER/MANAGER; the expense is written to the cashbox at once */
+  createCleaning: async (body: RentalCleaningPayload): Promise<RentalCleaning> => {
+    const response = await api.post<RentalCleaning>(`${RENTAL_BASE_URL}/cleanings`, body);
+    return response.data;
+  },
+
+  /** OWNER/MANAGER, before the start only; the amount comes back to a cashbox */
+  cancelCleaning: async (id: string, cashboxId?: string): Promise<RentalCleaning> => {
+    const response = await api.post<RentalCleaning>(
+      `${RENTAL_BASE_URL}/cleanings/${id}/cancel`,
+      cashboxId ? { cashboxId } : {},
+    );
     return response.data;
   },
 };

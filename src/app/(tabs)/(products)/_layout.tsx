@@ -15,6 +15,7 @@ export default function TabLayout() {
       <Stack.Screen name="history/[variantId]" />
       <Stack.Screen name="rental/[variantId]" />
       <Stack.Screen name="rental-form/[variantId]" />
+      <Stack.Screen name="cleaning/[variantId]" />
     </Stack>
   );
 }

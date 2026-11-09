@@ -7,16 +7,25 @@ import { canManageProducts } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import type { ProductDetail, ProductVariant } from '@/models/product.model';
 import { useAuth } from '@/provider/AuthProvider';
-import { RentalStatus, useRentalCalendar, useRentals } from '@/services/rental';
+import {
+  RentalCleaningState,
+  RentalStatus,
+  useRentalCalendar,
+  useRentalCleanings,
+  useRentals,
+  type RentalCleaning,
+} from '@/services/rental';
 import { router } from 'expo-router';
-import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Pencil, WashingMachine } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CancelCleaningSheet } from './CancelCleaningSheet';
 import {
   formatDay,
   formatLocalDate,
+  formatLocalDays,
   formatMonth,
   monthEnd,
   monthGrid,
@@ -49,6 +58,7 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
   const canManage = canManageProducts(user);
   const today = toLocalDate(new Date());
   const [month, setMonth] = useState(monthStart(today));
+  const [cancelling, setCancelling] = useState<RentalCleaning | null>(null);
 
   const params = { warehouseId: product.warehouseId, variantIds: [variant.id] };
   const todayCalendar = useRentalCalendar({ ...params, from: today, to: today });
@@ -60,6 +70,7 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
     sort: 'asc',
     pageSize: 5,
   });
+  const cleanings = useRentalCleanings({ warehouseId: product.warehouseId, variantId: variant.id });
 
   const todayRow = todayCalendar.data?.variants[0];
   const owned = todayRow?.owned ?? variant.quantity;
@@ -71,6 +82,12 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
   const rentable = !!variant.canRent && price > 0;
   const category = product.category ? t(`category.${product.category}`, { defaultValue: product.category }) : '';
   const subtitle = [category, getVariantLabel(variant)].filter(Boolean).join(' · ');
+
+  const openCleaning = () =>
+    router.push({
+      pathname: '/(tabs)/(products)/cleaning/[variantId]',
+      params: { variantId: variant.id, productId: product.id },
+    });
 
   const shiftMonth = (step: number) => {
     const [y, m] = month.split('-').map(Number);
@@ -162,6 +179,10 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
                 const d = days.get(day);
                 const busy = d ? d.busy > 0 : false;
                 const full = d ? d.available === 0 && monthOwned > 0 : false;
+                const cleaning = d ? d.cleaning > 0 : false;
+                // Busy only because of dry cleaning: its own colour, not the booking red/yellow
+                const cleaningOnly = cleaning && !!d && d.busy === d.cleaning;
+                const tone = cleaningOnly ? 'info' : full ? 'err' : busy ? 'warn' : null;
                 return (
                   <View key={day} className="w-[14.28%] p-0.5">
                     <View
@@ -172,21 +193,27 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
                       })}
                       className={cn(
                         'h-12 rounded-md items-center justify-center',
-                        full ? 'bg-err-bg' : busy ? 'bg-warn-bg' : '',
-                        day === today && 'border-2 border-accent',
+                        tone === 'info' ? 'bg-info-bg' : tone === 'err' ? 'bg-err-bg' : tone === 'warn' ? 'bg-warn-bg' : '',
+                        // Bookings and dry cleaning on the same day: booking colour + blue ring
+                        day === today ? 'border-2 border-accent' : cleaning && !cleaningOnly && 'border-2 border-info-fg',
                       )}
                     >
                       <Text
                         className={cn(
                           'text-sm tabular-nums',
                           day === today ? 'font-onest-bold' : 'font-onest-medium',
-                          full ? 'text-err-fg' : busy ? 'text-warn-fg' : 'text-ink',
+                          tone === 'info' ? 'text-info-fg' : tone === 'err' ? 'text-err-fg' : tone === 'warn' ? 'text-warn-fg' : 'text-ink',
                         )}
                       >
                         {Number(day.slice(8))}
                       </Text>
                       {busy && d ? (
-                        <Text className={cn('font-onest-semibold text-[10px]', full ? 'text-err-fg' : 'text-warn-fg')}>
+                        <Text
+                          className={cn(
+                            'font-onest-semibold text-[10px]',
+                            tone === 'info' ? 'text-info-fg' : full ? 'text-err-fg' : 'text-warn-fg',
+                          )}
+                        >
                           {d.available}/{monthOwned}
                         </Text>
                       ) : null}
@@ -205,7 +232,60 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
               <View className="w-3 h-3 rounded-sm bg-err-bg" />
               <Text className="font-onest text-xs text-muted">{t('rental.item.allBusy')}</Text>
             </View>
+            <View className="flex-row items-center gap-1.5">
+              <View className="w-3 h-3 rounded-sm bg-info-bg" />
+              <Text className="font-onest text-xs text-muted">{t('rental.cleaningCard.legend')}</Text>
+            </View>
           </View>
+        </View>
+
+        <View className="bg-card rounded-xl p-3.5 gap-2">
+          <View className="flex-row items-center justify-between px-0.5 pb-0.5">
+            <Text className="font-onest-bold text-[15px] text-ink">{t('rental.cleaningCard.title')}</Text>
+            {canManage && rentalEnabled ? (
+              <Pressable onPress={openCleaning} accessibilityRole="button" hitSlop={8} className="active:opacity-70">
+                <Text className="font-onest-semibold text-[13px] text-ink">{t('rental.cleaningCard.plan')}</Text>
+              </Pressable>
+            ) : null}
+          </View>
+          {cleanings.isLoading ? (
+            <ActivityIndicator color={colors.muted} className="py-3" />
+          ) : (cleanings.data ?? []).length === 0 ? (
+            <Text className="font-onest text-[13px] text-muted px-0.5 pb-1">{t('rental.cleaningCard.empty')}</Text>
+          ) : (
+            (cleanings.data ?? []).map((c) => {
+              const cancellable = canManage && c.canCancel;
+              const meta = [
+                t('rental.cleaningCard.expense', { amount: formatMoney(Number(c.amount)) }),
+                t(`sale.pay.method.${c.paymentType}`),
+                c.comment,
+              ]
+                .filter(Boolean)
+                .join(' · ');
+              return (
+                <Pressable
+                  key={c.id}
+                  disabled={!cancellable}
+                  onPress={() => setCancelling(c)}
+                  accessibilityRole={cancellable ? 'button' : undefined}
+                  accessibilityHint={cancellable ? t('rental.cleaningCard.cancelA11y') : undefined}
+                  className="flex-row items-center gap-3 p-3 rounded-lg bg-sunken active:opacity-80"
+                >
+                  <View className="w-10 h-10 rounded-md bg-info-bg items-center justify-center">
+                    <WashingMachine size={20} color={colors.infoFg} strokeWidth={2} />
+                  </View>
+                  <View className="flex-1 min-w-0 gap-0.5">
+                    <Text className="type-body-strong text-ink">{formatLocalDays(c.firstDay, c.lastDay, lang)}</Text>
+                    <Text className="font-onest text-xs text-muted" numberOfLines={2}>{meta}</Text>
+                  </View>
+                  <StatusBadge
+                    label={t(`rental.cleaningCard.state.${c.state}`)}
+                    tone={c.state === RentalCleaningState.IN_PROGRESS ? 'info' : 'neutral'}
+                  />
+                </Pressable>
+              );
+            })
+          )}
         </View>
 
         <View className="bg-card rounded-xl p-3.5 gap-2">
@@ -246,22 +326,35 @@ export function RentalItemScreen({ product, variant }: RentalItemScreenProps) {
           {!rentable ? (
             <Text className="font-onest text-[13px] text-center text-muted">{t('rental.item.cantBook')}</Text>
           ) : null}
-          <Button
-            variant="accent"
-            size="lg"
-            full
-            disabled={!rentable}
-            onPress={() =>
-              router.push({
-                pathname: '/(tabs)/(rentals)/create',
-                params: { productId: product.id, variantId: variant.id },
-              })
-            }
-          >
-            {t('rental.item.book')}
-          </Button>
+          <View className="flex-row gap-2">
+            {canManage && owned > 0 ? (
+              <View className="flex-1">
+                <Button variant="secondary" size="lg" full icon={WashingMachine} onPress={openCleaning}>
+                  {t('rental.cleaningCard.toCleaning')}
+                </Button>
+              </View>
+            ) : null}
+            <View className="flex-1">
+              <Button
+                variant="accent"
+                size="lg"
+                full
+                disabled={!rentable}
+                onPress={() =>
+                  router.push({
+                    pathname: '/(tabs)/(rentals)/create',
+                    params: { productId: product.id, variantId: variant.id },
+                  })
+                }
+              >
+                {t('rental.item.book')}
+              </Button>
+            </View>
+          </View>
         </View>
       ) : null}
+
+      <CancelCleaningSheet cleaning={cancelling} onClose={() => setCancelling(null)} />
     </View>
   );
 }

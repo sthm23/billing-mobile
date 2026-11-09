@@ -51,6 +51,8 @@ export enum CashTransactionCategory {
   RENT = 'RENT',
   /** Income of a rental order (set by the backend, not picked by hand) */
   RENTAL = 'RENTAL',
+  /** Planned dry cleaning of a rental item: expense, its cancel is income (set by the backend) */
+  DRY_CLEANING = 'DRY_CLEANING',
   DELIVERY = 'DELIVERY',
   SALARY = 'SALARY',
   PURCHASE = 'PURCHASE',

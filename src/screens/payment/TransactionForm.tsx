@@ -83,8 +83,10 @@ export const TransactionForm = ({
     }
   };
 
-  // Rental income comes from rental payments only, not from a manual transaction
-  const categoryOptions = Object.values(CashTransactionCategory).filter((c) => c !== CashTransactionCategory.RENTAL);
+  // RENTAL and DRY_CLEANING are written by the backend only
+  const categoryOptions = Object.values(CashTransactionCategory).filter(
+    (c) => c !== CashTransactionCategory.RENTAL && c !== CashTransactionCategory.DRY_CLEANING,
+  );
   const paymentTypeOptions = Object.values(PaymentType);
 
   return (

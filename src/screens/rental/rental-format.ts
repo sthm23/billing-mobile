@@ -81,6 +81,17 @@ export function bookingDays(startDate: string, endDate: string): number {
   return Math.max(1, Math.round((Date.UTC(ye, me - 1, de) - Date.UTC(ys, ms - 1, ds)) / 86_400_000));
 }
 
+/** «14 мая» of a YYYY-MM-DD */
+export function formatLocalDay(value: string, language: string): string {
+  return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long' });
+}
+
+/** «14 мая» or «14 – 16 мая» of a period of YYYY-MM-DD days (inclusive) */
+export function formatLocalDays(first: string, last: string, language: string): string {
+  if (first === last) return formatLocalDay(first, language);
+  return `${formatLocalDay(first, language)} – ${formatLocalDay(last, language)}`;
+}
+
 /** «14 мая, чт» of a YYYY-MM-DD */
 export function formatLocalDate(value: string, language: string): string {
   return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long', weekday: 'short' });
