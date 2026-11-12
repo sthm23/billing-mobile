@@ -6,6 +6,8 @@ import { useWorkingWarehouse } from "@/hooks/use-working-warehouse";
 import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
+import { isAdmin } from "@/libs/roles";
+import { useAdminStoreCounts } from "@/services/admin-store";
 import { useDebtors } from "@/services/debt";
 import { useStaffList } from "@/services/store";
 import Constants from "expo-constants";
@@ -33,7 +35,10 @@ const MobileProfilePage = () => {
   const colors = useTheme();
   const bottomInset = useBottomNavInset();
   const version = Constants.expoConfig?.version ?? '';
-  const debtors = useDebtors();
+  const admin = isAdmin(user);
+  // The platform admin has no store: no debtors / warehouse / modes
+  const debtors = useDebtors({}, !admin);
+  const storeCounts = useAdminStoreCounts(admin);
   const storeMode = useStoreMode();
   const working = useWorkingWarehouse();
   const staffList = useStaffList(
@@ -53,7 +58,22 @@ const MobileProfilePage = () => {
     >
       <Text className="type-title text-ink pb-1" accessibilityRole="header">{t('profile.title')}</Text>
       <ProfileCard user={user} />
-      <WorkingWarehouseCard />
+      {admin ? (
+        <ListCard
+          leading={
+            <View className="w-11 h-11 rounded-[14px] bg-accent items-center justify-center">
+              <Store size={20} color={colors.onAccent} strokeWidth={2} />
+            </View>
+          }
+          title={t('adminShops.title')}
+          subtitle={
+            storeCounts.data ? t('adminShops.entrySubtitle', { count: storeCounts.data.counts.total }) : undefined
+          }
+          onPress={() => router.push('/(tabs)/(profile)/shops')}
+        />
+      ) : (
+        <WorkingWarehouseCard />
+      )}
       {user.role === UserRole.OWNER ? (
         <ListCard
           leading={
@@ -94,7 +114,7 @@ const MobileProfilePage = () => {
         </View>
       ) : null}
       {/* Any employee: debts belong to the store */}
-      <ListCard
+      {admin ? null : <ListCard
         leading={
           <View className="w-11 h-11 rounded-[14px] bg-err-bg items-center justify-center">
             <HandCoins size={20} color={colors.errFg} strokeWidth={2} />
@@ -105,7 +125,7 @@ const MobileProfilePage = () => {
         amount={debtors.data?.summary.total}
         amountTone="err"
         onPress={() => router.push('/(tabs)/(profile)/debtors')}
-      />
+      />}
       <SettingItems />
       <View className="flex-1 justify-end gap-3 pt-3">
         <LogoutButton onLogOutPress={logout} />

@@ -70,7 +70,12 @@ export function Sheet({ isOpen, onClose, children, size = 'full' }: SheetProps) 
   }, [isOpen]);
 
   const handleDismiss = useCallback(() => {
-    // Closed by the user (swipe, backdrop, back button) — sync, then tell the parent.
+    // onDismiss also fires after our own dismiss() (parent set isOpen=false,
+    // presented is already false). Reporting that as onClose would undo the
+    // parent's next state — e.g. a menu sheet switching to another sheet gets
+    // it closed right away. Only a close by the user (swipe, backdrop, back
+    // button) is reported.
+    if (!presented.current) return;
     presented.current = false;
     onClose();
   }, [onClose]);

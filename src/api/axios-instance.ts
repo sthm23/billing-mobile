@@ -71,6 +71,29 @@ const shouldSkipUnauthorizedHandling = (url?: string): boolean => {
   return PUBLIC_ENDPOINTS.some((endpoint) => url.includes(endpoint))
 }
 
+/** Backend code of a 403 for a suspended store (SubscriptionGuard) */
+export const STORE_SUSPENDED_CODE = 'STORE_SUSPENDED'
+
+type StoreSuspendedListener = () => void
+const storeSuspendedListeners = new Set<StoreSuspendedListener>()
+
+/**
+ * Called when any request gets 403 STORE_SUSPENDED (the admin suspended the
+ * store). AuthProvider reloads the profile and the app shows «Магазин
+ * приостановлен». Returns an unsubscribe function.
+ */
+export const onStoreSuspended = (listener: StoreSuspendedListener): (() => void) => {
+  storeSuspendedListeners.add(listener)
+  return () => {
+    storeSuspendedListeners.delete(listener)
+  }
+}
+
+const isStoreSuspendedError = (error: AxiosError): boolean => {
+  const data = error.response?.data as { code?: string } | undefined
+  return error.response?.status === 403 && data?.code === STORE_SUSPENDED_CODE
+}
+
 const clearSession = async (): Promise<void> => {
   await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.TOKEN)
   await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER)
@@ -130,6 +153,11 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
     (response) => response,
     async (error: AxiosError) => {
       const originalConfig = error.config as RetryableConfig | undefined
+
+      if (isStoreSuspendedError(error)) {
+        storeSuspendedListeners.forEach((listener) => listener())
+        return Promise.reject(error)
+      }
 
       if (originalConfig?.url?.includes('/logout')) {
         await clearSession()

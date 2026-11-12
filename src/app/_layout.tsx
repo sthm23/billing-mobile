@@ -1,6 +1,7 @@
 import '@/assets/i18next/i18next';
 import { ToastHost } from '@/components/base/Toast';
 import { SplashView } from '@/components/brand/SplashView';
+import { isStoreSuspended } from '@/libs/roles';
 import { AuthProvider, AuthStatusEnum, useAuth } from '@/provider/AuthProvider';
 import {
   Onest_400Regular,
@@ -34,17 +35,25 @@ SplashScreen.preventAutoHideAsync();
 
 const InitiallyLayout = () => {
   const { t } = useTranslation();
-  const { authStatus, isAuthenticated } = useAuth();
+  const { authStatus, isAuthenticated, user } = useAuth();
 
   if (authStatus === AuthStatusEnum.Loading) {
     return <SplashView />;
   }
 
+  const signedIn = authStatus === AuthStatusEnum.Authenticated && isAuthenticated;
+  const suspended = isStoreSuspended(user);
+
   return (
     <Stack >
-      <Stack.Protected guard={authStatus === AuthStatusEnum.Authenticated && isAuthenticated}>
+      <Stack.Protected guard={signedIn && !suspended}>
         <Stack.Screen name="(tabs)"
           options={{ title: "Tabs", headerShown: false }} />
+      </Stack.Protected>
+
+      {/* The admin suspended the user's store (subscription): nothing else works */}
+      <Stack.Protected guard={signedIn && suspended}>
+        <Stack.Screen name="suspended" options={{ headerShown: false }} />
       </Stack.Protected>
 
       <Stack.Protected guard={authStatus === AuthStatusEnum.Unauthenticated && !isAuthenticated}>

@@ -1,4 +1,274 @@
 const en = {
+  "shopSuspended": {
+    "title": "The store is suspended",
+    "ownerText": "Pay the subscription to continue. Staff can't work until access is resumed.",
+    "employeeText": "You can't work in the app right now. Contact the store owner.",
+    "store": "Store",
+    "reason": "Reason",
+    "since": "Since",
+    "accessSuspended": "Access suspended",
+    "dataKept": "Products, orders, cashboxes and debts are kept",
+    "support": "Contact support",
+    "logout": "Log out"
+  },
+  "adminShopNew": {
+    "title": "New store",
+    "subtitle": "Store, first warehouse and owner",
+    "shopSection": "Store",
+    "name": "Store name",
+    "namePlaceholder": "e.g. Baraka Textile",
+    "category": "Category",
+    "categoriesFailed": "Couldn't load categories · retry",
+    "optional": "optional",
+    "address": "Address",
+    "addressPlaceholder": "City, street, landmark",
+    "inn": "TIN",
+    "innPlaceholder": "9 digits",
+    "note": "Comment",
+    "notePlaceholder": "e.g. 2 warehouses, about 10 staff",
+    "warehouse": "First warehouse name",
+    "warehouseHint": "The owner adds other warehouses",
+    "defaultWarehouse": "Main warehouse",
+    "ownerSection": "Owner",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Last name First name",
+    "phone": "Phone",
+    "login": "Login",
+    "loginPlaceholder": "Latin letters, no spaces",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "passwordHint": "Give the password to the owner in person",
+    "ownerHint": "The owner signs in with this login and adds staff",
+    "catalogSection": "Catalog",
+    "addBrand": "Brand",
+    "addAttribute": "Attribute",
+    "remove": "Remove «{{name}}»",
+    "modesSection": "Modes",
+    "modesHint": "At least one mode must be on",
+    "trialTitle": "Trial — 1 month",
+    "trialText": "First month free · then a subscription",
+    "summary": "Store «{{name}}» · {{category}} · warehouse «{{warehouse}}» · owner {{owner}} · 1-month trial",
+    "summaryEmpty": "Fill in the store name and the owner — the summary appears here",
+    "fillHint": "Fill in the name, category and owner",
+    "submit": "Create store",
+    "creating": "Creating the store…",
+    "created": "Store created. The owner can sign in with login {{login}}",
+    "errors": {
+      "name": "Enter the store name",
+      "inn": "TIN must be exactly 9 digits",
+      "warehouse": "Enter the warehouse name",
+      "fullName": "Enter the owner's full name",
+      "phone": "Enter 9 digits after +998",
+      "login": "Latin letters, digits, dot and _ only (3+ characters)",
+      "password": "At least 8 characters",
+      "taken": "The login or phone is already taken — change the owner's details",
+      "failed": "Couldn't create the store. Try again."
+    },
+    "brand": {
+      "title": "Brand",
+      "subtitle": "Pick one or type a new one — it becomes available to all stores",
+      "placeholder": "e.g. Mango",
+      "already": "This brand is already added",
+      "add": "Add",
+      "addNew": "Add «{{name}}»"
+    },
+    "attr": {
+      "title": "New attribute",
+      "subtitle": "Appears on this store's product card",
+      "name": "Name",
+      "namePlaceholder": "e.g. Material",
+      "type": "Value type",
+      "types": {
+        "STRING": "Text",
+        "NUMBER": "Number",
+        "BOOLEAN": "Yes / No"
+      },
+      "typesDesc": {
+        "STRING": "Any text",
+        "NUMBER": "e.g. 6 m",
+        "BOOLEAN": "Switch"
+      },
+      "unit": "Unit · optional",
+      "unitPlaceholder": "m, kg, l, mm",
+      "unitHint": "On a product: «{{name}} — 6 {{unit}}»",
+      "unitHintName": "Length",
+      "stringHint": "Values (e.g. Cotton, Silk) are added on the product card — variants are built from them.",
+      "boolPreview": "What the seller sees",
+      "submit": "Add attribute",
+      "duplicate": "This attribute is already added",
+      "typeConflict": "Attribute «{{name}}» already exists with type «{{type}}»"
+    }
+  },
+  "adminShop": {
+    "title": "Store",
+    "more": "More",
+    "readOnly": "read only",
+    "cancel": "Cancel",
+    "inactive": "Inactive",
+    "saveFailed": "Couldn't save. Try again.",
+    "errorTitle": "Couldn't open the store",
+    "term": {
+      "paid": "Paid until {{date}}",
+      "trial": "Trial until {{date}}",
+      "trialEnded": "Trial ended {{date}}",
+      "suspended": "Suspended since {{date}}",
+      "since": "Working since {{date}}"
+    },
+    "tiles": {
+      "warehouses": "warehouses",
+      "staff": "staff",
+      "active": "active"
+    },
+    "suspendedTitle": "Store suspended {{date}}",
+    "suspendedReason": "Reason: {{reason}}",
+    "suspendedBy": "suspended by {{name}}",
+    "suspendedEffect": "Staff can't work, data is kept",
+    "reason": {
+      "UNPAID": "Subscription not paid",
+      "OWNER_REQUEST": "Owner's request",
+      "OTHER": "Other"
+    },
+    "reasonShort": {
+      "UNPAID": "subscription not paid",
+      "OWNER_REQUEST": "owner's request",
+      "OTHER": "other reason"
+    },
+    "owner": "Owner",
+    "ownerStatus": "Owner status",
+    "noOwner": "Owner not found",
+    "callOwner": "Call the owner",
+    "modes": {
+      "title": "Store modes",
+      "sale": "Sales",
+      "saleDesc": "Orders, scanner, cashbox",
+      "rent": "Rental",
+      "rentDesc": "Bookings, issue and return",
+      "lastError": "At least one mode must stay on — turn on «{{mode}}» first"
+    },
+    "warehouses": "Warehouses ({{count}})",
+    "addWarehouse": "+ Add warehouse",
+    "warehouseStaff": "staff with access: {{count}}",
+    "staff": "Staff ({{count}})",
+    "onlyOwner": "No staff besides the owner. The owner adds them in their profile.",
+    "allStaff": "All staff · {{count}}",
+    "staffTitle": "Staff · {{count}}",
+    "staffSubtitle": "{{name}} · read only",
+    "staffHint": "The store owner manages the staff",
+    "staffFailed": "Couldn't load the staff",
+    "catalog": {
+      "title": "Catalog",
+      "category": "Category",
+      "brands": "Brands",
+      "attributes": "Product attributes"
+    },
+    "application": {
+      "title": "Application data",
+      "address": "Address",
+      "inn": "TIN",
+      "note": "Comment"
+    },
+    "metrics": {
+      "title": "Metrics",
+      "revenue": "revenue this month",
+      "orders": "orders",
+      "subscription": "subscription",
+      "hint": "Revenue, orders and subscription payments will appear once billing is connected"
+    },
+    "menu": {
+      "rename": "Rename",
+      "suspend": "Suspend",
+      "resume": "Resume work"
+    },
+    "rename": {
+      "title": "Rename the store",
+      "label": "Store name",
+      "placeholder": "e.g. Baraka Textile",
+      "submit": "Save",
+      "done": "Name saved"
+    },
+    "suspend": {
+      "title": "Suspend the store?",
+      "effectStaff": "Staff won't be able to work in the app",
+      "effectData": "Products, orders, cashboxes and debts are kept",
+      "effectResume": "Work can be resumed at any time",
+      "reason": "Reason",
+      "comment": "Comment for the owner · optional",
+      "submit": "Suspend",
+      "done": "Store suspended"
+    },
+    "resume": {
+      "title": "Resume «{{name}}»?",
+      "textPaid": "Staff can sign in and sell again. Status becomes «Active», paid until {{date}}.",
+      "textNoPay": "Staff can sign in and sell again. The paid-until date stays the same.",
+      "paidUntil": "Paid",
+      "months": "+{{count}} mo.",
+      "noPay": "No payment",
+      "submit": "Resume",
+      "done": "Store resumed"
+    },
+    "warehouse": {
+      "title": "New warehouse",
+      "subtitle": "Store «{{name}}» · the owner gives staff access",
+      "label": "Warehouse name",
+      "placeholder": "e.g. Warehouse 2 · Yunusabad",
+      "submit": "Add",
+      "done": "Warehouse added"
+    }
+  },
+  "adminShops": {
+    "title": "Stores",
+    "entrySubtitle": "Stores: {{count}}",
+    "tabShops": "Stores",
+    "tabRequests": "Requests",
+    "soon": "soon",
+    "noAccess": "Only the administrator can open this section",
+    "loading": "Loading…",
+    "offline": "No connection",
+    "total": "Total: {{count}}",
+    "create": "New store",
+    "createFirst": "Create the first store",
+    "sum": {
+      "total": "total",
+      "active": "active",
+      "trial": "on trial",
+      "suspended": "suspended"
+    },
+    "search": "Store name, owner or phone",
+    "filter": {
+      "all": "All",
+      "ACTIVE": "Active",
+      "TRIAL": "Trial",
+      "SUSPENDED": "Suspended"
+    },
+    "mode": {
+      "sale": "Sales",
+      "rent": "Rental"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "TRIAL": "Trial",
+      "SUSPENDED": "Suspended",
+      "trialExpired": "Trial ended"
+    },
+    "term": {
+      "since": "since {{date}}",
+      "paidUntil": "paid until {{date}}",
+      "trialUntil": "trial until {{date}}",
+      "trialEnded": "trial ended {{date}}",
+      "suspendedSince": "suspended since {{date}}"
+    },
+    "rowMeta": "Owner: {{owner}} · warehouses: {{warehouses}} · staff: {{staff}}",
+    "loadingMore": "Loading {{count}} more of {{total}}",
+    "errorTitle": "Couldn't load stores",
+    "errorText": "Check your connection and try again.",
+    "retry": "Retry",
+    "emptyTitle": "No stores yet",
+    "emptyText": "Create the first store and its owner — the owner adds staff and products.",
+    "notFoundTitle": "Nothing found",
+    "notFoundText": "No stores match «{{query}}». Check the name or the owner's phone.",
+    "notFoundFilters": "No stores with these filters.",
+    "resetSearch": "Reset search"
+  },
   "debtors": {
     "unassigned": {
       "title": "No customer",

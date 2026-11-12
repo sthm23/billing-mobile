@@ -10,6 +10,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/base';
 import type { ButtonIconComponent } from '@/components/base';
 import { useStoreMode, type NavMode } from '@/hooks/use-store-mode';
+import { isAdmin } from '@/libs/roles';
+import { useAuth } from '@/provider/AuthProvider';
 
 /** Height of the floating bar (STHM design: 68px). */
 const NAV_HEIGHT = 68;
@@ -54,6 +56,12 @@ function getBottomOffset(insetBottom: number): number {
  */
 export function useBottomNavInset(): number {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
+
+  // The admin has no bar (Profile only)
+  if (isAdmin(user)) {
+    return getBottomOffset(insets.bottom) + CONTENT_GAP;
+  }
 
   return NAV_HEIGHT + getBottomOffset(insets.bottom) + CONTENT_GAP;
 }
@@ -90,6 +98,7 @@ export function BottomNav({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const keyboardVisible = useKeyboardVisible();
   const { navMode } = useStoreMode();
+  const { user } = useAuth();
   const isRent = navMode === 'rent';
 
   const focusedRoute = state.routes[state.index];
@@ -101,7 +110,8 @@ export function BottomNav({ state, navigation }: BottomTabBarProps) {
     : (focusedRoute?.params as { screen?: string } | undefined)?.screen;
   const isNestedScreen = activeScreen !== undefined && activeScreen !== 'index';
 
-  if (isNestedScreen || keyboardVisible) {
+  // Platform admin: Profile is the only tab — no bar
+  if (isNestedScreen || keyboardVisible || isAdmin(user)) {
     return null;
   }
 

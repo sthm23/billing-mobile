@@ -75,7 +75,7 @@ billing-mobile/
 └── src/                          # Alias @/*
     ├── api/axios-instance.ts     # Axios instances, auth + refresh interceptors
     ├── app/                      # Expo Router routes (thin wrappers around screens/)
-    ├── screens/                  # Screen implementations: login, order, payment, product, profile, debt
+    ├── screens/                  # Screen implementations: login, order, payment, product, profile, debt, admin (stores, suspended)
     ├── components/
     │   ├── base/                 # Design primitives (see COMPONENTS.md)
     │   ├── navigation/           # BottomNav (floating tab bar) + useBottomNavInset
@@ -88,10 +88,10 @@ billing-mobile/
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
-    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts
+    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, roles.ts (isAdmin, isStoreSuspended, …)
     ├── models/                   # API types (app, auth, order, payment, product, store, user)
     ├── provider/AuthProvider.tsx # Auth context
-    └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product)
+    └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product, admin-store, …)
 ```
 
 `src/app` route files mostly import a component from `src/screens/` — put screen code in `screens/`, keep routes thin.
@@ -106,9 +106,9 @@ billing-mobile/
 - Provider order: `GestureHandlerRootView` → `ThemeControlContext.Provider` → `StatusBar` → `AuthProvider` → `QueryClientProvider`. `<ToastHost />` is mounted once after `BottomSheetModalProvider`, so toasts show above sheets.
 - QueryClient: `staleTime` 60 s; no retry for axios responses with status < 500, otherwise up to 2 retries.
 - While the session is being restored it renders `SplashView` (`components/brand`).
-- `Stack.Protected`: `(tabs)` when authenticated, `login` when unauthenticated.
+- `Stack.Protected`: `(tabs)` when authenticated and the store is not suspended, `suspended` when authenticated and `isStoreSuspended(user)` (`user.staff.store.status === 'SUSPENDED'`, see «Suspended store»), `login` when unauthenticated.
 
-Other root routes: `index.tsx` (redirects by auth state), `login.tsx` (→ `screens/login/LoginPage`), `+not-found.tsx` (404 for unknown routes), `component-demo.tsx` (`/component-demo`, dev showcase).
+Other root routes: `index.tsx` (redirects by auth state: suspended → `/suspended`, platform ADMIN → Profile), `suspended.tsx` (→ `screens/admin/ShopSuspendedScreen`), `login.tsx` (→ `screens/login/LoginPage`), `+not-found.tsx` (404 for unknown routes), `component-demo.tsx` (`/component-demo`, dev showcase).
 
 All stacks use `headerShown: false` — screens draw their own header (back `IconButton` + title) inside a `SafeAreaView edges={['top']}`.
 
@@ -132,7 +132,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(rentals)` | `index`, `[id]`, `create`, `edit/[id]`, `pay/[id]` (`?created=1`), `issue/[id]`, `return/[id]`, `calendar`; `create?productId&variantId[&startDate&endDate]` — booking started from an item card (with its dates) | Rental mode only (see «Rental» below). `RentalListScreen`, `RentalDetailScreen`, `RentalFormScreen` (new / edit / preset item), `RentalPayScreen` (`pay`, and `mode="issue"` for `issue/[id]`), `RentalReturnScreen`, `RentalCalendarScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `staff/index`, `staff/create`, `staff/[id]`, `staff/edit/[id]`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`) | `MobileProfilePage`, `StaffListScreen` / `CreateStaffScreen` / `StaffCardScreen` / `StaffEditScreen` (OWNER only, see «Staff»), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen` |
+| `(profile)` | `index`, `staff/index`, `staff/create`, `staff/[id]`, `staff/edit/[id]`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`), `shops/index`, `shops/new`, `shops/[id]/index`, `shops/[id]/staff` | `MobileProfilePage`, `StaffListScreen` / `CreateStaffScreen` / `StaffCardScreen` / `StaffEditScreen` (OWNER only, see «Staff»), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen`, `AdminShopsScreen` / `AdminShopNewScreen` / `AdminShopScreen` / `AdminShopStaffScreen` (platform ADMIN only, see «Admin stores») |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
@@ -140,6 +140,7 @@ Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — ne
 - **Store mode** (`useStoreMode()`, `src/hooks/use-store-mode.ts`): in rental mode the second tab is **Rentals** (`(rentals)`) instead of Orders and the center button opens `/(tabs)/(rentals)/create` (new booking). A store with only one mode always shows it; a store with both uses the menu choice saved on the device — switched by `NavModeSwitch` («Заказы | Аренды», `components/navigation/NavModeSwitch.tsx`) on top of both lists, or in Profile → «Нижнее меню».
 - The bar is **absolutely positioned** over the content and **hidden** on nested screens (any stack screen above a tab's root) and while the keyboard is open.
 - **Tab root screens must reserve space for it**: `const bottomInset = useBottomNavInset();` → `contentContainerStyle={{ paddingBottom: bottomInset }}` on the scroll container.
+- **Platform ADMIN** (no Staff record) sees **only Profile**: `(products)`, `(orders)`, `(rentals)`, `(cashbox)` are wrapped in `Tabs.Protected guard={!admin}`, `BottomNav` renders nothing for ADMIN and `useBottomNavInset()` drops the bar height; `src/app/index.tsx` and `src/app/(tabs)/index.tsx` redirect ADMIN to Profile.
 - To add a tab: add the route group, a `Tabs.Screen` in the layout, and an entry in `LEFT_TABS` / `RIGHT_TABS` in `BottomNav.tsx` (lucide icon + i18n key under `navigation.*`).
 
 ### Navigation
@@ -276,7 +277,7 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`).
+Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
 
 List hooks of the working warehouse take `warehouseId` in their params and an `enabled` flag: `useProducts(params, enabled)`, `useOrders(params, enabled)`, `useTodaySalesSummary(warehouseId, enabled)`, `useCashboxList(params, enabled)`, `useRentalsInfinite(params, enabled)`, `useRentalSummary(enabled, warehouseId)`, `useRentalAgenda(from, to, warehouseId, enabled)` — pass `useWorkingWarehouse().isReady` as `enabled`.
 
@@ -362,6 +363,15 @@ Role checks in the UI are UX only — the backend enforces permissions.
 - Owner = `user.role === UserRole.OWNER` (not `staff.role`). The owner's store is `user.staff.storeId`.
 - Owner-only UI: Profile → «Сотрудники» (list, card, edit, new employee). The screens also show «нет доступа» for non-owners.
 - A deactivated employee gets 401 on every request (backend, 2026-11-09): the refresh fails and the app logs out.
+- Platform ADMIN = `isAdmin(user)` (`src/libs/roles.ts`); has no `staff` — Profile only (see «Tabs»), debtors are hidden and not loaded (`useDebtors(params, enabled)`).
+
+### Suspended store
+
+A store suspended by an admin gets 403 `{ code: 'STORE_SUSPENDED' }` on every request except `GET /auth/me` (backend `SubscriptionGuard`, rules in [`../docs/features/stores-warehouses.md`](../docs/features/stores-warehouses.md) → «Store Status»).
+
+- `src/api/axios-instance.ts` emits `onStoreSuspended()` on such a 403 → `AuthProvider` reloads `GET /auth/me` → `isStoreSuspended(user)` (`user.staff.store.status === 'SUSPENDED'`) → the root layout shows the `suspended` route instead of the tabs.
+- `ShopSuspendedScreen` (`src/screens/admin/`): owner — reason, date, «данные сохранены», «Связаться с поддержкой» (`SUPPORT_URL` = `https://t.me/sthm_support`); employee — «обратитесь к владельцу»; «Выйти». When the app returns to the foreground (`AppState` active) it reloads the profile, so a resumed store opens again.
+- The `Store` model has `status`, `suspendedAt`, `suspendReason`.
 
 ---
 
@@ -387,6 +397,17 @@ Screens in `src/screens/profile/staff/`, design «Профиль» page of the S
 - Helpers: `staff-format.ts` (`formatPhone`, `formatNationalPhone`, `PHONE_PREFIX`/`PHONE_DIGITS`/`STAFF_LOGIN_PATTERN`, `roleLabel`, `warehousesLabel`, `compactAmount`, `tenureLabel`).
 - Not built: password reset, photo, «на смене», «последний вход».
 - i18n: `staff.*`, `workingWarehouse.*` (`staffCreate.*` — the create form).
+
+---
+
+## Admin stores (platform ADMIN)
+
+Profile → card «Магазины · N» (shown to ADMIN instead of «Рабочий склад»). Screens in `src/screens/admin/shops/` (+ `shop-format.ts`, `ShopSheets.tsx`, `NewShopSheets.tsx`), API `services/admin-store/` → `/admin/stores*` ([`../docs/api-map.md`](../docs/api-map.md) → «Admin Stores»). Business rules: [`../docs/features/stores-warehouses.md`](../docs/features/stores-warehouses.md) → «Admin Store Management».
+
+- **List** (`AdminShopsScreen`, `(profile)/shops`): segment «Магазины | Заявки (скоро)» (requests — stub), summary by status, search, status chips with counts (`counts` from the backend), mode chips, infinite pages of 10; skeleton / error / empty («Создать первый магазин») / not found states.
+- **Card** (`AdminShopScreen`, `shops/[id]`): hero with status, term and tiles; suspended banner + «Возобновить работу»; owner read-only + call; mode switches (the last one can't be turned off — error text); warehouses (always shown active — warehouse status is a later task) + «Новый склад» sheet (`POST /warehouse`); staff preview + «Все сотрудники» (`AdminShopStaffScreen`, `shops/[id]/staff`, read-only); catalog; «Данные заявки» (filled fields only); «Показатели — скоро». «⋯» → menu sheet: Переименовать, Приостановить (effects, reason chips, comment) / Возобновить (paid until +1 / +3 months / no payment).
+- **New store** (`AdminShopNewScreen`, `shops/new`): name, category (top-level chips, `GET /category`), address, INN (9 digits), comment, first warehouse; new owner (full name, `+998` phone, login, password); brands — chips + `BrandSheet` (existing from `GET /category/brand` or a new name); attributes — chips from `GET /category/attributes` + `AttributeSheet` (name, type Текст / Число / Да-Нет, unit for numbers; values are added with products); modes; trial banner. Client validation mirrors the DTO (UX only); 409 shown above the button; on success → the card + toast.
+- i18n: `adminShops.*`, `adminShop.*`, `adminShopNew.*`, `shopSuspended.*`.
 
 ---
 

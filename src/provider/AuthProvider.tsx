@@ -1,3 +1,4 @@
+import { onStoreSuspended } from "@/api/axios-instance";
 import { LOCALE_STORAGE_KEYS } from "@/models/app.models";
 import { AuthRequest, CurrentUserType } from "@/models/auth.model";
 import { loginAuth, logoutAuth, profileAuth } from "@/services/auth.service";
@@ -130,6 +131,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(profile);
         await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
     };
+
+    // The admin suspended the store while the app was open: reload the profile
+    // (GET /auth/me stays available) — the root layout then shows «Магазин приостановлен».
+    useEffect(() => onStoreSuspended(() => {
+        refreshUser().catch((error) => console.error("Failed to reload profile after suspension:", error));
+    }), []);
 
     return (
         <AuthContext.Provider value={{ isAuthenticated, authStatus, user, login, logout, refreshUser }}>

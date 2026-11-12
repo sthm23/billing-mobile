@@ -19,6 +19,10 @@ export interface Store {
   salesEnabled?: boolean
   /** Store rents goods out (default false) */
   rentalEnabled?: boolean
+  /** Subscription: TRIAL / ACTIVE / SUSPENDED (suspended → the app shows «Магазин приостановлен») */
+  status?: 'TRIAL' | 'ACTIVE' | 'SUSPENDED'
+  suspendedAt?: string | null
+  suspendReason?: 'UNPAID' | 'OWNER_REQUEST' | 'OTHER' | null
   creator: User
   warehouse: Warehouse[]
   categories: { category: Category[], categoryId: string, storeId: string }[]

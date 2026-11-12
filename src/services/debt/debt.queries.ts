@@ -13,10 +13,14 @@ export const debtQueryKeys = {
 }
 
 /** Debtors list and totals; «Погашено» covers the current local month. */
-export const useDebtors = (params: Omit<DebtorsParams, 'from' | 'to'> = {}): UseQueryResult<DebtorsResponse> => {
+export const useDebtors = (
+  params: Omit<DebtorsParams, 'from' | 'to'> = {},
+  enabled = true,
+): UseQueryResult<DebtorsResponse> => {
   const query: DebtorsParams = { ...params, ...monthRange() }
 
   return useQuery({
+    enabled,
     queryKey: debtQueryKeys.debtors(query),
     queryFn: () => debtService.getDebtors(query),
     placeholderData: (previous) => previous,

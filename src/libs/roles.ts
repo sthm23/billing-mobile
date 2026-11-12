@@ -20,3 +20,16 @@ export function canLowerPrice(user: CurrentUserType | null | undefined): boolean
  * UX only — the backend enforces it (`POST /warehouse/:id/inventory`, `DELETE /product/:id`).
  */
 export const canManageProducts = canLowerPrice;
+
+/**
+ * Platform administrator: has no store (no Staff record) and only manages
+ * stores — Profile → «Магазины». UX only — the backend checks `AdminGuard`.
+ */
+export function isAdmin(user: CurrentUserType | null | undefined): boolean {
+  return user?.role === UserRole.ADMIN;
+}
+
+/** The user's store was suspended by an admin (subscription) — the app is blocked. */
+export function isStoreSuspended(user: CurrentUserType | null | undefined): boolean {
+  return !isAdmin(user) && user?.staff?.store?.status === 'SUSPENDED';
+}

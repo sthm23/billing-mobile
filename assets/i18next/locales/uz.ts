@@ -1,4 +1,274 @@
 const uz = {
+  "shopSuspended": {
+    "title": "Doʻkon ishi toʻxtatildi",
+    "ownerText": "Davom etish uchun obunani toʻlang. Ruxsat tiklanmaguncha xodimlar ishlay olmaydi.",
+    "employeeText": "Hozir ilovada ishlab boʻlmaydi. Doʻkon egasiga murojaat qiling.",
+    "store": "Doʻkon",
+    "reason": "Sabab",
+    "since": "Qaysi sanadan",
+    "accessSuspended": "Ruxsat toʻxtatilgan",
+    "dataKept": "Tovarlar, buyurtmalar, kassalar va qarzlar saqlangan",
+    "support": "Yordam xizmatiga yozish",
+    "logout": "Chiqish"
+  },
+  "adminShopNew": {
+    "title": "Yangi doʻkon",
+    "subtitle": "Doʻkon, birinchi ombor va egasi",
+    "shopSection": "Doʻkon",
+    "name": "Doʻkon nomi",
+    "namePlaceholder": "Masalan: Baraka Textile",
+    "category": "Kategoriya",
+    "categoriesFailed": "Kategoriyalarni yuklab boʻlmadi · qayta urinish",
+    "optional": "ixtiyoriy",
+    "address": "Manzil",
+    "addressPlaceholder": "Shahar, koʻcha, moʻljal",
+    "inn": "STIR",
+    "innPlaceholder": "9 ta raqam",
+    "note": "Izoh",
+    "notePlaceholder": "Masalan: 2 ta ombor, 10 ga yaqin xodim",
+    "warehouse": "Birinchi ombor nomi",
+    "warehouseHint": "Boshqa omborlarni egasi oʻzi qoʻshadi",
+    "defaultWarehouse": "Asosiy ombor",
+    "ownerSection": "Egasi",
+    "fullName": "F.I.Sh.",
+    "fullNamePlaceholder": "Familiya Ism",
+    "phone": "Telefon",
+    "login": "Login",
+    "loginPlaceholder": "Lotin harflarida, boʻshliqsiz",
+    "password": "Parol",
+    "passwordPlaceholder": "Kamida 8 ta belgi",
+    "passwordHint": "Parolni egasiga shaxsan bering",
+    "ownerHint": "Egasi shu login bilan kiradi va xodimlarni oʻzi qoʻshadi",
+    "catalogSection": "Katalog",
+    "addBrand": "Brend",
+    "addAttribute": "Atribut",
+    "remove": "«{{name}}» ni olib tashlash",
+    "modesSection": "Rejimlar",
+    "modesHint": "Kamida bitta rejim yoqilgan boʻlishi kerak",
+    "trialTitle": "Sinov davri — 1 oy",
+    "trialText": "Birinchi oy bepul · keyin obuna",
+    "summary": "«{{name}}» doʻkoni · {{category}} · «{{warehouse}}» ombori · egasi {{owner}} · 1 oy sinov",
+    "summaryEmpty": "Doʻkon nomi va egasi maʼlumotlarini toʻldiring — bu yerda xulosa chiqadi",
+    "fillHint": "Nomi, kategoriya va egasini toʻldiring",
+    "submit": "Doʻkon yaratish",
+    "creating": "Doʻkon yaratilmoqda…",
+    "created": "Doʻkon yaratildi. Egasi {{login}} login bilan kira oladi",
+    "errors": {
+      "name": "Doʻkon nomini kiriting",
+      "inn": "STIR — aynan 9 ta raqam",
+      "warehouse": "Ombor nomini kiriting",
+      "fullName": "Egasining F.I.Sh. ni kiriting",
+      "phone": "+998 dan keyin 9 ta raqam kiriting",
+      "login": "Faqat lotin harflari, raqamlar, nuqta va _ (kamida 3 ta)",
+      "password": "Kamida 8 ta belgi",
+      "taken": "Login yoki telefon band — egasi maʼlumotlarini oʻzgartiring",
+      "failed": "Doʻkonni yaratib boʻlmadi. Qayta urinib koʻring."
+    },
+    "brand": {
+      "title": "Brend",
+      "subtitle": "Roʻyxatdan tanlang yoki yangisini kiriting — u barcha doʻkonlarga ochiq boʻladi",
+      "placeholder": "Masalan: Mango",
+      "already": "Bu brend allaqachon qoʻshilgan",
+      "add": "Qoʻshish",
+      "addNew": "«{{name}}» ni qoʻshish"
+    },
+    "attr": {
+      "title": "Yangi atribut",
+      "subtitle": "Shu doʻkon tovar kartochkasida chiqadi",
+      "name": "Nomi",
+      "namePlaceholder": "Masalan: Material",
+      "type": "Qiymat turi",
+      "types": {
+        "STRING": "Matn",
+        "NUMBER": "Son",
+        "BOOLEAN": "Ha / Yoʻq"
+      },
+      "typesDesc": {
+        "STRING": "Istalgan satr",
+        "NUMBER": "Masalan: 6 m",
+        "BOOLEAN": "Almashtirgich"
+      },
+      "unit": "Birlik · ixtiyoriy",
+      "unitPlaceholder": "m, kg, l, mm",
+      "unitHint": "Tovarda: «{{name}} — 6 {{unit}}»",
+      "unitHintName": "Uzunlik",
+      "stringHint": "Qiymatlar (masalan, Paxta, Ipak) tovar kartochkasida qoʻshiladi — variantlar ulardan tuziladi.",
+      "boolPreview": "Sotuvchi shunday koʻradi",
+      "submit": "Atribut qoʻshish",
+      "duplicate": "Bu atribut allaqachon qoʻshilgan",
+      "typeConflict": "«{{name}}» atributi «{{type}}» turi bilan mavjud"
+    }
+  },
+  "adminShop": {
+    "title": "Doʻkon",
+    "more": "Yana",
+    "readOnly": "faqat koʻrish",
+    "cancel": "Bekor qilish",
+    "inactive": "Nofaol",
+    "saveFailed": "Saqlab boʻlmadi. Qayta urinib koʻring.",
+    "errorTitle": "Doʻkonni ochib boʻlmadi",
+    "term": {
+      "paid": "{{date}} gacha toʻlangan",
+      "trial": "Sinov davri {{date}} gacha",
+      "trialEnded": "Sinov davri {{date}} tugagan",
+      "suspended": "{{date}} dan toʻxtatilgan",
+      "since": "{{date}} dan ishlaydi"
+    },
+    "tiles": {
+      "warehouses": "omborlar",
+      "staff": "xodimlar",
+      "active": "faol"
+    },
+    "suspendedTitle": "Doʻkon {{date}} toʻxtatilgan",
+    "suspendedReason": "Sabab: {{reason}}",
+    "suspendedBy": "toʻxtatgan: {{name}}",
+    "suspendedEffect": "Xodimlar ishlay olmaydi, maʼlumotlar saqlanadi",
+    "reason": {
+      "UNPAID": "Obuna toʻlanmagan",
+      "OWNER_REQUEST": "Egasining soʻrovi",
+      "OTHER": "Boshqa"
+    },
+    "reasonShort": {
+      "UNPAID": "obuna toʻlanmagan",
+      "OWNER_REQUEST": "egasining soʻrovi",
+      "OTHER": "boshqa sabab"
+    },
+    "owner": "Egasi",
+    "ownerStatus": "Egasining holati",
+    "noOwner": "Egasi topilmadi",
+    "callOwner": "Egasiga qoʻngʻiroq",
+    "modes": {
+      "title": "Doʻkon rejimlari",
+      "sale": "Tovar savdosi",
+      "saleDesc": "Buyurtmalar, skaner, kassa",
+      "rent": "Ijara",
+      "rentDesc": "Bronlar, berish va qaytarish",
+      "lastError": "Kamida bitta rejim yoqilgan boʻlishi kerak — avval «{{mode}}» ni yoqing"
+    },
+    "warehouses": "Omborlar ({{count}})",
+    "addWarehouse": "+ Ombor qoʻshish",
+    "warehouseStaff": "ruxsati bor xodimlar: {{count}}",
+    "staff": "Xodimlar ({{count}})",
+    "onlyOwner": "Egasidan boshqa xodim yoʻq. Egasi ularni profilida oʻzi qoʻshadi.",
+    "allStaff": "Barcha xodimlar · {{count}}",
+    "staffTitle": "Xodimlar · {{count}}",
+    "staffSubtitle": "{{name}} · faqat koʻrish",
+    "staffHint": "Xodimlarni doʻkon egasi boshqaradi",
+    "staffFailed": "Xodimlarni yuklab boʻlmadi",
+    "catalog": {
+      "title": "Katalog",
+      "category": "Kategoriya",
+      "brands": "Brendlar",
+      "attributes": "Tovar atributlari"
+    },
+    "application": {
+      "title": "Ariza maʼlumotlari",
+      "address": "Manzil",
+      "inn": "STIR",
+      "note": "Izoh"
+    },
+    "metrics": {
+      "title": "Koʻrsatkichlar",
+      "revenue": "oylik tushum",
+      "orders": "buyurtmalar",
+      "subscription": "obuna",
+      "hint": "Tushum, buyurtmalar va obuna toʻlovi billing ulanganda chiqadi"
+    },
+    "menu": {
+      "rename": "Nomini oʻzgartirish",
+      "suspend": "Toʻxtatish",
+      "resume": "Ishni tiklash"
+    },
+    "rename": {
+      "title": "Doʻkon nomini oʻzgartirish",
+      "label": "Doʻkon nomi",
+      "placeholder": "Masalan: Baraka Textile",
+      "submit": "Saqlash",
+      "done": "Nomi saqlandi"
+    },
+    "suspend": {
+      "title": "Doʻkonni toʻxtatasizmi?",
+      "effectStaff": "Xodimlar ilovada ishlay olmaydi",
+      "effectData": "Tovarlar, buyurtmalar, kassalar va qarzlar saqlanadi",
+      "effectResume": "Ishni istalgan vaqtda tiklash mumkin",
+      "reason": "Sabab",
+      "comment": "Egasi uchun izoh · ixtiyoriy",
+      "submit": "Toʻxtatish",
+      "done": "Doʻkon toʻxtatildi"
+    },
+    "resume": {
+      "title": "«{{name}}» ishini tiklaysizmi?",
+      "textPaid": "Xodimlar yana kirib savdo qila oladi. Holat «Faol», {{date}} gacha toʻlangan.",
+      "textNoPay": "Xodimlar yana kirib savdo qila oladi. Toʻlov muddati oʻzgarmaydi.",
+      "paidUntil": "Toʻlangan",
+      "months": "+{{count}} oy",
+      "noPay": "Toʻlovsiz",
+      "submit": "Tiklash",
+      "done": "Doʻkon ishi tiklandi"
+    },
+    "warehouse": {
+      "title": "Yangi ombor",
+      "subtitle": "«{{name}}» doʻkoni · xodimlarga ruxsatni egasi beradi",
+      "label": "Ombor nomi",
+      "placeholder": "Masalan: 2-ombor · Yunusobod",
+      "submit": "Qoʻshish",
+      "done": "Ombor qoʻshildi"
+    }
+  },
+  "adminShops": {
+    "title": "Doʻkonlar",
+    "entrySubtitle": "Doʻkonlar: {{count}}",
+    "tabShops": "Doʻkonlar",
+    "tabRequests": "Arizalar",
+    "soon": "tez orada",
+    "noAccess": "Boʻlim faqat administrator uchun",
+    "loading": "Yuklanmoqda…",
+    "offline": "Aloqa yoʻq",
+    "total": "Jami: {{count}}",
+    "create": "Yangi doʻkon",
+    "createFirst": "Birinchi doʻkonni yaratish",
+    "sum": {
+      "total": "jami",
+      "active": "faol",
+      "trial": "sinov davrida",
+      "suspended": "toʻxtatilgan"
+    },
+    "search": "Doʻkon nomi, egasi yoki telefon",
+    "filter": {
+      "all": "Hammasi",
+      "ACTIVE": "Faol",
+      "TRIAL": "Sinov",
+      "SUSPENDED": "Toʻxtatilgan"
+    },
+    "mode": {
+      "sale": "Savdo",
+      "rent": "Ijara"
+    },
+    "status": {
+      "ACTIVE": "Faol",
+      "TRIAL": "Sinov",
+      "SUSPENDED": "Toʻxtatilgan",
+      "trialExpired": "Sinov tugagan"
+    },
+    "term": {
+      "since": "{{date}} dan",
+      "paidUntil": "{{date}} gacha toʻlangan",
+      "trialUntil": "sinov {{date}} gacha",
+      "trialEnded": "sinov {{date}} tugagan",
+      "suspendedSince": "{{date}} dan toʻxtatilgan"
+    },
+    "rowMeta": "Egasi: {{owner}} · omborlar: {{warehouses}} · xodimlar: {{staff}}",
+    "loadingMore": "Yana {{count}} ta yuklanmoqda, jami {{total}}",
+    "errorTitle": "Doʻkonlarni yuklab boʻlmadi",
+    "errorText": "Internetni tekshirib, qayta urinib koʻring.",
+    "retry": "Qayta urinish",
+    "emptyTitle": "Hali doʻkonlar yoʻq",
+    "emptyText": "Birinchi doʻkon va egasini yarating — egasi xodim va tovarlarni oʻzi qoʻshadi.",
+    "notFoundTitle": "Hech narsa topilmadi",
+    "notFoundText": "«{{query}}» boʻyicha doʻkon yoʻq. Nomi yoki egasining telefonini tekshiring.",
+    "notFoundFilters": "Bunday filtrlar bilan doʻkon yoʻq.",
+    "resetSearch": "Qidiruvni tozalash"
+  },
   "debtors": {
     "unassigned": {
       "title": "Mijozsiz",
