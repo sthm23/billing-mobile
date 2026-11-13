@@ -90,6 +90,21 @@ export const onStoreSuspended = (listener: StoreSuspendedListener): (() => void)
   }
 }
 
+type SessionExpiredListener = () => void
+const sessionExpiredListeners = new Set<SessionExpiredListener>()
+
+/**
+ * Called when a 401 could not be fixed by /refresh (refresh token expired or
+ * revoked): the local token is already removed. AuthProvider resets its state
+ * so the root layout opens the login screen. Returns an unsubscribe function.
+ */
+export const onSessionExpired = (listener: SessionExpiredListener): (() => void) => {
+  sessionExpiredListeners.add(listener)
+  return () => {
+    sessionExpiredListeners.delete(listener)
+  }
+}
+
 const isStoreSuspendedError = (error: AxiosError): boolean => {
   const data = error.response?.data as { code?: string } | undefined
   return error.response?.status === 403 && data?.code === STORE_SUSPENDED_CODE
@@ -201,6 +216,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
         return instance.request(originalConfig)
       } catch (refreshError) {
         await handleUnauthorizedExit(accessToken)
+        sessionExpiredListeners.forEach((listener) => listener())
         return Promise.reject(refreshError)
       } finally {
         isRefreshing = false

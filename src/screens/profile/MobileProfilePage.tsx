@@ -1,6 +1,7 @@
 import { ListCard, Pressable, Segmented, Text } from "@/components/base";
 import { EmptyState } from "@/components/common";
 import { useBottomNavInset } from "@/components/navigation/BottomNav";
+import { useRefreshControl } from "@/hooks/use-refresh-control";
 import { useStoreMode, type NavMode } from "@/hooks/use-store-mode";
 import { useWorkingWarehouse } from "@/hooks/use-working-warehouse";
 import { useTheme } from "@/hooks/use-theme";
@@ -15,6 +16,7 @@ import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { HandCoins, Store, UserRoundX, UsersRound } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
+import { useCallback } from "react";
 import { ScrollView, View } from "react-native";
 import LogoutButton from "./LogoutButton";
 import ProfileCard from "./ProfileCard";
@@ -31,7 +33,7 @@ const PRIVACY_POLICY_URLS: Record<string, string> = {
 const MobileProfilePage = () => {
   const { t, i18n } = useTranslation();
   const privacyPolicyUrl = PRIVACY_POLICY_URLS[i18n.language] ?? PRIVACY_POLICY_URLS.ru;
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const colors = useTheme();
   const bottomInset = useBottomNavInset();
   const version = Constants.expoConfig?.version ?? '';
@@ -46,6 +48,21 @@ const MobileProfilePage = () => {
     { enabled: user?.role === UserRole.OWNER && working.isReady }
   );
 
+  const { refetch: refetchDebtors } = debtors;
+  const { refetch: refetchStoreCounts } = storeCounts;
+  const { refetch: refetchStaff } = staffList;
+  // Pull to refresh: the profile itself (GET /auth/me — also checks the session:
+  // an expired one goes through /refresh or back to the login screen) plus the
+  // counters on the cards of this role.
+  const refresh = useCallback(async () => {
+    await Promise.allSettled([
+      refreshUser(),
+      admin ? refetchStoreCounts() : refetchDebtors(),
+      user?.role === UserRole.OWNER && working.isReady ? refetchStaff() : undefined,
+    ]);
+  }, [refreshUser, admin, refetchStoreCounts, refetchDebtors, refetchStaff, user?.role, working.isReady]);
+  const refreshControl = useRefreshControl(refresh);
+
   if (!user) {
     return <EmptyState icon={UserRoundX} message={t('profile.noUser')} />;
   }
@@ -53,6 +70,7 @@ const MobileProfilePage = () => {
   return (
     <ScrollView
       className="flex-1 bg-bg"
+      refreshControl={refreshControl}
       // One prop only: on native contentContainerStyle replaces contentContainerClassName
       contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingTop: 8, gap: 12, paddingBottom: bottomInset }}
     >

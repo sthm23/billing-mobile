@@ -1,4 +1,4 @@
-import { onStoreSuspended } from "@/api/axios-instance";
+import { onSessionExpired, onStoreSuspended } from "@/api/axios-instance";
 import { LOCALE_STORAGE_KEYS } from "@/models/app.models";
 import { getAccessToken, removeAccessToken, setAccessToken } from "@/libs/token-storage";
 import { AuthRequest, CurrentUserType } from "@/models/auth.model";
@@ -131,6 +131,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // (GET /auth/me stays available) — the root layout then shows «Магазин приостановлен».
     useEffect(() => onStoreSuspended(() => {
         refreshUser().catch((error) => console.error("Failed to reload profile after suspension:", error));
+    }), []);
+
+    // The refresh token expired or was revoked (axios already removed the local
+    // token): drop the in-memory session so the root layout opens the login screen.
+    useEffect(() => onSessionExpired(() => {
+        setAuthenticated(false);
+        setAuthStatus(AuthStatusEnum.Unauthenticated);
+        setUser(null);
     }), []);
 
     return (
