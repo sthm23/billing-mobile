@@ -950,6 +950,7 @@ const ru = {
     "title": "Ошибка",
     "loginFailed": "Ошибка входа",
     "invalidCredentials": "Неверный логин или пароль",
+    "tooManyAttempts": "Слишком много попыток входа. Попробуйте через минуту",
     "networkUnavailable": "Нет соединения с сервером. Проверьте интернет и настройки API URL."
   },
   "app": {

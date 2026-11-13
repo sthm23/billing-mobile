@@ -1,5 +1,6 @@
 
-import { LOCALE_STORAGE_KEYS } from '@/models/app.models';
+import { LOCALE_STORAGE_KEYS } from '@/models/app.models'
+import { getAccessToken, removeAccessToken, setAccessToken } from '@/libs/token-storage';
 import { LogoutRequest } from '@/models/auth.model';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
@@ -95,7 +96,7 @@ const isStoreSuspendedError = (error: AxiosError): boolean => {
 }
 
 const clearSession = async (): Promise<void> => {
-  await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.TOKEN)
+  await removeAccessToken()
   await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER)
 }
 
@@ -116,7 +117,7 @@ const handleUnauthorizedExit = async (accessToken: string | null): Promise<void>
   try {
     if (accessToken) {
       const body: LogoutRequest = {
-        allDevices: true,
+        allDevices: false, // only this device; other sessions stay signed in
         sessionId: accessToken, // Backend expects access token as sessionId to decode sid
       }
       await RAW_API.post('/logout', body)
@@ -139,7 +140,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
         return config
       }
 
-      const token = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN)
+      const token = await getAccessToken()
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
@@ -185,7 +186,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
       }
 
       isRefreshing = true
-      const accessToken = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN)
+      const accessToken = await getAccessToken()
 
       try {
         const newToken = await refreshAccessToken()
@@ -194,7 +195,7 @@ const attachAuthInterceptor = (instance: AxiosInstance): void => {
           throw new Error('Token refresh failed')
         }
 
-        await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.TOKEN, newToken)
+        await setAccessToken(newToken)
         originalConfig.headers.Authorization = `Bearer ${newToken}`
 
         return instance.request(originalConfig)

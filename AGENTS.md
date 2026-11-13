@@ -36,8 +36,11 @@ Verify the SDK in `package.json` (`expo`) before relying on any doc.
 | Forms | `react-hook-form` + `zod` | 7.81 / 4.4 |
 | i18n | `i18next` + `react-i18next` + `expo-localization` (en, ru, uz) | 26 / 17 |
 | Storage | `@react-native-async-storage/async-storage` | 2.2.0 |
+| Secure storage | `expo-secure-store` (access token; config plugin in `app.json`) | ~57.0.4 |
 
 `app.json` enables `typedRoutes`, `reactCompiler` and `userInterfaceStyle: automatic`.
+
+Secure storage: `expo-secure-store` was added 2026-11-13 with its config plugin in `app.json` — needs a new dev build / native rebuild.
 
 Barcode scanning: `expo-camera` (`CameraView` + `useCameraPermissions`, config plugin in `app.json` with the camera permission text — needs a native rebuild / new dev client).
 
@@ -265,8 +268,10 @@ import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 `src/api/axios-instance.ts`:
 - `BASE_URL` is chosen with `Platform.select`. **It currently points to a LAN dev server** (`http://<lan-ip>:4000/api`, `localhost` for web); production is `https://sthm23.uz/api` (commented). Check it before building a release.
 - Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payment`), `warehouseApi` (`/warehouse`), `categoryApi` (`/category`). Timeout 30 s, `withCredentials: true`.
-- Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup`, `/refresh`, `/logout`.
-- On 401: one shared `GET /refresh` (httpOnly cookie) → save new token → retry once. If refresh fails: `POST /logout` and clear stored token/user.
+- Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup` (leftover; the backend route was removed 2026-11-13), `/refresh`, `/logout`.
+- The token is read / written only through `src/libs/token-storage.ts` (`getAccessToken`, `setAccessToken`, `removeAccessToken`); never use AsyncStorage for it directly.
+- On 401: one shared `GET /refresh` (httpOnly cookie) → save new token → retry once. If refresh fails: `POST /logout` (`allDevices: false`) and clear stored token/user.
+- The backend rejects an access token as soon as its session is revoked (logout, refresh rotation), so an old token is useless after a refresh.
 
 Endpoint reference: [`../docs/api-map.md`](../docs/api-map.md) (verify against the backend controller — parts are outdated).
 
@@ -356,7 +361,9 @@ Always handle loading / error / empty states (`components/common/LoadingState`, 
 ## Authentication
 
 `src/provider/AuthProvider.tsx` exports `AuthProvider`, `useAuth`, `AuthStatusEnum` (`loading` | `authenticated` | `unauthenticated`).
-`useAuth()` → `{ isAuthenticated, authStatus, user, login(data), logout() }`. On start it reads the token and loads `GET /auth/me`.
+`useAuth()` → `{ isAuthenticated, authStatus, user, login(data), logout() }`. On start it reads the token (`getAccessToken`) and loads `GET /auth/me`. `logout()` sends `POST /logout` with `allDevices: false` (this device only).
+
+Login screen (`screens/login/LoginPage.tsx`): HTTP 429 (backend rate limit on `POST /login`) → `errors.tooManyAttempts` (ru / en / uz).
 
 Role checks in the UI are UX only — the backend enforces permissions.
 
@@ -415,8 +422,8 @@ Profile → card «Магазины · N» (shown to ADMIN instead of «Рабо
 
 | Key | Where | Purpose |
 |---|---|---|
-| `my_billing_access_token` | `LOCALE_STORAGE_KEYS.TOKEN` (`models/app.models.ts`) | Access token |
-| `my_billing_current_user` | `LOCALE_STORAGE_KEYS.USER` | Cached user |
+| `my_billing_access_token` | `LOCALE_STORAGE_KEYS.TOKEN` (`models/app.models.ts`), via `libs/token-storage.ts` | Access token — **`expo-secure-store`** on iOS / Android, AsyncStorage on Expo web. A copy left in AsyncStorage by an older app version is moved to SecureStore once. |
+| `my_billing_current_user` | `LOCALE_STORAGE_KEYS.USER` | Cached user (AsyncStorage) |
 | `sthm23-theme-mode` | `ThemeStorageKey.THEME_MODE` (`hooks/use-theme-control.ts`) | Theme mode |
 | `sthm23-nav-mode` | `hooks/use-store-mode.ts` | Bottom menu mode (sale / rent) |
 | `sthm23-working-warehouse` | `hooks/use-working-warehouse.ts` | Working warehouse id |
@@ -495,4 +502,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-11-09
+**Last updated**: 2026-11-13

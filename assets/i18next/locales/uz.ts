@@ -950,6 +950,7 @@ const uz = {
     "title": "Xato",
     "loginFailed": "Kirish muvaffaqiyatsiz",
     "invalidCredentials": "Noto'g'ri login yoki parol",
+    "tooManyAttempts": "Kirish urinishlari juda ko'p. Bir daqiqadan so'ng qayta urinib ko'ring",
     "networkUnavailable": "Server bilan ulanish yo'q. Internetni va API URL sozlamalarini tekshiring."
   },
   "app": {

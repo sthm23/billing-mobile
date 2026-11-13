@@ -949,6 +949,7 @@ const en = {
     "title": "Error",
     "loginFailed": "Login Failed",
     "invalidCredentials": "Invalid login or password",
+    "tooManyAttempts": "Too many login attempts. Try again in a minute",
     "networkUnavailable": "Cannot connect to the server. Check your internet connection and API URL settings."
   },
   "app": {

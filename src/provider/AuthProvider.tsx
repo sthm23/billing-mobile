@@ -1,5 +1,6 @@
 import { onStoreSuspended } from "@/api/axios-instance";
 import { LOCALE_STORAGE_KEYS } from "@/models/app.models";
+import { getAccessToken, removeAccessToken, setAccessToken } from "@/libs/token-storage";
 import { AuthRequest, CurrentUserType } from "@/models/auth.model";
 import { loginAuth, logoutAuth, profileAuth } from "@/services/auth.service";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     useEffect(()=>{
         const loadAuthState = async () => {
             try {
-                const token = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN);
+                const token = await getAccessToken();
 
                 if (!token) {
                     setAuthenticated(false);
@@ -56,10 +57,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
                 } catch (profileError) {
                     // Token exists but profile request failed: clear broken local session.
-                    await AsyncStorage.multiRemove([
-                        LOCALE_STORAGE_KEYS.TOKEN,
-                        LOCALE_STORAGE_KEYS.USER,
-                    ]);
+                    await removeAccessToken();
+                    await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER);
                     setAuthenticated(false);
                     setAuthStatus(AuthStatusEnum.Unauthenticated);
                     setUser(null);
@@ -83,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (data: AuthRequest) => {
         try {
             const response = await loginAuth(data)
-            await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.TOKEN, response.accessToken);
+            await setAccessToken(response.accessToken);
 
             const profile = await profileAuth();
             setAuthenticated(true);
@@ -91,10 +90,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setUser(profile);
             await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
         } catch (error) {
-            await AsyncStorage.multiRemove([
-                LOCALE_STORAGE_KEYS.TOKEN,
-                LOCALE_STORAGE_KEYS.USER,
-            ]);
+            await removeAccessToken();
+            await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER);
             setAuthenticated(false);
             setAuthStatus(AuthStatusEnum.Unauthenticated);
             setUser(null);
@@ -104,22 +101,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const logout = async () => {
-        const accessToken = await AsyncStorage.getItem(LOCALE_STORAGE_KEYS.TOKEN);
+        const accessToken = await getAccessToken();
 
         try {
             if (accessToken) {
                 await logoutAuth({
-                    allDevices: true,
+                    allDevices: false,
                     sessionId: accessToken, // Backend expects access token as sessionId to decode sid
                 });
             }
         } catch (error) {
             console.error("Failed to logout API call:", error);
         } finally {
-            await AsyncStorage.multiRemove([
-                LOCALE_STORAGE_KEYS.TOKEN,
-                LOCALE_STORAGE_KEYS.USER,
-            ]);
+            await removeAccessToken();
+            await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER);
             setAuthenticated(false);
             setAuthStatus(AuthStatusEnum.Unauthenticated);
             setUser(null);

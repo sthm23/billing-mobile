@@ -57,6 +57,10 @@ export function LoginPage() {
             if (error.response.status === 401 || error.response.status === 404) {
                 return t('errors.invalidCredentials');
             }
+            // Login rate limit (backend throttler)
+            if (error.response.status === 429) {
+                return t('errors.tooManyAttempts');
+            }
             const apiMessage = error.response.data?.message;
             if (typeof apiMessage === 'string' && apiMessage.trim()) {
                 return apiMessage;
