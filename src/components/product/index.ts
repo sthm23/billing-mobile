@@ -1,3 +1,4 @@
+export { CategorySheet } from './CategorySheet';
 export { ImageCarousel } from './ImageCarousel';
 export { ProductCard } from './ProductCard';
 export { ProductCardSkeleton } from './ProductCardSkeleton';

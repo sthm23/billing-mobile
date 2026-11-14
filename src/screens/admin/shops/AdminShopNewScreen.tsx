@@ -3,6 +3,7 @@ import { SafeAreaView } from '@/components/base/SafeAreaView';
 import { EmptyState } from '@/components/common';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
+import { categoryLabel } from '@/libs/category';
 import { isAdmin } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
@@ -78,7 +79,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
  * one-month trial (backend).
  */
 export function AdminShopNewScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
@@ -216,7 +217,7 @@ export function AdminShopNewScreen() {
         name: name.trim(),
         warehouse: warehouseName.trim(),
         owner: ownerLabel,
-        category: category?.name ?? '—',
+        category: category ? categoryLabel(category, i18n.language) : '—',
       })
     : t('adminShopNew.summaryEmpty');
 
@@ -252,7 +253,7 @@ export function AdminShopNewScreen() {
                   {(categories.data ?? []).map((c) => (
                     <Chip
                       key={c.id}
-                      label={c.name}
+                      label={categoryLabel(c, i18n.language)}
                       tone="sunken"
                       selected={categoryId === c.id}
                       onPress={() => setCategoryId(c.id)}

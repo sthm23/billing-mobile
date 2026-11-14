@@ -1,8 +1,7 @@
-import { categoryApi, productsApi, warehouseApi } from '@/api/axios-instance'
+import { productsApi, warehouseApi } from '@/api/axios-instance'
 import { BaseListResponse } from '@/models/app.models'
 import { OrderProductVariant } from '@/services/order/order.type'
 import type {
-  Category,
   CreateProduct,
   CreateProductVariantPayload,
   InventoryMovementPayload,
@@ -84,12 +83,6 @@ const getStockMovements = async (
   return response.data
 }
 
-/** Top categories of the store (filter chips). */
-const getStoreCategories = async (storeId: string): Promise<Category[]> => {
-  const response = await categoryApi.get<Category[]>(`/${storeId}/categories`)
-  return response.data
-}
-
 const createProductVariants = async (body: CreateProductVariantPayload): Promise<Product> => {
   const response = await productsApi.post<Product>(ENDPOINTS.VARIANTS, body)
 
@@ -129,7 +122,6 @@ export const productService = {
   getProductById,
   getProducts,
   getStockMovements,
-  getStoreCategories,
   createProductVariants,
   searchProducts,
   addInventory,

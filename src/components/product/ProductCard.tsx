@@ -1,4 +1,5 @@
 import { ListCard, type StatusTone } from '@/components/base';
+import { productCategoryLabel } from '@/libs/category';
 import { getTotalQuantity } from '@/libs/product-utils';
 import { Product } from '@/models/product.model';
 import { useTranslation } from 'react-i18next';
@@ -16,12 +17,11 @@ interface ProductCardProps {
  * «от» price and stock badge.
  */
 export function ProductCard({ product, lowStockThreshold, onPress }: ProductCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const totalQuantity = getTotalQuantity(product);
   const stockTone: StatusTone = totalQuantity <= lowStockThreshold ? 'err' : 'ok';
 
-  // Get translated category or fallback to original
-  const category = t(`category.${product.category}`, { defaultValue: product.category });
+  const category = productCategoryLabel(product, i18n.language);
   const meta = [category, product.brand, product.warehouse?.name].filter(Boolean).join(' · ');
 
   return (

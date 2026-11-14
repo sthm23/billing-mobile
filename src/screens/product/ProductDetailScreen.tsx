@@ -5,6 +5,7 @@ import { ProductVariantCard, RentalPriceRow } from '@/components/product/Product
 import { useStoreMode } from '@/hooks/use-store-mode';
 import { StockMovementSheet, type StockMovementTarget } from '@/components/product/StockMovementSheet';
 import { getApiErrorMessage } from '@/libs/api-error';
+import { productCategoryLabel } from '@/libs/category';
 import { formatMoney } from '@/libs/format';
 import {
   buildAttributeMap,
@@ -65,7 +66,7 @@ function toOrderVariant(
 }
 
 export default function ProductDetailScreen({ product, onRefresh }: ProductDetailScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const refreshControl = useRefreshControl(onRefresh);
   const { user } = useAuth();
   const canManage = canManageProducts(user);
@@ -190,9 +191,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
   };
 
   const attributeNames = (product.attributes ?? []).map((a) => a.name);
-  const category = product.category
-    ? t(`category.${product.category}`, { defaultValue: product.category })
-    : '';
+  const category = productCategoryLabel(product, i18n.language);
   const subtitle = [category, product.brand].filter(Boolean).join(' · ');
 
   return (

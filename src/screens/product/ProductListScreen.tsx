@@ -7,11 +7,13 @@ import { ProductCardSkeleton } from '@/components/product/ProductCardSkeleton';
 import { useDebounce } from '@/hooks/use-debounce';
 import { Product } from '@/models/product.model';
 import { useAuth } from '@/provider/AuthProvider';
-import { DEBOUNCE_TIME_MS, productQueryKeys, useProducts, useStoreCategories } from '@/services/product/product.queries';
+import { categoryLabel } from '@/libs/category';
+import { useStoreCategories } from '@/services/category';
+import { DEBOUNCE_TIME_MS, productQueryKeys, useProducts } from '@/services/product/product.queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Package, Plus, SlidersHorizontal } from 'lucide-react-native';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, ScrollView, View } from 'react-native';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
@@ -22,7 +24,7 @@ const DEFAULT_LOW_STOCK_THRESHOLD = 5;
 
 export default function ProductListScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const bottomInset = useBottomNavInset();
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,7 +34,9 @@ export default function ProductListScreen() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   const debouncedSearch = useDebounce(searchQuery, DEBOUNCE_TIME_MS);
-  const { data: categories } = useStoreCategories(user?.staff?.storeId);
+  const { data: directions } = useStoreCategories(user?.staff?.storeId);
+  // Chips are the subcategories of the store direction
+  const subcategories = useMemo(() => (directions ?? []).flatMap((d) => d.children ?? []), [directions]);
 
   const queryClient = useQueryClient();
   const refreshControl = useRefreshControl(async () => {
@@ -109,15 +113,16 @@ export default function ProductListScreen() {
           contentContainerClassName="px-4 gap-2"
         >
           <Chip label={allLabel} selected={!categoryId} onPress={() => setCategoryId(undefined)} />
-          {(categories ?? []).map((category) => (
+          {/* «Мало» goes before the subcategories: a direction can have many */}
+          <Chip label={lowLabel} tone="err" selected={lowStock} onPress={() => setLowStock((v) => !v)} />
+          {subcategories.map((category) => (
             <Chip
               key={category.id}
-              label={t(`category.${category.name}`, { defaultValue: category.name })}
+              label={categoryLabel(category, i18n.language)}
               selected={categoryId === category.id}
               onPress={() => setCategoryId(categoryId === category.id ? undefined : category.id)}
             />
           ))}
-          <Chip label={lowLabel} tone="err" selected={lowStock} onPress={() => setLowStock((v) => !v)} />
         </ScrollView>
       </View>
 

@@ -119,10 +119,12 @@ export interface UpdateAdminStorePayload {
   rentalEnabled?: boolean;
 }
 
-/** GET /category — top-level categories (store directions) */
+/** GET /category — top-level categories (store directions); `name` is Russian */
 export interface CatalogCategory {
   id: string;
   name: string;
+  nameUz: string | null;
+  nameEn: string | null;
   parentId: string | null;
 }
 

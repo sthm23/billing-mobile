@@ -91,10 +91,10 @@ billing-mobile/
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
-    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, roles.ts (isAdmin, isStoreSuspended, …)
+    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, roles.ts (isAdmin, isStoreSuspended, canAddCategory, …), category.ts (categoryLabel)
     ├── models/                   # API types (app, auth, order, payment, product, store, user)
     ├── provider/AuthProvider.tsx # Auth context
-    └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product, admin-store, …)
+    └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product, category, admin-store, …)
 ```
 
 `src/app` route files mostly import a component from `src/screens/` — put screen code in `screens/`, keep routes thin.
@@ -346,6 +346,7 @@ All totals come from the backend; the client sends its local day bounds from `to
 - **Card** (`ProductDetailScreen`): «В заказ · {sum}» opens `AddToOrderSheet` — «Новый заказ» fills the cart (`cartStore.startNew(product.warehouseId)` + `addVariant(variant, quantity)`) and opens `/(tabs)/(orders)/create?keep=1` (`OrderCartScreen` `keepCart` keeps the prefilled cart); an open CREATED/HOLD order of the product's warehouse → `useAddToOrder` (GET order → add to the variant's line, keeping its price → `POST /orders/items`) + toast «Товар добавлен в заказ».
 - «Приход / Списание» (`StockMovementSheet` → `POST /warehouse/:id/inventory`) and archive (`DELETE /product/:id`) are shown only to owner/manager (`canManageProducts()` in `libs/roles.ts` — UX only). «История» (`StockHistoryScreen`, `GET /product/variants/:id/stock-movements`) — all staff.
 - Margin «Продажа · маржа N%» is display-only. Edit (pencil) is disabled.
+- **Categories** (2 levels: store direction → product subcategory, one shared dictionary; rules in [`../docs/features/products.md`](../docs/features/products.md)): names come from the backend — `name` (Russian) + `nameUz` / `nameEn`, shown with `categoryLabel(c, i18n.language)` / `productCategoryLabel(product, …)` from `libs/category.ts` (never a `category.*` i18n key — that block was removed). API and hooks in `services/category/` (`useStoreCategories`, `useCategoryTree`, `useCreateSubcategory`, `useUpdateSubcategory`, `useDeleteSubcategory`). The product list chips are the subcategories of the store direction. `components/product/CategorySheet.tsx` — subcategory picker with search over all languages and «Добавить «…»» for OWNER/ADMIN (`canAddCategory()`, UX only); ready for the product form. Admin store card «Каталог»: tap a subcategory → `SubcategorySheet` (rename / translations / delete).
 - `libs/product-utils.ts`: `getVariantLabel`, `getLatestCostPrice` (skips movements without a cost; the cart's `latestReceiptCost` too).
 
 ```tsx

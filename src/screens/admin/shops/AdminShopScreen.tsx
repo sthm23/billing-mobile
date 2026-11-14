@@ -5,11 +5,14 @@ import { EmptyState } from '@/components/common';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
+import { categoryLabel } from '@/libs/category';
 import { formatDate, formatDayMonth } from '@/libs/date';
 import { isAdmin } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
+import type { Category } from '@/models/product.model';
 import { useAdminStore, useUpdateAdminStore, type AdminStoreDetails, type StoreMode } from '@/services/admin-store';
+import { useCategoryTree } from '@/services/category';
 import { formatPhone, roleLabel, warehousesLabel } from '@/screens/profile/staff/staff-format';
 import { router } from 'expo-router';
 import {
@@ -31,6 +34,7 @@ import { Linking, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { shopInitials, shopModes, shopStatusBadge } from './shop-format';
 import { NewWarehouseSheet, RenameShopSheet, ResumeShopSheet, ShopMenuSheet, SuspendShopSheet } from './ShopSheets';
+import { SubcategorySheet } from './SubcategorySheet';
 
 type SheetKind = 'none' | 'menu' | 'rename' | 'suspend' | 'resume' | 'warehouse';
 const MODES: StoreMode[] = ['sale', 'rent'];
@@ -62,6 +66,15 @@ function SmallChip({ label }: { label: string }) {
     <View className="px-2.5 py-1 rounded-pill bg-sunken">
       <Text className="font-onest-semibold text-xs text-ink">{label}</Text>
     </View>
+  );
+}
+
+/** Subcategory chip of the catalog block: tap → rename / delete */
+function EditableChip({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" className="px-2.5 py-1 rounded-pill bg-sunken active:opacity-70">
+      <Text className="font-onest-semibold text-xs text-ink">{label}</Text>
+    </Pressable>
   );
 }
 
@@ -102,7 +115,7 @@ function ShopSkeleton() {
  * (read-only), catalog, application data. «⋯» → rename / suspend / resume.
  */
 export function AdminShopScreen({ id }: { id: string }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
@@ -112,7 +125,12 @@ export function AdminShopScreen({ id }: { id: string }) {
   const refreshControl = useRefreshControl(query.refetch);
   const [sheet, setSheet] = useState<SheetKind>('none');
   const [modeError, setModeError] = useState<string | null>(null);
+  const [editCategory, setEditCategory] = useState<Category | null>(null);
   const store = query.data;
+  // Subcategories of the store direction (shared dictionary) — from the full tree
+  const categoryTree = useCategoryTree(admin && !!store);
+  const direction = categoryTree.data?.find((c) => c.id === store?.categories[0]?.id);
+  const directionName = direction ? categoryLabel(direction, i18n.language) : (store?.categories[0]?.name ?? '');
 
   const header = (
     <View className="flex-row items-center gap-2.5 px-4 pt-2 pb-3">
@@ -375,8 +393,42 @@ export function AdminShopScreen({ id }: { id: string }) {
 
         {/* Catalog */}
         <Section title={t('adminShop.catalog.title')}>
+          <View className="gap-2">
+            <Text className="font-onest text-[13px] text-soft">{t('adminShop.catalog.category')}</Text>
+            {directionName ? (
+              <View className="flex-row flex-wrap gap-1.5">
+                <SmallChip label={directionName} />
+              </View>
+            ) : (
+              <Text className="font-onest text-[13px] text-muted">—</Text>
+            )}
+          </View>
+          {store.categories.length ? (
+            <View className="gap-2">
+              <Text className="font-onest text-[13px] text-soft">
+                {t('adminShop.catalog.subcategories', { count: direction?.children?.length ?? 0 })}
+              </Text>
+              {categoryTree.isError ? (
+                <Pressable onPress={() => void categoryTree.refetch()} accessibilityRole="button">
+                  <Text className="font-onest text-[13px] text-err-fg">{t('adminShop.catalog.loadFailed')}</Text>
+                </Pressable>
+              ) : direction?.children?.length ? (
+                <>
+                  <View className="flex-row flex-wrap gap-1.5">
+                    {direction.children.map((c) => (
+                      <EditableChip key={c.id} label={categoryLabel(c, i18n.language)} onPress={() => setEditCategory(c)} />
+                    ))}
+                  </View>
+                  <Text className="font-onest text-xs text-muted">{t('adminShop.catalog.editHint')}</Text>
+                </>
+              ) : (
+                <Text className="font-onest text-[13px] text-muted">
+                  {categoryTree.isLoading ? '…' : t('adminShop.catalog.noSubcategories')}
+                </Text>
+              )}
+            </View>
+          ) : null}
           {[
-            { key: 'category', label: t('adminShop.catalog.category'), items: store.categories.map((c) => c.name) },
             { key: 'brands', label: t('adminShop.catalog.brands'), items: store.brands.map((b) => b.name) },
             {
               key: 'attributes',
@@ -447,6 +499,7 @@ export function AdminShopScreen({ id }: { id: string }) {
       <SuspendShopSheet store={store} isOpen={sheet === 'suspend'} onClose={() => setSheet('none')} />
       <ResumeShopSheet store={store} isOpen={sheet === 'resume'} onClose={() => setSheet('none')} />
       <NewWarehouseSheet store={store} isOpen={sheet === 'warehouse'} onClose={() => setSheet('none')} />
+      <SubcategorySheet category={editCategory} directionName={directionName} onClose={() => setEditCategory(null)} />
     </SafeAreaView>
   );
 }

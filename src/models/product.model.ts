@@ -7,7 +7,10 @@ export interface BaseProduct {
   warehouseId: string
   warehouse: Warehouse
   name: string
+  /** Subcategory name in Russian; use `productCategoryLabel()` to show it */
   category: string
+  /** All names of the subcategory — the label follows the app language */
+  categoryI18n?: CategoryNames | null
   brand: string
   isArchived: boolean
   description: string | null
@@ -92,9 +95,16 @@ export interface CreateProduct {
   tagIds: string[],
   description?: string
 }
-export interface Category {
-  id: string
+/** Category names: `name` is Russian (primary), translations may be missing */
+export interface CategoryNames {
   name: string
+  nameUz: string | null
+  nameEn: string | null
+}
+
+/** Level 1 = store direction (`parentId` null), level 2 = product subcategory */
+export interface Category extends CategoryNames {
+  id: string
   parentId: string | null
   children?: Category[]
 }
@@ -175,7 +185,8 @@ export interface CreateProductVariantPayload {
   storeId: string;
   warehouseId: string;
   productId: string;
-  category: string;
+  /** @deprecated ignored by the backend — the SKU uses the product's category */
+  category?: string;
   variants: ProductVariantPayload[];
 }
 
@@ -245,7 +256,7 @@ export interface ProductParams {
   pageSize?: number;
   /** Product name, SKU or barcode */
   search?: string;
-  /** Top category (includes its subcategories) */
+  /** A subcategory, or a direction (includes its subcategories) */
   categoryId?: string;
   /** Only «Мало» products */
   lowStock?: boolean;

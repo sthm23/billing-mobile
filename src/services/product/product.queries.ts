@@ -13,7 +13,6 @@ import {
 import { type AxiosError } from 'axios'
 import { productService } from './product.service'
 import type {
-  Category,
   CreateProduct,
   InventoryMovementPayload,
   Product,
@@ -122,16 +121,6 @@ export const useProducts = (params: ProductParams = {}, enabled = true): UseQuer
 
   return useQuery(queryOptions)
 }
-
-/** Top categories of the store for the filter chips. */
-export const useStoreCategories = (storeId: string | undefined): UseQueryResult<Category[]> =>
-  useQuery({
-    queryKey: ['category', 'store', storeId],
-    queryFn: () => productService.getStoreCategories(storeId!),
-    enabled: Boolean(storeId),
-    staleTime: 10 * 60_000,
-    refetchOnWindowFocus: false,
-  })
 
 const HISTORY_PAGE_SIZE = 20
 

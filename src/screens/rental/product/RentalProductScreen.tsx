@@ -3,6 +3,7 @@ import { ImageCarousel } from '@/components/product/ImageCarousel';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { useStoreMode } from '@/hooks/use-store-mode';
 import { useTheme } from '@/hooks/use-theme';
+import { productCategoryLabel } from '@/libs/category';
 import { formatMoney } from '@/libs/format';
 import {
   buildAttributeMap,
@@ -178,7 +179,7 @@ export function RentalProductScreen({ product, onRefresh, initialVariantId, init
   const rentPrices = product.variants.filter(isRentable).map((v) => Number(v.rentPricePerDay));
   const minPrice = rentPrices.length ? Math.min(...rentPrices) : 0;
   const ownedTotal = product.variants.reduce((sum, v) => sum + v.quantity, 0);
-  const category = product.category ? t(`category.${product.category}`, { defaultValue: product.category }) : '';
+  const category = productCategoryLabel(product, i18n.language);
   const subtitle = [category, t('rental.product.ownedTotal', { count: ownedTotal })].filter(Boolean).join(' · ');
   const variantLabel = selected ? getVariantLabel(selected) : '';
   const dates = start && end ? formatLocalDays(start, end, lang) : '';
