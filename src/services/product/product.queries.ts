@@ -63,6 +63,7 @@ export const useCreateProduct = (): UseMutationResult<
   AxiosError<unknown>,
   CreateProduct
 > => {
+  const queryClient = useQueryClient()
   const mutationOptions: MutationOptions<
     Product,
     AxiosError<unknown>,
@@ -70,8 +71,9 @@ export const useCreateProduct = (): UseMutationResult<
   > = {
     mutationKey: productQueryKeys.create(),
     mutationFn: (body): Promise<Product> => productService.createProduct(body),
-    onError: (error): void => {
-      /* showToast({ type: 'error', message: getErrorMessage(error) }) */
+    // The new card shows in the list (as a draft until it has variants)
+    onSuccess: (): void => {
+      void queryClient.invalidateQueries({ queryKey: [...productQueryKeys.all(), 'list'] })
     },
   }
 

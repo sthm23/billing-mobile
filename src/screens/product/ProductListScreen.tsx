@@ -8,6 +8,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { Product } from '@/models/product.model';
 import { useAuth } from '@/provider/AuthProvider';
 import { categoryLabel } from '@/libs/category';
+import { canCreateProduct } from '@/libs/roles';
 import { useStoreCategories } from '@/services/category';
 import { DEBOUNCE_TIME_MS, productQueryKeys, useProducts } from '@/services/product/product.queries';
 import { useQueryClient } from '@tanstack/react-query';
@@ -96,10 +97,17 @@ export default function ProductListScreen() {
       <View className="pt-2 pb-3 gap-3.5">
         <View className="px-4 flex-row items-center justify-between">
           <Text className="type-title text-ink" accessibilityRole="header">{t('product.title')}</Text>
-          {/* More filters and product creation are not available yet */}
+          {/* More filters are not available yet; a product is created by the owner (UX only) */}
           <View className="flex-row gap-2">
             <IconButton icon={SlidersHorizontal} accessibilityLabel={t('common.filter')} disabled />
-            <IconButton icon={Plus} variant="primary" accessibilityLabel={t('product.createTitle')} disabled />
+            {canCreateProduct(user) ? (
+              <IconButton
+                icon={Plus}
+                variant="primary"
+                accessibilityLabel={t('product.createTitle')}
+                onPress={() => router.push('/(tabs)/(products)/create')}
+              />
+            ) : null}
           </View>
         </View>
         <View className="px-4">

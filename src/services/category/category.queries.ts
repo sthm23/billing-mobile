@@ -10,7 +10,14 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
-import { categoryService, type UpdateSubcategoryPayload } from './category.service';
+import {
+  catalogService,
+  categoryService,
+  type StoreAttribute,
+  type StoreBrand,
+  type TagGroup,
+  type UpdateSubcategoryPayload,
+} from './category.service';
 
 type ApiError = AxiosError<{ message?: string | string[] }>;
 
@@ -18,7 +25,37 @@ export const categoryQueryKeys = {
   all: () => ['category'] as const,
   store: (storeId: string | undefined) => [...categoryQueryKeys.all(), 'store', storeId] as const,
   tree: () => [...categoryQueryKeys.all(), 'tree'] as const,
+  brands: (storeId: string | undefined) => [...categoryQueryKeys.all(), 'brands', storeId] as const,
+  attributes: (storeId: string | undefined) => [...categoryQueryKeys.all(), 'attributes', storeId] as const,
+  tags: () => [...categoryQueryKeys.all(), 'tags'] as const,
 };
+
+/** Brands of the store (product form). */
+export const useStoreBrands = (storeId: string | undefined): UseQueryResult<StoreBrand[]> =>
+  useQuery({
+    queryKey: categoryQueryKeys.brands(storeId),
+    queryFn: () => catalogService.getStoreBrands(storeId!),
+    enabled: Boolean(storeId),
+    staleTime: 10 * 60_000,
+  });
+
+/** Attributes of the store (product form attribute chips). */
+export const useStoreAttributes = (storeId: string | undefined): UseQueryResult<StoreAttribute[]> =>
+  useQuery({
+    queryKey: categoryQueryKeys.attributes(storeId),
+    queryFn: () => catalogService.getStoreAttributes(storeId!),
+    enabled: Boolean(storeId),
+    staleTime: 10 * 60_000,
+  });
+
+/** Tag groups with values (product form tag chips). */
+export const useTags = (enabled = true): UseQueryResult<TagGroup[]> =>
+  useQuery({
+    queryKey: categoryQueryKeys.tags(),
+    queryFn: catalogService.getTags,
+    enabled,
+    staleTime: 10 * 60_000,
+  });
 
 /** The store's direction(s) with subcategories: filter chips, category picker. */
 export const useStoreCategories = (storeId: string | undefined): UseQueryResult<Category[]> =>

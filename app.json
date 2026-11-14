@@ -56,7 +56,15 @@
           "recordAudioAndroid": false
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Доступ к фото нужен, чтобы добавить снимки товара",
+          "cameraPermission": "Камера нужна, чтобы сканировать штрихкоды и снимать товары",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

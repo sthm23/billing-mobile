@@ -48,3 +48,45 @@ export const categoryService = {
   updateSubcategory,
   deleteSubcategory,
 };
+
+/** A brand linked to the store (`GET /category/brand/:storeId`) */
+export interface StoreBrand {
+  id: string;
+  name: string;
+}
+
+/** A catalog attribute linked to the store (`GET /category/attributes/store/:storeId`) */
+export interface StoreAttribute {
+  id: string;
+  name: string;
+  type: 'STRING' | 'NUMBER' | 'BOOLEAN';
+  /** Unit of a NUMBER attribute («м», «кг») */
+  unit: string | null;
+}
+
+/** A tag group with its values (`GET /category/tag`); the form shows the values flat */
+export interface TagGroup {
+  id: string;
+  name: string;
+  values: { id: string; tagId: string; value: string }[];
+}
+
+/** Brands of the store — the product form brand picker */
+const getStoreBrands = async (storeId: string): Promise<StoreBrand[]> => {
+  const response = await categoryApi.get<StoreBrand[]>(`/brand/${storeId}`);
+  return response.data;
+};
+
+/** Attributes of the store — product attribute chips (variants are built from them) */
+const getStoreAttributes = async (storeId: string): Promise<StoreAttribute[]> => {
+  const response = await categoryApi.get<StoreAttribute[]>(`/attributes/store/${storeId}`);
+  return response.data;
+};
+
+/** All tag groups with values (shared dictionary) */
+const getTags = async (): Promise<TagGroup[]> => {
+  const response = await categoryApi.get<TagGroup[]>('/tag');
+  return response.data;
+};
+
+export const catalogService = { getStoreBrands, getStoreAttributes, getTags };

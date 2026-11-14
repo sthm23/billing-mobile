@@ -48,3 +48,9 @@ export function canAddCategory(user: CurrentUserType | null | undefined): boolea
   if (!user) return false;
   return user.role === UserRole.ADMIN || user.role === UserRole.OWNER || user.staff?.role === StaffRole.OWNER;
 }
+
+/**
+ * Store owner or platform ADMIN: may create a product (step 1 «Карточка»).
+ * A manager edits products and adds variants. UX only — the backend checks it (`POST /product`).
+ */
+export const canCreateProduct = canAddCategory;
