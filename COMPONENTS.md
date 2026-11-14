@@ -153,6 +153,7 @@ List row for orders, cashboxes, debtors, products. Pressable when `onPress` is s
 | `amount` / `amountTone` | `string \| number` / `'default' \| 'err'` |
 | `badge` | `{ label, tone: StatusTone }` |
 | `highlight` | `boolean` — accent ring + accent lead |
+| `tag` | `string` — small neutral pill before the subtitle (e.g. «до STHM» in the debtors list) |
 
 ### StatusBadge
 
@@ -265,7 +266,7 @@ toast.show(getApiErrorMessage(error, t('common.error')), 'error');
 
 - `components/brand`: **Logo** (`variant: 'horizontal' | 'icon'`, `width`, `onDark?` — official SVGs via `react-native-svg`), **SplashView** (in-app splash while the session is restored).
 - `components/navigation`: **BottomNav** (floating tab bar) + `useBottomNavInset()`.
-- `components/common`: **ComingSoonScreen** (`title`, `description?`, `icon?`) — header with back + «Скоро будет доступно» for routes whose feature isn't built yet.
+- `components/common`: **ComingSoonScreen** (`title`, `description?`, `icon?`) — header with back + «Скоро будет доступно» for routes whose feature isn't built yet; **DatePickerSheet** (generic one-day month grid in an `auto` `Sheet`: `title`, `subtitle`, `value`, `min`, `max`, `onPick`; reuses the helpers of `screens/rental/rental-format.ts`; used by `DebtNewScreen`).
 - `components/product`: `ProductCard` (ListCard row), `ProductCardSkeleton`, `ProductImage` (thumbnail with placeholder fallback), `ImageCarousel` (photo gallery, `overlay` for back/edit buttons), `ProductVariantCard`, `StockMovementSheet` («Приход / Списание»: `Segmented` receipt / write-off, quantity, unit cost prefilled with the last receipt cost, optional new price, hero preview «Сейчас → Станет», API error inline, toast on success).
 - `components/order`: `OrderItemCard`, `SwipeableOrderItemCard` (swipe left → delete), `ProductSearchSheet`, `AddToOrderSheet` (half sheet: «Новый заказ» + open CREATED/HOLD orders of the product's warehouse), `PaymentMethodsInput` («Способ оплаты»: method tiles, several allowed, + an amount field per selected method with «Остаток» / «Очистить»; props `selected`, `amounts`, `onSelectedChange`, `onAmountsChange`, `due`; shared by `OrderPayScreen` and `DebtPayScreen`; also exports `PAYMENT_METHODS`, `EMPTY_PAYMENT_AMOUNTS`, `amountOf`, `totalEntered`, `digitsOf`).
 - `components/cashbox`: `FilterSheet` (placeholder), type `CashboxStatusFilter`, `CashboxPickerSheet` («Куда принять деньги» when the employee has no open cashbox: «Открыть свою кассу» on the working warehouse (`POST /cashbox`, `useWorkingWarehouse`), or a list of other open cashboxes of the store (`GET /cashbox/open`); `onPick(cashboxId | undefined)` — `undefined` = own cashbox just opened).

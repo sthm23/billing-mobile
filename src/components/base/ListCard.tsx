@@ -9,6 +9,10 @@ export interface ListCardProps extends Omit<PressableProps, 'children'> {
   title: string;
   subtitle?: string;
   /**
+   * Small neutral pill before the subtitle («до STHM»)
+   */
+  tag?: string;
+  /**
    * Short text in the round lead: initials («ТС») or a number («#127»)
    */
   lead?: string;
@@ -61,6 +65,7 @@ export interface ListCardProps extends Omit<PressableProps, 'children'> {
 export function ListCard({
   title,
   subtitle,
+  tag,
   lead,
   leading,
   amount,
@@ -108,10 +113,19 @@ export function ListCard({
         <Text className="font-onest-semibold text-[15px] text-ink" numberOfLines={1}>
           {title}
         </Text>
-        {subtitle ? (
-          <Text className="font-onest text-[13px] text-muted" numberOfLines={1}>
-            {subtitle}
-          </Text>
+        {subtitle || tag ? (
+          <View className="flex-row items-center gap-1.5">
+            {tag ? (
+              <View className="px-[7px] py-px rounded-pill bg-sunken">
+                <Text className="font-onest-semibold text-[11px] text-soft">{tag}</Text>
+              </View>
+            ) : null}
+            {subtitle ? (
+              <Text className="flex-1 min-w-0 font-onest text-[13px] text-muted" numberOfLines={1}>
+                {subtitle}
+              </Text>
+            ) : null}
+          </View>
         ) : null}
       </View>
 

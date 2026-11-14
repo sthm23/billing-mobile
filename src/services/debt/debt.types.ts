@@ -28,6 +28,10 @@ export interface Debtor {
   /** Date of the oldest open debt */
   since: string
   ageDays: number
+  /** Nearest repay-by date of the open manual debts; null — none */
+  dueAt: string | null
+  /** dueAt has passed (backend) */
+  overdue: boolean
 }
 
 /** `GET /debt/debtors` — any employee sees the whole store. */
@@ -74,6 +78,10 @@ export interface CustomerDebtItem {
   total: number
   paid: number
   remaining: number
+  /** Repay-by date of a manual debt; null — no term (always null for an order) */
+  dueAt: string | null
+  /** dueAt has passed (backend) */
+  overdue: boolean
   payments: DebtHistoryPayment[]
 }
 
@@ -94,4 +102,31 @@ export interface RepayDebtInput {
   /** Open cashbox of the store; omitted — the employee's own open cashbox */
   cashboxId?: string
   payments: { type: PaymentType; amount: number }[]
+}
+
+/**
+ * `POST /debt` — a manual debt that existed before STHM (owner/manager).
+ * The store comes from the token.
+ */
+export interface CreateDebtInput {
+  /** Customer.id */
+  customerId: string
+  amount: number
+  description?: string
+  /** When the debt arose (ISO); omitted — now */
+  createdAt?: string
+  /** Repay by (ISO); omitted — no term */
+  returnedAt?: string
+}
+
+/** Created manual debt (Decimal fields come as strings) */
+export interface CustomerDebt {
+  id: string
+  customerId: string
+  totalAmount: string
+  paidAmount: string
+  status: 'ACTIVE' | 'PAID'
+  description: string | null
+  createdAt: string
+  returnedAt: string | null
 }

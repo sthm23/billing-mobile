@@ -290,7 +290,60 @@ const en = {
     "notFoundFilters": "No stores with these filters.",
     "resetSearch": "Reset search"
   },
+  "debtNew": {
+    "title": "New debt",
+    "subtitle": "A debt from before STHM",
+    "noAccess": "Only the owner and managers can add debts",
+    "customer": "Customer",
+    "required": "required",
+    "change": "Change",
+    "searchCustomer": "Find customer",
+    "addCustomer": "Add customer",
+    "customerRequired": "Pick or add a customer",
+    "owes": "owes {{amount}}",
+    "noDebts": "no debts",
+    "amountLabel": "How much the customer owes",
+    "amountA11y": "Debt amount",
+    "amountHint": "Amount owed to the store on the creation date",
+    "amountRequired": "Enter an amount above zero",
+    "dates": "Dates",
+    "created": "Created",
+    "due": "Repay by",
+    "today": "Today, {{date}}",
+    "notSet": "Not set",
+    "dateError": "The repay-by date can't be before the creation date",
+    "returnIn": "Repay in",
+    "quick": {
+      "1w": "1 week",
+      "2w": "2 weeks",
+      "1m": "1 month",
+      "none": "No term"
+    },
+    "comment": "Comment",
+    "optional": "optional",
+    "commentPlaceholder": "What the debt is for, invoice number",
+    "note": "The debt will show in «Debtors» marked «before STHM». No money goes to the cashbox — the customer owes it.",
+    "fillHint": "Pick a customer and enter the amount",
+    "submit": "Add debt",
+    "submitAmount": "Add debt · {{amount}} UZS",
+    "saving": "Saving…",
+    "added": "Debt added. {{name}} · {{amount}} UZS",
+    "failed": "Couldn't add the debt",
+    "createdTitle": "When the debt arose",
+    "createdHint": "You can pick a past date",
+    "dueTitle": "Repay by"
+  },
+  "datePicker": {
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "pick": "Pick {{date}}",
+    "pickDay": "Pick a day"
+  },
   "debtors": {
+    "addDebt": "Debt",
+    "beforeSthm": "before STHM",
+    "dueBy": "due {{date}}",
+    "overdueSince": "overdue since {{date}}",
     "unassigned": {
       "title": "No customer",
       "hint": "Debt orders without a customer · attach one when repaying"
@@ -1123,6 +1176,7 @@ const en = {
       "inStock": "In stock {{count}}"
     },
     "customer": {
+      "owes": "owes {{amount}}",
       "button": "Customer",
       "clear": "Remove customer",
       "title": "Customer",

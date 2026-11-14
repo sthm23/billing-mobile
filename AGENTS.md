@@ -83,7 +83,7 @@ billing-mobile/
     │   ├── base/                 # Design primitives (see COMPONENTS.md)
     │   ├── navigation/           # BottomNav (floating tab bar) + useBottomNavInset
     │   ├── brand/                # Logo (official SVGs via SvgXml), SplashView
-    │   ├── common/               # EmptyState, LoadingState, ComingSoonScreen
+    │   ├── common/               # EmptyState, LoadingState, ComingSoonScreen, DatePickerSheet
     │   ├── product/ order/ cashbox/  # Domain components
     ├── constants/
     │   ├── tokens.ts             # STHM color palette (JS mirror of global.css) + FontFamily
@@ -135,7 +135,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(rentals)` | `index`, `[id]`, `create`, `edit/[id]`, `pay/[id]` (`?created=1`), `issue/[id]`, `return/[id]`, `calendar`; `create?productId&variantId[&startDate&endDate]` — booking started from an item card (with its dates) | Rental mode only (see «Rental» below). `RentalListScreen`, `RentalDetailScreen`, `RentalFormScreen` (new / edit / preset item), `RentalPayScreen` (`pay`, and `mode="issue"` for `issue/[id]`), `RentalReturnScreen`, `RentalCalendarScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
-| `(profile)` | `index`, `staff/index`, `staff/create`, `staff/[id]`, `staff/edit/[id]`, `settings`, `store-settings`, `debtors/index`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`), `shops/index`, `shops/new`, `shops/[id]/index`, `shops/[id]/staff` | `MobileProfilePage`, `StaffListScreen` / `CreateStaffScreen` / `StaffCardScreen` / `StaffEditScreen` (OWNER only, see «Staff»), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtorScreen`, `DebtPayScreen`, `AdminShopsScreen` / `AdminShopNewScreen` / `AdminShopScreen` / `AdminShopStaffScreen` (platform ADMIN only, see «Admin stores») |
+| `(profile)` | `index`, `staff/index`, `staff/create`, `staff/[id]`, `staff/edit/[id]`, `settings`, `store-settings`, `debtors/index`, `debtors/new`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`), `shops/index`, `shops/new`, `shops/[id]/index`, `shops/[id]/staff` | `MobileProfilePage`, `StaffListScreen` / `CreateStaffScreen` / `StaffCardScreen` / `StaffEditScreen` (OWNER only, see «Staff»), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtNewScreen` (OWNER/MANAGER/admin), `DebtorScreen`, `DebtPayScreen`, `AdminShopsScreen` / `AdminShopNewScreen` / `AdminShopScreen` / `AdminShopStaffScreen` (platform ADMIN only, see «Admin stores») |
 
 Unbuilt features use `ComingSoonScreen` (routes) or a **disabled** button — never a button that silently does nothing.
 
@@ -282,7 +282,7 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
+Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`, `useCreateDebt` — invalidates debt + customer queries), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
 
 List hooks of the working warehouse take `warehouseId` in their params and an `enabled` flag: `useProducts(params, enabled)`, `useOrders(params, enabled)`, `useTodaySalesSummary(warehouseId, enabled)`, `useCashboxList(params, enabled)`, `useRentalsInfinite(params, enabled)`, `useRentalSummary(enabled, warehouseId)`, `useRentalAgenda(from, to, warehouseId, enabled)` — pass `useWorkingWarehouse().isReady` as `enabled`.
 
@@ -304,11 +304,12 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 A debt is owed to the **store**: every employee (seller, cashier, manager, owner) sees all debtors and may accept a repayment. Business rules: [`../docs/features/debt.md`](../docs/features/debt.md).
 
 - **Profile**: card «Должники» (count + total from `useDebtors().summary`) for every employee → `/(tabs)/(profile)/debtors`.
-- **List** (`screens/debt/DebtorsScreen.tsx`, `GET /debt/debtors`): hero «Общий долг» + chip «Клиентов: N», tiles «Дольше 30 дней» (`over30`) / «Погашено за месяц» (`paidInPeriod` — DEBT_PAYMENT in the month; the app sends `monthRange()` from `libs/date.ts`), search, `Segmented` По сумме / По дате (`sort`). Rows by customer with an age badge: > 30 days `err`, ≥ 21 `warn`, else neutral.
-- **Customer** (`DebtorScreen.tsx`, `GET /debt/debtors/:customerId`): the customer's open debts (ORDER / MANUAL); with a single debt it opens the payment right away (`router.replace`).
+- **List** (`screens/debt/DebtorsScreen.tsx`, `GET /debt/debtors`): hero «Общий долг» + chip «Клиентов: N», tiles «Дольше 30 дней» (`over30`) / «Погашено за месяц» (`paidInPeriod` — DEBT_PAYMENT in the month; the app sends `monthRange()` from `libs/date.ts`), search, `Segmented` По сумме / По дате (`sort`). Rows by customer with an age badge: > 30 days `err`, ≥ 21 `warn`, else neutral. Row tag «до STHM» (`ListCard` `tag`) when `debtsCount > 0`; the meta shows «вернуть до DD.MM» / «просрочен с DD.MM» when the row has `dueAt` (instead of the last payment). Header button «+ Долг» for `canCreateDebt(user)` (`libs/roles.ts`, = `canLowerPrice`: owner / manager / admin — UX only) → `debtors/new`.
+- **Customer** (`DebtorScreen.tsx`, `GET /debt/debtors/:customerId`): the customer's open debts (ORDER / MANUAL); with a single debt it opens the payment right away (`router.replace`). A MANUAL debt row has a badge «вернуть до DD.MM» (neutral) / «просрочен с DD.MM» (`err`) from `dueAt` / `overdue`.
+- **New debt** (`DebtNewScreen`, `debtors/new`, `POST /debt` via `useCreateDebt()`, design canvas page «debtors», artboards `DebtNew*`): customer (required; `CustomerPickerSheet`, «Добавить клиента» opens it in create mode via the `startCreating` prop; rows show «должен {amount}» from `debtTotal`), amount in the hero block, dates «Создано» (default today, past allowed, `DatePickerSheet` max today) and «Вернуть до» (`DatePickerSheet` min = created; chips 1 неделя / 2 недели / 1 месяц counted from today / «Без срока»), comment (≤ 500), note «в кассу деньги не попадут». Sends `createdAt` = start of the local day (omitted when today) and `returnedAt` = end of the local day (omitted = no term). Errors: client/amount after a submit attempt, date error live, server error banner above the button; the button is disabled while the form is empty. Success → toast «Долг добавлен. Имя · сумма UZS» + back. Non owner/manager → «нет доступа» (UX only; the backend allows only OWNER/MANAGER).
 - **Payment of one debt** (`DebtPayScreen.tsx`, design «OrderPay» in debt mode): remaining, progress, method tiles + amounts (`PaymentMethodsInput`, shared with `OrderPayScreen`), cash change, payment history. `useRepayDebt()` → ORDER: `POST /payment` (no stock movement), MANUAL: `POST /debt/payment`. Overpayment is never sent (cash minus change); the backend rejects it anyway.
 - **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox` on the working warehouse) or pick another open cashbox of the store → `cashboxId`.
-- i18n: top-level `debtors.*`.
+- i18n: top-level `debtors.*` (incl. `addDebt`, `beforeSthm`, `dueBy`, `overdueSince`), `debtNew.*`, `datePicker.*`, `sale.customer.owes`.
 
 ### Rental (phase 6, in progress)
 
@@ -370,6 +371,7 @@ Role checks in the UI are UX only — the backend enforces permissions.
 
 - Owner = `user.role === UserRole.OWNER` (not `staff.role`). The owner's store is `user.staff.storeId`.
 - Owner-only UI: Profile → «Сотрудники» (list, card, edit, new employee). The screens also show «нет доступа» for non-owners.
+- Owner / manager / admin UI: `canLowerPrice()` (cart price lowering) and `canCreateDebt()` (Debtors → «+ Долг», `debtors/new`) in `src/libs/roles.ts`.
 - A deactivated employee gets 401 on every request (backend, 2026-11-09): the refresh fails and the app logs out.
 - Platform ADMIN = `isAdmin(user)` (`src/libs/roles.ts`); has no `staff` — Profile only (see «Tabs»), debtors are hidden and not loaded (`useDebtors(params, enabled)`).
 
@@ -475,7 +477,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`).
-- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount, creating a manual debt (`POST /debt`). Staff creation has no «comment» field (not stored by the backend).
+- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount. Staff creation has no «comment» field (not stored by the backend).
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
 ---
@@ -503,4 +505,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-11-13
+**Last updated**: 2026-11-14

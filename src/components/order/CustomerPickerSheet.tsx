@@ -1,8 +1,9 @@
-import { Button, IconButton, Pressable, SearchField, Text, toast } from '@/components/base';
+import { Button, IconButton, Pressable, SearchField, StatusBadge, Text, toast } from '@/components/base';
 import { EmptyState } from '@/components/common';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
+import { formatMoney } from '@/libs/format';
 import { cn } from '@/libs/utils';
 import { type OrderCustomer, useCreateCustomer, useCustomerSearch } from '@/services/customer';
 import { Sheet, SheetFlatList, SheetTextInput } from '@/components/base/Sheet';
@@ -19,6 +20,8 @@ interface CustomerPickerSheetProps {
   selectedId?: string | null;
   onClose: () => void;
   onSelect: (customer: OrderCustomer) => void;
+  /** Open straight on the «Новый клиент» form */
+  startCreating?: boolean;
 }
 
 function initials(name: string): string {
@@ -31,10 +34,11 @@ function initials(name: string): string {
 }
 
 /**
- * Picks the order customer: search by name/phone or create a new one
- * (`GET`/`POST /users/customers`).
+ * Picks a customer (order, manual debt): search by name/phone or create a new
+ * one (`GET`/`POST /users/customers`). A customer with an open debt in the
+ * store gets «должен …».
  */
-export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: CustomerPickerSheetProps) {
+export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect, startCreating = false }: CustomerPickerSheetProps) {
   const { t } = useTranslation();
   const colors = useTheme();
   const [search, setSearch] = useState('');
@@ -53,8 +57,10 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
       setFullName('');
       setPhone('');
       setError(null);
+    } else if (startCreating) {
+      setCreating(true);
     }
-  }, [isOpen]);
+  }, [isOpen, startCreating]);
 
   const customers = (data?.data ?? []).filter((c) => c.customer);
 
@@ -82,7 +88,7 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
       {
         onSuccess: (created) => {
           if (!created.customer) return;
-          onSelect({ id: created.customer.id, fullName: created.fullName, phone: created.phone });
+          onSelect({ id: created.customer.id, fullName: created.fullName, phone: created.phone, debtTotal: 0 });
         },
         onError: (err) => {
           // The phone is taken — usually a customer of another store: find them by the full number.
@@ -177,7 +183,9 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
                   const selected = customerId === selectedId;
                   return (
                     <Pressable
-                      onPress={() => onSelect({ id: customerId, fullName: item.fullName, phone: item.phone })}
+                      onPress={() =>
+                        onSelect({ id: customerId, fullName: item.fullName, phone: item.phone, debtTotal: item.debtTotal })
+                      }
                       accessibilityRole="button"
                       accessibilityState={{ selected }}
                       className={cn('flex-row items-center gap-3 p-2.5 rounded-lg bg-sunken', selected && 'border-2 border-accent')}
@@ -189,6 +197,13 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect }: C
                         <Text className="type-body-strong text-ink" numberOfLines={1}>{item.fullName}</Text>
                         <Text className="font-onest text-xs text-muted tabular-nums">{item.phone}</Text>
                       </View>
+                      {item.debtTotal ? (
+                        <StatusBadge
+                          label={t('sale.customer.owes', { amount: formatMoney(item.debtTotal) })}
+                          tone="err"
+                          size="sm"
+                        />
+                      ) : null}
                       {selected && <Check size={20} color={colors.ink} strokeWidth={2.2} />}
                     </Pressable>
                   );

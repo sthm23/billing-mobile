@@ -1,10 +1,11 @@
 import { monthRange } from '@/libs/date'
 import { cashboxQueryKeys } from '@/services/cashbox/cashbox.queries'
+import { customerQueryKeys } from '@/services/customer/customer.queries'
 import { orderQueryKeys } from '@/services/order/order.queries'
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query'
 import type { AxiosError } from 'axios'
 import { debtService } from './debt.service'
-import type { DebtorDetail, DebtorsParams, DebtorsResponse, RepayDebtInput } from './debt.types'
+import type { CreateDebtInput, CustomerDebt, DebtorDetail, DebtorsParams, DebtorsResponse, RepayDebtInput } from './debt.types'
 
 export const debtQueryKeys = {
   all: () => ['debt'] as const,
@@ -47,6 +48,19 @@ export const useRepayDebt = (): UseMutationResult<void, AxiosError<{ message?: s
       queryClient.invalidateQueries({ queryKey: debtQueryKeys.all() })
       queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
       queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() })
+    },
+  })
+}
+
+/** Creates a manual debt; refreshes debtors and the customers' debt badges. */
+export const useCreateDebt = (): UseMutationResult<CustomerDebt, AxiosError<{ message?: string | string[] }>, CreateDebtInput> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input) => debtService.create(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: debtQueryKeys.all() })
+      queryClient.invalidateQueries({ queryKey: customerQueryKeys.all() })
     },
   })
 }

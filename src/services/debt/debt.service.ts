@@ -1,5 +1,5 @@
 import { api, paymentsApi } from '@/api/axios-instance'
-import type { DebtorDetail, DebtorsParams, DebtorsResponse, RepayDebtInput } from './debt.types'
+import type { CreateDebtInput, CustomerDebt, DebtorDetail, DebtorsParams, DebtorsResponse, RepayDebtInput } from './debt.types'
 
 /** Debtors of the store with totals. */
 const getDebtors = async (params: DebtorsParams): Promise<DebtorsResponse> => {
@@ -25,4 +25,10 @@ const repay = async ({ kind, id, customerId, cashboxId, payments }: RepayDebtInp
   }
 }
 
-export const debtService = { getDebtors, getDebtor, repay }
+/** Manual debt that existed before STHM (`POST /debt`, owner/manager). */
+const create = async (input: CreateDebtInput): Promise<CustomerDebt> => {
+  const response = await api.post<CustomerDebt>('/debt', input)
+  return response.data
+}
+
+export const debtService = { getDebtors, getDebtor, repay, create }

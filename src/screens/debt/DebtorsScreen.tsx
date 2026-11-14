@@ -1,13 +1,15 @@
-import { HeroCard, IconButton, ListCard, SearchField, Segmented, Text, type StatusTone } from '@/components/base';
+import { Button, HeroCard, IconButton, ListCard, SearchField, Segmented, Text, type StatusTone } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useDebounce } from '@/hooks/use-debounce';
 import { useTheme } from '@/hooks/use-theme';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { formatDayMonth } from '@/libs/date';
+import { canCreateDebt } from '@/libs/roles';
+import { useAuth } from '@/provider/AuthProvider';
 import { UNASSIGNED_DEBTOR, useDebtors, type Debtor, type DebtorsSort } from '@/services/debt';
 import { DEBOUNCE_TIME_MS } from '@/services/product/product.queries';
 import { router } from 'expo-router';
-import { ChevronLeft, CircleAlert, HandCoins, UserRoundX } from 'lucide-react-native';
+import { ChevronLeft, CircleAlert, HandCoins, Plus, UserRoundX } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
@@ -37,6 +39,7 @@ export function DebtorsScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const colors = useTheme();
+  const { user } = useAuth();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<DebtorsSort>('amount');
   const debouncedSearch = useDebounce(search, DEBOUNCE_TIME_MS);
@@ -46,11 +49,15 @@ export function DebtorsScreen() {
   });
   const refreshControl = useRefreshControl(refetch);
 
-  const meta = (d: Pick<Debtor, 'ordersCount' | 'lastPaymentAt'> & { debtsCount?: number }) =>
+  const meta = (d: Pick<Debtor, 'ordersCount' | 'lastPaymentAt'> & Partial<Pick<Debtor, 'debtsCount' | 'dueAt' | 'overdue'>>) =>
     [
       d.ordersCount > 0 ? t('debtors.orders', { count: d.ordersCount }) : null,
       d.debtsCount ? t('debtors.manualDebts', { count: d.debtsCount }) : null,
-      d.lastPaymentAt ? t('debtors.lastPayment', { date: formatDayMonth(d.lastPaymentAt) }) : t('debtors.noPayments'),
+      d.dueAt
+        ? t(d.overdue ? 'debtors.overdueSince' : 'debtors.dueBy', { date: formatDayMonth(d.dueAt) })
+        : d.lastPaymentAt
+          ? t('debtors.lastPayment', { date: formatDayMonth(d.lastPaymentAt) })
+          : t('debtors.noPayments'),
     ]
       .filter(Boolean)
       .join(' · ');
@@ -67,6 +74,11 @@ export function DebtorsScreen() {
         <View className="flex-row items-center gap-2.5">
           <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
           <Text className="flex-1 type-heading text-ink" accessibilityRole="header">{t('debtors.title')}</Text>
+          {canCreateDebt(user) ? (
+            <Button icon={Plus} onPress={() => router.push('/(tabs)/(profile)/debtors/new')}>
+              {t('debtors.addDebt')}
+            </Button>
+          ) : null}
         </View>
         {data && (
           <HeroCard
@@ -104,6 +116,7 @@ export function DebtorsScreen() {
               lead={initials(item.fullName)}
               title={item.fullName}
               subtitle={meta(item)}
+              tag={item.debtsCount > 0 ? t('debtors.beforeSthm') : undefined}
               amount={item.total}
               amountTone="err"
               badge={{ label: t('debtors.ageDays', { count: item.ageDays }), tone: ageTone(item.ageDays) }}

@@ -22,6 +22,12 @@ export function canLowerPrice(user: CurrentUserType | null | undefined): boolean
 export const canManageProducts = canLowerPrice;
 
 /**
+ * Owner or manager: may add a manual debt (existed before STHM).
+ * UX only — the backend checks it (`POST /debt`).
+ */
+export const canCreateDebt = canLowerPrice;
+
+/**
  * Platform administrator: has no store (no Staff record) and only manages
  * stores — Profile → «Магазины». UX only — the backend checks `AdminGuard`.
  */

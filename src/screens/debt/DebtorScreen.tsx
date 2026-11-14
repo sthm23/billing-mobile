@@ -2,7 +2,7 @@ import { Button, HeroCard, IconButton, ListCard, Text } from '@/components/base'
 import { EmptyState, LoadingState } from '@/components/common';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { useTheme } from '@/hooks/use-theme';
-import { formatDate } from '@/libs/date';
+import { formatDate, formatDayMonth } from '@/libs/date';
 import { formatMoney } from '@/libs/format';
 import { useDebtor, type CustomerDebtItem } from '@/services/debt';
 import { router } from 'expo-router';
@@ -104,6 +104,14 @@ export function DebtorScreen({ customerId }: DebtorScreenProps) {
               })}`}
               amount={item.remaining}
               amountTone="err"
+              badge={
+                item.dueAt
+                  ? {
+                      label: t(item.overdue ? 'debtors.overdueSince' : 'debtors.dueBy', { date: formatDayMonth(item.dueAt) }),
+                      tone: item.overdue ? 'err' : 'neutral',
+                    }
+                  : undefined
+              }
               onPress={() => openPay(customerId, item)}
             />
           )}

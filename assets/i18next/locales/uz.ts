@@ -290,7 +290,60 @@ const uz = {
     "notFoundFilters": "Bunday filtrlar bilan doʻkon yoʻq.",
     "resetSearch": "Qidiruvni tozalash"
   },
+  "debtNew": {
+    "title": "Yangi qarz",
+    "subtitle": "STHM gacha bo‘lgan qarz",
+    "noAccess": "Qarzni faqat egasi va menejer qo‘sha oladi",
+    "customer": "Mijoz",
+    "required": "majburiy",
+    "change": "O‘zgartirish",
+    "searchCustomer": "Mijozni qidirish",
+    "addCustomer": "Mijoz qo‘shish",
+    "customerRequired": "Mijozni tanlang yoki qo‘shing",
+    "owes": "qarzi {{amount}}",
+    "noDebts": "qarzi yo‘q",
+    "amountLabel": "Mijoz qancha qarz",
+    "amountA11y": "Qarz summasi",
+    "amountHint": "Yaratilgan sanadagi mijozning do‘kondan qarzi",
+    "amountRequired": "Noldan katta summa kiriting",
+    "dates": "Sanalar",
+    "created": "Yaratilgan",
+    "due": "Qaytarish muddati",
+    "today": "Bugun, {{date}}",
+    "notSet": "Ko‘rsatilmagan",
+    "dateError": "Qaytarish sanasi yaratilgan sanadan oldin bo‘lishi mumkin emas",
+    "returnIn": "Qaytarish muddati",
+    "quick": {
+      "1w": "1 hafta",
+      "2w": "2 hafta",
+      "1m": "1 oy",
+      "none": "Muddatsiz"
+    },
+    "comment": "Izoh",
+    "optional": "ixtiyoriy",
+    "commentPlaceholder": "Qarz nima uchun, nakladnoy raqami",
+    "note": "Qarz «Qarzdorlar»da «STHM gacha» belgisi bilan chiqadi. Kassaga pul tushmaydi — mijoz qarzdor.",
+    "fillHint": "Mijozni tanlang va summani kiriting",
+    "submit": "Qarz qo‘shish",
+    "submitAmount": "Qarz qo‘shish · {{amount}} UZS",
+    "saving": "Saqlanmoqda…",
+    "added": "Qarz qo‘shildi. {{name}} · {{amount}} UZS",
+    "failed": "Qarzni qo‘shib bo‘lmadi",
+    "createdTitle": "Qarz qachon paydo bo‘lgan",
+    "createdHint": "O‘tgan sanani tanlash mumkin",
+    "dueTitle": "Qachon qaytarish"
+  },
+  "datePicker": {
+    "prevMonth": "Oldingi oy",
+    "nextMonth": "Keyingi oy",
+    "pick": "{{date}} ni tanlash",
+    "pickDay": "Kunni tanlang"
+  },
   "debtors": {
+    "addDebt": "Qarz",
+    "beforeSthm": "STHM gacha",
+    "dueBy": "{{date}} gacha qaytarish",
+    "overdueSince": "{{date}} dan muddati o‘tgan",
     "unassigned": {
       "title": "Mijozsiz",
       "hint": "Mijozsiz qarz buyurtmalar · to‘lashda mijozni biriktirish mumkin"
@@ -1124,6 +1177,7 @@ const uz = {
       "inStock": "Omborda {{count}}"
     },
     "customer": {
+      "owes": "qarzi {{amount}}",
       "button": "Mijoz",
       "clear": "Mijozni olib tashlash",
       "title": "Mijoz",
