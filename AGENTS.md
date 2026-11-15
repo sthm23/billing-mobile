@@ -44,6 +44,8 @@ Secure storage: `expo-secure-store` was added 2026-11-13 with its config plugin 
 
 Barcode scanning: `expo-camera` (`CameraView` + `useCameraPermissions`, config plugin in `app.json` with the camera permission text — needs a native rebuild / new dev client).
 
+Product photos (2026-11-14): `expo-image-picker` (~57.0.21, config plugin in `app.json`) + `expo-image-manipulator` (~57.0.22) — gallery/camera and compression in `libs/product-image.ts`. Added with a native module → **new dev build needed**.
+
 **Not installed yet**: a test runner, ESLint config (`npm run lint` tries to install ESLint and fails on the private registry).
 
 ---
@@ -52,7 +54,7 @@ Barcode scanning: `expo-camera` (`CameraView` + `useCameraPermissions`, config p
 
 **What mobile does**:
 - Display data from the backend API
-- Handle user interactions (touch, swipe; barcode scan — planned)
+- Handle user interactions (touch, swipe, barcode scan)
 - Client-side validation (UX only)
 - Local state, React Query cache, user preferences (theme, language)
 
@@ -91,7 +93,7 @@ billing-mobile/
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
-    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, roles.ts (isAdmin, isStoreSuspended, canAddCategory, …), category.ts (categoryLabel)
+    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, roles.ts (isAdmin, isStoreSuspended, canAddCategory, canCreateProduct, …), product-image.ts (pick / compress / presigned upload), category.ts (categoryLabel)
     ├── models/                   # API types (app, auth, order, payment, product, store, user)
     ├── provider/AuthProvider.tsx # Auth context
     └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product, category, admin-store, …)
@@ -131,7 +133,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 
 | Tab | Routes | Renders |
 |---|---|---|
-| `(products)` | `index`, `[id]`, `create`, `history/[variantId]`, `rental/[variantId]` (`?productId[&startDate&endDate]`), `rental-form/[variantId]` (`?productId`), `cleaning/[variantId]` (`?productId`) | `ProductListScreen`, `ProductDetailScreen` (sale) or `RentalProductScreen` (rental mode; `[id]?variantId&startDate&endDate`), `ComingSoonScreen`, `StockHistoryScreen` (params `title`, `subtitle`, `stock`), `RentalProductScreen` (variant preselected), `RentalItemFormScreen` / `CleaningNewScreen` (via `VariantLoader`) |
+| `(products)` | `index`, `[id]`, `create`, `variants/[id]`, `edit/[id]`, `history/[variantId]`, `rental/[variantId]` (`?productId[&startDate&endDate]`), `rental-form/[variantId]` (`?productId`), `cleaning/[variantId]` (`?productId`) | `ProductListScreen`, `ProductDetailScreen` (sale) or `RentalProductScreen` (rental mode; `[id]?variantId&startDate&endDate`), `ProductCardFormScreen` (`create`; `edit/[id]` with `productId`), `ProductVariantsScreen` (`variants/[id]`), `StockHistoryScreen` (params `title`, `subtitle`, `stock`), `RentalProductScreen` (variant preselected), `RentalItemFormScreen` / `CleaningNewScreen` (via `VariantLoader`) |
 | `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
 | `(rentals)` | `index`, `[id]`, `create`, `edit/[id]`, `pay/[id]` (`?created=1`), `issue/[id]`, `return/[id]`, `calendar`; `create?productId&variantId[&startDate&endDate]` — booking started from an item card (with its dates) | Rental mode only (see «Rental» below). `RentalListScreen`, `RentalDetailScreen`, `RentalFormScreen` (new / edit / preset item), `RentalPayScreen` (`pay`, and `mode="issue"` for `issue/[id]`), `RentalReturnScreen`, `RentalCalendarScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
@@ -282,7 +284,7 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`, `useCreateDebt` — invalidates debt + customer queries), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStoreCategories`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
+Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`, `useCreateDebt` — invalidates debt + customer queries), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`, `useCreateProduct`, `useCreateProductVariants`, `useUpdateProduct`), `category` (`useStoreCategories`, `useCategoryTree`, subcategory mutations, product form: `useStoreBrands`, `useStoreAttributes`, `useTags`, `useAttributeValues`, `useCreateAttributeValue`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
 
 List hooks of the working warehouse take `warehouseId` in their params and an `enabled` flag: `useProducts(params, enabled)`, `useOrders(params, enabled)`, `useTodaySalesSummary(warehouseId, enabled)`, `useCashboxList(params, enabled)`, `useRentalsInfinite(params, enabled)`, `useRentalSummary(enabled, warehouseId)`, `useRentalAgenda(from, to, warehouseId, enabled)` — pass `useWorkingWarehouse().isReady` as `enabled`.
 
@@ -346,8 +348,14 @@ All totals come from the backend; the client sends its local day bounds from `to
 - **List** (`ProductListScreen`): search + chips «Все · N», store top categories (`GET /category/:storeId/categories`), «Мало · N» (toggle, combines with a category). Filtering, counts and the low-stock threshold come from `GET /product` (`search`, `categoryId`, `lowStock`; `counts`, `lowStockThreshold`). `ProductCard` badge is `err` when the total ≤ `lowStockThreshold`, else `ok`.
 - **Card** (`ProductDetailScreen`): «В заказ · {sum}» opens `AddToOrderSheet` — «Новый заказ» fills the cart (`cartStore.startNew(product.warehouseId)` + `addVariant(variant, quantity)`) and opens `/(tabs)/(orders)/create?keep=1` (`OrderCartScreen` `keepCart` keeps the prefilled cart); an open CREATED/HOLD order of the product's warehouse → `useAddToOrder` (GET order → add to the variant's line, keeping its price → `POST /orders/items`) + toast «Товар добавлен в заказ».
 - «Приход / Списание» (`StockMovementSheet` → `POST /warehouse/:id/inventory`) and archive (`DELETE /product/:id`) are shown only to owner/manager (`canManageProducts()` in `libs/roles.ts` — UX only). «История» (`StockHistoryScreen`, `GET /product/variants/:id/stock-movements`) — all staff.
-- Margin «Продажа · маржа N%» is display-only. Edit (pencil) is disabled.
-- **Categories** (2 levels: store direction → product subcategory, one shared dictionary; rules in [`../docs/features/products.md`](../docs/features/products.md)): names come from the backend — `name` (Russian) + `nameUz` / `nameEn`, shown with `categoryLabel(c, i18n.language)` / `productCategoryLabel(product, …)` from `libs/category.ts` (never a `category.*` i18n key — that block was removed). API and hooks in `services/category/` (`useStoreCategories`, `useCategoryTree`, `useCreateSubcategory`, `useUpdateSubcategory`, `useDeleteSubcategory`). The product list chips are the subcategories of the store direction. `components/product/CategorySheet.tsx` — subcategory picker with search over all languages and «Добавить «…»» for OWNER/ADMIN (`canAddCategory()`, UX only); ready for the product form. Admin store card «Каталог»: tap a subcategory → `SubcategorySheet` (rename / translations / delete).
+- Margin «Продажа · маржа N%» is display-only. The pencil (owner/manager, `canManageProducts()`) opens the card edit `edit/[id]`; the rental price form (`rental-form`) is reached from the rental card → «Управление». Owner/manager «+» in the staff panel opens `variants/[id]` (add variants).
+- **Create / edit** (2026-11-14, plan `../billing/docs/product-create/PLAN.md`, design artifact page «Товары», artboards `ProductNew` / `ProductVariants` / `ProductScan`). Two steps, two requests; no shared form store — step 2 loads the product by id, so the same route finishes a draft.
+  - «+» on the list — owner/admin only (`canCreateProduct()`; backend `POST /product` is OWNER + ADMIN).
+  - **Step 1 «Карточка»** (`screens/product/form/ProductCardFormScreen.tsx`, route `create`): working-warehouse banner, photos (`use-product-photos.ts` + `libs/product-image.ts`: gallery/camera, compression, `POST /image/upload` → presigned PUT with progress, max 5 × 5 MB, tap = make main), name, description, `CategorySheet`, `BrandSheet` (store brands; brand required), attribute chips (store attributes), tag chips (existing values, optional). «Далее» → `POST /product` → `variants/[id]`. Edit mode (`edit/[id]`, `productId` prop): prefilled, attributes locked once the product has variants, «Сохранить» → `PATCH /product/:id` → back.
+  - **Step 2 «Варианты»** (`ProductVariantsScreen.tsx` + `variant-builder.ts`): value chips per attribute (NUMBER → number input), «+ значение» sheet for owner/admin (`canAddCategory()`, find-or-create `POST /category/attribute/value`); variants = all combinations minus removed (no attributes → one); «Одинаково для всех»; per variant qty / cost / price, margin badge (display only), barcode input + `BarcodeScanModal`. Save: all three empty → dropped, partly filled → inline error, 409 → highlights the variant with that barcode. Existing combinations are skipped when adding to an existing product; «Изменить» opens `edit/[id]`; «Добавить варианты позже» on a draft → list. Success → product card + toast.
+  - **Drafts** (`isDraft` from `GET /product`): «Черновик» badge (warn), no price/stock; tap → `variants/[id]` for owner/manager.
+  - i18n: `productForm.*`, `productVariants.*`.
+- **Categories** (2 levels: store direction → product subcategory, one shared dictionary; rules in [`../docs/features/products.md`](../docs/features/products.md)): names come from the backend — `name` (Russian) + `nameUz` / `nameEn`, shown with `categoryLabel(c, i18n.language)` / `productCategoryLabel(product, …)` from `libs/category.ts` (never a `category.*` i18n key — that block was removed). API and hooks in `services/category/` (`useStoreCategories`, `useCategoryTree`, `useCreateSubcategory`, `useUpdateSubcategory`, `useDeleteSubcategory`). The product list chips are the subcategories of the store direction. `components/product/CategorySheet.tsx` — subcategory picker with search over all languages and «Добавить «…»» for OWNER/ADMIN (`canAddCategory()`, UX only); used by the product form (step 1). Admin store card «Каталог»: tap a subcategory → `SubcategorySheet` (rename / translations / delete).
 - `libs/product-utils.ts`: `getVariantLabel`, `getLatestCostPrice` (skips movements without a cost; the cart's `latestReceiptCost` too).
 
 ```tsx
@@ -477,7 +485,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`).
-- Not built yet (disabled buttons / `ComingSoonScreen`): product create/edit, open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount. Staff creation has no «comment» field (not stored by the backend).
+- Not built yet (disabled buttons / `ComingSoonScreen`): open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount. Staff creation has no «comment» field (not stored by the backend).
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
 ---
@@ -505,4 +513,4 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 **Remember**: This app **displays data** and **handles user interactions**. **Business logic lives in the backend.** Always use the versioned Expo docs (v57).
 
-**Last updated**: 2026-11-14
+**Last updated**: 2026-11-15
