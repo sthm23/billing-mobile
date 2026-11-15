@@ -93,7 +93,7 @@ billing-mobile/
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
-    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, due-date.ts (repay-by quick picks), roles.ts (isAdmin, isStoreSuspended, canAddCategory, canCreateProduct, canProcessReturns, …), product-image.ts (pick / compress / presigned upload), category.ts (categoryLabel)
+    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, due-date.ts (repay-by quick picks), roles.ts (isAdmin, isStoreSuspended, canAddCategory, canCreateProduct, canProcessReturns, canOpenCashbox, cashboxRights, …), product-image.ts (pick / compress / presigned upload), category.ts (categoryLabel)
     ├── models/                   # API types (app, auth, order, payment, product, store, user)
     ├── provider/AuthProvider.tsx # Auth context
     └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product, category, admin-store, …)
@@ -301,6 +301,7 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 - **Warehouse**: a new cart uses the working warehouse (`useWorkingWarehouse`, see below; filled in when it loads after the screen opened). There is no warehouse choice in the cart. A cart prefilled from a product card keeps the product's warehouse.
 - **Types**: list `Order` has only the `warehouse` object (no `warehouseId`); `OrderDetail.warehouseId` exists.
 - **Debt due date**: when part of the order stays on debt, the pay screen offers «Вернуть до» (optional; chips 1 неделя / 2 недели / 1 месяц / Без срока from `libs/due-date.ts`, shared with «Новый долг») → `debtDueAt` = end of the local day. `useCreateOrderPayment` also refreshes debtors.
+- **Payment cashbox** (2026-11-15): when money is paid and the employee has no own open cashbox (`GET /cashbox/open` → `isMine`), `OrderPayScreen` opens `CashboxPickerSheet` and sends the picked `cashboxId` with `POST /orders/payment/:id`. A seller never has an own cashbox and always picks one. A sale fully on debt needs no cashbox.
 
 ### Order view + return (2026-11-15)
 
@@ -321,7 +322,7 @@ A debt is owed to the **store**: every employee (seller, cashier, manager, owner
 - **Customer** (`DebtorScreen.tsx`, `GET /debt/debtors/:customerId`): the customer's open debts (ORDER / MANUAL); with a single debt it opens the payment right away (`router.replace`). A MANUAL debt row has a badge «вернуть до DD.MM» (neutral) / «просрочен с DD.MM» (`err`) from `dueAt` / `overdue`.
 - **New debt** (`DebtNewScreen`, `debtors/new`, `POST /debt` via `useCreateDebt()`, design canvas page «debtors», artboards `DebtNew*`): customer (required; `CustomerPickerSheet`, «Добавить клиента» opens it in create mode via the `startCreating` prop; rows show «должен {amount}» from `debtTotal`), amount in the hero block, dates «Создано» (default today, past allowed, `DatePickerSheet` max today) and «Вернуть до» (`DatePickerSheet` min = created; chips 1 неделя / 2 недели / 1 месяц counted from today / «Без срока»), comment (≤ 500), note «в кассу деньги не попадут». Sends `createdAt` = start of the local day (omitted when today) and `returnedAt` = end of the local day (omitted = no term). Errors: client/amount after a submit attempt, date error live, server error banner above the button; the button is disabled while the form is empty. Success → toast «Долг добавлен. Имя · сумма UZS» + back. Non owner/manager → «нет доступа» (UX only; the backend allows only OWNER/MANAGER).
 - **Payment of one debt** (`DebtPayScreen.tsx`, design «OrderPay» in debt mode): remaining, progress, method tiles + amounts (`PaymentMethodsInput`, shared with `OrderPayScreen`), cash change, payment history. `useRepayDebt()` → ORDER: `POST /payment` (no stock movement), MANUAL: `POST /debt/payment`. Overpayment is never sent (cash minus change); the backend rejects it anyway.
-- **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox` on the working warehouse) or pick another open cashbox of the store → `cashboxId`.
+- **Cashbox**: with an own open cashbox (`GET /cashbox/open` → `isMine`) the backend takes it. Otherwise `CashboxPickerSheet` (`components/cashbox`): «Открыть свою кассу» (`POST /cashbox` on the working warehouse; shown only when `canOpenCashbox(user)` — owner / manager / cashier; a seller sees texts `debtors.cashbox.textSeller` / `noneSeller`) or pick another open cashbox → `cashboxId`. `GET /cashbox/open` lists only cashboxes of the employee's warehouses (owner: the whole store).
 - i18n: top-level `debtors.*` (incl. `addDebt`, `beforeSthm`, `dueBy`, `overdueSince`), `debtNew.*`, `datePicker.*`, `sale.customer.owes`.
 
 ### Rental (phase 6, in progress)
@@ -350,7 +351,8 @@ All totals come from the backend; the client sends its local day bounds from `to
 
 - **Orders screen**: HeroCard «Продажи сегодня» — `useTodaySalesSummary()` (`services/order/order.queries.ts`, `GET /orders/summary`, type `OrdersSummary`): chip «Заказов: N», tiles Оплачено / В долг. Scope by role is decided by the backend.
 - **Cashbox list**: `CashboxTodayHero` from `GET /cashbox` → `today` (`CashboxTodaySummary`): «Сегодня в открытых кассах» (chip «Открыто: N», Приход/Расход за сегодня) or «Нет открытых касс» + «Последняя закрыта сегодня/вчера/DD.MM в HH:MM». Rows show the shift: open «с 09:00» (another day «с 20.10, 09:00»), closed «16.10, 09:00–19:30» (`closedAt`).
-- **Cashbox details**: hero Приход/Расход and `PaymentMethodTiles` (`byMethod`) from `GET /cashbox/:id` → `summary` (`CashboxSummary`). A closed cashbox: label «Итог смены», «Смена 16.10 · 09:00 – 19:30».
+- **Cashbox details**: hero Приход/Расход and `PaymentMethodTiles` (`byMethod`) from `GET /cashbox/:id` → `summary` (`CashboxSummary`). A closed cashbox: label «Итог смены», «Смена 16.10 · 09:00 – 19:30». Actions by `cashboxRights(user, cashbox.sellerId)` (`libs/roles.ts`, UX only): «Расход» on someone else's cashbox only for owner / manager; closing only for the own cashbox or the owner. A failed transaction shows a toast (`payment.transactionFailed` fallback).
+- **Cashbox list scope** (backend): owner — store; manager — their warehouses; seller / cashier / warehouse — own cashboxes + open cashboxes of their warehouses.
 - Balances and shift totals include all payment methods (CASH, CARD, Click, Перечисление).
 - i18n: `order.summary.*`, `payment.today.*`, `payment.shiftTotal`, `payment.shift`, `payment.since`.
 
@@ -391,6 +393,7 @@ Role checks in the UI are UX only — the backend enforces permissions.
 - Owner = `user.role === UserRole.OWNER` (not `staff.role`). The owner's store is `user.staff.storeId`.
 - Owner-only UI: Profile → «Сотрудники» (list, card, edit, new employee). The screens also show «нет доступа» for non-owners.
 - Owner / manager / admin UI: `canLowerPrice()` (cart price lowering) and `canCreateDebt()` (Debtors → «+ Долг», `debtors/new`) in `src/libs/roles.ts`.
+- Cashbox UI (2026-11-15): `canOpenCashbox()` (owner / manager / cashier / admin — «Открыть свою кассу») and `cashboxRights(user, sellerId)` (`expense`, `close`) in `src/libs/roles.ts`.
 - Owner / manager (not admin) UI: `canProcessReturns()` — «Возврат товара», «Выдать деньги», «Компенсация за брак» on the order screen (backend: OWNER any warehouse, MANAGER own warehouses).
 - A deactivated employee gets 401 on every request (backend, 2026-11-09): the refresh fails and the app logs out.
 - Platform ADMIN = `isAdmin(user)` (`src/libs/roles.ts`); has no `staff` — Profile only (see «Tabs»), debtors are hidden and not loaded (`useDebtors(params, enabled)`).
@@ -411,7 +414,7 @@ A store suspended by an admin gets 403 `{ code: 'STORE_SUSPENDED' }` on every re
 
 - One warehouse at a time, chosen in Profile → «Рабочий склад» (`screens/profile/WorkingWarehouseCard.tsx`: card + `Sheet`). Saved on the device (`sthm23-working-warehouse`); a saved warehouse the user can no longer use falls back to the first available one.
 - Available: the owner — every active warehouse of the store (`useStoreById`; the owner's own `staff.warehouse` rows hold only the first one), others — `useStaffWarehouses()` (`/auth/me`).
-- Filtered by it (`warehouseId` query param): products, orders + «Продажи сегодня», cashboxes, rentals (list, counters, calendar), the staff list and its count in Profile. Created on it: new cart, new booking, own cashbox. **Debtors are not filtered** (store-wide).
+- Filtered by it (`warehouseId` query param): products, orders + «Продажи сегодня», cashboxes, rentals (list, counters, calendar), the staff list and its count in Profile. Created on it: new cart, new booking, own cashbox (owner / manager / cashier). **Debtors are not filtered** (store-wide).
 - Lists wait for `isReady` (saved choice + the owner's store loaded), so nothing is fetched unfiltered first. `warehouseId` is part of the query keys — switching refetches.
 - The backend checks access to the warehouse (403 otherwise); the client choice is UX only.
 
@@ -498,7 +501,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Known Issues
 
 - Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`); display-only previews in `OrderViewScreen` (net total after a return) and `OrderReturnScreen` (hero sums — the backend decides the amounts).
-- Not built yet (disabled buttons / `ComingSoonScreen`): open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount. Staff creation has no «comment» field (not stored by the backend).
+- Not built yet (disabled buttons / `ComingSoonScreen`): open cashbox from the cashbox list (opening works only from the payment flows, `CashboxPickerSheet`), cashbox filters, order-level discount. Staff creation has no «comment» field (not stored by the backend).
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 
 ---
