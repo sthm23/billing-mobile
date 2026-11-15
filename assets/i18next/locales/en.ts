@@ -871,6 +871,39 @@ const en = {
     "submit": "Submit",
     "cancel": "Cancel"
   },
+  "orderFilter": {
+    "title": "Filter orders",
+    "period": "Period",
+    "byCreatedDate": "by creation date",
+    "bySaleDate": "by sale date",
+    "periods": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "7d": "7 days",
+      "30d": "30 days",
+      "custom": "Custom"
+    },
+    "from": "From",
+    "to": "To",
+    "pickDay": "Pick",
+    "customer": "Customer",
+    "anyCustomer": "Any customer",
+    "clearCustomer": "Remove customer",
+    "status": "Status",
+    "statuses": {
+      "CREATED": "Created",
+      "HOLD": "Hold",
+      "COMPLETED": "Completed",
+      "DEBT": "Debt",
+      "REFUNDED": "Returned",
+      "OWED": "Owed to customer"
+    },
+    "reset": "Reset",
+    "apply": "Show",
+    "empty": "No orders match the filter",
+    "buttonActive": "Filter, {{count}} on",
+    "removeChip": "Remove filter «{{label}}»"
+  },
   "orderReturn": {
     "title": "Return goods",
     "noAccess": "Only the owner or a manager can process returns",

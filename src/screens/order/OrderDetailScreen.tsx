@@ -1,5 +1,7 @@
 import { Button } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
+import { canLowerPrice } from '@/libs/roles';
+import { useAuth } from '@/provider/AuthProvider';
 import { useOrderById } from '@/services/order/order.queries';
 import { OrderStatus } from '@/services/order/order.type';
 import { router } from 'expo-router';
@@ -14,10 +16,12 @@ interface OrderDetailScreenProps {
 
 /**
  * Order screen: CREATED/HOLD orders open in the cart for editing and
- * payment; sold ones in the read-only view (`OrderViewScreen`).
+ * payment (someone else's open order — read-only for a seller); sold ones in
+ * the read-only view (`OrderViewScreen`).
  */
 export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { data: order, isLoading, isError, refetch } = useOrderById(orderId);
 
   if (isLoading) {
@@ -34,7 +38,10 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
     );
   }
 
-  if (order.status === OrderStatus.CREATED || order.status === OrderStatus.HOLD) {
+  // Someone else's open order: a seller only looks at it (the backend rejects
+  // the edit — owner / manager only)
+  const editable = canLowerPrice(user) || order.cashier?.id === user?.staff?.id;
+  if ((order.status === OrderStatus.CREATED || order.status === OrderStatus.HOLD) && editable) {
     return <OrderCartScreen order={order} />;
   }
 

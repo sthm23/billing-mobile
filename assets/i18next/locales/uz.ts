@@ -871,6 +871,39 @@ const uz = {
     "submit": "Tasdiqlash",
     "cancel": "Bekor qilmoq"
   },
+  "orderFilter": {
+    "title": "Buyurtmalar filtri",
+    "period": "Davr",
+    "byCreatedDate": "yaratilgan sana bo'yicha",
+    "bySaleDate": "sotilgan sana bo'yicha",
+    "periods": {
+      "today": "Bugun",
+      "yesterday": "Kecha",
+      "7d": "7 kun",
+      "30d": "30 kun",
+      "custom": "O'z davri"
+    },
+    "from": "Dan",
+    "to": "Gacha",
+    "pickDay": "Tanlash",
+    "customer": "Mijoz",
+    "anyCustomer": "Istalgan mijoz",
+    "clearCustomer": "Mijozni olib tashlash",
+    "status": "Holat",
+    "statuses": {
+      "CREATED": "Yaratilgan",
+      "HOLD": "Bron",
+      "COMPLETED": "Yakunlangan",
+      "DEBT": "Qarz",
+      "REFUNDED": "Qaytarilgan",
+      "OWED": "Mijozga qarzmiz"
+    },
+    "reset": "Tozalash",
+    "apply": "Ko'rsatish",
+    "empty": "Filtr bo'yicha buyurtma yo'q",
+    "buttonActive": "Filtr, yoqilgan: {{count}}",
+    "removeChip": "«{{label}}» filtrini olib tashlash"
+  },
   "orderReturn": {
     "title": "Mahsulotni qaytarish",
     "noAccess": "Qaytarishni faqat egasi va menejer rasmiylashtiradi",

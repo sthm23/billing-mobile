@@ -73,12 +73,15 @@ export function OrderViewScreen({ order, refetch }: OrderViewScreenProps) {
   const [compensationCashbox, setCompensationCashbox] = useState<string | null>(null);
 
   const ret = order.returns;
-  const { debt, owedToCustomer } = order.settlement ?? { debt: 0, owedToCustomer: 0, refundedOut: 0 };
+  const sold = order.status === OrderStatus.COMPLETED || order.status === OrderStatus.DEBT || order.status === OrderStatus.REFUNDED;
+  const settlement = order.settlement ?? { debt: 0, owedToCustomer: 0, refundedOut: 0 };
+  // An unpaid (open / cancelled) order owes nothing yet
+  const debt = sold ? settlement.debt : 0;
+  const owedToCustomer = settlement.owedToCustomer;
   const total = Number(order.totalAmount);
   const returned = Number(order.returnedAmount ?? 0);
   // Display only: what stays with the store after the return
   const netTotal = total - returned;
-  const sold = order.status === OrderStatus.COMPLETED || order.status === OrderStatus.DEBT || order.status === OrderStatus.REFUNDED;
   const manager = canProcessReturns(user);
   const canReturn = manager && !order.isReturned && (order.status === OrderStatus.COMPLETED || order.status === OrderStatus.DEBT);
   const canPayout = manager && !!ret && ret.status === ReturnOrderStatus.CREDIT && owedToCustomer > 0;
@@ -93,7 +96,7 @@ export function OrderViewScreen({ order, refetch }: OrderViewScreenProps) {
   const pills: { key: string; label: string; value: number; tone: 'accent' | 'err' | 'warn' | 'muted' }[] = [
     { key: 'paid', label: t('orderView.paid'), value: Number(order.paidAmount), tone: 'accent' },
   ];
-  if (debt > 0 || !order.isReturned) {
+  if (sold && (debt > 0 || !order.isReturned)) {
     pills.push({ key: 'debt', label: t('orderView.debt'), value: debt, tone: debt > 0 ? 'err' : 'muted' });
   }
   if (order.isReturned) {

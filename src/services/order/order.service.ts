@@ -67,6 +67,15 @@ const getOrders = async (params: OrderParams = {}): Promise<BaseListResponse<Ord
   if (params.warehouseId) {
     queryParams.append('warehouseId', params.warehouseId);
   }
+  if (params.dateBy) {
+    queryParams.append('dateBy', params.dateBy);
+  }
+  if (params.customerId) {
+    queryParams.append('customerId', params.customerId);
+  }
+  if (params.owedToCustomer) {
+    queryParams.append('owedToCustomer', 'true');
+  }
 
   const response = await ordersApi.get<BaseListResponse<Order>>(ENDPOINTS.BASE, {
     params: queryParams,

@@ -871,6 +871,39 @@ const ru = {
     "submit": "Подтвердить",
     "cancel": "Отмена"
   },
+  "orderFilter": {
+    "title": "Фильтр заказов",
+    "period": "Период",
+    "byCreatedDate": "по дате создания",
+    "bySaleDate": "по дате продажи",
+    "periods": {
+      "today": "Сегодня",
+      "yesterday": "Вчера",
+      "7d": "7 дней",
+      "30d": "30 дней",
+      "custom": "Свой период"
+    },
+    "from": "С",
+    "to": "По",
+    "pickDay": "Выбрать",
+    "customer": "Клиент",
+    "anyCustomer": "Любой клиент",
+    "clearCustomer": "Убрать клиента",
+    "status": "Статус",
+    "statuses": {
+      "CREATED": "Создан",
+      "HOLD": "Бронь",
+      "COMPLETED": "Завершён",
+      "DEBT": "Долг",
+      "REFUNDED": "Возврат",
+      "OWED": "Должны клиенту"
+    },
+    "reset": "Сбросить",
+    "apply": "Показать",
+    "empty": "Нет заказов по фильтру",
+    "buttonActive": "Фильтр, включено: {{count}}",
+    "removeChip": "Убрать фильтр «{{label}}»"
+  },
   "orderReturn": {
     "title": "Возврат товара",
     "noAccess": "Возврат оформляют только владелец и менеджер",

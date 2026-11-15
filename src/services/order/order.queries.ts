@@ -8,6 +8,8 @@
 import { BaseListResponse } from '@/models/app.models'
 import { cashboxQueryKeys } from '@/services/cashbox/cashbox.queries'
 import {
+  keepPreviousData,
+  useInfiniteQuery,
   useMutation,
   useQuery,
   useQueryClient,
@@ -136,6 +138,22 @@ export const useOrders = (params: OrderParams = {}, enabled = true): UseQueryRes
 
   return useQuery(queryOptions)
 }
+
+/**
+ * Orders list with filters, page by page (`GET /orders`); the filters are
+ * part of the key, so changing one starts again from page 1.
+ */
+export const useOrdersInfinite = (params: Omit<OrderParams, 'currentPage'>, enabled = true) =>
+  useInfiniteQuery({
+    enabled,
+    queryKey: [...orderQueryKeys.all(), 'list', 'infinite', params] as const,
+    queryFn: ({ pageParam }) => orderService.getOrders({ ...params, currentPage: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (last: BaseListResponse<Order>) =>
+      Number(last.currentPage) * Number(last.pageSize) < Number(last.total) ? Number(last.currentPage) + 1 : undefined,
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  })
 
 /**
  * «Продажи сегодня» (`GET /orders/summary`) for the local day. Refreshed with

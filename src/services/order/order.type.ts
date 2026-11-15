@@ -45,6 +45,11 @@ export interface OrderParams {
     search?: string
     /** The working warehouse */
     warehouseId?: string
+    /** Which date fromDate / toDate filter: creation (default) or sale date */
+    dateBy?: 'created' | 'sold'
+    customerId?: string
+    /** Only orders whose return is paid out later (the store owes the customer) */
+    owedToCustomer?: boolean
 }
 export interface Order {
     id: string

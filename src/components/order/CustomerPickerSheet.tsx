@@ -22,6 +22,8 @@ interface CustomerPickerSheetProps {
   onSelect: (customer: OrderCustomer) => void;
   /** Open straight on the «Новый клиент» form */
   startCreating?: boolean;
+  /** `false` — pick only, no «Новый клиент» (e.g. the orders filter) */
+  allowCreate?: boolean;
 }
 
 function initials(name: string): string {
@@ -38,7 +40,7 @@ function initials(name: string): string {
  * one (`GET`/`POST /users/customers`). A customer with an open debt in the
  * store gets «должен …».
  */
-export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect, startCreating = false }: CustomerPickerSheetProps) {
+export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect, startCreating = false, allowCreate = true }: CustomerPickerSheetProps) {
   const { t } = useTranslation();
   const colors = useTheme();
   const [search, setSearch] = useState('');
@@ -160,9 +162,11 @@ export function CustomerPickerSheet({ isOpen, selectedId, onClose, onSelect, sta
               variant="sunken"
             />
             <Text className="font-onest text-xs text-muted -mt-1 px-1">{t('sale.customer.searchHint')}</Text>
-            <Button variant="secondary" icon={UserPlus} onPress={startCreate}>
-              {t('sale.customer.add')}
-            </Button>
+            {allowCreate ? (
+              <Button variant="secondary" icon={UserPlus} onPress={startCreate}>
+                {t('sale.customer.add')}
+              </Button>
+            ) : null}
             {isError ? (
               <EmptyState icon={UserRound} message={t('sale.customer.loadFailed')} />
             ) : customers.length === 0 ? (
