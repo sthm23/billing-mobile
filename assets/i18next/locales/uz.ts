@@ -1002,6 +1002,7 @@ const uz = {
       "title": "Do'kon mijozga {{amount}} UZS qarz",
       "text": "Qaytarish pul berilmasdan rasmiylashtirildi. Kassada mablag' bo'lganda pulni bering."
     },
+    "payOrder": "To'lovni qabul qilish · {{amount}}",
     "payDebt": "Qarz to'lovini qabul qilish · {{amount}}",
     "returnGoods": "Mahsulotni qaytarish",
     "payout": {

@@ -200,7 +200,9 @@ export function OrderViewScreen({ order, refetch }: OrderViewScreenProps) {
     }
   };
 
-  const hasActions = canPayDebt || canPayout || canReturn;
+  // A colleague's booked order (opened read-only): any employee may take its payment
+  const canPayHold = order.status === OrderStatus.HOLD;
+  const hasActions = canPayHold || canPayDebt || canPayout || canReturn;
 
   return (
     <View className="flex-1 bg-bg">
@@ -409,6 +411,16 @@ export function OrderViewScreen({ order, refetch }: OrderViewScreenProps) {
 
       {hasActions ? (
         <View className="px-4 pt-3 gap-2 bg-bg" style={{ paddingBottom: insets.bottom + 12 }}>
+          {canPayHold ? (
+            <Button
+              variant="accent"
+              size="lg"
+              full
+              onPress={() => router.push({ pathname: '/(tabs)/(orders)/pay/[id]', params: { id: order.id } })}
+            >
+              {t('orderView.payOrder', { amount: formatMoney(total) })}
+            </Button>
+          ) : null}
           {canPayDebt ? (
             <Button
               variant="accent"

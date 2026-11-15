@@ -1002,6 +1002,7 @@ const en = {
       "title": "The store owes the customer {{amount}} UZS",
       "text": "The return was made without a payout. Pay the money out when the cashbox has funds."
     },
+    "payOrder": "Take payment · {{amount}}",
     "payDebt": "Accept debt payment · {{amount}}",
     "returnGoods": "Return goods",
     "payout": {
