@@ -15,6 +15,8 @@ export default function TabLayout() {
       <Stack.Screen name="search" />
       <Stack.Screen name="scan" options={{ presentation: 'fullScreenModal', animation: 'fade' }} />
       <Stack.Screen name="pay/[id]" />
+      <Stack.Screen name="debt-pay" />
+      <Stack.Screen name="return/[id]" />
     </Stack>
   );
 }

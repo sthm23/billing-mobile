@@ -7,7 +7,8 @@ import { formatMoney } from '@/libs/format';
 import { canCreateDebt } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
-import { addLocalDays, formatLocalDay, fromLocalDate, initials, toLocalDate } from '@/screens/rental/rental-format';
+import { DUE_QUICK, endOfLocalDay, quickDue, type DueQuick } from '@/libs/due-date';
+import { formatLocalDay, fromLocalDate, initials, toLocalDate } from '@/screens/rental/rental-format';
 import type { OrderCustomer } from '@/services/customer';
 import { useCreateDebt } from '@/services/debt';
 import { router } from 'expo-router';
@@ -17,29 +18,13 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type Quick = '1w' | '2w' | '1m' | 'none';
+type Quick = DueQuick;
 type SheetName = 'none' | 'clients' | 'newClient' | 'created' | 'due';
 
-const QUICK: Quick[] = ['1w', '2w', '1m', 'none'];
+const QUICK = DUE_QUICK;
 /** Up to 9 999 999 999 999 UZS */
 const MAX_AMOUNT_DIGITS = 13;
 const DESCRIPTION_MAX = 500;
-
-/** Repay-by day of a quick chip, counted from today */
-function quickDue(quick: Quick, today: string): string | null {
-  if (quick === 'none') return null;
-  if (quick === '1w') return addLocalDays(today, 7);
-  if (quick === '2w') return addLocalDays(today, 14);
-  const d = fromLocalDate(today);
-  return toLocalDate(new Date(d.getFullYear(), d.getMonth() + 1, d.getDate()));
-}
-
-/** End of the local day — «вернуть до 28.11» includes the 28th */
-function endOfLocalDay(day: string): string {
-  const d = fromLocalDate(day);
-  d.setHours(23, 59, 59, 999);
-  return d.toISOString();
-}
 
 /**
  * «Новый долг» (design «DebtNew»): a debt the customer owed before STHM —

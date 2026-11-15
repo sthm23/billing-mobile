@@ -7,7 +7,7 @@
 
 import { ordersApi, paymentsApi, usersApi } from '@/api/axios-instance'
 import { BaseListResponse } from '@/models/app.models'
-import type { CreateOrderItemPayload, CreateOrderPayload, CreateOrderPaymentPayload, Order, OrderDetail, OrderParams, OrdersSummary, ReturnOrderItemPayload } from './order.type'
+import type { CreateOrderItemPayload, CreateOrderPayload, CreateOrderPaymentPayload, Order, OrderDetail, OrderParams, OrdersSummary, ReturnOrderItemPayload, ReturnOrderResult, ReturnPayoutPayload } from './order.type'
 
 const ENDPOINTS = {
   BASE: '/',
@@ -110,8 +110,16 @@ const createOrderPayment = async (orderId: string, body: CreateOrderPaymentPaylo
   return response.data
 }
 
-const returnOrder = (returnOrderPayload: ReturnOrderItemPayload) => {
-  return ordersApi.post<{ message: string }>(ENDPOINTS.RETURN, returnOrderPayload)
+/** Returns goods of a sold order (`POST /orders/return`, OWNER/MANAGER); stock goes back to the order's warehouse. */
+const returnOrder = async (returnOrderPayload: ReturnOrderItemPayload): Promise<ReturnOrderResult> => {
+  const response = await ordersApi.post<ReturnOrderResult>(ENDPOINTS.RETURN, returnOrderPayload)
+  return response.data
+}
+
+/** Pays out what the store owes after a CREDIT return (`POST /payment/return/:id`, OWNER/MANAGER). */
+const payoutReturn = async ({ returnId, ...body }: ReturnPayoutPayload): Promise<{ message: string }> => {
+  const response = await paymentsApi.post<{ message: string }>(`/return/${returnId}`, body)
+  return response.data
 }
 
 /** Repays a DEBT order (`POST /payment`) — no stock movement. */
@@ -138,6 +146,7 @@ export const orderService = {
   getOrders,
   getSummary,
   returnOrder,
+  payoutReturn,
   createOrderItems,
   searchOrders,
   createOrderPayment,

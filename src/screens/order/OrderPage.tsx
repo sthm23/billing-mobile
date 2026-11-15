@@ -20,8 +20,8 @@ const getStatus = (value: OrderStatusType): OrderStatus[] => {
     if (value === 'active') {
         return [OrderStatus.CREATED, OrderStatus.HOLD];
     } else {
-        // Sold orders, including those left partly unpaid as debt
-        return [OrderStatus.COMPLETED, OrderStatus.DEBT];
+        // Sold orders, incl. those left partly unpaid as debt and returned ones
+        return [OrderStatus.COMPLETED, OrderStatus.DEBT, OrderStatus.REFUNDED];
     }
 };
 export default function OrderPage() {

@@ -57,6 +57,8 @@ export enum CashTransactionCategory {
   SALARY = 'SALARY',
   PURCHASE = 'PURCHASE',
   RETURN = 'RETURN',
+  /** Money given for a defective item the store does not take back (expense, no stock movement) */
+  DEFECT_COMPENSATION = 'DEFECT_COMPENSATION',
   OTHER = 'OTHER',
 }
 

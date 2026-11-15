@@ -869,6 +869,79 @@ const en = {
     "submit": "Submit",
     "cancel": "Cancel"
   },
+  "orderView": {
+    "title": "Order №{{no}}",
+    "badge": {
+      "owedToCustomer": "Owed to customer",
+      "returnedFull": "Return · full",
+      "returnedPartial": "Return · partial",
+      "partialReturn": "Partial return"
+    },
+    "total": "Total",
+    "totalAfterReturn": "Total after return",
+    "paid": "Paid",
+    "debt": "Debt",
+    "returned": "Returned",
+    "customer": "Customer",
+    "phone": "Phone",
+    "call": "Call the customer",
+    "warehouse": "Warehouse",
+    "seller": "Seller",
+    "dueAt": "Repay by",
+    "overdueSince": "overdue since {{date}}",
+    "items": "Items · {{count}}",
+    "units": "{{count}} pcs",
+    "returnedUnits": "{{count}} pcs returned",
+    "calc": "{{qty}} pcs × {{price}}",
+    "calcReturned": "{{left}} of {{qty}} pcs × {{price}}",
+    "returnedBadge": "{{count}} pcs returned",
+    "history": {
+      "title": "Payments and returns",
+      "debt": "On debt",
+      "dueBy": "Customer must repay by {{date}}",
+      "noTerm": "No repayment term",
+      "return": "Return №{{no}}",
+      "paidBy": {
+        "CASH": "in cash",
+        "CARD": "to card",
+        "ONLINE": "via Click",
+        "TRANSFER": "by transfer"
+      },
+      "payLater": "to be paid out later",
+      "againstDebt": "against the debt",
+      "payout": "Paid to customer · {{method}}"
+    },
+    "reason": {
+      "DEFECT": "defect",
+      "NOT_FIT": "didn't fit",
+      "EXTRA": "extra",
+      "OTHER": "other"
+    },
+    "owed": {
+      "title": "The store owes the customer {{amount}} UZS",
+      "text": "The return was made without a payout. Pay the money out when the cashbox has funds."
+    },
+    "payDebt": "Accept debt payment · {{amount}}",
+    "returnGoods": "Return goods",
+    "payout": {
+      "button": "Pay out · {{amount}}",
+      "title": "Pay money to the customer",
+      "amount": "To pay out",
+      "method": "Payout method",
+      "note": "The money leaves your open cashbox. If you have none, pick a cashbox.",
+      "submit": "Pay out {{amount}} UZS",
+      "success": "{{amount}} UZS paid to the customer",
+      "failed": "Could not pay out"
+    },
+    "compensation": {
+      "hint": "A defective item the store does not take back: part of the money to the customer as a cashbox expense, no return to stock.",
+      "button": "Defect compensation",
+      "title": "Compensation · №{{no}}",
+      "note": "A cashbox expense linked to the order. The item does not go back to stock.",
+      "success": "Compensation of {{amount}} UZS recorded",
+      "failed": "Could not record the compensation"
+    }
+  },
   "order": {
     "summary": {
       "today": "Sales today",
@@ -1110,6 +1183,7 @@ const en = {
       "SALARY": "Salary",
       "PURCHASE": "Purchase",
       "RETURN": "Return",
+      "DEFECT_COMPENSATION": "Defect compensation",
       "OTHER": "Other"
     },
     "cashboxStatus": {
@@ -1383,6 +1457,9 @@ const en = {
       "hint": "Point the camera at a barcode"
     },
     "pay": {
+      "dueTitle": "Repay by",
+      "dueOptional": "optional",
+      "dueNone": "No term",
       "retry": "Retry",
       "alreadyPaid": "The order is already paid",
       "debtLater": "Repay the debt in «Debtors» (Profile)",

@@ -27,6 +27,9 @@ import type {
   OrderItemPayload,
   OrderParams,
   OrdersSummary,
+  ReturnOrderItemPayload,
+  ReturnOrderResult,
+  ReturnPayoutPayload,
 } from './order.type'
 import { todayRange } from '@/libs/date'
 
@@ -244,6 +247,54 @@ export const useCreateOrderPayment = (): UseMutationResult<
 
   return useMutation({
     mutationFn: ({ orderId, body }) => orderService.createOrderPayment(orderId, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
+      queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() })
+      // A payment may leave a debt — debtors list
+      queryClient.invalidateQueries({ queryKey: DEBT_QUERY_KEY })
+    },
+  })
+}
+
+// Literal keys of `debtQueryKeys.all()` / `productQueryKeys.all()` / `customerQueryKeys.all()`:
+// importing them here would make an import cycle (those modules import orderQueryKeys).
+const DEBT_QUERY_KEY = ['debt'] as const
+const PRODUCT_QUERY_KEY = ['product'] as const
+const CUSTOMER_QUERY_KEY = ['customer'] as const
+
+/**
+ * Returns goods of a sold order (`POST /orders/return`). Refreshes orders,
+ * cashboxes, stock, debtors and customers' debt totals.
+ */
+export const useReturnOrder = (): UseMutationResult<
+  ReturnOrderResult,
+  AxiosError<{ message?: string | string[] }>,
+  ReturnOrderItemPayload
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (body) => orderService.returnOrder(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
+      queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() })
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: DEBT_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEY })
+    },
+  })
+}
+
+/** Pays out a CREDIT return (`POST /payment/return/:id`). Refreshes orders and cashboxes. */
+export const usePayoutReturn = (): UseMutationResult<
+  { message: string },
+  AxiosError<{ message?: string | string[] }>,
+  ReturnPayoutPayload
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (body) => orderService.payoutReturn(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: orderQueryKeys.all() })
       queryClient.invalidateQueries({ queryKey: cashboxQueryKeys.all() })

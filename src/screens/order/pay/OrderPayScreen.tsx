@@ -1,5 +1,5 @@
 import { Button, IconButton, Money, Pressable, Text } from '@/components/base';
-import { EmptyState, LoadingState } from '@/components/common';
+import { DatePickerSheet, EmptyState, LoadingState } from '@/components/common';
 import {
   CustomerPickerSheet,
   EMPTY_PAYMENT_AMOUNTS,
@@ -11,6 +11,7 @@ import {
 } from '@/components/order';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/libs/api-error';
+import { DUE_QUICK, endOfLocalDay, quickDue, type DueQuick } from '@/libs/due-date';
 import { formatMoney } from '@/libs/format';
 import { cn } from '@/libs/utils';
 import type { OrderCustomer } from '@/services/customer';
@@ -18,11 +19,12 @@ import { useCreateOrderPayment, useOrderById } from '@/services/order/order.quer
 import { orderService } from '@/services/order/order.service';
 import { OrderStatus, PaymentType, type OrderPaymentPayload } from '@/services/order/order.type';
 import { router } from 'expo-router';
-import { ChevronDown, ChevronLeft, CircleAlert, Plus, UserRound, X } from 'lucide-react-native';
+import { CalendarDays, ChevronDown, ChevronLeft, CircleAlert, Plus, UserRound, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { formatLocalDay, toLocalDate } from '@/screens/rental/rental-format';
 import { variantLabel } from '../cart/cart-store';
 
 interface OrderPayScreenProps {
@@ -35,10 +37,15 @@ interface OrderPayScreenProps {
  * deducts stock; overpayment is never sent — cash is reduced by the change.
  */
 export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const { data: order, isLoading, isError, refetch } = useOrderById(orderId);
+  const today = toLocalDate(new Date());
+  // Optional repay-by day of the debt left on the order (YYYY-MM-DD)
+  const [due, setDue] = useState<string | null>(null);
+  const [dueQuick, setDueQuick] = useState<DueQuick | null>(null);
+  const [dueOpen, setDueOpen] = useState(false);
   const payOrder = useCreateOrderPayment();
   const [selected, setSelected] = useState<PaymentType[]>([PaymentType.CASH]);
   const [amounts, setAmounts] = useState<PaymentAmounts>(EMPTY_PAYMENT_AMOUNTS);
@@ -130,7 +137,13 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
       }
       await payOrder.mutateAsync({
         orderId: order.id,
-        body: { orderId: order.id, customerId: customer?.id ?? null, payments },
+        body: {
+          orderId: order.id,
+          customerId: customer?.id ?? null,
+          payments,
+          // Only when part of the order is left on debt (the backend ignores it otherwise)
+          debtDueAt: rest > 0 && due ? endOfLocalDay(due) : undefined,
+        },
       });
       Alert.alert(
         t('sale.pay.successTitle'),
@@ -218,6 +231,48 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
           )}
         </View>
 
+        {/* Repay-by of the debt left on the order — optional */}
+        {rest > 0 && customer ? (
+          <View className="bg-card rounded-3xl px-3.5 py-3.5 gap-2.5">
+            <View className="flex-row items-baseline justify-between px-0.5">
+              <Text className="font-onest-bold text-[15px] text-ink">{t('sale.pay.dueTitle')}</Text>
+              <Text className="font-onest text-xs text-muted">{t('sale.pay.dueOptional')}</Text>
+            </View>
+            <Pressable
+              onPress={() => setDueOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel={`${t('sale.pay.dueTitle')}: ${due ? formatLocalDay(due, i18n.language) : t('sale.pay.dueNone')}`}
+              className="h-12 rounded-2xl bg-sunken px-3.5 flex-row items-center gap-2"
+            >
+              <Text className={cn('flex-1 text-[15px]', due ? 'font-onest-bold text-ink' : 'font-onest-medium text-muted')} numberOfLines={1}>
+                {due ? formatLocalDay(due, i18n.language) : t('sale.pay.dueNone')}
+              </Text>
+              <CalendarDays size={18} color={colors.muted} strokeWidth={2} />
+            </Pressable>
+            <View className="flex-row gap-1.5">
+              {DUE_QUICK.map((q) => {
+                const on = q === dueQuick;
+                return (
+                  <Pressable
+                    key={q}
+                    onPress={() => {
+                      setDueQuick(q);
+                      setDue(quickDue(q, today));
+                    }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: on }}
+                    className={cn('flex-1 h-9 rounded-pill items-center justify-center px-1.5', on ? 'bg-primary' : 'bg-sunken')}
+                  >
+                    <Text className={cn('font-onest-semibold text-xs', on ? 'text-on-primary' : 'text-ink')} numberOfLines={1}>
+                      {t(`debtNew.quick.${q}`)}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        ) : null}
+
         {/* Methods */}
         <PaymentMethodsInput
           selected={selected}
@@ -284,6 +339,18 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
         </Button>
       </View>
 
+      <DatePickerSheet
+        isOpen={dueOpen}
+        onClose={() => setDueOpen(false)}
+        title={t('sale.pay.dueTitle')}
+        value={due}
+        min={today}
+        onPick={(day) => {
+          setDue(day);
+          setDueQuick(null);
+          setDueOpen(false);
+        }}
+      />
       <CustomerPickerSheet
         isOpen={customerOpen}
         selectedId={customer?.id}

@@ -54,3 +54,13 @@ export function canAddCategory(user: CurrentUserType | null | undefined): boolea
  * A manager edits products and adds variants. UX only — the backend checks it (`POST /product`).
  */
 export const canCreateProduct = canAddCategory;
+
+/**
+ * Store owner or manager: may return goods of a sold order, pay out a refund
+ * and give a defect compensation. UX only — the backend checks it (a manager
+ * only for orders of their own warehouses).
+ */
+export function canProcessReturns(user: CurrentUserType | null | undefined): boolean {
+  if (!user) return false;
+  return user.role === UserRole.OWNER || user.staff?.role === StaffRole.OWNER || user.staff?.role === StaffRole.MANAGER;
+}

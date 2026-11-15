@@ -869,6 +869,79 @@ const uz = {
     "submit": "Tasdiqlash",
     "cancel": "Bekor qilmoq"
   },
+  "orderView": {
+    "title": "Buyurtma №{{no}}",
+    "badge": {
+      "owedToCustomer": "Mijozga qarzmiz",
+      "returnedFull": "Qaytarish · to'liq",
+      "returnedPartial": "Qaytarish · qisman",
+      "partialReturn": "Qisman qaytarish"
+    },
+    "total": "Jami",
+    "totalAfterReturn": "Qaytarishdan keyin jami",
+    "paid": "To'langan",
+    "debt": "Qarz",
+    "returned": "Qaytarilgan",
+    "customer": "Mijoz",
+    "phone": "Telefon",
+    "call": "Mijozga qo'ng'iroq qilish",
+    "warehouse": "Ombor",
+    "seller": "Sotuvchi",
+    "dueAt": "Qaytarish muddati",
+    "overdueSince": "{{date}} dan kechikkan",
+    "items": "Mahsulotlar · {{count}}",
+    "units": "{{count}} dona",
+    "returnedUnits": "{{count}} dona qaytarildi",
+    "calc": "{{qty}} dona × {{price}}",
+    "calcReturned": "{{qty}} donadan {{left}} × {{price}}",
+    "returnedBadge": "{{count}} dona qaytarildi",
+    "history": {
+      "title": "To'lovlar va qaytarishlar",
+      "debt": "Qarzga",
+      "dueBy": "Mijoz {{date}} gacha qaytarishi kerak",
+      "noTerm": "Qaytarish muddatisiz",
+      "return": "Qaytarish №{{no}}",
+      "paidBy": {
+        "CASH": "naqd",
+        "CARD": "kartaga",
+        "ONLINE": "Click orqali",
+        "TRANSFER": "o'tkazma bilan"
+      },
+      "payLater": "keyinroq beriladi",
+      "againstDebt": "qarz hisobiga",
+      "payout": "Mijozga berildi · {{method}}"
+    },
+    "reason": {
+      "DEFECT": "brak",
+      "NOT_FIT": "to'g'ri kelmadi",
+      "EXTRA": "ortiqcha",
+      "OTHER": "boshqa"
+    },
+    "owed": {
+      "title": "Do'kon mijozga {{amount}} UZS qarz",
+      "text": "Qaytarish pul berilmasdan rasmiylashtirildi. Kassada mablag' bo'lganda pulni bering."
+    },
+    "payDebt": "Qarz to'lovini qabul qilish · {{amount}}",
+    "returnGoods": "Mahsulotni qaytarish",
+    "payout": {
+      "button": "Pul berish · {{amount}}",
+      "title": "Mijozga pul berish",
+      "amount": "Beriladi",
+      "method": "Berish usuli",
+      "note": "Pul ochiq kassangizdan chiqadi. Agar u bo'lmasa — kassani tanlang.",
+      "submit": "{{amount}} UZS berish",
+      "success": "Mijozga {{amount}} UZS berildi",
+      "failed": "Pulni berib bo'lmadi"
+    },
+    "compensation": {
+      "hint": "Do'kon qaytarib olmaydigan brak mahsulot: pulning bir qismi mijozga kassadan xarajat sifatida, omborga qaytarilmaydi.",
+      "button": "Brak uchun kompensatsiya",
+      "title": "Kompensatsiya · №{{no}}",
+      "note": "Buyurtmaga bog'langan kassa xarajati. Mahsulot omborga qaytmaydi.",
+      "success": "{{amount}} UZS kompensatsiya yozildi",
+      "failed": "Kompensatsiyani yozib bo'lmadi"
+    }
+  },
   "order": {
     "summary": {
       "today": "Bugungi sotuvlar",
@@ -1111,6 +1184,7 @@ const uz = {
       "SALARY": "Maosh",
       "PURCHASE": "Sotib olish",
       "RETURN": "Qaytarish",
+      "DEFECT_COMPENSATION": "Brak uchun kompensatsiya",
       "OTHER": "Boshqa"
     },
     "cashboxStatus": {
@@ -1384,6 +1458,9 @@ const uz = {
       "hint": "Kamerani shtrix-kodga qarating"
     },
     "pay": {
+      "dueTitle": "Qaytarish muddati",
+      "dueOptional": "ixtiyoriy",
+      "dueNone": "Muddatsiz",
       "retry": "Qayta urinish",
       "alreadyPaid": "Buyurtma allaqachon to'langan",
       "debtLater": "Qarzni «Qarzdorlar» bo'limida to'lang (Profil)",

@@ -94,6 +94,67 @@ export interface Order {
     returnedAmount: number
     isReturned: boolean
     returnedAt: string | null
+    /** When the order was paid (first payment); null before */
+    soldAt?: string | null
+    /** Repay-by date of the debt left on the order (set on the pay screen) */
+    debtDueAt?: string | null
+    /** `GET /orders` list: status of the order's return, null when none */
+    returnStatus?: ReturnOrderStatus | null
+}
+
+/** `ReturnedOrder.status`: DEBT — the customer still owes, CREDIT — the store owes the customer */
+export enum ReturnOrderStatus {
+    DEBT = 'DEBT',
+    CREDIT = 'CREDIT',
+    COMPLETED = 'COMPLETED'
+}
+
+/** Return reason — information only, changes no amounts */
+export enum ReturnReason {
+    DEFECT = 'DEFECT',
+    NOT_FIT = 'NOT_FIT',
+    EXTRA = 'EXTRA',
+    OTHER = 'OTHER'
+}
+
+/** Name of the employee who took a payment / made a payout */
+export interface OrderStaffName {
+    user: { fullName: string }
+}
+
+/** A payout of a return (money given back to the customer) */
+export interface ReturnPayment {
+    id: string
+    returnOrderId: string
+    amount: number | string
+    type: PaymentType
+    createdAt: string
+    createdBy: string
+    cashier?: OrderStaffName | null
+}
+
+/** The order's return (one per order), `GET /orders/:id` → `returns` */
+export interface OrderReturn {
+    id: string
+    orderId: string
+    status: ReturnOrderStatus
+    totalAmount: number | string
+    reason: ReturnReason
+    comment: string | null
+    createdAt: string
+    createdBy: string
+    items: { itemId: string; quantity: number }[]
+    payments: ReturnPayment[]
+}
+
+/** Computed by the backend for display (`GET /orders/:id`) */
+export interface OrderSettlement {
+    /** What the customer still owes on the order */
+    debt: number
+    /** What the store still owes the customer after a return (CREDIT) */
+    owedToCustomer: number
+    /** Refund already paid out */
+    refundedOut: number
 }
 
 export interface OrderDetail extends Order {
@@ -102,8 +163,9 @@ export interface OrderDetail extends Order {
     payments: OrderPayment[]
     items: OrderDetailItem[]
     services: OrderAdditionalService[]
-
-
+    settlement: OrderSettlement
+    /** The order's return; null when the order was not returned */
+    returns: OrderReturn | null
 }
 
 export interface OrderPayment {
@@ -114,6 +176,8 @@ export interface OrderPayment {
     orderId: string
     paidAt: string | null
     type: PaymentType
+    /** Who took the payment */
+    cashier?: OrderStaffName | null
 }
 /** Variant attribute as returned by `GET /orders/:id` (Prisma relation). */
 export interface OrderVariantAttribute {
@@ -132,6 +196,8 @@ export interface OrderDetailItem {
     id: string
     orderId: string
     quantity: number
+    /** Units of this line taken back by the order's return */
+    returnedQuantity?: number
     retailPrice: number | string
     sale: number | string
     variant: {
@@ -191,7 +257,30 @@ export interface ReturnOrderItemPayload {
     orderId: string,
     /** Prices and cost come from the order line on the backend */
     items: { itemId: string; quantity: number }[]
+    /** Money given to the customer now; empty — debt reduced or paid out later (CREDIT) */
     returnPayments: OrderPaymentPayload[]
+    reason?: ReturnReason
+    comment?: string
+    /** Open cashbox to pay out from; default — the employee's own */
+    cashboxId?: string
+}
+
+/** `POST /orders/return` response */
+export interface ReturnOrderResult {
+    message: string
+    returnId: string
+    status: ReturnOrderStatus
+    totalAmount: number
+    /** Paid out to the customer now */
+    paidOut: number
+    cashboxId: string | null
+}
+
+/** `POST /payment/return/:returnId` — pay out what the store owes after a CREDIT return */
+export interface ReturnPayoutPayload {
+    returnId: string
+    payments: { type: PaymentType; amount: number }[]
+    cashboxId?: string
 }
 export interface CreateOrderPayload {
     storeId: string;
@@ -213,6 +302,8 @@ export interface CreateOrderPaymentPayload {
     orderId: string
     customerId?: string | null
     payments: OrderPaymentPayload[]
+    /** Repay-by (ISO) when part of the order is left on debt; ignored otherwise */
+    debtDueAt?: string
 }
 
 export enum DebtStatus {

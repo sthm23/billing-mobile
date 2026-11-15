@@ -1,7 +1,7 @@
 import { ListCard } from '@/components/base';
 import { Order } from '@/services/order/order.type';
 import { TFunction } from 'i18next';
-import { ORDER_STATUS_TONE } from './order-status';
+import { orderBadges, orderNo } from './order-status';
 
 type OrderCardProps = {
     order: Order;
@@ -20,7 +20,8 @@ function getInitials(name: string): string {
 }
 
 /**
- * Order row: cashier, warehouse and time, total and status.
+ * Order row: cashier, number, warehouse and time, total and the main badge
+ * («Должны клиенту» first when the store owes the customer after a return).
  */
 export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
     const cashierName = order.cashier.user.fullName;
@@ -35,9 +36,10 @@ export const OrderCard = ({ order, onPress, t }: OrderCardProps) => {
         <ListCard
             lead={getInitials(cashierName)}
             title={cashierName}
-            subtitle={`${order.warehouse.name} · ${createdAt}`}
-            amount={order.totalAmount}
-            badge={{ label: t(`order.status.${order.status}`), tone: ORDER_STATUS_TONE[order.status] ?? 'neutral' }}
+            subtitle={`№${orderNo(order.id)} · ${order.warehouse.name} · ${createdAt}`}
+            // After a return — the total that stays with the store (display only)
+            amount={Number(order.totalAmount) - Number(order.returnedAmount ?? 0)}
+            badge={orderBadges(order, t)[0]}
             onPress={() => onPress(order.id)}
         />
     );

@@ -39,6 +39,12 @@ type TransactionFormData = z.infer<typeof transactionSchema>;
 type TransactionFormProps = {
   cashboxId: string;
   transactionType: CashTransactionType;
+  /** Preselected category */
+  defaultCategory?: CashTransactionCategory;
+  /** Only the preselected category is offered (e.g. «Компенсация за брак» from an order) */
+  lockCategory?: boolean;
+  /** Order the transaction belongs to (the backend checks it is of the same store) */
+  orderId?: string;
   onSubmit: (payload: CreateTransactionPayload) => Promise<void>;
   onCancel: () => void;
   isLoading?: boolean;
@@ -47,6 +53,9 @@ type TransactionFormProps = {
 export const TransactionForm = ({
   cashboxId,
   transactionType,
+  defaultCategory = CashTransactionCategory.OTHER,
+  lockCategory = false,
+  orderId,
   onSubmit: onSubmitProp,
   onCancel,
   isLoading = false,
@@ -60,7 +69,7 @@ export const TransactionForm = ({
   } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
-      category: CashTransactionCategory.OTHER,
+      category: defaultCategory,
       paymentType: PaymentType.CASH,
       amount: "",
       comment: "",
@@ -76,17 +85,23 @@ export const TransactionForm = ({
         paymentType: data.paymentType,
         amount: Number(data.amount),
         comment: data.comment || "",
-        orderId: null,
+        orderId: orderId ?? null,
       });
     } catch (error) {
       console.error("Failed to create transaction:", error);
     }
   };
 
-  // RENTAL and DRY_CLEANING are written by the backend only
-  const categoryOptions = Object.values(CashTransactionCategory).filter(
-    (c) => c !== CashTransactionCategory.RENTAL && c !== CashTransactionCategory.DRY_CLEANING,
-  );
+  // RENTAL and DRY_CLEANING are written by the backend only; a defect
+  // compensation is an expense only (the backend rejects it as income)
+  const categoryOptions = lockCategory
+    ? [defaultCategory]
+    : Object.values(CashTransactionCategory).filter(
+        (c) =>
+          c !== CashTransactionCategory.RENTAL &&
+          c !== CashTransactionCategory.DRY_CLEANING &&
+          !(c === CashTransactionCategory.DEFECT_COMPENSATION && transactionType === CashTransactionType.INCOME),
+      );
   const paymentTypeOptions = Object.values(PaymentType);
 
   return (
