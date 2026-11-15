@@ -24,13 +24,30 @@ function locale(language: string): string {
   return LOCALES[language] ?? LOCALES.ru;
 }
 
+// Hermes has no Uzbek locale data (`uz-UZ` falls back to English), so Uzbek
+// dates are built by hand: «14-may», «14-may, 10:20», «May 2026».
+const UZ_MONTHS = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
+/** Sunday first, as `Date.getDay()` */
+const UZ_WEEKDAYS = ['yakshanba', 'dushanba', 'seshanba', 'chorshanba', 'payshanba', 'juma', 'shanba'];
+const UZ_WEEKDAYS_SHORT = ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
+
+const isUz = (language: string) => language === 'uz';
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const uzDay = (d: Date) => `${d.getDate()}-${UZ_MONTHS[d.getMonth()]}`;
+const uzTime = (d: Date) => `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+
 /** «14 мая» */
 export function formatDay(iso: string, language: string): string {
+  if (isUz(language)) return uzDay(new Date(iso));
   return new Date(iso).toLocaleDateString(locale(language), { day: 'numeric', month: 'long' });
 }
 
 /** «14 мая, 10:20» */
 export function formatDayTime(iso: string, language: string): string {
+  if (isUz(language)) {
+    const d = new Date(iso);
+    return `${uzDay(d)}, ${uzTime(d)}`;
+  }
   return new Date(iso).toLocaleString(locale(language), {
     day: 'numeric',
     month: 'long',
@@ -83,6 +100,7 @@ export function bookingDays(startDate: string, endDate: string): number {
 
 /** «14 мая» of a YYYY-MM-DD */
 export function formatLocalDay(value: string, language: string): string {
+  if (isUz(language)) return uzDay(fromLocalDate(value));
   return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long' });
 }
 
@@ -94,6 +112,10 @@ export function formatLocalDays(first: string, last: string, language: string): 
 
 /** «14 мая, чт» of a YYYY-MM-DD */
 export function formatLocalDate(value: string, language: string): string {
+  if (isUz(language)) {
+    const d = fromLocalDate(value);
+    return `${uzDay(d)}, ${UZ_WEEKDAYS_SHORT[d.getDay()]}`;
+  }
   return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long', weekday: 'short' });
 }
 
@@ -156,6 +178,8 @@ export function itemAttributes(item: RentalOrderItem): string {
 
 /** «Пн … Вс» in the app language, Monday first */
 export function weekDayLabels(language: string): string[] {
+  // 1 Jan 2024 is a Monday
+  if (isUz(language)) return Array.from({ length: 7 }, (_, i) => UZ_WEEKDAYS_SHORT[(i + 1) % 7]);
   return Array.from({ length: 7 }, (_, i) =>
     new Date(2024, 0, 1 + i).toLocaleDateString(locale(language), { weekday: 'short' }),
   );
@@ -189,12 +213,21 @@ export function monthGrid(value: string): (string | null)[] {
 
 /** «Май 2026» */
 export function formatMonth(value: string, language: string): string {
+  if (isUz(language)) {
+    const d = fromLocalDate(value);
+    const m = UZ_MONTHS[d.getMonth()];
+    return `${m.charAt(0).toUpperCase()}${m.slice(1)} ${d.getFullYear()}`;
+  }
   const text = fromLocalDate(value).toLocaleDateString(locale(language), { month: 'long', year: 'numeric' });
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /** «14 мая, четверг» of a YYYY-MM-DD */
 export function formatLongDay(value: string, language: string): string {
+  if (isUz(language)) {
+    const d = fromLocalDate(value);
+    return `${uzDay(d)}, ${UZ_WEEKDAYS[d.getDay()]}`;
+  }
   return fromLocalDate(value).toLocaleDateString(locale(language), { day: 'numeric', month: 'long', weekday: 'long' });
 }
 

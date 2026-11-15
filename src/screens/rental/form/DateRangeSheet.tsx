@@ -5,11 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
-import { bookingDays, effectiveEnd, formatLocalDate, fromLocalDate, pickRangeDay, toLocalDate } from '../rental-format';
+import { bookingDays, effectiveEnd, formatLocalDate, formatMonth, fromLocalDate, pickRangeDay, toLocalDate, weekDayLabels } from '../rental-format';
 
-const LOCALES: Record<string, string> = { ru: 'ru-RU', uz: 'uz-UZ', en: 'en-GB' };
-/** A Monday, to name the week days */
-const A_MONDAY = new Date(2024, 0, 1);
 
 export interface DateRange {
   /** YYYY-MM-DD, issue day */
@@ -34,7 +31,7 @@ interface DateRangeSheetProps {
  */
 export function DateRangeSheet({ isOpen, value, minDate, onClose, onChange }: DateRangeSheetProps) {
   const { t, i18n } = useTranslation();
-  const locale = LOCALES[i18n.language] ?? LOCALES.ru;
+  const lang = i18n.language;
   const [start, setStart] = useState<string | null>(value?.start ?? null);
   const [end, setEnd] = useState<string | null>(value?.end ?? null);
   const [month, setMonth] = useState(() => {
@@ -50,13 +47,7 @@ export function DateRangeSheet({ isOpen, value, minDate, onClose, onChange }: Da
     setMonth(new Date(d.getFullYear(), d.getMonth(), 1));
   }, [isOpen, value]);
 
-  const weekDays = useMemo(
-    () =>
-      Array.from({ length: 7 }, (_, i) =>
-        new Date(A_MONDAY.getFullYear(), 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }),
-      ),
-    [locale],
-  );
+  const weekDays = useMemo(() => weekDayLabels(lang), [lang]);
 
   // Monday-first grid of the month, padded with empty cells
   const cells = useMemo(() => {
@@ -107,7 +98,7 @@ export function DateRangeSheet({ isOpen, value, minDate, onClose, onChange }: Da
             onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
           />
           <Text className="font-onest-bold text-base text-ink capitalize">
-            {month.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
+            {formatMonth(toLocalDate(month), lang)}
           </Text>
           <IconButton
             icon={ChevronRight}

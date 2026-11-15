@@ -257,8 +257,14 @@ export interface ReturnOrderItemPayload {
     orderId: string,
     /** Prices and cost come from the order line on the backend */
     items: { itemId: string; quantity: number }[]
-    /** Money given to the customer now; empty — debt reduced or paid out later (CREDIT) */
+    /** Money given to the customer now (web style); send [] with `payoutMethod` */
     returnPayments: OrderPaymentPayload[]
+    /**
+     * Pay out now by this method — the backend computes the amount (the
+     * refund, or the part above the debt). Omitted = debt reduced only or
+     * paid out later (CREDIT).
+     */
+    payoutMethod?: PaymentType
     reason?: ReturnReason
     comment?: string
     /** Open cashbox to pay out from; default — the employee's own */
