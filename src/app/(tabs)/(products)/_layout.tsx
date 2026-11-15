@@ -12,6 +12,7 @@ export default function TabLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="create" />
       <Stack.Screen name="variants/[id]" />
+      <Stack.Screen name="edit/[id]" />
       <Stack.Screen name="[id]" />
       <Stack.Screen name="history/[variantId]" />
       <Stack.Screen name="rental/[variantId]" />

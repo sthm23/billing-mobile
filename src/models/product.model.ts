@@ -12,6 +12,10 @@ export interface BaseProduct {
   /** All names of the subcategory — the label follows the app language */
   categoryI18n?: CategoryNames | null
   brand: string
+  /** Detail only (`GET /product/:id`) — for the edit form */
+  brandId?: string | null
+  /** Detail only (`GET /product/:id`) — for the edit form */
+  categoryId?: string | null
   isArchived: boolean
   description: string | null
   createdAt: string
@@ -87,6 +91,18 @@ export interface StockMovement {
     }
   }
 }
+/** `PATCH /product/:id` — omitted fields stay; `images` = full new list (keys or URLs), first = main */
+export interface UpdateProduct {
+  name?: string
+  description?: string
+  categoryId?: string
+  brandId?: string
+  /** Only while the product has no variants */
+  attributeIds?: string[]
+  tagIds?: string[]
+  images?: string[]
+}
+
 export interface CreateProduct {
   warehouseId: string
   name: string

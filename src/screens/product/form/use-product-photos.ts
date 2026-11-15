@@ -22,7 +22,8 @@ export interface FormPhoto {
   key?: string;
   /** Why it failed: too large / other */
   error?: 'tooLarge' | 'failed';
-  source: PickedImage;
+  /** Picked file (new photos); saved photos of the product have none */
+  source?: PickedImage;
 }
 
 export type PickError = 'permission' | 'failed';
@@ -32,7 +33,8 @@ let seq = 0;
 /**
  * Photos of the product form: pick (camera / library), compress and upload each
  * right away (presigned PUT), keep order (first = main), remove, retry.
- * `keys` is what `POST /product` gets as `images`.
+ * `keys` is what `POST /product` / `PATCH /product/:id` get as `images`
+ * (saved photos keep their public URL — the backend turns it into the key).
  */
 export function useProductPhotos() {
   const [photos, setPhotos] = useState<FormPhoto[]>([]);
@@ -45,6 +47,7 @@ export function useProductPhotos() {
 
   const upload = useCallback(
     (photo: FormPhoto) => {
+      if (!photo.source) return;
       uploadProductImage(photo.source, (progress) => {
         if (!removed.current.has(photo.id)) patch(photo.id, { progress });
       })
@@ -98,10 +101,24 @@ export function useProductPhotos() {
     });
   }, []);
 
+  /** Edit form: the product's saved photos (main first); the public URL is sent back as is */
+  const load = useCallback((images: { id: string; url: string; isMain: boolean }[]) => {
+    const sorted = [...images].sort((a, b) => Number(b.isMain) - Number(a.isMain));
+    setPhotos(
+      sorted.slice(0, PRODUCT_IMAGE_MAX_COUNT).map((img) => ({
+        id: `saved-${img.id}`,
+        uri: img.url,
+        status: 'done',
+        progress: 1,
+        key: img.url,
+      })),
+    );
+  }, []);
+
   const retry = useCallback(
     (id: string) => {
       const photo = photos.find((p) => p.id === id);
-      if (!photo || photo.error === 'tooLarge') return;
+      if (!photo || !photo.source || photo.error === 'tooLarge') return;
       patch(id, { status: 'uploading', progress: 0, error: undefined });
       upload(photo);
     },
@@ -110,6 +127,7 @@ export function useProductPhotos() {
 
   return {
     photos,
+    load,
     add,
     remove,
     makeMain,

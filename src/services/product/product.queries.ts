@@ -21,6 +21,7 @@ import type {
   ProductListResponse,
   ProductParams,
   StockMovementHistoryItem,
+  UpdateProduct,
   UpdateProductVariantPrice,
 } from '@/models/product.model'
 
@@ -224,6 +225,23 @@ export const useCreateProductVariants = (): UseMutationResult<
     onSuccess: (_data, body): void => {
       void queryClient.invalidateQueries({ queryKey: [...productQueryKeys.all(), 'list'] })
       void queryClient.invalidateQueries({ queryKey: productQueryKeys.byId(body.productId) })
+    },
+  })
+}
+
+/** `PATCH /product/:id` — edit the card; refreshes the list and the card. */
+export const useUpdateProduct = (): UseMutationResult<
+  ProductDetail,
+  AxiosError<{ message?: string | string[] }>,
+  { id: string; body: UpdateProduct }
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, body }) => productService.updateProduct(id, body),
+    onSuccess: (_data, { id }): void => {
+      void queryClient.invalidateQueries({ queryKey: [...productQueryKeys.all(), 'list'] })
+      void queryClient.invalidateQueries({ queryKey: productQueryKeys.byId(id) })
     },
   })
 }

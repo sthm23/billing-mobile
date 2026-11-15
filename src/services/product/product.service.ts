@@ -11,6 +11,7 @@ import type {
   ProductParams,
   ProductVariant,
   StockMovementHistoryItem,
+  UpdateProduct,
   UpdateProductVariantPrice
 } from '@/models/product.model'
 
@@ -35,6 +36,12 @@ const createProduct = async (body: CreateProduct): Promise<Product> => {
     throw new Error(response.data || 'Failed to create Product')
   }
 
+  return response.data
+}
+
+/** `PATCH /product/:id` — edit the card; returns the product detail */
+const updateProduct = async (productId: string, body: UpdateProduct): Promise<ProductDetail> => {
+  const response = await productsApi.patch<ProductDetail>(ENDPOINTS.BY_ID(productId), body)
   return response.data
 }
 
@@ -119,6 +126,7 @@ const updateProductVariant = (productVariantId: string, body: UpdateProductVaria
 
 export const productService = {
   createProduct,
+  updateProduct,
   getProductById,
   getProducts,
   getStockMovements,

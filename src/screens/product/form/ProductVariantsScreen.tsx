@@ -304,6 +304,14 @@ export function ProductVariantsScreen() {
               <Text className="font-onest-bold text-base text-ink" numberOfLines={1}>{product.name}</Text>
               <Text className="font-onest text-[13px] text-muted" numberOfLines={1}>{subtitle}</Text>
             </View>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="bg-sunken"
+              onPress={() => router.push({ pathname: '/(tabs)/(products)/edit/[id]', params: { id: product.id } })}
+            >
+              {t('productVariants.editCard')}
+            </Button>
           </View>
 
           {noAttributesAndExists ? (

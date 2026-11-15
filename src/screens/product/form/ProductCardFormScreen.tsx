@@ -1,6 +1,6 @@
 import { Button, IconButton, Input, InputField, Pressable, Text, TextArea, toast } from '@/components/base';
 import { Sheet } from '@/components/base/Sheet';
-import { EmptyState } from '@/components/common';
+import { EmptyState, LoadingState } from '@/components/common';
 import { BrandSheet } from '@/components/product/BrandSheet';
 import { CategorySheet } from '@/components/product/CategorySheet';
 import { useTheme } from '@/hooks/use-theme';
@@ -8,12 +8,12 @@ import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { categoryLabel } from '@/libs/category';
 import { PRODUCT_IMAGE_MAX_COUNT, type PickSource } from '@/libs/product-image';
-import { canCreateProduct } from '@/libs/roles';
+import { canCreateProduct, canManageProducts } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import type { Category } from '@/models/product.model';
 import { useAuth } from '@/provider/AuthProvider';
 import { useStoreAttributes, useTags, type StoreAttribute, type StoreBrand } from '@/services/category';
-import { useCreateProduct } from '@/services/product/product.queries';
+import { useCreateProduct, useProductById, useUpdateProduct } from '@/services/product/product.queries';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import {
@@ -24,12 +24,13 @@ import {
   CircleAlert,
   Images,
   Lock,
+  PackageX,
   Plus,
   RotateCw,
   Warehouse,
   X,
 } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -49,19 +50,22 @@ interface ToggleChipProps {
   onPress: () => void;
   /** Attribute chips show ✓ / + */
   withIcon?: boolean;
+  disabled?: boolean;
 }
 
-function ToggleChip({ label, selected, onPress, withIcon }: ToggleChipProps) {
+function ToggleChip({ label, selected, onPress, withIcon, disabled }: ToggleChipProps) {
   const colors = useTheme();
   const color = selected ? colors.onPrimary : colors.ink;
 
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityState={{ selected, disabled }}
       className={cn(
         'flex-row items-center gap-1.5 rounded-pill',
+        disabled && 'opacity-60',
         withIcon ? 'h-10 pl-2.5 pr-3.5' : 'h-9 px-3.5',
         selected ? 'bg-primary' : 'bg-sunken',
       )}
@@ -148,13 +152,22 @@ function PhotoTile({
 
 type SheetName = 'none' | 'category' | 'brand' | 'photoSource';
 
+interface ProductCardFormScreenProps {
+  /** Edit mode: the product to change (`PATCH /product/:id`) */
+  productId?: string;
+}
+
 /**
  * «Новый товар · шаг 1 из 2 · Карточка» (design «ProductNew»): photos, name,
  * description, category, brand, attributes (variants are built from them on
  * step 2) and tags, on the working warehouse. «Далее» creates the card
  * (`POST /product`) and opens step 2. Store owner / admin only (the backend checks it).
+ *
+ * With `productId` it edits the card (owner / manager / admin): prefilled from
+ * `GET /product/:id`, attributes locked once the product has variants, «Сохранить»
+ * sends `PATCH /product/:id` and goes back.
  */
-export function ProductCardFormScreen() {
+export function ProductCardFormScreen({ productId }: ProductCardFormScreenProps = {}) {
   const { t, i18n } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
@@ -165,6 +178,11 @@ export function ProductCardFormScreen() {
   const attributes = useStoreAttributes(storeId);
   const tags = useTags();
   const create = useCreateProduct();
+  const update = useUpdateProduct();
+  const isEdit = !!productId;
+  const productQuery = useProductById(productId ?? '', { enabled: isEdit });
+  const product = productQuery.data;
+  const prefilled = useRef(false);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -178,27 +196,74 @@ export function ProductCardFormScreen() {
 
   const tagValues = useMemo(() => (tags.data ?? []).flatMap((g) => g.values), [tags.data]);
 
+  // Edit mode: fill the form once the product is loaded
+  useEffect(() => {
+    if (!product || prefilled.current) return;
+    prefilled.current = true;
+    setName(product.name);
+    setDescription(product.description ?? '');
+    if (product.categoryId) {
+      setCategory({
+        id: product.categoryId,
+        parentId: null,
+        name: product.categoryI18n?.name ?? product.category,
+        nameUz: product.categoryI18n?.nameUz ?? null,
+        nameEn: product.categoryI18n?.nameEn ?? null,
+      });
+    }
+    if (product.brandId) setBrand({ id: product.brandId, name: product.brand });
+    setAttributeIds(product.attributes.map((a) => a.id));
+    setTagIds(product.tags.map((tag) => tag.id));
+    photos.load(product.images ?? []);
+  }, [product, photos.load]);
+
+  const attributesLocked = isEdit && (product?.variants.length ?? 0) > 0;
+
   const header = (
     <View className="px-4 pt-2 pb-3 gap-3">
       <View className="flex-row items-center gap-2.5">
         <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
         <View className="flex-1 min-w-0">
-          <Text className="type-heading text-ink" accessibilityRole="header">{t('productForm.title')}</Text>
-          <Text className="font-onest text-[13px] text-muted">{t('productForm.step1')}</Text>
+          <Text className="type-heading text-ink" accessibilityRole="header">
+            {isEdit ? t('productForm.editTitle') : t('productForm.title')}
+          </Text>
+          <Text className="font-onest text-[13px] text-muted" numberOfLines={1}>
+            {isEdit ? (product?.name ?? '') : t('productForm.step1')}
+          </Text>
         </View>
       </View>
-      <View className="flex-row gap-1.5">
-        <View className="flex-1 h-1 rounded-sm bg-accent" />
-        <View className="flex-1 h-1 rounded-sm bg-track" />
-      </View>
+      {isEdit ? null : (
+        <View className="flex-row gap-1.5">
+          <View className="flex-1 h-1 rounded-sm bg-accent" />
+          <View className="flex-1 h-1 rounded-sm bg-track" />
+        </View>
+      )}
     </View>
   );
 
-  if (!canCreateProduct(user)) {
+  if (isEdit ? !canManageProducts(user) : !canCreateProduct(user)) {
     return (
       <View className="flex-1 bg-bg">
         {header}
-        <EmptyState icon={Lock} message={t('productForm.noAccess')} />
+        <EmptyState icon={Lock} message={isEdit ? t('productForm.noEditAccess') : t('productForm.noAccess')} />
+      </View>
+    );
+  }
+  if (isEdit && productQuery.isLoading) {
+    return (
+      <View className="flex-1 bg-bg">
+        {header}
+        <LoadingState />
+      </View>
+    );
+  }
+  if (isEdit && !product) {
+    return (
+      <View className="flex-1 bg-bg">
+        {header}
+        <Pressable onPress={() => void productQuery.refetch()} accessibilityRole="button">
+          <EmptyState icon={PackageX} message={t('productForm.loadFailed')} />
+        </Pressable>
       </View>
     );
   }
@@ -206,7 +271,7 @@ export function ProductCardFormScreen() {
   const nameError = submitted && !name.trim();
   const categoryError = submitted && !category;
   const brandError = submitted && !brand;
-  const blocked = photos.isUploading || !working.warehouseId;
+  const blocked = photos.isUploading || (!isEdit && !working.warehouseId);
 
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
@@ -220,7 +285,33 @@ export function ProductCardFormScreen() {
   const submit = () => {
     setSubmitted(true);
     setServerError(null);
-    if (!name.trim() || !category || !brand || !working.warehouseId || photos.isUploading) return;
+    if (!name.trim() || !category || !brand || photos.isUploading) return;
+    if (isEdit && productId) {
+      update.mutate(
+        {
+          id: productId,
+          body: {
+            name: name.trim(),
+            description: description.trim(),
+            categoryId: category.id,
+            brandId: brand.id,
+            tagIds,
+            images: photos.keys,
+            // Attributes define the variants — sent only while there are none
+            ...(attributesLocked ? {} : { attributeIds }),
+          },
+        },
+        {
+          onSuccess: () => {
+            toast.show(t('productForm.saved'));
+            router.back();
+          },
+          onError: (err) => setServerError(getApiErrorMessage(err, t('productForm.updateFailed'))),
+        },
+      );
+      return;
+    }
+    if (!working.warehouseId) return;
     create.mutate(
       {
         warehouseId: working.warehouseId,
@@ -261,8 +352,10 @@ export function ProductCardFormScreen() {
           <View className="flex-row items-center gap-2.5 px-3.5 py-2.5 rounded-2xl bg-card">
             <Warehouse size={18} color={colors.soft} strokeWidth={2} />
             <Text className="flex-1 font-onest text-[13px] text-soft">
-              {t('productForm.warehouse')}{' '}
-              <Text className="font-onest-bold text-[13px] text-ink">{working.warehouse?.name ?? '—'}</Text>
+              {isEdit ? t('productForm.warehouseEdit') : t('productForm.warehouse')}{' '}
+              <Text className="font-onest-bold text-[13px] text-ink">
+                {(isEdit ? product?.warehouse?.name : working.warehouse?.name) ?? '—'}
+              </Text>
             </Text>
           </View>
 
@@ -384,6 +477,7 @@ export function ProductCardFormScreen() {
                     label={attributeLabel(a)}
                     selected={attributeIds.includes(a.id)}
                     onPress={() => setAttributeIds((list) => toggle(list, a.id))}
+                    disabled={attributesLocked}
                     withIcon
                   />
                 ))}
@@ -393,7 +487,10 @@ export function ProductCardFormScreen() {
                 {attributes.isError ? t('productForm.attributesFailed') : t('productForm.attributesEmpty')}
               </Text>
             )}
-            {attributeIds.length === 0 && attributes.data?.length ? (
+            {attributesLocked ? (
+              <Text className="font-onest text-xs text-muted px-0.5">{t('productForm.attributesLocked')}</Text>
+            ) : null}
+            {!attributesLocked && attributeIds.length === 0 && attributes.data?.length ? (
               <Text className="font-onest text-xs text-muted px-0.5">{t('productForm.noAttributesHint')}</Text>
             ) : null}
           </View>
@@ -428,12 +525,25 @@ export function ProductCardFormScreen() {
               <Text className="flex-1 font-onest-semibold text-[13px] leading-[18px] text-err-fg">{serverError}</Text>
             </View>
           ) : null}
-          <Button variant="accent" size="lg" full disabled={blocked} loading={create.isPending} onPress={submit}>
-            {photos.isUploading ? t('productForm.photosUploading') : t('productForm.next')}
+          <Button
+            variant="accent"
+            size="lg"
+            full
+            disabled={blocked}
+            loading={create.isPending || update.isPending}
+            onPress={submit}
+          >
+            {photos.isUploading
+              ? t('productForm.photosUploading')
+              : isEdit
+                ? t('productForm.saveEdit')
+                : t('productForm.next')}
           </Button>
-          <Text className="font-onest text-xs text-muted text-center">
-            {photos.hasErrors ? t('productForm.photosErrorHint') : t('productForm.draftHint')}
-          </Text>
+          {photos.hasErrors || !isEdit ? (
+            <Text className="font-onest text-xs text-muted text-center">
+              {photos.hasErrors ? t('productForm.photosErrorHint') : t('productForm.draftHint')}
+            </Text>
+          ) : null}
         </View>
       </KeyboardAvoidingView>
 

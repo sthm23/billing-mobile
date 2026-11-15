@@ -207,19 +207,12 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
         overlay={
           <>
             <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
-            {/* Product editing is not built on mobile; in a renting store the pencil opens
-                «Цена и аренда» of the picked variant (OWNER/MANAGER) */}
+            {/* Edit the product card (OWNER/MANAGER); rent settings stay in the rental card */}
             <IconButton
               icon={Pencil}
-              accessibilityLabel={t('rental.item.edit')}
-              disabled={!(rentalEnabled && canManage && selectedVariant)}
-              onPress={() =>
-                selectedVariant &&
-                router.push({
-                  pathname: '/(tabs)/(products)/rental-form/[variantId]',
-                  params: { variantId: selectedVariant.id, productId: product.id },
-                })
-              }
+              accessibilityLabel={t('productForm.editTitle')}
+              disabled={!canManage}
+              onPress={() => router.push({ pathname: '/(tabs)/(products)/edit/[id]', params: { id: product.id } })}
             />
           </>
         }

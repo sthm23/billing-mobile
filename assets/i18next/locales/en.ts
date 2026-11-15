@@ -1,5 +1,6 @@
 const en = {
   "productVariants": {
+    "editCard": "Edit",
     "saved": "Variants added: {{count}}",
     "save": "Save · variants: {{count}}",
     "partialCount": "Not fully filled: {{count}}",
@@ -63,6 +64,14 @@ const en = {
     "draft": "Draft"
   },
   "productForm": {
+    "editTitle": "Edit product",
+    "noEditAccess": "Only the owner and managers can edit products",
+    "loadFailed": "Could not load the product. Tap to retry",
+    "warehouseEdit": "Product warehouse:",
+    "saveEdit": "Save",
+    "saved": "Product card saved",
+    "updateFailed": "Could not save the product",
+    "attributesLocked": "The product already has variants — attributes can't be changed",
     "title": "New product",
     "step1": "Step 1 of 2 · Product card",
     "variantsTitle": "Variants",

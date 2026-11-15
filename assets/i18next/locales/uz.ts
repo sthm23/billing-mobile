@@ -1,5 +1,6 @@
 const uz = {
   "productVariants": {
+    "editCard": "O'zgartirish",
     "saved": "Variantlar qo'shildi: {{count}}",
     "save": "Saqlash · variantlar: {{count}}",
     "partialCount": "To'liq to'ldirilmagan: {{count}}",
@@ -63,6 +64,14 @@ const uz = {
     "draft": "Qoralama"
   },
   "productForm": {
+    "editTitle": "Mahsulotni o'zgartirish",
+    "noEditAccess": "Mahsulotni faqat ega va menejer o'zgartira oladi",
+    "loadFailed": "Mahsulotni yuklab bo'lmadi. Qayta urinish uchun bosing",
+    "warehouseEdit": "Mahsulot ombori:",
+    "saveEdit": "Saqlash",
+    "saved": "Mahsulot kartasi saqlandi",
+    "updateFailed": "Mahsulotni saqlab bo'lmadi",
+    "attributesLocked": "Mahsulotda variantlar bor — atributlarni o'zgartirib bo'lmaydi",
     "title": "Yangi mahsulot",
     "step1": "1-qadam / 2 · Mahsulot kartasi",
     "variantsTitle": "Variantlar",
