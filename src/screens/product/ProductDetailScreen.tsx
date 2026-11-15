@@ -23,7 +23,7 @@ import { useAddToOrder } from '@/services/order/order.queries';
 import type { Order, OrderProductVariant } from '@/services/order/order.type';
 import { useArchiveProduct } from '@/services/product/product.queries';
 import { router } from 'expo-router';
-import { ChevronLeft, Pencil, Trash2 } from 'lucide-react-native';
+import { ChevronLeft, Pencil, Plus, Trash2 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
@@ -307,13 +307,20 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
           <Text className="font-onest text-[13px] text-muted">{t('product.adminAccess')}</Text>
         </View>
         {canManage && (
-          <IconButton
-            icon={Trash2}
-            variant="danger"
-            accessibilityLabel={t('product.deleteProduct')}
-            onPress={handleDelete}
-            disabled={archive.isPending}
-          />
+          <View className="flex-row gap-2">
+            <IconButton
+              icon={Plus}
+              accessibilityLabel={t('productVariants.addTitle')}
+              onPress={() => router.push({ pathname: '/(tabs)/(products)/variants/[id]', params: { id: product.id } })}
+            />
+            <IconButton
+              icon={Trash2}
+              variant="danger"
+              accessibilityLabel={t('product.deleteProduct')}
+              onPress={handleDelete}
+              disabled={archive.isPending}
+            />
+          </View>
         )}
       </View>
 

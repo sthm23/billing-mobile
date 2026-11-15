@@ -14,7 +14,7 @@ interface ProductCardProps {
 
 /**
  * Product row in the list: photo, name, category · brand · warehouse,
- * «от» price and stock badge.
+ * «от» price and stock badge; a draft (no variants yet) shows «Черновик».
  */
 export function ProductCard({ product, lowStockThreshold, onPress }: ProductCardProps) {
   const { t, i18n } = useTranslation();
@@ -24,15 +24,22 @@ export function ProductCard({ product, lowStockThreshold, onPress }: ProductCard
   const category = productCategoryLabel(product, i18n.language);
   const meta = [category, product.brand, product.warehouse?.name].filter(Boolean).join(' · ');
 
+  // A draft (card without variants) has no price or stock yet
+  const draft = !!product.isDraft;
+
   return (
     <ListCard
       leading={<ProductImage images={product.images} productName={product.name} size="md" />}
       title={product.name}
       subtitle={meta}
-      amount={product.priceRange?.min ?? 0}
-      amountPrefix={t('product.from')}
-      amountCurrency={t('common.currency')}
-      badge={{ label: `${totalQuantity} ${t('product.unit')}`, tone: stockTone }}
+      amount={draft ? undefined : (product.priceRange?.min ?? 0)}
+      amountPrefix={draft ? undefined : t('product.from')}
+      amountCurrency={draft ? undefined : t('common.currency')}
+      badge={
+        draft
+          ? { label: t('productVariants.draft'), tone: 'warn' }
+          : { label: `${totalQuantity} ${t('product.unit')}`, tone: stockTone }
+      }
       onPress={() => onPress(product.id)}
       className="pl-2.5"
     />

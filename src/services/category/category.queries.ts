@@ -13,6 +13,7 @@ import type { AxiosError } from 'axios';
 import {
   catalogService,
   categoryService,
+  type AttributeValueItem,
   type StoreAttribute,
   type StoreBrand,
   type TagGroup,
@@ -28,6 +29,29 @@ export const categoryQueryKeys = {
   brands: (storeId: string | undefined) => [...categoryQueryKeys.all(), 'brands', storeId] as const,
   attributes: (storeId: string | undefined) => [...categoryQueryKeys.all(), 'attributes', storeId] as const,
   tags: () => [...categoryQueryKeys.all(), 'tags'] as const,
+  attributeValues: (attributeIds: string[]) =>
+    [...categoryQueryKeys.all(), 'attributeValues', [...attributeIds].sort().join(',')] as const,
+};
+
+/** Values of the product's attributes (step 2 value chips). */
+export const useAttributeValues = (attributeIds: string[], enabled = true): UseQueryResult<AttributeValueItem[]> =>
+  useQuery({
+    queryKey: categoryQueryKeys.attributeValues(attributeIds),
+    queryFn: () => catalogService.getAttributeValues(attributeIds),
+    enabled: enabled && attributeIds.length > 0,
+    staleTime: 5 * 60_000,
+  });
+
+/** Find or create an attribute value; refreshes the value lists. */
+export const useCreateAttributeValue = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: catalogService.createAttributeValue,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: [...categoryQueryKeys.all(), 'attributeValues'] });
+    },
+  });
 };
 
 /** Brands of the store (product form). */

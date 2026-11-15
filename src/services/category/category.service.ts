@@ -89,4 +89,38 @@ const getTags = async (): Promise<TagGroup[]> => {
   return response.data;
 };
 
-export const catalogService = { getStoreBrands, getStoreAttributes, getTags };
+/** A value of an attribute (`GET /category/attributes/items`) */
+export interface AttributeValueItem {
+  id: string;
+  attributeId: string;
+  attributeName: string;
+  value: string | number | boolean;
+}
+
+/** All values of the given attributes (shared dictionary) */
+const getAttributeValues = async (attributeIds: string[]): Promise<AttributeValueItem[]> => {
+  const response = await categoryApi.get<AttributeValueItem[]>('/attributes/items', {
+    params: { attributeIds: attributeIds.join(',') },
+  });
+  return response.data;
+};
+
+/**
+ * POST /category/attribute/value — find or create a value (store OWNER for an
+ * attribute of the store, or ADMIN); the same value returns the existing one.
+ */
+const createAttributeValue = async (body: {
+  attributeId: string;
+  value: string;
+}): Promise<{ id: string; attributeId: string; value: string | number | boolean; created: boolean }> => {
+  const response = await categoryApi.post('/attribute/value', body);
+  return response.data;
+};
+
+export const catalogService = {
+  getStoreBrands,
+  getStoreAttributes,
+  getTags,
+  getAttributeValues,
+  createAttributeValue,
+};

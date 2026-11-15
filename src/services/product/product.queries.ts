@@ -14,6 +14,7 @@ import { type AxiosError } from 'axios'
 import { productService } from './product.service'
 import type {
   CreateProduct,
+  CreateProductVariantPayload,
   InventoryMovementPayload,
   Product,
   ProductDetail,
@@ -207,5 +208,22 @@ export const useProductVariantSearch = (
     placeholderData: (previous) => previous,
     refetchOnWindowFocus: false,
     staleTime: 30_000,
+  })
+}
+
+/** `POST /product/variants` — new variants of a product (step 2); refreshes the list and the card. */
+export const useCreateProductVariants = (): UseMutationResult<
+  Product,
+  AxiosError<{ message?: string | string[] }>,
+  CreateProductVariantPayload
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: productService.createProductVariants,
+    onSuccess: (_data, body): void => {
+      void queryClient.invalidateQueries({ queryKey: [...productQueryKeys.all(), 'list'] })
+      void queryClient.invalidateQueries({ queryKey: productQueryKeys.byId(body.productId) })
+    },
   })
 }

@@ -8,7 +8,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { Product } from '@/models/product.model';
 import { useAuth } from '@/provider/AuthProvider';
 import { categoryLabel } from '@/libs/category';
-import { canCreateProduct } from '@/libs/roles';
+import { canCreateProduct, canManageProducts } from '@/libs/roles';
 import { useStoreCategories } from '@/services/category';
 import { DEBOUNCE_TIME_MS, productQueryKeys, useProducts } from '@/services/product/product.queries';
 import { useQueryClient } from '@tanstack/react-query';
@@ -83,6 +83,12 @@ export default function ProductListScreen() {
   }, [hasNextPage, isFetching]);
 
   const handleProductPress = (productId: string) => {
+    // A draft (card without variants) opens step 2 «Варианты» — only owner/manager see drafts
+    const product = allProducts.find((p) => p.id === productId);
+    if (product?.isDraft && canManageProducts(user)) {
+      router.push({ pathname: '/(tabs)/(products)/variants/[id]', params: { id: productId } });
+      return;
+    }
     router.push(`/(tabs)/(products)/${productId}`);
   };
 
