@@ -64,3 +64,29 @@ export function canProcessReturns(user: CurrentUserType | null | undefined): boo
   if (!user) return false;
   return user.role === UserRole.OWNER || user.staff?.role === StaffRole.OWNER || user.staff?.role === StaffRole.MANAGER;
 }
+
+/** Store owner (or platform admin): every cashbox of the store. */
+function isStoreOwner(user: CurrentUserType | null | undefined): boolean {
+  return user?.role === UserRole.ADMIN || user?.role === UserRole.OWNER || user?.staff?.role === StaffRole.OWNER;
+}
+
+/**
+ * Owner, manager or cashier: may open an own cashbox. A seller works in an
+ * open cashbox of their warehouse. UX only — the backend checks it (`POST /cashbox`).
+ */
+export function canOpenCashbox(user: CurrentUserType | null | undefined): boolean {
+  return isStoreOwner(user) || user?.staff?.role === StaffRole.MANAGER || user?.staff?.role === StaffRole.CASHIER;
+}
+
+/**
+ * May take money out of (expense) / close the cashbox of `sellerId`: own
+ * cashbox — always; someone else's — expense for the owner and managers, close
+ * for the owner only. A seller only adds income. UX only — the backend checks it.
+ */
+export function cashboxRights(user: CurrentUserType | null | undefined, sellerId: string | undefined) {
+  const mine = !!sellerId && sellerId === user?.staff?.id;
+  return {
+    expense: mine || isStoreOwner(user) || user?.staff?.role === StaffRole.MANAGER,
+    close: mine || isStoreOwner(user),
+  };
+}

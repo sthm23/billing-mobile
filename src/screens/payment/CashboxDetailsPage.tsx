@@ -1,4 +1,7 @@
-import { Button, HeroCard, IconButton, Text } from "@/components/base";
+import { Button, HeroCard, IconButton, Text, toast } from "@/components/base";
+import { getApiErrorMessage } from "@/libs/api-error";
+import { cashboxRights } from "@/libs/roles";
+import { useAuth } from "@/provider/AuthProvider";
 import { EmptyState, LoadingState } from "@/components/common";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
@@ -21,6 +24,7 @@ export default function CashboxDetailsPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
 
   const [sheetVisible, setSheetVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
@@ -34,6 +38,8 @@ export default function CashboxDetailsPage() {
   const createTransactionMutation = useCreateTransaction();
 
   const isOpen = cashbox?.status === CashboxStatus.OPEN;
+  // A seller works in someone else's open cashbox: income only, no closing
+  const rights = cashboxRights(user, cashbox?.sellerId);
   const handleCloseCashbox = () => {
     Alert.alert(
       t('payment.closeCashboxConfirmation.title'),
@@ -64,8 +70,12 @@ export default function CashboxDetailsPage() {
   };
 
   const handleCreateTransaction = async (payload: CreateTransactionPayload) => {
-    await createTransactionMutation.mutateAsync(payload);
-    setSheetVisible(false);
+    try {
+      await createTransactionMutation.mutateAsync(payload);
+      setSheetVisible(false);
+    } catch (err) {
+      toast.show(getApiErrorMessage(err, t('payment.transactionFailed')), 'error');
+    }
   };
 
   const header = (
@@ -135,16 +145,20 @@ export default function CashboxDetailsPage() {
               <Button variant="accent" icon={ArrowDownRight} className="flex-1" onPress={handleAddIncome}>
                 {t('payment.type.INCOME')}
               </Button>
-              <Button variant="hero" icon={ArrowUpRight} className="flex-1" onPress={handleAddExpense}>
-                {t('payment.type.EXPENSE')}
-              </Button>
-              <IconButton
-                icon={Lock}
-                variant="danger"
-                accessibilityLabel={t('payment.closeCashbox')}
-                onPress={handleCloseCashbox}
-                disabled={closeCashboxMutation.isPending}
-              />
+              {rights.expense ? (
+                <Button variant="hero" icon={ArrowUpRight} className="flex-1" onPress={handleAddExpense}>
+                  {t('payment.type.EXPENSE')}
+                </Button>
+              ) : null}
+              {rights.close ? (
+                <IconButton
+                  icon={Lock}
+                  variant="danger"
+                  accessibilityLabel={t('payment.closeCashbox')}
+                  onPress={handleCloseCashbox}
+                  disabled={closeCashboxMutation.isPending}
+                />
+              ) : null}
             </View>
           ) : (
             <View className="flex-row items-center justify-between bg-hero-sub rounded-lg px-3.5 py-3">

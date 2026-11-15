@@ -1,6 +1,8 @@
 import { Button, IconButton, ListCard, Spinner, Text, toast } from '@/components/base';
 import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
+import { canOpenCashbox } from '@/libs/roles';
+import { useAuth } from '@/provider/AuthProvider';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { formatTime } from '@/libs/date';
 import { useOpenCashbox, useOpenCashboxes } from '@/services/cashbox';
@@ -29,6 +31,9 @@ export function CashboxPickerSheet({ isOpen, onClose, onPick }: CashboxPickerShe
   const { warehouseId } = useWorkingWarehouse();
   const { data: cashboxes, isLoading } = useOpenCashboxes(isOpen);
   const openCashbox = useOpenCashbox();
+  const { user } = useAuth();
+  // A seller has no own cashbox: only an open one of their warehouse
+  const canOpen = canOpenCashbox(user);
 
   const others = (cashboxes ?? []).filter((c) => !c.isMine);
 
@@ -53,25 +58,31 @@ export function CashboxPickerSheet({ isOpen, onClose, onPick }: CashboxPickerShe
         <IconButton icon={X} variant="sunken" accessibilityLabel={t('common.close')} onPress={onClose} />
       </View>
       <SheetScrollView className="flex-1" contentContainerClassName="px-4 pb-6 gap-3">
-        <Text className="font-onest text-[13px] leading-[19px] text-muted">{t('debtors.cashbox.text')}</Text>
+        <Text className="font-onest text-[13px] leading-[19px] text-muted">
+          {canOpen ? t('debtors.cashbox.text') : t('debtors.cashbox.textSeller')}
+        </Text>
 
-        <Button
-          variant="accent"
-          size="lg"
-          icon={Plus}
-          full
-          onPress={openOwn}
-          disabled={!warehouseId}
-          loading={openCashbox.isPending}
-        >
-          {t('debtors.cashbox.open')}
-        </Button>
+        {canOpen ? (
+          <Button
+            variant="accent"
+            size="lg"
+            icon={Plus}
+            full
+            onPress={openOwn}
+            disabled={!warehouseId}
+            loading={openCashbox.isPending}
+          >
+            {t('debtors.cashbox.open')}
+          </Button>
+        ) : null}
 
         <Text className="type-label text-muted px-1 pt-2">{t('debtors.cashbox.others')}</Text>
         {isLoading ? (
           <Spinner size="sm" className="py-4" />
         ) : others.length === 0 ? (
-          <Text className="font-onest text-[13px] text-muted text-center py-4">{t('debtors.cashbox.none')}</Text>
+          <Text className="font-onest text-[13px] text-muted text-center py-4">
+            {canOpen ? t('debtors.cashbox.none') : t('debtors.cashbox.noneSeller')}
+          </Text>
         ) : (
           others.map((c) => (
             <ListCard

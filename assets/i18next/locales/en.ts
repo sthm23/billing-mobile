@@ -534,6 +534,8 @@ const en = {
       "title": "Where to take the money",
       "text": "You have no open cashbox. Open your own or choose an open cashbox of the store.",
       "open": "Open my cashbox",
+      "textSeller": "You have no cashbox of your own. Pick an open cashbox of your warehouse.",
+      "noneSeller": "No open cashboxes — ask a manager or cashier to open one",
       "chooseWarehouse": "Warehouse for the new cashbox",
       "others": "Open cashboxes",
       "none": "No other open cashboxes",
@@ -1164,6 +1166,7 @@ const en = {
     "returnedAt": "Returned at"
   },
   "payment": {
+    "transactionFailed": "Could not save the transaction",
     "today": {
       "title": "Today in open cashboxes",
       "openCount": "Open: {{count}}",

@@ -1,4 +1,6 @@
 import { Button, IconButton, Money, Pressable, Text } from '@/components/base';
+import { CashboxPickerSheet } from '@/components/cashbox';
+import { useOpenCashboxes } from '@/services/cashbox';
 import { DatePickerSheet, EmptyState, LoadingState } from '@/components/common';
 import {
   CustomerPickerSheet,
@@ -47,6 +49,8 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
   const [dueQuick, setDueQuick] = useState<DueQuick | null>(null);
   const [dueOpen, setDueOpen] = useState(false);
   const payOrder = useCreateOrderPayment();
+  const { data: openCashboxes } = useOpenCashboxes();
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [selected, setSelected] = useState<PaymentType[]>([PaymentType.CASH]);
   const [amounts, setAmounts] = useState<PaymentAmounts>(EMPTY_PAYMENT_AMOUNTS);
   const [customer, setCustomer] = useState<OrderCustomer | null>(null);
@@ -119,8 +123,16 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
     status = { text: t('sale.pay.statusNeedCustomer', { amount: formatMoney(rest) }), tone: 'warn' };
   }
 
-  const submit = async () => {
+  const submit = () => {
     if (!canPay || submitting) return;
+    // Money goes to the own open cashbox (the backend takes it); without one —
+    // a chosen open cashbox of the warehouse (a seller never has an own one)
+    const moneyIn = paid - change > 0;
+    if (moneyIn && !openCashboxes?.some((c) => c.isMine)) setPickerOpen(true);
+    else void pay();
+  };
+
+  const pay = async (cashboxId?: string) => {
     // Change is given from cash: send only what stays in the till.
     const payments: OrderPaymentPayload[] = PAYMENT_METHODS.map((m) => ({
       type: m.type,
@@ -143,6 +155,7 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
           payments,
           // Only when part of the order is left on debt (the backend ignores it otherwise)
           debtDueAt: rest > 0 && due ? endOfLocalDay(due) : undefined,
+          cashboxId,
         },
       });
       Alert.alert(
@@ -339,6 +352,14 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
         </Button>
       </View>
 
+      <CashboxPickerSheet
+        isOpen={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onPick={(cashboxId) => {
+          setPickerOpen(false);
+          void pay(cashboxId);
+        }}
+      />
       <DatePickerSheet
         isOpen={dueOpen}
         onClose={() => setDueOpen(false)}

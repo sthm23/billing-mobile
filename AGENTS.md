@@ -93,7 +93,7 @@ billing-mobile/
     ├── global.css                # Tailwind v4 config: STHM tokens, radius, fonts, type-* utilities
     ├── hooks/                    # use-theme, use-theme-control, use-debounce
     ├── icons/                    # CustomIcon (SF Symbols / Material Symbols via <Host>)
-    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, roles.ts (isAdmin, isStoreSuspended, canAddCategory, canCreateProduct, …), product-image.ts (pick / compress / presigned upload), category.ts (categoryLabel)
+    ├── libs/                     # cn() (utils.ts), product-utils.ts, date.ts, due-date.ts (repay-by quick picks), roles.ts (isAdmin, isStoreSuspended, canAddCategory, canCreateProduct, canProcessReturns, …), product-image.ts (pick / compress / presigned upload), category.ts (categoryLabel)
     ├── models/                   # API types (app, auth, order, payment, product, store, user)
     ├── provider/AuthProvider.tsx # Auth context
     └── services/                 # API services + React Query hooks (auth, cashbox, debt, order, product, category, admin-store, …)
@@ -134,7 +134,7 @@ Expo Router `Tabs` with a custom `tabBar`: **`BottomNav`** (`src/components/navi
 | Tab | Routes | Renders |
 |---|---|---|
 | `(products)` | `index`, `[id]`, `create`, `variants/[id]`, `edit/[id]`, `history/[variantId]`, `rental/[variantId]` (`?productId[&startDate&endDate]`), `rental-form/[variantId]` (`?productId`), `cleaning/[variantId]` (`?productId`) | `ProductListScreen`, `ProductDetailScreen` (sale) or `RentalProductScreen` (rental mode; `[id]?variantId&startDate&endDate`), `ProductCardFormScreen` (`create`; `edit/[id]` with `productId`), `ProductVariantsScreen` (`variants/[id]`), `StockHistoryScreen` (params `title`, `subtitle`, `stock`), `RentalProductScreen` (variant preselected), `RentalItemFormScreen` / `CleaningNewScreen` (via `VariantLoader`) |
-| `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, else read-only), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen` |
+| `(orders)` | `index`, `[id]`, `create`, `search`, `scan`, `pay/[id]`, `debt-pay` (`?customerId&id`), `return/[id]` | `OrderPage`, `OrderDetailScreen` (CREATED/HOLD → `OrderCartScreen`, sold / cancelled → `OrderViewScreen`), `OrderCartScreen` (new order), `OrderSearchScreen`, `ScanScreen` (full-screen modal), `OrderPayScreen`, `DebtPayScreen` (kind ORDER), `OrderReturnScreen` (see «Order view + return») |
 | `(rentals)` | `index`, `[id]`, `create`, `edit/[id]`, `pay/[id]` (`?created=1`), `issue/[id]`, `return/[id]`, `calendar`; `create?productId&variantId[&startDate&endDate]` — booking started from an item card (with its dates) | Rental mode only (see «Rental» below). `RentalListScreen`, `RentalDetailScreen`, `RentalFormScreen` (new / edit / preset item), `RentalPayScreen` (`pay`, and `mode="issue"` for `issue/[id]`), `RentalReturnScreen`, `RentalCalendarScreen` |
 | `(cashbox)` | `index`, `[id]` | `CashboxListPage`, `CashboxDetailsPage` |
 | `(profile)` | `index`, `staff/index`, `staff/create`, `staff/[id]`, `staff/edit/[id]`, `settings`, `store-settings`, `debtors/index`, `debtors/new`, `debtors/[customerId]`, `debtors/pay` (`?customerId&kind&id`), `shops/index`, `shops/new`, `shops/[id]/index`, `shops/[id]/staff` | `MobileProfilePage`, `StaffListScreen` / `CreateStaffScreen` / `StaffCardScreen` / `StaffEditScreen` (OWNER only, see «Staff»), `ComingSoonScreen`, `StoreSettingsScreen` (store modes, OWNER only), `DebtorsScreen`, `DebtNewScreen` (OWNER/MANAGER/admin), `DebtorScreen`, `DebtPayScreen`, `AdminShopsScreen` / `AdminShopNewScreen` / `AdminShopScreen` / `AdminShopStaffScreen` (platform ADMIN only, see «Admin stores») |
@@ -284,7 +284,7 @@ Pattern per domain in `src/services/<domain>/`:
 - `<domain>.queries.ts` — query-key factory (`orderQueryKeys`, …) + hooks (`useOrders`, `useOrderById`, `useCreateOrder`, `useProducts`, `useCashboxList`, `useCloseCashbox`, `useStoreById`, `useCreateStaff`, …).
 - `<domain>.types.ts` — request/response types (`cashbox`, `store`).
 
-Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`, `useCreateDebt` — invalidates debt + customer queries), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`, `useCreateProduct`, `useCreateProductVariants`, `useUpdateProduct`), `category` (`useStoreCategories`, `useCategoryTree`, subcategory mutations, product form: `useStoreBrands`, `useStoreAttributes`, `useTags`, `useAttributeValues`, `useCreateAttributeValue`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
+Domains: `auth`, `cashbox` (+ `useOpenCashboxes`, `useOpenCashbox`), `customer` (search/create customers), `debt` (`useDebtors`, `useDebtor`, `useRepayDebt`, `useCreateDebt` — invalidates debt + customer queries), `order` (+ `useSaveOrder`, `useCreateOrderPayment`, `useAddToOrder`, `useReturnOrder`, `usePayoutReturn`), `product` (+ `useProductVariantSearch(warehouseId, text)`, `useStockMovements`, `useInventoryMovement`, `useArchiveProduct`, `useCreateProduct`, `useCreateProductVariants`, `useUpdateProduct`), `category` (`useStoreCategories`, `useCategoryTree`, subcategory mutations, product form: `useStoreBrands`, `useStoreAttributes`, `useTags`, `useAttributeValues`, `useCreateAttributeValue`), `store` (owner's store, `useCreateStaff`, staff: `useStaffList`, `useStaff`, `useUpdateStaff`, `useDeactivateStaff`, `useActivateStaff`), `admin-store` (platform ADMIN, `/admin/stores*`: `useAdminStoresInfinite`, `useAdminStoreCounts`, `useAdminStore`, `useAdminStoreStaff`, `useCreateAdminStore`, `useUpdateAdminStore`, `useSuspendStore`, `useResumeStore`, `useCreateStoreWarehouse`, catalog pickers `useRootCategories`, `useAllBrands`, `useAllAttributes`).
 
 List hooks of the working warehouse take `warehouseId` in their params and an `enabled` flag: `useProducts(params, enabled)`, `useOrders(params, enabled)`, `useTodaySalesSummary(warehouseId, enabled)`, `useCashboxList(params, enabled)`, `useRentalsInfinite(params, enabled)`, `useRentalSummary(enabled, warehouseId)`, `useRentalAgenda(from, to, warehouseId, enabled)` — pass `useWorkingWarehouse().isReady` as `enabled`.
 
@@ -300,6 +300,17 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 - **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
 - **Warehouse**: a new cart uses the working warehouse (`useWorkingWarehouse`, see below; filled in when it loads after the screen opened). There is no warehouse choice in the cart. A cart prefilled from a product card keeps the product's warehouse.
 - **Types**: list `Order` has only the `warehouse` object (no `warehouseId`); `OrderDetail.warehouseId` exists.
+- **Debt due date**: when part of the order stays on debt, the pay screen offers «Вернуть до» (optional; chips 1 неделя / 2 недели / 1 месяц / Без срока from `libs/due-date.ts`, shared with «Новый долг») → `debtDueAt` = end of the local day. `useCreateOrderPayment` also refreshes debtors.
+
+### Order view + return (2026-11-15)
+
+Plan and decisions: [`../billing/docs/order-return/PLAN.md`](../billing/docs/order-return/PLAN.md); business rules [`../docs/features/returns.md`](../docs/features/returns.md). Design artifact page «Заказы» (`OrderDone*`, `OrderReturn*`).
+
+- **Order screen** (`screens/order/view/OrderViewScreen.tsx`, sold / cancelled orders via `OrderDetailScreen`): header `№A1B2C3` (`orderNo()` — first 6 uuid chars upper-case, display only) + badges (`orderBadges()` in `screens/order/order-status.ts`: REFUNDED → «Возврат · частичный / полный», DEBT + `isReturned` → «Долг» + «Частичный возврат», CREDIT return → «Должны клиенту»), hero with «Оплачено» / «Долг» / «Возвращено», info (customer + call, warehouse, seller, «вернуть до» / overdue from `debtDueAt`), items with returned units (`returnedQuantity`), history of payments and the return. Money figures come from `GET /orders/:id` → `settlement` (`debt`, `owedToCustomer`, `refundedOut`) — never computed here.
+- **Actions**: «Принять оплату долга» → `(orders)/debt-pay` (`DebtPayScreen` kind ORDER); «Возврат товара» → `(orders)/return/[id]` (`canProcessReturns`, not returned yet, COMPLETED / DEBT); «Выдать деньги» for a CREDIT return → `view/RefundPayoutSheet.tsx` (`usePayoutReturn`, `POST /payment/return/:id`; method + cashbox); «Компенсация за брак» (owner/manager, sold order) → `AddTransactionSheet` with `defaultCategory=DEFECT_COMPENSATION`, `lockCategory`, `orderId`, `title`, `note` (props of `AddTransactionSheet` / `TransactionForm`); cashbox — own open one, else `CashboxPickerSheet`.
+- **Return screen** (`screens/order/return/OrderReturnScreen.tsx`): per-line stepper, reason chips + comment, hero «Вернуть клиенту» / «Долг уменьшится на» / both (preview only), «Выдать сейчас» (one method) / «Выдать позже». Sends `returnPayments: []` + `payoutMethod` (now) or no payout (later / debt only) — the backend computes amounts and status. A payout without an own open cashbox opens `CashboxPickerSheet` (→ `cashboxId`). Success → toast from the response (`paidOut`, `status`) + back. Hook `useReturnOrder` (invalidates orders, cashboxes, products, debtors, customers).
+- **Orders list** (`OrderPage`, `OrderCard`): «Завершённые» tab = COMPLETED, DEBT, REFUNDED; `№` and the first badge from `orderBadges()`.
+- i18n: `orderView.*`, `orderReturn.*`, `sale.pay.due*`, `payment.category.DEFECT_COMPENSATION`.
 
 ### Debtors flow (stage 8)
 
@@ -380,6 +391,7 @@ Role checks in the UI are UX only — the backend enforces permissions.
 - Owner = `user.role === UserRole.OWNER` (not `staff.role`). The owner's store is `user.staff.storeId`.
 - Owner-only UI: Profile → «Сотрудники» (list, card, edit, new employee). The screens also show «нет доступа» for non-owners.
 - Owner / manager / admin UI: `canLowerPrice()` (cart price lowering) and `canCreateDebt()` (Debtors → «+ Долг», `debtors/new`) in `src/libs/roles.ts`.
+- Owner / manager (not admin) UI: `canProcessReturns()` — «Возврат товара», «Выдать деньги», «Компенсация за брак» on the order screen (backend: OWNER any warehouse, MANAGER own warehouses).
 - A deactivated employee gets 401 on every request (backend, 2026-11-09): the refresh fails and the app logs out.
 - Platform ADMIN = `isAdmin(user)` (`src/libs/roles.ts`); has no `staff` — Profile only (see «Tabs»), debtors are hidden and not loaded (`useDebtors(params, enabled)`).
 
@@ -446,6 +458,7 @@ Profile → card «Магазины · N» (shown to ADMIN instead of «Рабо
 
 - `assets/i18next/i18next.ts` exports `AppLanguage` (`auto` | `en` | `ru` | `uz`), `setAppLanguage()`, `getSavedLanguageOption()`, default `i18n`.
 - Device language is used if it's en/ru/uz, otherwise `ru`.
+- **Uzbek dates**: Hermes has no `uz` locale data (`uz-UZ` falls back to English), so `screens/rental/rental-format.ts` builds Uzbek day / month / weekday strings by hand (`formatDay`, `formatDayTime`, `formatLocalDay`, …). Use these shared formatters for dates (order screens, `DateRangeSheet` do) instead of `toLocaleDateString` with `uz`.
 - Strings live in `assets/i18next/locales/{en,ru,uz}.ts`. Add every new key to all three.
 
 ```tsx
@@ -484,7 +497,7 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 
 ## Known Issues
 
-- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`, `OrderDetailScreen`).
+- Client-side totals that belong to the backend: order subtotal/discount preview (`OrderCartScreen`); display-only previews in `OrderViewScreen` (net total after a return) and `OrderReturnScreen` (hero sums — the backend decides the amounts).
 - Not built yet (disabled buttons / `ComingSoonScreen`): open cashbox from the cashbox list (opening works only from the debt payment flow, `CashboxPickerSheet`), cashbox filters, order-level discount. Staff creation has no «comment» field (not stored by the backend).
 - `scripts/reset-project.js` (referenced by `npm run reset-project`) is missing.
 

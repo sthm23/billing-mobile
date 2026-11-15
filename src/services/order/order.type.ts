@@ -310,6 +310,8 @@ export interface CreateOrderPaymentPayload {
     payments: OrderPaymentPayload[]
     /** Repay-by (ISO) when part of the order is left on debt; ignored otherwise */
     debtDueAt?: string
+    /** Open cashbox to take the money into; default — the employee's own (a seller has none) */
+    cashboxId?: string
 }
 
 export enum DebtStatus {

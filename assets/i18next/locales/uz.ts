@@ -534,6 +534,8 @@ const uz = {
       "title": "Pulni qayerga qabul qilish",
       "text": "Sizda ochiq kassa yo‘q. O‘z kassangizni oching yoki do‘konning ochiq kassasini tanlang.",
       "open": "O‘z kassamni ochish",
+      "textSeller": "Sizning kassangiz yo'q. O'z omboringizning ochiq kassasini tanlang.",
+      "noneSeller": "Ochiq kassa yo'q — menejer yoki kassirdan kassa ochishni so'rang",
       "chooseWarehouse": "Yangi kassa uchun ombor",
       "others": "Ochiq kassalar",
       "none": "Boshqa ochiq kassalar yo‘q",
@@ -1164,6 +1166,7 @@ const uz = {
     "returnedAt": "Qaytarish sanasi"
   },
   "payment": {
+    "transactionFailed": "Operatsiyani saqlab bo'lmadi",
     "today": {
       "title": "Bugun ochiq kassalarda",
       "openCount": "Ochiq: {{count}}",
