@@ -1,0 +1,149 @@
+import { onSessionExpired, onStoreSuspended } from "@/api/axios-instance";
+import { LOCALE_STORAGE_KEYS } from "@/models/app.models";
+import { getAccessToken, removeAccessToken, setAccessToken } from "@/libs/token-storage";
+import { AuthRequest, CurrentUserType } from "@/models/auth.model";
+import { loginAuth, logoutAuth, profileAuth } from "@/services/auth.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+
+// type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+export enum AuthStatusEnum {
+    Loading = "loading",
+    Authenticated = "authenticated",
+    Unauthenticated = "unauthenticated"
+}
+interface AuthContextType {
+    isAuthenticated: boolean;
+    authStatus: AuthStatusEnum;
+    user: CurrentUserType | null;
+    login: (data: AuthRequest) => Promise<void>;
+    logout: () => Promise<void>;
+    /** Reloads the profile (e.g. after the owner changed the store modes) */
+    refreshUser: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+    return context;
+}
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [isAuthenticated, setAuthenticated] = useState<boolean>(false);
+    const [authStatus, setAuthStatus] = useState<AuthStatusEnum>(AuthStatusEnum.Loading);
+    const [user, setUser] = useState<CurrentUserType | null>(null);
+
+    useEffect(()=>{
+        const loadAuthState = async () => {
+            try {
+                const token = await getAccessToken();
+
+                if (!token) {
+                    setAuthenticated(false);
+                    setAuthStatus(AuthStatusEnum.Unauthenticated);
+                    setUser(null);
+                    return;
+                }
+
+                try {
+                    const profile = await profileAuth();
+                    setAuthenticated(true);
+                    setAuthStatus(AuthStatusEnum.Authenticated);
+                    setUser(profile);
+                    await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
+                } catch (profileError) {
+                    // Token exists but profile request failed: clear broken local session.
+                    await removeAccessToken();
+                    await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER);
+                    setAuthenticated(false);
+                    setAuthStatus(AuthStatusEnum.Unauthenticated);
+                    setUser(null);
+                    console.error("Failed to bootstrap user profile:", profileError);
+                }
+            } catch (error) {
+                console.error("Failed to load auth state:", error);
+                setAuthenticated(false);
+                setAuthStatus(AuthStatusEnum.Unauthenticated);
+                setUser(null);
+            }
+        };
+
+        loadAuthState();
+    }, [])
+
+
+    // No global Loading status here: the root layout would swap the login
+    // screen for the splash and its error message would be lost. The login
+    // button shows its own spinner.
+    const login = async (data: AuthRequest) => {
+        try {
+            const response = await loginAuth(data)
+            await setAccessToken(response.accessToken);
+
+            const profile = await profileAuth();
+            setAuthenticated(true);
+            setAuthStatus(AuthStatusEnum.Authenticated);
+            setUser(profile);
+            await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
+        } catch (error) {
+            await removeAccessToken();
+            await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER);
+            setAuthenticated(false);
+            setAuthStatus(AuthStatusEnum.Unauthenticated);
+            setUser(null);
+            // Expected case (wrong login/password) — the login screen shows it, so no console.error.
+            throw error; // Rethrow the error so that the caller can handle it
+        }
+    };
+
+    const logout = async () => {
+        const accessToken = await getAccessToken();
+
+        try {
+            if (accessToken) {
+                await logoutAuth({
+                    allDevices: false,
+                    sessionId: accessToken, // Backend expects access token as sessionId to decode sid
+                });
+            }
+        } catch (error) {
+            console.error("Failed to logout API call:", error);
+        } finally {
+            await removeAccessToken();
+            await AsyncStorage.removeItem(LOCALE_STORAGE_KEYS.USER);
+            setAuthenticated(false);
+            setAuthStatus(AuthStatusEnum.Unauthenticated);
+            setUser(null);
+        }
+    };
+
+    const refreshUser = async () => {
+        const profile = await profileAuth();
+        setUser(profile);
+        await AsyncStorage.setItem(LOCALE_STORAGE_KEYS.USER, JSON.stringify(profile));
+    };
+
+    // The admin suspended the store while the app was open: reload the profile
+    // (GET /auth/me stays available) — the root layout then shows «Магазин приостановлен».
+    useEffect(() => onStoreSuspended(() => {
+        refreshUser().catch((error) => console.error("Failed to reload profile after suspension:", error));
+    }), []);
+
+    // The refresh token expired or was revoked (axios already removed the local
+    // token): drop the in-memory session so the root layout opens the login screen.
+    useEffect(() => onSessionExpired(() => {
+        setAuthenticated(false);
+        setAuthStatus(AuthStatusEnum.Unauthenticated);
+        setUser(null);
+    }), []);
+
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, authStatus, user, login, logout, refreshUser }}>
+            {children}
+        </AuthContext.Provider>
+    )
+}

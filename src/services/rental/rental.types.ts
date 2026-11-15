@@ -1,0 +1,466 @@
+import type { BaseListResponse } from '@/models/app.models';
+import type { OrderStatus, PaymentType } from '@/models/order.model';
+
+/**
+ * Rental (wedding salon) — docs/features/rental.md and
+ * billing/docs/rental/03_RENTAL_API.md. Money fields come from the backend as
+ * Decimal strings: show them with `Money` / `formatMoney`, never compute totals here.
+ */
+export enum RentalStatus {
+  BOOKED = 'BOOKED',
+  ISSUED = 'ISSUED',
+  PARTIALLY_RETURNED = 'PARTIALLY_RETURNED',
+  RETURNED = 'RETURNED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum CollateralType {
+  PASSPORT = 'PASSPORT',
+  GOLD = 'GOLD',
+  OTHER = 'OTHER',
+}
+
+/** Business error codes of the rental API (`error.response.data.code`) */
+export enum RentalErrorCode {
+  RENTAL_DISABLED = 'RENTAL_DISABLED',
+  VARIANT_NOT_RENTABLE = 'VARIANT_NOT_RENTABLE',
+  NOT_AVAILABLE = 'NOT_AVAILABLE',
+}
+
+export interface RentalApiError {
+  code?: RentalErrorCode;
+  message?: string | string[];
+  variantId?: string;
+  available?: number;
+  /** 409 NOT_AVAILABLE of POST /rental/cleanings */
+  conflicts?: RentalCleaningConflictDay[];
+}
+
+/** Planned dry cleaning (R13): `state` of a /rental/cleanings row */
+export enum RentalCleaningState {
+  PLANNED = 'PLANNED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+  CANCELLED = 'CANCELLED',
+}
+
+/** One unit of a variant in dry cleaning on chosen days */
+export interface RentalCleaning {
+  id: string;
+  warehouseId: string;
+  variantId: string;
+  sku: string;
+  productId: string;
+  productName: string;
+  startDate: string;
+  /** Noon after the last day — the unit is free again */
+  endDate: string;
+  /** Salon local dates, YYYY-MM-DD */
+  firstDay: string;
+  lastDay: string;
+  days: number;
+  amount: Money;
+  paymentType: PaymentType;
+  comment: string | null;
+  status: 'ACTIVE' | 'CANCELLED';
+  state: RentalCleaningState;
+  canCancel: boolean;
+  createdBy: string;
+  createdAt: string;
+  cancelledBy: string | null;
+  cancelledAt: string | null;
+}
+
+export interface RentalCleaningPayload {
+  warehouseId: string;
+  variantId: string;
+  /** YYYY-MM-DD, first day */
+  startDate: string;
+  /** 1…30 */
+  days: number;
+  amount: number;
+  paymentType: PaymentType;
+  comment?: string;
+  cashboxId?: string;
+}
+
+/** A day short of a unit: the bookings and cleanings holding the units */
+export interface RentalCleaningConflictDay {
+  date: string;
+  rentals: {
+    rentalId: string;
+    code: string;
+    orderId: string;
+    customerName: string | null;
+    startDate: string;
+    endDate: string;
+    quantity: number;
+  }[];
+  cleanings: { cleaningId: string; startDate: string; endDate: string }[];
+}
+
+/** GET /rental/cleanings/check */
+export interface RentalCleaningCheck {
+  ok: boolean;
+  owned: number;
+  /** Free for the whole period without this cleaning */
+  available: number;
+  startDate: string;
+  endDate: string;
+  conflicts: RentalCleaningConflictDay[];
+}
+
+export type Money = string | number;
+
+/** Quick filters of the list (`view`), counted by GET /rental/summary */
+export const RENTAL_VIEWS = ['issueToday', 'returnToday', 'overdue', 'booked', 'out', 'all'] as const;
+export type RentalView = (typeof RENTAL_VIEWS)[number];
+export type RentalSummary = Record<RentalView, number>;
+
+// ------------------------------------------------------------------ payloads
+
+export interface RentalPaymentItem {
+  type: PaymentType;
+  amount: number;
+}
+
+export interface RentalCollateralPayload {
+  type: CollateralType;
+  description: string;
+}
+
+export interface RentalItemPayload {
+  variantId: string;
+  quantity: number;
+  /** Discount per unit */
+  sale?: number;
+}
+
+export interface RentalServicePayload {
+  name: string;
+  price: number;
+  sale?: number;
+  description?: string;
+}
+
+/** POST /rental, PATCH /rental/:id (full body) */
+export interface RentalBookingPayload {
+  warehouseId: string;
+  customerId: string;
+  /** YYYY-MM-DD, salon local date */
+  startDate: string;
+  endDate: string;
+  items: RentalItemPayload[];
+  services?: RentalServicePayload[];
+  notes?: string;
+}
+
+/** POST /rental/:id/payments and /issue */
+export interface RentalPaymentPayload {
+  payments?: RentalPaymentItem[];
+  collaterals?: RentalCollateralPayload[];
+  cashboxId?: string;
+}
+
+export interface RentalReturnLinePayload {
+  orderItemId: string;
+  quantity: number;
+  cleaningDays: number;
+}
+
+export interface RentalReturnPayload {
+  /** ISO with zone; omitted = now */
+  returnedAt?: string;
+  items: RentalReturnLinePayload[];
+  penaltyAmount?: number;
+  penaltyComment?: string;
+  earlyReturnRefund?: number;
+  refundPaymentType?: PaymentType;
+  payments?: RentalPaymentItem[];
+  cashboxId?: string;
+}
+
+export interface RentalCancelPayload {
+  refundAmount: number;
+  refundPaymentType?: PaymentType;
+  reason?: string;
+  cashboxId?: string;
+}
+
+// ----------------------------------------------------------------- responses
+
+export interface VariantAvailability {
+  variantId: string;
+  owned: number;
+  available: number;
+  /**
+   * Only when asked with `nextFree`: the asked start if a unit is free, else
+   * the earliest start of a booking of the same length with a free unit (up
+   * to 93 days ahead); `null` — none (e.g. the only unit is overdue).
+   */
+  nextFreeStart?: string | null;
+}
+
+export interface RentalCollateral {
+  id: string;
+  rentalId: string;
+  type: CollateralType;
+  description: string;
+  receivedAt: string;
+  receivedBy: string;
+  returnedAt: string | null;
+  returnedBy: string | null;
+}
+
+export interface RentalReturnEvent {
+  id: string;
+  returnedAt: string;
+  penaltyAmount: Money;
+  penaltyComment: string | null;
+  earlyReturnRefund: Money;
+  createdBy: string;
+  items: {
+    id: string;
+    orderItemId: string;
+    quantity: number;
+    cleaningDays: number;
+    availableFrom: string;
+  }[];
+}
+
+export interface RentalOrderItem {
+  id: string;
+  variantId: string;
+  quantity: number;
+  /** Price per unit for the whole booking (rentPricePerDay × plannedDays) */
+  retailPrice: Money;
+  /** Discount per unit */
+  sale: Money;
+  returnedQuantity: number;
+  variant: {
+    id: string;
+    sku: string;
+    barCode: string | null;
+    rentPricePerDay: Money | null;
+    /** Dry-cleaning days suggested on return */
+    defaultCleaningDays: number;
+    product: { id: string; name: string };
+    attributes: { value: { valueString: string | null; valueNumber: Money | null; attribute: { name: string } } }[];
+  };
+}
+
+export interface RentalOrderService {
+  id: string;
+  name: string;
+  price: Money;
+  sale: Money;
+  description: string | null;
+}
+
+export interface RentalOrderPayment {
+  id: string;
+  type: PaymentType;
+  amount: Money;
+  createdAt: string;
+}
+
+export interface Rental {
+  id: string;
+  orderId: string;
+  storeId: string;
+  warehouseId: string;
+  customerId: string;
+  /** Noon of the local date, ISO */
+  startDate: string;
+  endDate: string;
+  plannedDays: number;
+  status: RentalStatus;
+  issuedAt: string | null;
+  issuedBy: string | null;
+  /** Issued while the salon held no collateral */
+  issuedWithoutCollateral: boolean;
+  closedAt: string | null;
+  cancelledAt: string | null;
+  cancelledBy: string | null;
+  refundAmount: Money | null;
+  cancelReason: string | null;
+  notes: string | null;
+  createdAt: string;
+  overdue: boolean;
+  /** Short code shown to people and searched by */
+  code: string;
+}
+
+/** GET /rental/:id and the response of every rental mutation */
+export interface RentalDetail extends Rental {
+  collaterals: RentalCollateral[];
+  returns: RentalReturnEvent[];
+  order: {
+    id: string;
+    status: OrderStatus;
+    totalAmount: Money;
+    paidAmount: Money;
+    dueAmount: Money;
+    customer: { id: string; user: { id: string; fullName: string; phone: string } } | null;
+    warehouse: { id: string; name: string };
+    services: RentalOrderService[];
+    payments: RentalOrderPayment[];
+    items: RentalOrderItem[];
+  };
+}
+
+/** Row of GET /rental */
+export interface RentalListItem extends Rental {
+  order: {
+    id: string;
+    status: OrderStatus;
+    totalAmount: Money;
+    paidAmount: Money;
+    dueAmount: Money;
+  };
+  customer: { id: string; fullName: string; phone: string } | null;
+  itemCount: number;
+  /** Lines for thumbnails, in booking order */
+  items: { variantId: string; productName: string; imageUrl: string | null; quantity: number }[];
+}
+
+export type RentalListResponse = BaseListResponse<RentalListItem>;
+
+/** GET /rental/agenda: issues and returns per salon day (closed rentals not listed) */
+export interface RentalAgenda {
+  from: string;
+  to: string;
+  /** Salon today, YYYY-MM-DD */
+  today: string;
+  /** Only days with something to do */
+  days: { date: string; issues: number; returns: number }[];
+  /** A booking to issue (start day, or today once started) / a rental to take back (end day, overdue — today) */
+  events: { date: string; kind: 'ISSUE' | 'RETURN'; rental: RentalListItem }[];
+}
+
+export interface RentalListParams {
+  /** The working warehouse */
+  warehouseId?: string;
+  currentPage?: number;
+  pageSize?: number;
+  status?: RentalStatus[];
+  /** YYYY-MM-DD */
+  from?: string;
+  to?: string;
+  customerId?: string;
+  view?: RentalView;
+  /** Customer name, phone digits or rental code */
+  q?: string;
+  variantId?: string;
+  sort?: 'asc' | 'desc';
+  /** Default startDate */
+  sortBy?: 'startDate' | 'endDate';
+}
+
+export interface RentalCalendar {
+  from: string;
+  to: string;
+  variants: {
+    variantId: string;
+    sku: string;
+    productId: string;
+    productName: string;
+    owned: number;
+    /** cleaning — units held by planned dry cleaning that day (R13), part of busy */
+    days: { date: string; busy: number; available: number; cleaning: number }[];
+    /** Rentals only */
+    bookings: { rentalId: string; from: string; to: string; quantity: number }[];
+    cleanings: { cleaningId: string; from: string; to: string }[];
+  }[];
+  rentals: {
+    id: string;
+    /** Short code shown to people */
+    code: string;
+    /** With the customer past the end date (from the backend) */
+    overdue: boolean;
+    orderId: string;
+    status: RentalStatus;
+    startDate: string;
+    endDate: string;
+    customerName: string | null;
+  }[];
+}
+
+/** Row of GET /rental/similar */
+export interface SimilarVariant {
+  variantId: string;
+  sku: string;
+  productId: string;
+  productName: string;
+  imageUrl: string | null;
+  rentPricePerDay: Money | null;
+  attributes: { name: string; value: string }[];
+  owned: number;
+  available: number;
+}
+
+/** Row of the product search (`GET /product/search/:warehouseId`) with the rent fields */
+export interface RentableVariant {
+  id: string;
+  sku: string;
+  barCode: string | null;
+  productId: string;
+  productName: string;
+  canRent: boolean;
+  rentPricePerDay: Money | null;
+  attributes: { name: string; value: string | null }[];
+  /** Units in the warehouse (owned) */
+  quantity: number;
+}
+
+export interface SimilarVariants {
+  sameProduct: SimilarVariant[];
+  sameCategory: SimilarVariant[];
+}
+
+export interface CleaningConflict {
+  orderItemId: string;
+  variantId: string;
+  availableFrom: string;
+  conflicts: {
+    rentalId: string;
+    orderId: string;
+    customerName: string | null;
+    startDate: string;
+    endDate: string;
+    quantity: number;
+    availableAtStart: number;
+  }[];
+}
+
+export interface RentalReturnPreview {
+  returnedAt: string;
+  items: {
+    orderItemId: string;
+    variantId: string;
+    quantity: number;
+    cleaningDays: number;
+    availableFrom: string;
+    plannedDays: number;
+    actualDays: number;
+  }[];
+  penaltyAmount: Money;
+  earlyReturnRefund: Money;
+  maxEarlyReturnRefund: Money;
+  /** Hint: days past the planned period */
+  overdueDays: number;
+  /** Hint for the manual penalty: list day price × units × overdue days */
+  suggestedPenalty: Money;
+  /** Hint: unused planned days on an early return */
+  unusedDays: number;
+  /** Hint for earlyReturnRefund: paid day price × units × unused days */
+  unusedDaysAmount: Money;
+  newTotalAmount: Money;
+  paidAmount: Money;
+  paymentsAmount: Money;
+  dueAmount: Money;
+  cashOutAmount: Money;
+  paidAmountAfter: Money;
+  rentalStatusAfter: RentalStatus;
+  orderStatusAfter: OrderStatus;
+}
