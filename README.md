@@ -1,57 +1,89 @@
-# Welcome to your Expo app 👋
+# STHM Mobile — Expo + React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile app for the **my-billing** retail POS system (brand **STHM**: Sotuv · Toʻlov · Hisobot · Mahsulot).
 
-## Get started
+---
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Quick Start
 
 ```bash
-npm run reset-project
+npm install
+npm start               # Expo dev server
+npm run android         # Android
+npm run ios             # iOS
+npm run web             # Web
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Before running, check `BASE_URL` in `src/api/axios-instance.ts` — it points to a LAN dev backend by default; production is `https://sthm23.uz/api`.
 
-### Other setup steps
+---
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## ⚠️ Expo SDK 57
 
-## Learn more
+Always use the versioned docs: https://docs.expo.dev/versions/v57.0.0/
+Install packages with `npx expo install <package>`.
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Documentation
 
-## Join the community
+| File | What |
+|---|---|
+| [`AGENTS.md`](./AGENTS.md) | **Start here** — architecture, routing, styling, API, conventions |
+| [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md) | STHM design tokens, typography, components from the design, redesign status |
+| [`COMPONENTS.md`](./COMPONENTS.md) | Base component API reference |
+| [`src/components/base/EXAMPLES.md`](./src/components/base/EXAMPLES.md) | Usage examples |
+| [`../AGENTS.md`](../AGENTS.md), [`../docs/INDEX.md`](../docs/INDEX.md) | Project-wide rules and business docs |
 
-Join our community of developers creating universal apps.
+---
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Tech Stack
 
+- **Expo SDK 57**, React Native 0.86.3, React 19.2.3, TypeScript 6.0.3
+- **Expo Router 57** — file-based routing, typed routes
+- **NativeWind 5 (preview)** + **Tailwind CSS v4** — config lives in `src/global.css` (no `tailwind.config.js`)
+- **Onest** font (`@expo-google-fonts/onest`), `lucide-react-native` icons
+- **React Query** + **Axios** — data fetching, JWT with refresh
+- **React Hook Form** + **Zod** — forms
+- **i18next** — Russian, Uzbek, English
+- **@expo/ui** — native bottom sheets
+
+---
+
+## Project Structure
+
+```
+assets/            # brand/ (STHM SVG logos), i18next/, images/ (icons, splash)
+src/
+├── api/           # axios-instance.ts
+├── app/           # Expo Router routes
+├── screens/       # Screen implementations
+├── components/    # base/ (primitives), common/, product/, order/, cashbox/
+├── constants/     # tokens.ts (STHM palette), theme.ts
+├── global.css     # Tailwind v4 theme: STHM tokens, radius, fonts, type-* styles
+├── hooks/ icons/ libs/ models/ provider/ services/
+```
+
+---
+
+## Commands
+
+```bash
+npx tsc --noEmit                      # Type-check
+npx expo export --platform android    # Bundle check (CSS/imports)
+npx expo start --clear                # Clear NativeWind/Metro cache
+npx expo prebuild --clean             # Regenerate native projects (after app.json icon/splash changes)
+```
+
+No test runner or ESLint config is set up yet.
+
+---
+
+## Related Projects
+
+- Backend API: [`../billing/`](../billing/) — NestJS + Prisma + PostgreSQL
+- Web: [`../billing_ui/`](../billing_ui/) — Angular + PrimeNG
+
+---
+
+**Last updated:** 2026-10-19 · **Expo SDK:** 57
