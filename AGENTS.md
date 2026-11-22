@@ -71,7 +71,7 @@ Product photos (2026-11-14): `expo-image-picker` (~57.0.21, config plugin in `ap
 billing-mobile/
 ├── app.json                      # Expo config (name "STHM", icons, splash)
 ├── metro.config.js               # withNativewind(config, { inlineRem: 16, input: './src/global.css' })
-├── babel.config.js               # babel-preset-expo + nativewind/babel, module-resolver, worklets
+├── babel.config.js               # babel-preset-expo + nativewind/babel (overrides: NOT for react-native-web files), module-resolver, worklets
 ├── postcss.config.mjs            # @tailwindcss/postcss
 ├── assets/                       # Project-root assets (alias @/assets/*)
 │   ├── brand/                    # STHM logo SVGs (mark, horizontal, app icon; -on-dark variants)
@@ -269,7 +269,7 @@ import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 
 `src/api/axios-instance.ts`:
 - `BASE_URL`: `EXPO_PUBLIC_API_URL` (build-time, e.g. `.env.local`) if set; otherwise `__DEV__` → LAN dev server (`http://<lan-ip>:4000/api`, `localhost` for web), release → `https://sthm23.uz/api` on native and relative `/api` on web (the web build is served by the same nginx as the API — same-origin refresh cookie, no CORS).
-- **Expo web release** (replaces the Angular `billing_ui`): `npm run build:web` (`expo export --platform web`, `app.json` `web.output: "single"` → SPA, one `index.html`) → `dist/`. `public/` (Play Market `privacy*.html`, `delete-account*.html`) is copied into `dist/` as is; nginx needs `try_files $uri $uri.html $uri/ /index.html`.
+- **Expo web release** (replaces the Angular `billing_ui`): `npm run build:web` (`expo export --platform web`, `app.json` `web.output: "single"` → SPA, one `index.html`) → `dist/`. `public/` (Play Market `privacy*.html`, `delete-account*.html`) is copied into `dist/` as is; nginx needs `try_files $uri $uri.html $uri/ /index.html`. Deploy: `.github/workflows/deploy.yml` on push to `main` builds in GitHub Actions (the server is too slow for Metro), uploads `dist` as `/var/www/billing-mobile/release.tgz` and pipes `deploy.sh` into `ssh … bash -s` (unpack → `dist-next` → swap, previous build in `dist-prev`), then smoke-checks `https://sthm23.uz` and the Play Market pages.
 - Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payment`), `warehouseApi` (`/warehouse`), `categoryApi` (`/category`). Timeout 30 s, `withCredentials: true`.
 - Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup` (leftover; the backend route was removed 2026-11-13), `/refresh`, `/logout`.
 - The token is read / written only through `src/libs/token-storage.ts` (`getAccessToken`, `setAccessToken`, `removeAccessToken`); never use AsyncStorage for it directly.
@@ -521,6 +521,8 @@ Changes to `app.json` (icon, splash, name) need a native rebuild (`npx expo preb
 ## Troubleshooting
 
 **Styling not applied** — check `metro.config.js` uses `withNativewind`, `babel.config.js` has `nativewind/babel`, then `npx expo start --clear`. Remember Tailwind only generates classes that appear in source; dynamic class strings (`` `gap-${n}` ``) are not generated unless the full class appears somewhere.
+
+**Web build: blank page, `Cannot read properties of undefined (reading 'default')` at `FlatList`** (Linux builds only) — `nativewind/babel` rewrote react-native-web's own relative imports into `react-native-css/components/*` (a react-native-css 3.0.x bug that only matches POSIX paths), creating a require cycle. `babel.config.js` applies `nativewind/babel` through `overrides` with an `exclude` function for `node_modules/react-native-web/` — keep it until react-native-css fixes `parseReactNativeWebSource`. A Windows build passing proves nothing here: check the Linux (CI) build.
 
 **Custom font not applied** — make sure the class sets a family (`type-*`, `font-onest-*`) and that the root layout finished loading fonts.
 
