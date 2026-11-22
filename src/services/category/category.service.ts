@@ -1,5 +1,5 @@
 import { categoryApi } from '@/api/axios-instance';
-import type { Category } from '@/models/product.model';
+import type { AttributeNames, Category } from '@/models/product.model';
 
 /** PATCH /category/subcategory/:id — an empty string clears a translation */
 export interface UpdateSubcategoryPayload {
@@ -56,9 +56,8 @@ export interface StoreBrand {
 }
 
 /** A catalog attribute linked to the store (`GET /category/attributes/store/:storeId`) */
-export interface StoreAttribute {
+export interface StoreAttribute extends AttributeNames {
   id: string;
-  name: string;
   type: 'STRING' | 'NUMBER' | 'BOOLEAN';
   /** Unit of a NUMBER attribute («м», «кг») */
   unit: string | null;
@@ -94,6 +93,8 @@ export interface AttributeValueItem {
   id: string;
   attributeId: string;
   attributeName: string;
+  attributeNameUz?: string | null;
+  attributeNameEn?: string | null;
   value: string | number | boolean;
 }
 
@@ -117,10 +118,30 @@ const createAttributeValue = async (body: {
   return response.data;
 };
 
+/** PATCH /category/attribute/:id (ADMIN) — an empty string clears a translation; 409 if the name is taken */
+export interface UpdateAttributePayload {
+  name?: string;
+  nameUz?: string;
+  nameEn?: string;
+}
+
+/** The updated attribute: names, type and unit */
+export interface UpdatedAttribute extends AttributeNames {
+  id: string;
+  type: 'STRING' | 'NUMBER' | 'BOOLEAN';
+  unit: string | null;
+}
+
+const updateAttribute = async (id: string, body: UpdateAttributePayload): Promise<UpdatedAttribute> => {
+  const response = await categoryApi.patch<UpdatedAttribute>(`/attribute/${id}`, body);
+  return response.data;
+};
+
 export const catalogService = {
   getStoreBrands,
   getStoreAttributes,
   getTags,
   getAttributeValues,
   createAttributeValue,
+  updateAttribute,
 };

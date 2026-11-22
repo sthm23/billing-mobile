@@ -208,8 +208,8 @@ const en = {
     "attr": {
       "title": "New attribute",
       "subtitle": "Appears on this store's product card",
-      "name": "Name",
-      "namePlaceholder": "e.g. Material",
+      "name": "Name (Russian)",
+      "namePlaceholder": "e.g. Материал",
       "type": "Value type",
       "types": {
         "STRING": "Text",
@@ -222,7 +222,7 @@ const en = {
         "BOOLEAN": "Switch"
       },
       "unit": "Unit · optional",
-      "unitPlaceholder": "m, kg, l, mm",
+      "unitPlaceholder": "м, кг, л, мм — in Russian",
       "unitHint": "On a product: «{{name}} — 6 {{unit}}»",
       "unitHintName": "Length",
       "stringHint": "Values (e.g. Cotton, Silk) are added on the product card — variants are built from them.",
@@ -297,6 +297,12 @@ const en = {
       "noSubcategories": "No categories yet",
       "editHint": "Tap a category to rename or delete it",
       "loadFailed": "Couldn't load categories",
+      "attrHint": "Tap an attribute to rename it or add a translation",
+      "attrEdit": {
+        "title": "Attribute",
+        "subtitle": "Shared dictionary: every store with this attribute will see the change",
+        "saved": "Attribute saved"
+      },
       "edit": {
         "title": "Category",
         "subtitle": "Shared dictionary: every store of «{{direction}}» sees the changes",

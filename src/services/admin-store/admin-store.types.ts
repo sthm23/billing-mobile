@@ -1,3 +1,4 @@
+import type { AttributeNames } from '@/models/product.model';
 import type { StaffRole } from '@/models/user.model';
 
 /** Store subscription state (backend `StoreStatus`) */
@@ -67,9 +68,8 @@ export interface AdminStoreStaffItem {
   warehouses: { id: string; name: string }[];
 }
 
-export interface AdminStoreAttribute {
+export interface AdminStoreAttribute extends AttributeNames {
   id: string;
-  name: string;
   type: AttributeType;
   unit: string | null;
 }
@@ -91,7 +91,10 @@ export interface AdminStoreDetails extends AdminStoreListItem {
 }
 
 export interface NewStoreAttribute {
+  /** Russian name (primary) */
   name: string;
+  nameUz?: string;
+  nameEn?: string;
   type: AttributeType;
   unit?: string;
 }
@@ -135,9 +138,8 @@ export interface CatalogBrand {
 }
 
 /** GET /category/attributes — attributes (global groups) */
-export interface CatalogAttribute {
+export interface CatalogAttribute extends AttributeNames {
   id: string;
-  name: string;
   type: AttributeType;
   unit: string | null;
 }

@@ -76,7 +76,10 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
   const [addOpen, setAddOpen] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [movementTarget, setMovementTarget] = useState<StockMovementTarget | null>(null);
-  const nameById = useMemo(() => buildNameById(product.attributes ?? []), [product.attributes]);
+  const nameById = useMemo(
+    () => buildNameById(product.attributes ?? [], i18n.language),
+    [product.attributes, i18n.language]
+  );
 
   const attributeMap = useMemo(
     () => buildAttributeMap(product.variants, nameById),
@@ -190,7 +193,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
     });
   };
 
-  const attributeNames = (product.attributes ?? []).map((a) => a.name);
+  const attributeNames = (product.attributes ?? []).map((a) => nameById[a.id]);
   const category = productCategoryLabel(product, i18n.language);
   const subtitle = [category, product.brand].filter(Boolean).join(' · ');
 

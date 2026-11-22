@@ -17,6 +17,8 @@ import {
   type StoreAttribute,
   type StoreBrand,
   type TagGroup,
+  type UpdateAttributePayload,
+  type UpdatedAttribute,
   type UpdateSubcategoryPayload,
 } from './category.service';
 
@@ -127,6 +129,24 @@ export const useUpdateSubcategory = (): UseMutationResult<
     mutationFn: ({ id, ...body }) => categoryService.updateSubcategory(id, body),
     onSuccess: () => {
       invalidateCategories(queryClient);
+      void queryClient.invalidateQueries({ queryKey: productQueryKeys.all() });
+    },
+  });
+};
+
+/** Rename an attribute / set its uz, en translations (ADMIN). Names show up in forms, cards and the admin store card. */
+export const useUpdateAttribute = (): UseMutationResult<
+  UpdatedAttribute,
+  ApiError,
+  { id: string } & UpdateAttributePayload
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...body }) => catalogService.updateAttribute(id, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: categoryQueryKeys.all() });
+      void queryClient.invalidateQueries({ queryKey: adminStoreQueryKeys.all() });
       void queryClient.invalidateQueries({ queryKey: productQueryKeys.all() });
     },
   });
