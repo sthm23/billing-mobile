@@ -268,7 +268,8 @@ import { Sheet, SheetScrollView } from '@/components/base/Sheet';
 ## API Communication
 
 `src/api/axios-instance.ts`:
-- `BASE_URL` is chosen with `Platform.select`. **It currently points to a LAN dev server** (`http://<lan-ip>:4000/api`, `localhost` for web); production is `https://sthm23.uz/api` (commented). Check it before building a release.
+- `BASE_URL`: `EXPO_PUBLIC_API_URL` (build-time, e.g. `.env.local`) if set; otherwise `__DEV__` → LAN dev server (`http://<lan-ip>:4000/api`, `localhost` for web), release → `https://sthm23.uz/api` on native and relative `/api` on web (the web build is served by the same nginx as the API — same-origin refresh cookie, no CORS).
+- **Expo web release** (replaces the Angular `billing_ui`): `npm run build:web` (`expo export --platform web`, `app.json` `web.output: "single"` → SPA, one `index.html`) → `dist/`. `public/` (Play Market `privacy*.html`, `delete-account*.html`) is copied into `dist/` as is; nginx needs `try_files $uri $uri.html $uri/ /index.html`.
 - Exports `api`, `usersApi` (`/users`), `ordersApi` (`/orders`), `productsApi` (`/product`), `paymentsApi` (`/payment`), `warehouseApi` (`/warehouse`), `categoryApi` (`/category`). Timeout 30 s, `withCredentials: true`.
 - Request interceptor adds `Authorization: Bearer <token>` except for `/login`, `/signup` (leftover; the backend route was removed 2026-11-13), `/refresh`, `/logout`.
 - The token is read / written only through `src/libs/token-storage.ts` (`getAccessToken`, `setAccessToken`, `removeAccessToken`); never use AsyncStorage for it directly.

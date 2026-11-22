@@ -7,20 +7,19 @@ import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestCo
 import { Platform } from 'react-native';
 
 
-const BASE_URL = Platform.select({
-  // ios: 'http://192.168.18.2:4000/api',
-  // android: 'http://192.168.18.2:4000/api',
-  // default: 'http://localhost:4000/api',
-
-  ios: 'http://192.168.18.5:4000/api',
-  android: 'http://192.168.18.5:4000/api',
-  default: 'http://localhost:4000/api',
-
-
-  // ios: 'https://sthm23.uz/api',
-  // android: 'https://sthm23.uz/api',
-  // default: 'https://sthm23.uz/api',
-})
+/**
+ * API base URL. `EXPO_PUBLIC_API_URL` (inlined at build time, e.g. from `.env.local`) wins.
+ * Otherwise: dev → LAN backend (`localhost` for web); release → production. The web release
+ * is served by the same nginx as the API, so it uses the relative `/api` (same-origin
+ * refresh cookie, no CORS).
+ */
+const DEV_BASE_URL = Platform.select({
+  web: 'http://localhost:4000/api',
+  default: 'http://192.168.18.5:4000/api',
+});
+const PROD_BASE_URL = Platform.OS === 'web' ? '/api' : 'https://sthm23.uz/api';
+const BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || (__DEV__ ? DEV_BASE_URL : PROD_BASE_URL);
 
 const TIMEOUT = 30_000;
 const WITH_CREDENTIALS = true;
