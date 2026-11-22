@@ -156,9 +156,15 @@ export enum AttributeType {
   STRING = 'STRING',
   NUMBER = 'NUMBER',
 }
-export interface Attribute {
+/** Attribute name: Russian `name` (primary) + translations; shown via `attributeLabel()` (libs/attribute.ts) */
+export interface AttributeNames {
+  name: string
+  nameUz?: string | null
+  nameEn?: string | null
+}
+
+export interface Attribute extends AttributeNames {
   id: string,
-  name: string,
   type: AttributeType
   /** Unit of a NUMBER attribute («м», «кг») */
   unit?: string | null
@@ -171,6 +177,8 @@ export interface AttributeItem {
   id: string,
   attributeId: string,
   attributeName: string,
+  attributeNameUz?: string | null,
+  attributeNameEn?: string | null,
   value: string | number | boolean
 }
 

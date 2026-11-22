@@ -109,6 +109,8 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
   const { t } = useTranslation();
   const colors = useTheme();
   const [name, setName] = useState('');
+  const [nameUz, setNameUz] = useState('');
+  const [nameEn, setNameEn] = useState('');
   const [type, setType] = useState<AttributeType>('STRING');
   const [unit, setUnit] = useState('');
   const [preview, setPreview] = useState(true);
@@ -117,6 +119,8 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
   useEffect(() => {
     if (!isOpen) return;
     setName('');
+    setNameUz('');
+    setNameEn('');
     setType('STRING');
     setUnit('');
     setError(null);
@@ -124,7 +128,13 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
 
   const trimmed = name.trim();
   const submit = () => {
-    const err = onAdd({ name: trimmed, type, unit: type === 'NUMBER' ? unit.trim() || undefined : undefined });
+    const err = onAdd({
+      name: trimmed,
+      nameUz: nameUz.trim() || undefined,
+      nameEn: nameEn.trim() || undefined,
+      type,
+      unit: type === 'NUMBER' ? unit.trim() || undefined : undefined,
+    });
     if (err) {
       setError(err);
       return;
@@ -151,6 +161,24 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
             accessibilityLabel={t('adminShopNew.attr.name')}
           />
         </View>
+        {[
+          { key: 'uz', label: t('adminShop.catalog.edit.nameUz'), value: nameUz, set: setNameUz },
+          { key: 'en', label: t('adminShop.catalog.edit.nameEn'), value: nameEn, set: setNameEn },
+        ].map((f) => (
+          <View key={f.key} className="gap-1.5">
+            <Text className="font-onest-semibold text-[13px] text-soft">
+              {`${f.label} · ${t('adminShop.catalog.edit.optional')}`}
+            </Text>
+            <SheetTextInput
+              value={f.value}
+              onChangeText={f.set}
+              placeholderTextColor={colors.muted}
+              className={INPUT_CLASS}
+              maxLength={60}
+              accessibilityLabel={f.label}
+            />
+          </View>
+        ))}
         <View className="gap-1.5">
           <Text className="font-onest-semibold text-[13px] text-soft">{t('adminShopNew.attr.type')}</Text>
           <View className="flex-row gap-2" accessibilityRole="radiogroup">

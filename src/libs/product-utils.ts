@@ -1,3 +1,4 @@
+import { attributeLabel } from '@/libs/attribute';
 import { formatMoney } from '@/libs/format';
 import { Attribute, AttributeItem, Product, ProductVariant, StockMovementType } from '@/models/product.model';
 
@@ -53,10 +54,13 @@ export function getLatestCostPrice(variant: Pick<ProductVariant, 'stockMovements
   return lastIn ? Number(lastIn.unitCost) : 0;
 }
 
-/** Attribute name by id, for variant attributes that carry only the id */
-export function buildNameById(attributes: Attribute[]): Record<string, string> {
+/**
+ * Attribute name by id in the app language, for variant attributes that carry only the id.
+ * The names are also the keys of `buildAttributeMap` / `getVariantAttrs` / `findVariantByAttrs`.
+ */
+export function buildNameById(attributes: Attribute[], language: string): Record<string, string> {
   const map: Record<string, string> = {};
-  attributes.forEach((a) => (map[a.id] = a.name));
+  attributes.forEach((a) => (map[a.id] = attributeLabel(a, language)));
   return map;
 }
 

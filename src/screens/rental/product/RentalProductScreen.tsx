@@ -80,9 +80,9 @@ export function RentalProductScreen({ product, onRefresh, initialVariantId, init
   );
 
   // ------------------------------------------------------------ variant
-  const nameById = useMemo(() => buildNameById(product.attributes ?? []), [product.attributes]);
+  const nameById = useMemo(() => buildNameById(product.attributes ?? [], lang), [product.attributes, lang]);
   const attributeMap = useMemo(() => buildAttributeMap(product.variants, nameById), [product.variants, nameById]);
-  const attributeNames = (product.attributes ?? []).map((a) => a.name);
+  const attributeNames = (product.attributes ?? []).map((a) => nameById[a.id]);
   const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>(() => {
     const first =
       product.variants.find((v) => v.id === initialVariantId) ??

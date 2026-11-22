@@ -208,8 +208,8 @@ const uz = {
     "attr": {
       "title": "Yangi atribut",
       "subtitle": "Shu doʻkon tovar kartochkasida chiqadi",
-      "name": "Nomi",
-      "namePlaceholder": "Masalan: Material",
+      "name": "Nomi (rus tilida)",
+      "namePlaceholder": "Masalan: Материал",
       "type": "Qiymat turi",
       "types": {
         "STRING": "Matn",
@@ -222,7 +222,7 @@ const uz = {
         "BOOLEAN": "Almashtirgich"
       },
       "unit": "Birlik · ixtiyoriy",
-      "unitPlaceholder": "m, kg, l, mm",
+      "unitPlaceholder": "м, кг, л, мм — rus tilida",
       "unitHint": "Tovarda: «{{name}} — 6 {{unit}}»",
       "unitHintName": "Uzunlik",
       "stringHint": "Qiymatlar (masalan, Paxta, Ipak) tovar kartochkasida qoʻshiladi — variantlar ulardan tuziladi.",
@@ -297,6 +297,12 @@ const uz = {
       "noSubcategories": "Hali kategoriyalar yo'q",
       "editHint": "Nomini o'zgartirish yoki o'chirish uchun kategoriyani bosing",
       "loadFailed": "Kategoriyalarni yuklab bo'lmadi",
+      "attrHint": "Nomini o'zgartirish yoki tarjima qo'shish uchun atributni bosing",
+      "attrEdit": {
+        "title": "Atribut",
+        "subtitle": "Umumiy ma'lumotnoma: o'zgarishlarni shu atributli barcha do'konlar ko'radi",
+        "saved": "Atribut saqlandi"
+      },
       "edit": {
         "title": "Kategoriya",
         "subtitle": "Umumiy ma'lumotnoma: o'zgarishlarni «{{direction}}» yo'nalishidagi barcha do'konlar ko'radi",

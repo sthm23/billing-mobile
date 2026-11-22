@@ -1,3 +1,4 @@
+import { attributeHasName, attributeLabel, attributeTitle } from '@/libs/attribute';
 import { Button, Chip, IconButton, Input, InputField, Pressable, Switch, Text, toast } from '@/components/base';
 import { SafeAreaView } from '@/components/base/SafeAreaView';
 import { EmptyState } from '@/components/common';
@@ -174,19 +175,19 @@ export function AdminShopNewScreen() {
   };
 
   const addAttribute = (attr: NewStoreAttribute): string | null => {
-    const key = attr.name.toLowerCase();
-    const existing = attributesCatalog.data?.find((a) => a.name.toLowerCase() === key);
+    // The backend also reuses an attribute whose name or translation matches
+    const existing = attributesCatalog.data?.find((a) => attributeHasName(a, attr.name));
     if (existing) {
       if (existing.type !== attr.type) {
         return t('adminShopNew.attr.typeConflict', {
-          name: existing.name,
+          name: attributeLabel(existing, i18n.language),
           type: t(`adminShopNew.attr.types.${existing.type}`),
         });
       }
       setAttributeIds((ids) => (ids.includes(existing.id) ? ids : [...ids, existing.id]));
       return null;
     }
-    if (newAttributes.some((a) => a.name.toLowerCase() === key)) return t('adminShopNew.attr.duplicate');
+    if (newAttributes.some((a) => attributeHasName(a, attr.name))) return t('adminShopNew.attr.duplicate');
     setNewAttributes((list) => [...list, attr]);
 
     return null;
@@ -418,7 +419,7 @@ export function AdminShopNewScreen() {
                   return (
                     <Chip
                       key={a.id}
-                      label={a.unit ? `${a.name} (${a.unit})` : a.name}
+                      label={attributeTitle(a, i18n.language)}
                       tone="sunken"
                       selected={on}
                       onPress={() => setAttributeIds((ids) => (on ? ids.filter((x) => x !== a.id) : [...ids, a.id]))}
@@ -434,7 +435,7 @@ export function AdminShopNewScreen() {
                     className="h-9 pl-3.5 pr-2.5 rounded-pill bg-primary flex-row items-center gap-1.5"
                   >
                     <Text className="font-onest-semibold text-[13px] text-on-primary">
-                      {a.unit ? `${a.name} (${a.unit})` : a.name}
+                      {attributeTitle(a, i18n.language)}
                     </Text>
                     <X size={14} color={colors.onPrimary} strokeWidth={2.2} />
                   </Pressable>

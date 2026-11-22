@@ -32,17 +32,13 @@ import {
 } from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { attributeTitle } from '@/libs/attribute';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useProductPhotos, type FormPhoto } from './use-product-photos';
 
 const NAME_MAX = 120;
 const DESCRIPTION_MAX = 1000;
-
-/** «Длина (м)» for a NUMBER attribute with a unit */
-function attributeLabel(a: StoreAttribute): string {
-  return a.unit ? `${a.name} (${a.unit})` : a.name;
-}
 
 interface ToggleChipProps {
   label: string;
@@ -474,7 +470,7 @@ export function ProductCardFormScreen({ productId }: ProductCardFormScreenProps 
                 {attributes.data.map((a) => (
                   <ToggleChip
                     key={a.id}
-                    label={attributeLabel(a)}
+                    label={attributeTitle(a, i18n.language)}
                     selected={attributeIds.includes(a.id)}
                     onPress={() => setAttributeIds((list) => toggle(list, a.id))}
                     disabled={attributesLocked}

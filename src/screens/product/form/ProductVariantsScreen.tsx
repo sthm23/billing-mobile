@@ -17,6 +17,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Barcode, ChevronLeft, CircleAlert, Lock, PackageX, Plus, ScanBarcode, X } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { attributeLabel, attributeTitle, unitLabel } from '@/libs/attribute';
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -37,10 +38,12 @@ const VALUE_MAX = 50;
 
 const digits = (text: string, max: number) => text.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, max);
 
-/** «6 м» for a NUMBER value with a unit */
-function valueLabel(value: string | number | boolean, attribute: Attribute | undefined): string {
+/** «6 м» / «6 m» for a NUMBER value with a unit */
+function valueLabel(value: string | number | boolean, attribute: Attribute | undefined, language: string): string {
   const text = String(value);
-  return attribute?.type === AttributeType.NUMBER && attribute.unit ? `${text} ${attribute.unit}` : text;
+  return attribute?.type === AttributeType.NUMBER && attribute.unit
+    ? `${text} ${unitLabel(attribute.unit, language)}`
+    : text;
 }
 
 function NumberCell({
@@ -231,7 +234,7 @@ export function ProductVariantsScreen() {
       { attributeId: attribute.id, value },
       {
         onSuccess: (res) => {
-          const v = { attributeId: attribute.id, valueId: res.id, label: valueLabel(res.value, attribute) };
+          const v = { attributeId: attribute.id, valueId: res.id, label: valueLabel(res.value, attribute, i18n.language) };
           setChosen((prev) => {
             const list = prev[attribute.id] ?? [];
             return list.some((x) => x.valueId === v.valueId) ? prev : { ...prev, [attribute.id]: [...list, v] };
@@ -284,7 +287,9 @@ export function ProductVariantsScreen() {
   };
 
   const variantName = (c: Combo) => (c.values.length ? c.values.map((v) => v.label).join(' · ') : product.name);
-  const formula = attributes.map((a) => `${a.name} ${chosen[a.id]?.length ?? 0}`).join(' × ');
+  const formula = attributes
+    .map((a) => `${attributeLabel(a, i18n.language)} ${chosen[a.id]?.length ?? 0}`)
+    .join(' × ');
   const subtitle = [productCategoryLabel(product, i18n.language), product.warehouse?.name].filter(Boolean).join(' · ');
   const saveLabel = save.isPending
     ? t('productVariants.saving')
@@ -331,11 +336,11 @@ export function ProductVariantsScreen() {
                     return (
                       <View key={a.id} className="gap-2">
                         <Text className="font-onest-semibold text-[13px] text-soft">
-                          {a.unit ? `${a.name} (${a.unit})` : a.name}
+                          {attributeTitle(a, i18n.language)}
                         </Text>
                         <View className="flex-row flex-wrap gap-2">
                           {list.map((v) => {
-                            const cv = { attributeId: a.id, valueId: v.id, label: valueLabel(v.value, a) };
+                            const cv = { attributeId: a.id, valueId: v.id, label: valueLabel(v.value, a, i18n.language) };
                             const on = picked.some((x) => x.valueId === v.id);
                             return (
                               <Pressable
@@ -353,7 +358,7 @@ export function ProductVariantsScreen() {
                             <Pressable
                               onPress={() => openValueSheet(a)}
                               accessibilityRole="button"
-                              accessibilityLabel={t('productVariants.addValue', { name: a.name })}
+                              accessibilityLabel={t('productVariants.addValue', { name: attributeLabel(a, i18n.language) })}
                               className="w-10 h-10 rounded-full border-[1.5px] border-dashed border-line items-center justify-center"
                             >
                               <Plus size={16} color={colors.ink} strokeWidth={2.5} />
@@ -530,7 +535,7 @@ export function ProductVariantsScreen() {
       <Sheet isOpen={!!valueSheet} onClose={() => setValueSheet(null)} size="auto">
         <View className="px-4 pt-2 gap-3" style={{ paddingBottom: insets.bottom + 16 }}>
           <Text className="type-title text-ink" accessibilityRole="header">
-            {t('productVariants.valueSheet.title', { name: valueSheet?.attribute.name ?? '' })}
+            {t('productVariants.valueSheet.title', { name: attributeLabel(valueSheet?.attribute, i18n.language) })}
           </Text>
           <Text className="font-onest text-[13px] text-muted">{t('productVariants.valueSheet.hint')}</Text>
           <View className="h-[52px] rounded-2xl bg-sunken px-4 justify-center">

@@ -11,7 +11,13 @@ import { isAdmin } from '@/libs/roles';
 import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
 import type { Category } from '@/models/product.model';
-import { useAdminStore, useUpdateAdminStore, type AdminStoreDetails, type StoreMode } from '@/services/admin-store';
+import {
+  useAdminStore,
+  useUpdateAdminStore,
+  type AdminStoreAttribute,
+  type AdminStoreDetails,
+  type StoreMode,
+} from '@/services/admin-store';
 import { useCategoryTree } from '@/services/category';
 import { formatPhone, roleLabel, warehousesLabel } from '@/screens/profile/staff/staff-format';
 import { router } from 'expo-router';
@@ -35,6 +41,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { shopInitials, shopModes, shopStatusBadge } from './shop-format';
 import { NewWarehouseSheet, RenameShopSheet, ResumeShopSheet, ShopMenuSheet, SuspendShopSheet } from './ShopSheets';
 import { SubcategorySheet } from './SubcategorySheet';
+import { AttributeEditSheet } from './AttributeEditSheet';
+import { attributeTitle } from '@/libs/attribute';
 
 type SheetKind = 'none' | 'menu' | 'rename' | 'suspend' | 'resume' | 'warehouse';
 const MODES: StoreMode[] = ['sale', 'rent'];
@@ -126,6 +134,7 @@ export function AdminShopScreen({ id }: { id: string }) {
   const [sheet, setSheet] = useState<SheetKind>('none');
   const [modeError, setModeError] = useState<string | null>(null);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
+  const [editAttribute, setEditAttribute] = useState<AdminStoreAttribute | null>(null);
   const store = query.data;
   // Subcategories of the store direction (shared dictionary) — from the full tree
   const categoryTree = useCategoryTree(admin && !!store);
@@ -428,25 +437,31 @@ export function AdminShopScreen({ id }: { id: string }) {
               )}
             </View>
           ) : null}
-          {[
-            { key: 'brands', label: t('adminShop.catalog.brands'), items: store.brands.map((b) => b.name) },
-            {
-              key: 'attributes',
-              label: t('adminShop.catalog.attributes'),
-              items: store.attributes.map((a) => (a.unit ? `${a.name} (${a.unit})` : a.name)),
-            },
-          ].map((group) => (
-            <View key={group.key} className="gap-2">
-              <Text className="font-onest text-[13px] text-soft">{group.label}</Text>
-              {group.items.length ? (
+          <View className="gap-2">
+            <Text className="font-onest text-[13px] text-soft">{t('adminShop.catalog.brands')}</Text>
+            {store.brands.length ? (
+              <View className="flex-row flex-wrap gap-1.5">
+                {store.brands.map((b) => <SmallChip key={b.id} label={b.name} />)}
+              </View>
+            ) : (
+              <Text className="font-onest text-[13px] text-muted">—</Text>
+            )}
+          </View>
+          <View className="gap-2">
+            <Text className="font-onest text-[13px] text-soft">{t('adminShop.catalog.attributes')}</Text>
+            {store.attributes.length ? (
+              <>
                 <View className="flex-row flex-wrap gap-1.5">
-                  {group.items.map((item) => <SmallChip key={item} label={item} />)}
+                  {store.attributes.map((a) => (
+                    <EditableChip key={a.id} label={attributeTitle(a, i18n.language)} onPress={() => setEditAttribute(a)} />
+                  ))}
                 </View>
-              ) : (
-                <Text className="font-onest text-[13px] text-muted">—</Text>
-              )}
-            </View>
-          ))}
+                <Text className="font-onest text-xs text-muted">{t('adminShop.catalog.attrHint')}</Text>
+              </>
+            ) : (
+              <Text className="font-onest text-[13px] text-muted">—</Text>
+            )}
+          </View>
         </Section>
 
         {/* Application data — only the filled fields */}
@@ -500,6 +515,7 @@ export function AdminShopScreen({ id }: { id: string }) {
       <ResumeShopSheet store={store} isOpen={sheet === 'resume'} onClose={() => setSheet('none')} />
       <NewWarehouseSheet store={store} isOpen={sheet === 'warehouse'} onClose={() => setSheet('none')} />
       <SubcategorySheet category={editCategory} directionName={directionName} onClose={() => setEditCategory(null)} />
+      <AttributeEditSheet attribute={editAttribute} onClose={() => setEditAttribute(null)} />
     </SafeAreaView>
   );
 }
