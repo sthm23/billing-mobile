@@ -1,0 +1,104 @@
+name: Deploy web
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'eas.json'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Must match the npm major that wrote package-lock.json (Node 24 → npm 11).
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npx tsc --noEmit
+      # No EXPO_PUBLIC_API_URL here: the release web build uses the same-origin `/api`.
+      - run: npm run build:web
+
+      - name: Check build output
+        run: |
+          for f in index.html privacy.html delete-account.html; do
+            [[ -f "dist/$f" ]] || { echo "::error::dist/$f is missing"; exit 1; }
+          done
+          tar -czf web-dist.tgz -C dist .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: web-dist.tgz
+          retention-days: 7
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: deploy.sh
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          # Strip Windows line endings: a key copied from Windows (CRLF) fails with "error in libcrypto".
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if ! ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null; then
+            echo "::error::SSH_PRIVATE_KEY secret is not a valid unencrypted private key"
+            exit 1
+          fi
+          printf '%s\n' "$SSH_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          if ! ssh-keygen -lf ~/.ssh/known_hosts; then
+            echo "::error::SSH_KNOWN_HOSTS secret is empty or invalid (paste ssh-keyscan output)"
+            exit 1
+          fi
+
+      - name: Upload build and switch
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+        run: |
+          SSH=(ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" -o BatchMode=yes "$SSH_USER@$SSH_HOST")
+          "${SSH[@]}" 'cat > /var/www/billing-mobile/release.tgz' < web-dist.tgz
+          # CRLF would break bash on the server if the file was committed from Windows.
+          tr -d '\r' < deploy.sh | "${SSH[@]}" 'bash -s'
+
+      - name: Smoke check
+        run: |
+          body=$(curl -fsS https://sthm23.uz/) || { echo "::error::https://sthm23.uz/ is not reachable"; exit 1; }
+          grep -q '_expo/static' <<< "$body" || { echo "::error::https://sthm23.uz/ does not serve the Expo web build"; exit 1; }
+          # Play Market links: must be served as static pages, not swallowed by the SPA fallback.
+          for path in /privacy.html /privacy.uz.html /privacy.en.html \
+                      /delete-account.html /delete-account.uz.html /delete-account.en.html; do
+            body=$(curl -fsS "https://sthm23.uz$path") || { echo "::error::https://sthm23.uz$path is not reachable"; exit 1; }
+            if grep -q '_expo/static' <<< "$body"; then
+              echo "::error::https://sthm23.uz$path returns the app index.html instead of the static page"
+              exit 1
+            fi
+          done
