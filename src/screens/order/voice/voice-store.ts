@@ -1,5 +1,6 @@
 import type {
   FeedbackChoice,
+  FeedbackSample,
   FeedbackSource,
   MatchCandidate,
   MatchLine,
@@ -29,12 +30,16 @@ export interface VoiceState {
   /** Text the rows were matched from; editable before «Искать заново» */
   transcript: string;
   rows: VoiceRow[];
+  /** Kept recordings of this session (store consent) — labelled in `feedback` */
+  sampleIds: string[];
+  /** Texts the session was built from: the first one + each «Ещё» (typed or spoken) */
+  parts: number;
 }
 
 /** Why a row with a variant still does not reach the cart (cart-store rules). */
 export type RowSkip = 'outOfStock' | 'maxReached';
 
-const EMPTY: VoiceState = { transcript: '', rows: [] };
+const EMPTY: VoiceState = { transcript: '', rows: [], sampleIds: [], parts: 0 };
 
 let state: VoiceState = EMPTY;
 let nextKey = 0;
@@ -87,9 +92,19 @@ export const voiceStore = {
     };
   },
 
-  /** New assistant session for the cart's warehouse. */
-  start(warehouseId: string, transcript: string) {
-    setState({ warehouseId, transcript, rows: [] });
+  /** New assistant session for the cart's warehouse (`sampleId` — the text came from a kept recording). */
+  start(warehouseId: string, transcript: string, sampleId?: string | null) {
+    setState({ warehouseId, transcript, rows: [], sampleIds: sampleId ? [sampleId] : [], parts: 1 });
+  },
+
+  /** «Ещё»: more text (typed or spoken) added to the transcript. */
+  append(text: string, sampleId?: string | null) {
+    setState({
+      ...state,
+      transcript: state.transcript.trim() ? `${state.transcript.trimEnd()}\n${text}` : text,
+      sampleIds: sampleId ? [...state.sampleIds, sampleId] : state.sampleIds,
+      parts: state.parts + 1,
+    });
   },
 
   setTranscript(transcript: string) {
@@ -173,6 +188,20 @@ export function toOrderVariant(c: MatchCandidate): OrderProductVariant {
     attributes: c.attributes.map((a) => ({ name: a.name, value: a.value })),
     stockMovements: [],
   };
+}
+
+/**
+ * Kept recordings of the session for `feedback`. The review text is the corrected label
+ * only when the whole session came from one recording; with «Ещё» the text mixes several
+ * inputs, so the recordings get the seller's choices without a text.
+ */
+export function feedbackSamples(state: VoiceState): FeedbackSample[] {
+  const ids = state.sampleIds.slice(0, ORDER_ASSISTANT_LIMITS.SAMPLES);
+  const text = state.transcript.trim();
+  if (ids.length === 1 && state.parts === 1 && text) {
+    return [{ sampleId: ids[0], transcriptFinal: text.slice(0, ORDER_ASSISTANT_LIMITS.TEXT_LENGTH) }];
+  }
+  return ids.map((sampleId) => ({ sampleId }));
 }
 
 /** Feedback for every row the seller settled (phrases over the backend limit are skipped). */

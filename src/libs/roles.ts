@@ -50,6 +50,15 @@ export function hasOrderAssistant(user: CurrentUserType | null | undefined): boo
 }
 
 /**
+ * The store agreed that voice recordings are kept to improve recognition
+ * (`Store.voiceDataConsent`) — the voice tab tells the seller. Informational:
+ * the backend decides whether a recording is kept.
+ */
+export function hasVoiceDataConsent(user: CurrentUserType | null | undefined): boolean {
+  return user?.staff?.store?.voiceDataConsent === true;
+}
+
+/**
  * Store owner or platform ADMIN: may add a product subcategory («Добавить «…»»).
  * UX only — the backend checks it (`POST /category/subcategory`).
  */

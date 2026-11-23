@@ -9,7 +9,7 @@ import { UserRole } from '@/models/user.model';
 import { useAuth } from '@/provider/AuthProvider';
 import { useStoreById, useUpdateStoreModes } from '@/services/store';
 import { router } from 'expo-router';
-import { CalendarDays, Check, ChevronLeft, CircleAlert, ShieldX, ShoppingBag } from 'lucide-react-native';
+import { CalendarDays, Check, ChevronLeft, CircleAlert, Mic, ShieldX, ShoppingBag, TriangleAlert } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
@@ -26,6 +26,9 @@ const MODE_ICON: Record<Mode, ButtonIconComponent> = {
  * the only enabled mode switches to the other one (the backend rejects both off
  * anyway). After saving the menu follows the new modes; a newly enabled rental
  * opens in the menu right away.
+ *
+ * With the order assistant on (switched by a platform admin) — the store's consent to keep
+ * voice recordings (`voiceDataConsent`); turning it off deletes them on save.
  */
 export function StoreSettingsScreen() {
   const { t } = useTranslation();
@@ -38,16 +41,22 @@ export function StoreSettingsScreen() {
   const updateModes = useUpdateStoreModes();
 
   const [modes, setModes] = useState<Record<Mode, boolean>>({ sale: true, rent: false });
+  const [voiceConsent, setVoiceConsent] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (store) {
       setModes({ sale: store.salesEnabled ?? true, rent: store.rentalEnabled ?? false });
+      setVoiceConsent(store.voiceDataConsent ?? false);
     }
   }, [store]);
 
+  const savedConsent = store?.voiceDataConsent ?? false;
+  const consentChanged = !!store && voiceConsent !== savedConsent;
   const enabledCount = Number(modes.sale) + Number(modes.rent);
-  const changed = !!store && (modes.sale !== (store.salesEnabled ?? true) || modes.rent !== (store.rentalEnabled ?? false));
+  const changed =
+    !!store &&
+    (modes.sale !== (store.salesEnabled ?? true) || modes.rent !== (store.rentalEnabled ?? false) || consentChanged);
 
   const toggle = (mode: Mode) => {
     const other: Mode = mode === 'sale' ? 'rent' : 'sale';
@@ -69,6 +78,7 @@ export function StoreSettingsScreen() {
         payload: {
           salesEnabled: modes.sale,
           rentalEnabled: modes.rent,
+          ...(consentChanged ? { voiceDataConsent: voiceConsent } : {}),
           attributeIds: store.attributes.map((a) => a.attributeId),
           brandIds: store.brands.map((b) => b.brandId),
         },
@@ -173,6 +183,39 @@ export function StoreSettingsScreen() {
         </View>
 
         <Text className="font-onest text-xs leading-4 text-muted px-1 -mt-1">{t('storeSettings.atLeastOne')}</Text>
+
+        {store.orderAssistantEnabled ? (
+          <View className="bg-card rounded-2xl px-4 pt-4 pb-3 gap-1">
+            <Text className="type-body-strong text-ink pb-1">{t('storeSettings.voiceSection')}</Text>
+            <View className="flex-row items-center gap-3 py-2">
+              <View
+                className={cn(
+                  'w-11 h-11 rounded-[14px] items-center justify-center',
+                  voiceConsent ? 'bg-accent' : 'bg-sunken',
+                )}
+              >
+                <Mic size={20} color={voiceConsent ? colors.onAccent : colors.soft} strokeWidth={2} />
+              </View>
+              <View className="flex-1 min-w-0 gap-0.5">
+                <Text className="type-body-strong text-ink">{t('storeSettings.voiceData')}</Text>
+                <Text className="font-onest text-xs leading-4 text-muted">{t('storeSettings.voiceDataDesc')}</Text>
+              </View>
+              <Switch
+                value={voiceConsent}
+                onValueChange={setVoiceConsent}
+                accessibilityLabel={t('storeSettings.voiceData')}
+              />
+            </View>
+            {savedConsent && !voiceConsent ? (
+              <View className="flex-row gap-2 rounded-xl bg-err-bg px-3 py-2.5" accessibilityRole="alert">
+                <TriangleAlert size={16} color={colors.errFg} strokeWidth={2} />
+                <Text className="flex-1 font-onest-semibold text-xs leading-4 text-err-fg">
+                  {t('storeSettings.voiceDataOff')}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
 
         <View className="bg-card rounded-2xl p-4 gap-3">
           <Text className="type-body-strong text-ink">{t('storeSettings.effectsSection')}</Text>

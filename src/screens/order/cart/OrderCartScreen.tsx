@@ -327,10 +327,10 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
         isOpen={voiceOpen}
         warehouseId={cart.warehouseId}
         onClose={() => setVoiceOpen(false)}
-        onSubmit={(text) => {
+        onSubmit={(text, sampleId) => {
           if (!cart.warehouseId) return;
           setVoiceOpen(false);
-          voiceStore.start(cart.warehouseId, text);
+          voiceStore.start(cart.warehouseId, text, sampleId);
           router.push('/(tabs)/(orders)/voice');
         }}
       />

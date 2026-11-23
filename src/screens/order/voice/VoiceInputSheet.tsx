@@ -1,7 +1,9 @@
 import { Button, IconButton, Segmented, Text } from '@/components/base';
 import { Sheet, SheetTextInput } from '@/components/base/Sheet';
 import { useTheme } from '@/hooks/use-theme';
+import { hasVoiceDataConsent } from '@/libs/roles';
 import { cn } from '@/libs/utils';
+import { useAuth } from '@/provider/AuthProvider';
 import {
   ORDER_ASSISTANT_DISABLED,
   ORDER_ASSISTANT_LIMITS,
@@ -11,7 +13,7 @@ import {
   type RecordedAudio,
 } from '@/services/order-assistant';
 import { isAxiosError } from 'axios';
-import { Mic, MicOff, RotateCw, Search, TriangleAlert, WifiOff, X } from 'lucide-react-native';
+import { Mic, MicOff, RotateCw, Search, ShieldCheck, TriangleAlert, WifiOff, X } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, Platform, Pressable, View } from 'react-native';
@@ -42,8 +44,11 @@ function clock(ms: number): string {
 interface VoiceInputSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Called with the typed or recognized text; the caller closes the sheet */
-  onSubmit: (text: string) => void;
+  /**
+   * Called with the typed or recognized text; the caller closes the sheet.
+   * `sampleId` — the recording was kept (store consent), reported back in `feedback`.
+   */
+  onSubmit: (text: string, sampleId?: string | null) => void;
   /** Warehouse of the cart — required for the voice tab (`transcribe`) */
   warehouseId?: string;
   /** «Ещё» on the review screen: the text is added to the list */
@@ -67,6 +72,8 @@ export function VoiceInputSheet({
 }: VoiceInputSheetProps) {
   const { t } = useTranslation();
   const colors = useTheme();
+  const { user } = useAuth();
+  const keepsVoice = hasVoiceDataConsent(user);
   const voiceAvailable = !!warehouseId && canRecordVoice();
   const [mode, setMode] = useState<Mode>(voiceAvailable ? 'voice' : 'text');
   const [text, setText] = useState('');
@@ -90,11 +97,11 @@ export function VoiceInputSheet({
       transcribe.mutate(
         { warehouseId, audio: recorded },
         {
-          onSuccess: ({ text: heard }) => {
+          onSuccess: ({ text: heard, sampleId }) => {
             if (id !== session.current) return;
             setAudio(null);
             setPhase('idle');
-            onSubmit(heard.trim().slice(0, room));
+            onSubmit(heard.trim().slice(0, room), sampleId);
           },
           onError: (e) => {
             if (id !== session.current) return;
@@ -363,6 +370,15 @@ export function VoiceInputSheet({
                 <Button variant="accent" size="lg" className="flex-1" onPress={() => void finish()}>
                   {t('voiceOrder.input.done')}
                 </Button>
+              </View>
+            )}
+
+            {keepsVoice && !busy && (
+              <View className="flex-row items-center justify-center gap-1.5 px-2">
+                <ShieldCheck size={14} color={colors.muted} strokeWidth={2} />
+                <Text className="shrink font-onest text-xs text-muted text-center">
+                  {t('voiceOrder.input.voiceKept')}
+                </Text>
               </View>
             )}
           </View>

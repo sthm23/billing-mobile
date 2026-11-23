@@ -38,6 +38,8 @@ export interface AdminStoreListItem {
   rentalEnabled: boolean;
   /** Order assistant («Голос» in the cart), switched by the admin only */
   orderAssistantEnabled: boolean;
+  /** Voice recordings are kept for training (owner or admin) */
+  voiceDataConsent: boolean;
   owner: AdminStoreOwner | null;
   warehousesCount: number;
   staffCount: number;
@@ -123,6 +125,8 @@ export interface UpdateAdminStorePayload {
   salesEnabled?: boolean;
   rentalEnabled?: boolean;
   orderAssistantEnabled?: boolean;
+  /** `false` deletes the store's saved recordings */
+  voiceDataConsent?: boolean;
 }
 
 /** GET /category — top-level categories (store directions); `name` is Russian */

@@ -281,7 +281,11 @@ const uz = {
     "features": {
       "title": "Qoʻshimcha funksiyalar",
       "orderAssistant": "Ovozli yordamchi",
-      "orderAssistantDesc": "Savatda ovoz yoki matn orqali buyurtma · doʻkon soʻrovi bilan yoqiladi"
+      "orderAssistantDesc": "Savatda ovoz yoki matn orqali buyurtma · doʻkon soʻrovi bilan yoqiladi",
+      "voiceData": "Ovoz yozuvlarini saqlash",
+      "voiceDataDesc": "Doʻkon roziligi bilan · ovozni tanishni oʻrgatish uchun · 12 oy",
+      "voiceDataOff": "Doʻkonning barcha ovoz yozuvlari qayta tiklab boʻlmaydigan tarzda oʻchiriladi.",
+      "voiceDataOffConfirm": "Yozuvlarni oʻchirish"
     },
     "warehouses": "Omborlar ({{count}})",
     "addWarehouse": "+ Ombor qoʻshish",
@@ -1483,6 +1487,7 @@ const uz = {
       "idleHint": "Mahsulot va oʻlchamini ayting, mahsulotlar orasida qisqa toʻxtang",
       "idleExample": "«shifer quvasoy … metrovka to'rtga ikki olti metrli … foner nol to'rt … strapela»",
       "idleNote": "Miqdor va narxni keyin savatda oʻzgartirasiz",
+      "voiceKept": "Ovozni tanishni yaxshilash uchun yozuv saqlanadi",
       "micStart": "Bosing va gapiring",
       "micStop": "Gapiring — toʻxtatish uchun bosing",
       "micStartA11y": "Yozishni boshlash",
@@ -2238,6 +2243,10 @@ const uz = {
     "rental": "Ijara",
     "rentalDesc": "Bronlar, berish va qaytarish, bandlik kalendari",
     "atLeastOne": "Kamida bitta rejim yoqilgan bo'lishi kerak. Birini o'chirsangiz, ikkinchisi yoqiladi.",
+    "voiceSection": "Ovozli yordamchi",
+    "voiceData": "Ovoz yozuvlarini saqlash",
+    "voiceDataDesc": "Sotuvchilar yozuvlari Oʻzbekistondagi serverda 12 oygacha saqlanadi va faqat ovozni tanishni yaxshilash uchun kerak",
+    "voiceDataOff": "Saqlanganda doʻkonning barcha ovoz yozuvlari oʻchiriladi",
     "effectsSection": "Xodimlar nimani ko'radi",
     "effectRentOnly1": "«Buyurtmalar» bo'limi «Ijaralar»ga aylanadi, markaziy tugma bron yaratadi",
     "effectRentOnly2": "Sotuv ekranlari va sotuv narxi yashiriladi",

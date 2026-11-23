@@ -6,6 +6,8 @@ export const ORDER_ASSISTANT_LIMITS = {
   TEXT_LENGTH: 2000,
   PHRASES: 30,
   PHRASE_LENGTH: 200,
+  /** Kept recordings reported in one `feedback` */
+  SAMPLES: 10,
 } as const;
 
 /** 422 from `transcribe`: silence or noise, nothing recognized. */
@@ -84,14 +86,24 @@ export interface FeedbackChoice {
   source: FeedbackSource;
 }
 
+/** A kept recording of the session (`transcribe` → `sampleId`). */
+export interface FeedbackSample {
+  sampleId: string;
+  /** Review text after the seller's corrections — only when it is this recording's text */
+  transcriptFinal?: string;
+}
+
 /** `POST /order-assistant/feedback` */
 export interface OrderAssistantFeedbackInput {
   warehouseId: string;
   /** 1–30 per request */
   choices: FeedbackChoice[];
+  /** Up to 10; sent with every chunk of choices (the backend appends them) */
+  samples?: FeedbackSample[];
 }
 
 export interface OrderAssistantFeedbackResponse {
   learned: number;
   reinforced: number;
+  labeled: number;
 }

@@ -44,14 +44,16 @@ const match = async (input: MatchOrderTextInput): Promise<MatchOrderTextResponse
 };
 
 /**
- * Reports the seller's choices so the backend can learn aliases. Sent in
- * chunks of 30 (the backend limit per request).
+ * Reports the seller's choices so the backend can learn aliases (and label kept
+ * recordings). Sent in chunks of 30 (the backend limit per request); the recordings go
+ * with every chunk — the backend appends each chunk's choices to them.
  */
-const feedback = async ({ warehouseId, choices }: OrderAssistantFeedbackInput): Promise<void> => {
+const feedback = async ({ warehouseId, choices, samples }: OrderAssistantFeedbackInput): Promise<void> => {
   for (let i = 0; i < choices.length; i += ORDER_ASSISTANT_LIMITS.PHRASES) {
     await api.post<OrderAssistantFeedbackResponse>('/order-assistant/feedback', {
       warehouseId,
       choices: choices.slice(i, i + ORDER_ASSISTANT_LIMITS.PHRASES),
+      ...(samples?.length ? { samples } : {}),
     });
   }
 };

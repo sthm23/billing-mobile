@@ -281,7 +281,11 @@ const en = {
     "features": {
       "title": "Extra features",
       "orderAssistant": "Voice assistant",
-      "orderAssistantDesc": "Order by voice or text in the cart · switched on at the store's request"
+      "orderAssistantDesc": "Order by voice or text in the cart · switched on at the store's request",
+      "voiceData": "Keep voice recordings",
+      "voiceDataDesc": "With the store's consent · to train recognition · 12 months",
+      "voiceDataOff": "All of the store's voice recordings will be deleted permanently.",
+      "voiceDataOffConfirm": "Delete recordings"
     },
     "warehouses": "Warehouses ({{count}})",
     "addWarehouse": "+ Add warehouse",
@@ -1482,6 +1486,7 @@ const en = {
       "idleHint": "Say the product and size, pause briefly between products",
       "idleExample": "«shifer quvasoy … metrovka to'rtga ikki olti metrli … foner nol to'rt … strapela»",
       "idleNote": "You can change quantity and price later in the cart",
+      "voiceKept": "The recording is kept to improve recognition",
       "micStart": "Tap and speak",
       "micStop": "Speak — tap to stop",
       "micStartA11y": "Start recording",
@@ -2237,6 +2242,10 @@ const en = {
     "rental": "Rental",
     "rentalDesc": "Bookings, pick-up and return, occupancy calendar",
     "atLeastOne": "At least one mode stays on. Turn one off and the other turns on.",
+    "voiceSection": "Voice assistant",
+    "voiceData": "Keep voice recordings",
+    "voiceDataDesc": "Sellers' recordings are kept for up to 12 months on a server in Uzbekistan and used only to improve recognition",
+    "voiceDataOff": "On save, all of the store's voice recordings will be deleted",
     "effectsSection": "What staff will see",
     "effectRentOnly1": "The Orders tab becomes Rentals, the center button creates a booking",
     "effectRentOnly2": "Sales screens and the sale price are hidden",

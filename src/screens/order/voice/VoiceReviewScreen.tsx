@@ -18,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { cartStore, useCart } from '../cart/cart-store';
 import { VoiceInputSheet } from './VoiceInputSheet';
 import { VoiceRowCard } from './VoiceRowCard';
-import { feedbackChoices, rowSkips, toOrderVariant, useVoice, voiceStore } from './voice-store';
+import { feedbackChoices, feedbackSamples, rowSkips, toOrderVariant, useVoice, voiceStore } from './voice-store';
 
 type ErrorKind = 'offline' | 'disabled' | 'busy' | 'tooLong' | 'other';
 
@@ -126,7 +126,7 @@ export function VoiceReviewScreen() {
     }
     const choices = feedbackChoices(rows);
     // Fire-and-forget: learning must never block the sale.
-    if (choices.length > 0) feedback.mutate({ warehouseId, choices });
+    if (choices.length > 0) feedback.mutate({ warehouseId, choices, samples: feedbackSamples(voice) });
     toast.show(t('voiceOrder.added', { count: added }));
     voiceStore.clear();
     router.back();
@@ -318,9 +318,9 @@ export function VoiceReviewScreen() {
         append
         maxLength={room}
         onClose={() => setMoreOpen(false)}
-        onSubmit={(text) => {
+        onSubmit={(text, sampleId) => {
           setMoreOpen(false);
-          voiceStore.setTranscript(voice.transcript.trim() ? `${voice.transcript.trimEnd()}\n${text}` : text);
+          voiceStore.append(text, sampleId);
           run(text, true);
         }}
       />
