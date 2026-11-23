@@ -36,6 +36,8 @@ export interface AdminStoreListItem {
   createdAt: string;
   salesEnabled: boolean;
   rentalEnabled: boolean;
+  /** Order assistant («Голос» in the cart), switched by the admin only */
+  orderAssistantEnabled: boolean;
   owner: AdminStoreOwner | null;
   warehousesCount: number;
   staffCount: number;
@@ -120,6 +122,7 @@ export interface UpdateAdminStorePayload {
   name?: string;
   salesEnabled?: boolean;
   rentalEnabled?: boolean;
+  orderAssistantEnabled?: boolean;
 }
 
 /** GET /category — top-level categories (store directions); `name` is Russian */

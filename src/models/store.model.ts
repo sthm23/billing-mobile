@@ -19,6 +19,8 @@ export interface Store {
   salesEnabled?: boolean
   /** Store rents goods out (default false) */
   rentalEnabled?: boolean
+  /** Order assistant («Голос» in the cart) — switched on by a platform admin (default false) */
+  orderAssistantEnabled?: boolean
   /** Subscription: TRIAL / ACTIVE / SUSPENDED (suspended → the app shows «Магазин приостановлен») */
   status?: 'TRIAL' | 'ACTIVE' | 'SUSPENDED'
   suspendedAt?: string | null

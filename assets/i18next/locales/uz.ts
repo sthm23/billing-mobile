@@ -278,6 +278,11 @@ const uz = {
       "rentDesc": "Bronlar, berish va qaytarish",
       "lastError": "Kamida bitta rejim yoqilgan boʻlishi kerak — avval «{{mode}}» ni yoqing"
     },
+    "features": {
+      "title": "Qoʻshimcha funksiyalar",
+      "orderAssistant": "Ovozli yordamchi",
+      "orderAssistantDesc": "Savatda ovoz yoki matn orqali buyurtma · doʻkon soʻrovi bilan yoqiladi"
+    },
     "warehouses": "Omborlar ({{count}})",
     "addWarehouse": "+ Ombor qoʻshish",
     "warehouseStaff": "ruxsati bor xodimlar: {{count}}",
@@ -1451,6 +1456,88 @@ const uz = {
     "passwordMin": "Kamida 8 ta belgi",
     "warehouseRequired": "Omborni tanlang",
     "createFailed": "Xodimni yaratib bo'lmadi"
+  },
+  "voiceOrder": {
+    "button": "Ovoz",
+    "open": "Ovozli yordamchi",
+    "emptyCartText": "Shtrix-kodni skanerlang, tovarlar roʻyxatini yozing yoki tovarni nomi boʻyicha toping",
+    "pick": "Tanlash",
+    "pickHint": "tanlangan tovar roʻyxatga qaytadi",
+    "added": "Qoʻshildi: {{count}} ta tovar. Miqdor va narxni tekshiring",
+    "warn": "{{list}} — savatga tushmaydi",
+    "warnChoose": "tanlanmagan: {{count}}",
+    "warnSkipped": "qoldiq yoʻq: {{count}}",
+    "warnMissing": "topilmadi: {{count}}",
+    "input": {
+      "title": "Ovozli buyurtma",
+      "appendTitle": "Yana qoʻshish",
+      "subtitle": "Oʻzbek va rus tilida · miqdor va narxni savatda oʻzgartirasiz",
+      "label": "Bir qator — bitta tovar",
+      "placeholder": "shifer quvasoy\nmetrovka 4x2 6 m\nfoner 0.4\nstrapela",
+      "hint": "Oʻzbekcha, ruscha yoki aralash yozish mumkin",
+      "find": "Topish",
+      "findCount": "Topish · qatorlar: {{count}}"
+    },
+    "review": {
+      "title": "Roʻyxatni tekshiring",
+      "searchingTitle": "Tovarlar qidirilmoqda",
+      "subtitle": "matn orqali",
+      "close": "Yopish va savatga qaytish",
+      "text": "Sizning matningiz",
+      "editable": "tuzatish mumkin",
+      "research": "Qayta qidirish",
+      "searching": "Ombordan tovarlar qidirilmoqda…",
+      "searchingStep": "Tovarlar qidirilmoqda…",
+      "noneTitle": "Birorta ham tovar topilmadi",
+      "noneText": "Yuqoridagi matnni tekshirib «Qayta qidirish»ni bosing yoki tovarlarni qoʻlda toping",
+      "emptyTitle": "Roʻyxat boʻsh",
+      "emptyText": "«Yana» tugmasi bilan tovar qoʻshing yoki matnni tuzatib «Qayta qidirish»ni bosing",
+      "more": "Yana",
+      "moreA11y": "Yana tovar qoʻshish",
+      "add": "Savatga qoʻshish",
+      "addCount": "Savatga qoʻshish ({{count}})",
+      "searchingShort": "Qidirilmoqda…"
+    },
+    "summary": {
+      "found": "Topildi {{count}}",
+      "skipped": "Tushmaydi {{count}}",
+      "choose": "Tanlash {{count}}",
+      "missing": "Topilmadi {{count}}"
+    },
+    "stock": {
+      "none": "Mavjud emas",
+      "low": "Kam · {{count}}",
+      "inStock": "Mavjud {{count}}"
+    },
+    "row": {
+      "outOfStock": "Mavjud emas — savatga tushmaydi",
+      "maxReached": "Butun qoldiq savatda",
+      "notFound": "Topilmadi",
+      "choose": "Variantni tanlang",
+      "chosen": "Tanlandi",
+      "manual": "Qoʻlda tanlandi",
+      "chooseOf": "{{name}} · variantlar: {{count}}",
+      "chooseAny": "Tovarni tanlang",
+      "more": "{{total}} tadan {{shown}} tasi koʻrsatildi — qolganlarini qoʻlda toping",
+      "change": "Variantni oʻzgartirish",
+      "remove": "Olib tashlash",
+      "removeLine": "Qatorni olib tashlash",
+      "findManually": "Qoʻlda topish",
+      "notFoundText": "Omborda oʻxshash tovar yoʻq. Uni qoʻlda toping — ibora qidiruvga qoʻyiladi, tanlangan tovar shu roʻyxatga qaytadi."
+    },
+    "error": {
+      "offlineTitle": "Server javob bermadi",
+      "offlineText": "Internetni tekshiring. Matn saqlangan — «Qayta urinish»ni bosing.",
+      "disabledTitle": "Yordamchi oʻchirilgan",
+      "disabledText": "Doʻkon uchun ovozli yordamchi yoqilmagan. STHM qoʻllab-quvvatlash xizmatiga murojaat qiling.",
+      "busyTitle": "Soʻrovlar juda koʻp",
+      "busyText": "Bir daqiqa kutib «Qayta urinish»ni bosing.",
+      "tooLongTitle": "Roʻyxat juda uzun",
+      "tooLongText": "Bir martada 30 tadan koʻp boʻlmagan tovar — roʻyxatni qismlarga boʻling.",
+      "otherTitle": "Tovarlarni topib boʻlmadi",
+      "otherText": "Yana urinib koʻring.",
+      "retry": "Qayta urinish"
+    }
   },
   "sale": {
     "cart": {

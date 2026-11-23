@@ -10,22 +10,32 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Pressable, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { voiceStore } from '../voice/voice-store';
 import { cartStore, cartTotals, useCart, variantLabel } from './cart-store';
 
 type Filter = 'all' | 'inStock';
 
 const LOW_STOCK = 5;
 
+interface OrderSearchScreenProps {
+  /**
+   * Picker mode for the order assistant («Найти вручную»): the chosen variant
+   * goes back to this review row instead of the cart.
+   */
+  pickFor?: string;
+  initialQuery?: string;
+}
+
 /**
  * Product search for the order (design «OrderSearch»): by name, SKU or
  * barcode in the cart's warehouse; adds lines to the shared cart.
  */
-export function OrderSearchScreen() {
+export function OrderSearchScreen({ pickFor, initialQuery }: OrderSearchScreenProps = {}) {
   const { t } = useTranslation();
   const colors = useTheme();
   const insets = useSafeAreaInsets();
   const cart = useCart();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery ?? '');
   const [filter, setFilter] = useState<Filter>('all');
   const debounced = useDebounce(query, 400);
   const { data, isFetching, isError } = useProductVariantSearch(cart.warehouseId, debounced);
@@ -64,7 +74,19 @@ export function OrderSearchScreen() {
             <StatusBadge label={stock.label} tone={stock.tone} size="sm" />
           </View>
         </View>
-        {count > 0 ? (
+        {pickFor ? (
+          <Button
+            size="sm"
+            variant="primary"
+            disabled={outOfStock}
+            onPress={() => {
+              voiceStore.setManual(pickFor, item);
+              router.back();
+            }}
+          >
+            {t('voiceOrder.pick')}
+          </Button>
+        ) : count > 0 ? (
           <View className="items-center gap-0.5 bg-accent rounded-[22px] p-1">
             <IconButton
               icon={Plus}
@@ -116,12 +138,14 @@ export function OrderSearchScreen() {
             <IconButton icon={X} size="sm" variant="sunken" accessibilityLabel={t('common.clear')} onPress={() => setQuery('')} />
           )}
         </View>
-        <IconButton
-          icon={ScanBarcode}
-          variant="accent"
-          accessibilityLabel={t('sale.scan.title')}
-          onPress={() => router.replace('/(tabs)/(orders)/scan')}
-        />
+        {!pickFor && (
+          <IconButton
+            icon={ScanBarcode}
+            variant="accent"
+            accessibilityLabel={t('sale.scan.title')}
+            onPress={() => router.replace('/(tabs)/(orders)/scan')}
+          />
+        )}
       </View>
 
       <View className="flex-row gap-2 px-4 pb-3">
@@ -133,7 +157,9 @@ export function OrderSearchScreen() {
         <Text className="font-onest-semibold text-[13px] text-muted">
           {hasQuery ? t('sale.search.found', { count: results.length }) : t('sale.search.title')}
         </Text>
-        <Text className="font-onest text-xs text-muted">{t('sale.search.hint')}</Text>
+        <Text className="font-onest text-xs text-muted">
+          {pickFor ? t('voiceOrder.pickHint') : t('sale.search.hint')}
+        </Text>
       </View>
 
       <FlatList
@@ -141,7 +167,7 @@ export function OrderSearchScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 110, gap: 8 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: insets.bottom + (pickFor ? 24 : 110), gap: 8 }}
         ListEmptyComponent={
           isFetching ? (
             <ActivityIndicator color={colors.muted} className="pt-8" />
@@ -164,20 +190,22 @@ export function OrderSearchScreen() {
       />
 
       {/* Cart summary */}
-      <View
-        className="absolute left-4 right-4 h-[68px] flex-row items-center gap-3 pl-[22px] pr-2 rounded-[34px] bg-hero"
-        style={{ bottom: insets.bottom + 16 }}
-      >
-        <View className="flex-1 min-w-0">
-          <Text className="font-onest text-xs text-hero-muted">
-            {t('sale.search.inOrder', { count: totals.quantity })}
-          </Text>
-          <Money value={totals.total} className="text-[17px] text-hero-ink" currencyClassName="text-xs text-hero-muted" />
+      {!pickFor && (
+        <View
+          className="absolute left-4 right-4 h-[68px] flex-row items-center gap-3 pl-[22px] pr-2 rounded-[34px] bg-hero"
+          style={{ bottom: insets.bottom + 16 }}
+        >
+          <View className="flex-1 min-w-0">
+            <Text className="font-onest text-xs text-hero-muted">
+              {t('sale.search.inOrder', { count: totals.quantity })}
+            </Text>
+            <Money value={totals.total} className="text-[17px] text-hero-ink" currencyClassName="text-xs text-hero-muted" />
+          </View>
+          <Button variant="accent" size="lg" onPress={() => router.back()}>
+            {t('sale.search.done')}
+          </Button>
         </View>
-        <Button variant="accent" size="lg" onPress={() => router.back()}>
-          {t('sale.search.done')}
-        </Button>
-      </View>
+      )}
     </View>
   );
 }

@@ -278,6 +278,11 @@ const en = {
       "rentDesc": "Bookings, issue and return",
       "lastError": "At least one mode must stay on — turn on «{{mode}}» first"
     },
+    "features": {
+      "title": "Extra features",
+      "orderAssistant": "Voice assistant",
+      "orderAssistantDesc": "Order by voice or text in the cart · switched on at the store's request"
+    },
     "warehouses": "Warehouses ({{count}})",
     "addWarehouse": "+ Add warehouse",
     "warehouseStaff": "staff with access: {{count}}",
@@ -1450,6 +1455,88 @@ const en = {
     "passwordMin": "At least 8 characters",
     "warehouseRequired": "Choose a warehouse",
     "createFailed": "Could not create the employee"
+  },
+  "voiceOrder": {
+    "button": "Voice",
+    "open": "Voice assistant",
+    "emptyCartText": "Scan a barcode, type a list of products or find a product by name",
+    "pick": "Select",
+    "pickHint": "the selected product goes back to the list",
+    "added": "Products added: {{count}}. Check quantities and prices",
+    "warn": "{{list}} — won't be added to the cart",
+    "warnChoose": "not chosen: {{count}}",
+    "warnSkipped": "no stock: {{count}}",
+    "warnMissing": "not found: {{count}}",
+    "input": {
+      "title": "Voice order",
+      "appendTitle": "Add more",
+      "subtitle": "Uzbek and Russian · change quantity and price in the cart",
+      "label": "One line — one product",
+      "placeholder": "shifer quvasoy\nmetrovka 4x2 6 m\nfoner 0.4\nstrapela",
+      "hint": "Uzbek, Russian or mixed",
+      "find": "Find",
+      "findCount": "Find · lines: {{count}}"
+    },
+    "review": {
+      "title": "Check the list",
+      "searchingTitle": "Finding products",
+      "subtitle": "text input",
+      "close": "Close and go back to the cart",
+      "text": "Your text",
+      "editable": "can be edited",
+      "research": "Search again",
+      "searching": "Finding products in the warehouse…",
+      "searchingStep": "Finding products…",
+      "noneTitle": "No products found",
+      "noneText": "Check the text above and tap «Search again», or find the products manually",
+      "emptyTitle": "The list is empty",
+      "emptyText": "Add products with «More», or edit the text and tap «Search again»",
+      "more": "More",
+      "moreA11y": "Add more products",
+      "add": "Add to cart",
+      "addCount": "Add to cart ({{count}})",
+      "searchingShort": "Searching…"
+    },
+    "summary": {
+      "found": "Found {{count}}",
+      "skipped": "Skipped {{count}}",
+      "choose": "To choose {{count}}",
+      "missing": "Not found {{count}}"
+    },
+    "stock": {
+      "none": "Out of stock",
+      "low": "Low · {{count}}",
+      "inStock": "In stock {{count}}"
+    },
+    "row": {
+      "outOfStock": "Out of stock — won't be added",
+      "maxReached": "All stock is already in the cart",
+      "notFound": "Not found",
+      "choose": "Choose a variant",
+      "chosen": "Chosen",
+      "manual": "Chosen manually",
+      "chooseOf": "{{name}} · variants: {{count}}",
+      "chooseAny": "Choose a product",
+      "more": "Showing {{shown}} of {{total}} — find the rest manually",
+      "change": "Change variant",
+      "remove": "Remove",
+      "removeLine": "Remove line",
+      "findManually": "Find manually",
+      "notFoundText": "No similar product in the warehouse. Find it manually — the phrase goes to the search and the selected product comes back to this list."
+    },
+    "error": {
+      "offlineTitle": "The server did not respond",
+      "offlineText": "Check the internet connection. The text is kept — tap «Retry».",
+      "disabledTitle": "Assistant is off",
+      "disabledText": "The voice assistant is not enabled for this store. Contact STHM support.",
+      "busyTitle": "Too many requests",
+      "busyText": "Wait a minute and tap «Retry».",
+      "tooLongTitle": "The list is too long",
+      "tooLongText": "Up to 30 products at a time — split the list.",
+      "otherTitle": "Could not find products",
+      "otherText": "Please try again.",
+      "retry": "Retry"
+    }
   },
   "sale": {
     "cart": {

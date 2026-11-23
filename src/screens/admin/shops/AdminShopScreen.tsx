@@ -133,6 +133,8 @@ export function AdminShopScreen({ id }: { id: string }) {
   const refreshControl = useRefreshControl(query.refetch);
   const [sheet, setSheet] = useState<SheetKind>('none');
   const [modeError, setModeError] = useState<string | null>(null);
+  const updateAssistant = useUpdateAdminStore();
+  const [assistantError, setAssistantError] = useState<string | null>(null);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [editAttribute, setEditAttribute] = useState<AdminStoreAttribute | null>(null);
   const store = query.data;
@@ -194,6 +196,14 @@ export function AdminShopScreen({ id }: { id: string }) {
     updateModes.mutate(
       { id: store.id, [key]: on },
       { onError: (e) => setModeError(getApiErrorMessage(e, t('adminShop.saveFailed'))) },
+    );
+  };
+
+  const toggleAssistant = (on: boolean) => {
+    setAssistantError(null);
+    updateAssistant.mutate(
+      { id: store.id, orderAssistantEnabled: on },
+      { onError: (e) => setAssistantError(getApiErrorMessage(e, t('adminShop.saveFailed'))) },
     );
   };
 
@@ -336,6 +346,28 @@ export function AdminShopScreen({ id }: { id: string }) {
             <View className="flex-row items-start gap-2 bg-err-bg rounded-lg px-3 py-2.5" accessibilityRole="alert">
               <CircleAlert size={16} color={colors.errFg} strokeWidth={2} />
               <Text className="flex-1 font-onest-semibold text-[13px] leading-[18px] text-err-fg">{modeError}</Text>
+            </View>
+          ) : null}
+        </Section>
+
+        {/* Paid features, switched on at the store's request */}
+        <Section title={t('adminShop.features.title')}>
+          <View className="flex-row items-center gap-3">
+            <View className="flex-1 gap-0.5">
+              <Text className="font-onest-semibold text-[15px] text-ink">{t('adminShop.features.orderAssistant')}</Text>
+              <Text className="font-onest text-xs text-muted">{t('adminShop.features.orderAssistantDesc')}</Text>
+            </View>
+            <Switch
+              value={store.orderAssistantEnabled}
+              onValueChange={toggleAssistant}
+              disabled={updateAssistant.isPending}
+              accessibilityLabel={t('adminShop.features.orderAssistant')}
+            />
+          </View>
+          {assistantError ? (
+            <View className="flex-row items-start gap-2 bg-err-bg rounded-lg px-3 py-2.5" accessibilityRole="alert">
+              <CircleAlert size={16} color={colors.errFg} strokeWidth={2} />
+              <Text className="flex-1 font-onest-semibold text-[13px] leading-[18px] text-err-fg">{assistantError}</Text>
             </View>
           ) : null}
         </Section>

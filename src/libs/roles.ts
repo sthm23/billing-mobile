@@ -41,6 +41,15 @@ export function isStoreSuspended(user: CurrentUserType | null | undefined): bool
 }
 
 /**
+ * The store has the order assistant («Голос» in the cart) — switched on by a
+ * platform admin (`Store.orderAssistantEnabled`). UX only: the backend
+ * answers 403 `ORDER_ASSISTANT_DISABLED` otherwise.
+ */
+export function hasOrderAssistant(user: CurrentUserType | null | undefined): boolean {
+  return user?.staff?.store?.orderAssistantEnabled === true;
+}
+
+/**
  * Store owner or platform ADMIN: may add a product subcategory («Добавить «…»»).
  * UX only — the backend checks it (`POST /category/subcategory`).
  */
