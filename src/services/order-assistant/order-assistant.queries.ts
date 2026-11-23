@@ -16,3 +16,10 @@ export const useOrderAssistantFeedback = () =>
     mutationFn: orderAssistantService.feedback,
     retry: false,
   });
+
+/** `POST /order-assistant/transcribe` — no retry: the seller taps «Повторить» (the recording is kept). */
+export const useTranscribeAudio = () =>
+  useMutation({
+    mutationFn: orderAssistantService.transcribe,
+    retry: false,
+  });

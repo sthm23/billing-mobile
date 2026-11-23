@@ -1,11 +1,41 @@
 import { api } from '@/api/axios-instance';
+import { Platform } from 'react-native';
 import {
   ORDER_ASSISTANT_LIMITS,
+  type TranscribeAudioInput,
+  type TranscribeAudioResponse,
   type MatchOrderTextInput,
   type MatchOrderTextResponse,
   type OrderAssistantFeedbackInput,
   type OrderAssistantFeedbackResponse,
 } from './order-assistant.types';
+
+/** Backend waits up to 90 s for the STT queue + recognition. */
+const TRANSCRIBE_TIMEOUT_MS = 100_000;
+
+/**
+ * Seller's recording → text (multipart `audio` + `warehouseId`). A phone
+ * sends the file by uri; a browser has a blob: url, so the blob is read first.
+ * The instance default is `application/json`, and axios turns FormData into JSON
+ * under it (the file is lost) — so the request says multipart; the browser /
+ * React Native add the boundary themselves.
+ */
+const transcribe = async ({ warehouseId, audio }: TranscribeAudioInput): Promise<TranscribeAudioResponse> => {
+  const form = new FormData();
+  form.append('warehouseId', warehouseId);
+  if (Platform.OS === 'web') {
+    const blob = await (await fetch(audio.uri)).blob();
+    form.append('audio', blob, audio.name);
+  } else {
+    // React Native's FormData takes a file descriptor object
+    form.append('audio', { uri: audio.uri, name: audio.name, type: audio.mimeType } as unknown as Blob);
+  }
+  const response = await api.post<TranscribeAudioResponse>('/order-assistant/transcribe', form, {
+    timeout: TRANSCRIBE_TIMEOUT_MS,
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+};
 
 /** Seller's text → candidate variants per product phrase. Read-only. */
 const match = async (input: MatchOrderTextInput): Promise<MatchOrderTextResponse> => {
@@ -27,6 +57,7 @@ const feedback = async ({ warehouseId, choices }: OrderAssistantFeedbackInput): 
 };
 
 export const orderAssistantService = {
+  transcribe,
   match,
   feedback,
 };

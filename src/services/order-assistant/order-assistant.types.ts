@@ -8,6 +8,33 @@ export const ORDER_ASSISTANT_LIMITS = {
   PHRASE_LENGTH: 200,
 } as const;
 
+/** 422 from `transcribe`: silence or noise, nothing recognized. */
+export const SPEECH_NOT_RECOGNIZED = 'SPEECH_NOT_RECOGNIZED';
+
+/** Recording limit of the voice tab (the STT service accepts up to 65 s). */
+export const VOICE_MAX_MS = 60_000;
+
+/** A finished recording kept on the device until `transcribe` succeeds. */
+export interface RecordedAudio {
+  /** file:// on a phone, blob: in a browser */
+  uri: string;
+  mimeType: string;
+  name: string;
+  durationMs: number;
+}
+
+export interface TranscribeAudioInput {
+  warehouseId: string;
+  audio: RecordedAudio;
+}
+
+export interface TranscribeAudioResponse {
+  text: string;
+  durationMs: number;
+  /** Saved voice sample (stage 4, with the store's consent); null for now */
+  sampleId: string | null;
+}
+
 export type MatchStatus = 'MATCHED' | 'AMBIGUOUS' | 'NOT_FOUND';
 
 /** One sellable variant the phrase may mean; `price` is a decimal string. */

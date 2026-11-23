@@ -144,7 +144,7 @@ export function VoiceReviewScreen() {
             {loading ? t('voiceOrder.review.searchingTitle') : t('voiceOrder.review.title')}
           </Text>
           <Text className="font-onest text-[13px] text-muted" numberOfLines={1}>
-            {[warehouseName, t('voiceOrder.review.subtitle')].filter(Boolean).join(' · ')}
+            {warehouseName}
           </Text>
         </View>
       </View>
@@ -314,6 +314,7 @@ export function VoiceReviewScreen() {
 
       <VoiceInputSheet
         isOpen={moreOpen}
+        warehouseId={warehouseId}
         append
         maxLength={room}
         onClose={() => setMoreOpen(false)}

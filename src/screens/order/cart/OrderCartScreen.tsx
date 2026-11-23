@@ -325,6 +325,7 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
 
       <VoiceInputSheet
         isOpen={voiceOpen}
+        warehouseId={cart.warehouseId}
         onClose={() => setVoiceOpen(false)}
         onSubmit={(text) => {
           if (!cart.warehouseId) return;
