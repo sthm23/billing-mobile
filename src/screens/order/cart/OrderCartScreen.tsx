@@ -3,16 +3,18 @@ import { CustomerPickerSheet, PriceSheet, SwipeableOrderItemCard } from '@/compo
 import { useTheme } from '@/hooks/use-theme';
 import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { getApiErrorMessage } from '@/libs/api-error';
-import { canLowerPrice } from '@/libs/roles';
+import { canLowerPrice, hasOrderAssistant } from '@/libs/roles';
 import { useAuth } from '@/provider/AuthProvider';
 import { useSaveOrder } from '@/services/order/order.queries';
 import { OrderChannel, type OrderDetail } from '@/services/order/order.type';
 import { router } from 'expo-router';
-import { ChevronLeft, CircleAlert, ScanBarcode, Search, ShoppingCart, UserRound, X } from 'lucide-react-native';
+import { ChevronLeft, CircleAlert, Mic, ScanBarcode, Search, ShoppingCart, UserRound, X } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { VoiceInputSheet } from '../voice/VoiceInputSheet';
+import { voiceStore } from '../voice/voice-store';
 import { cartStore, cartToPayload, cartTotals, linePrice, useCart } from './cart-store';
 
 interface OrderCartScreenProps {
@@ -39,9 +41,11 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
   const saveOrder = useSaveOrder();
   const [priceKey, setPriceKey] = useState<string | null>(null);
   const [customerOpen, setCustomerOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scanOpened = useRef(false);
   const canLower = canLowerPrice(user);
+  const assistant = hasOrderAssistant(user);
 
   // Fresh cart per screen: the saved order, or an empty one on the working warehouse.
   useEffect(() => {
@@ -90,6 +94,14 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
       return;
     }
     router.push('/(tabs)/(orders)/scan');
+  };
+
+  const openVoice = () => {
+    if (!cart.warehouseId) {
+      setError(t('sale.cart.chooseWarehouse'));
+      return;
+    }
+    setVoiceOpen(true);
   };
 
   const save = (next: 'hold' | 'pay') => {
@@ -173,6 +185,17 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
             <Search size={20} color={colors.muted} strokeWidth={2} />
             <Text className="flex-1 font-onest text-[15px] text-muted">{t('order.addProduct')}</Text>
           </Pressable>
+          {assistant && (
+            <Pressable
+              onPress={openVoice}
+              accessibilityRole="button"
+              accessibilityLabel={t('voiceOrder.open')}
+              className="flex-row items-center gap-1.5 h-9 px-3 rounded-pill bg-primary"
+            >
+              <Mic size={16} color={colors.onPrimary} strokeWidth={2.2} />
+              <Text className="font-onest-bold text-[13px] text-on-primary">{t('voiceOrder.button')}</Text>
+            </Pressable>
+          )}
           <Pressable
             onPress={openScanner}
             accessibilityRole="button"
@@ -216,12 +239,17 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
               </View>
               <Text className="font-onest-bold text-lg text-ink">{t('sale.cart.emptyTitle')}</Text>
               <Text className="font-onest text-[13px] leading-[19px] text-muted text-center max-w-[260px]">
-                {t('sale.cart.emptyText')}
+                {assistant ? t('voiceOrder.emptyCartText') : t('sale.cart.emptyText')}
               </Text>
               <View className="flex-row gap-2 w-full pt-1.5">
                 <Button variant="secondary" icon={Search} className="flex-1" onPress={openSearch}>
                   {t('sale.cart.find')}
                 </Button>
+                {assistant && (
+                  <Button variant="primary" icon={Mic} className="flex-1" onPress={openVoice}>
+                    {t('voiceOrder.button')}
+                  </Button>
+                )}
                 <Button variant="accent" icon={ScanBarcode} className="flex-1" onPress={openScanner}>
                   {t('sale.cart.scan')}
                 </Button>
@@ -292,6 +320,18 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
           cartStore.setPrice(key, { retailPrice: result.retailPrice, sale: result.sale });
           cartStore.setQuantity(key, result.quantity);
           setPriceKey(null);
+        }}
+      />
+
+      <VoiceInputSheet
+        isOpen={voiceOpen}
+        warehouseId={cart.warehouseId}
+        onClose={() => setVoiceOpen(false)}
+        onSubmit={(text, sampleId) => {
+          if (!cart.warehouseId) return;
+          setVoiceOpen(false);
+          voiceStore.start(cart.warehouseId, text, sampleId);
+          router.push('/(tabs)/(orders)/voice');
         }}
       />
 

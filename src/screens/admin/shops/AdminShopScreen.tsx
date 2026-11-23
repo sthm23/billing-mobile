@@ -133,6 +133,9 @@ export function AdminShopScreen({ id }: { id: string }) {
   const refreshControl = useRefreshControl(query.refetch);
   const [sheet, setSheet] = useState<SheetKind>('none');
   const [modeError, setModeError] = useState<string | null>(null);
+  const updateAssistant = useUpdateAdminStore();
+  const [assistantError, setAssistantError] = useState<string | null>(null);
+  const [confirmVoiceOff, setConfirmVoiceOff] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [editAttribute, setEditAttribute] = useState<AdminStoreAttribute | null>(null);
   const store = query.data;
@@ -196,6 +199,25 @@ export function AdminShopScreen({ id }: { id: string }) {
       { onError: (e) => setModeError(getApiErrorMessage(e, t('adminShop.saveFailed'))) },
     );
   };
+
+  const toggleAssistant = (on: boolean) => {
+    setAssistantError(null);
+    updateAssistant.mutate(
+      { id: store.id, orderAssistantEnabled: on },
+      { onError: (e) => setAssistantError(getApiErrorMessage(e, t('adminShop.saveFailed'))) },
+    );
+  };
+
+  // Withdrawing consent deletes every recording — asked first
+  const saveVoiceConsent = (on: boolean) => {
+    setAssistantError(null);
+    setConfirmVoiceOff(false);
+    updateAssistant.mutate(
+      { id: store.id, voiceDataConsent: on },
+      { onError: (e) => setAssistantError(getApiErrorMessage(e, t('adminShop.saveFailed'))) },
+    );
+  };
+  const toggleVoiceConsent = (on: boolean) => (on ? saveVoiceConsent(true) : setConfirmVoiceOff(true));
 
   const reasonText = store.suspendReason ? t(`adminShop.reason.${store.suspendReason}`) : null;
 
@@ -336,6 +358,55 @@ export function AdminShopScreen({ id }: { id: string }) {
             <View className="flex-row items-start gap-2 bg-err-bg rounded-lg px-3 py-2.5" accessibilityRole="alert">
               <CircleAlert size={16} color={colors.errFg} strokeWidth={2} />
               <Text className="flex-1 font-onest-semibold text-[13px] leading-[18px] text-err-fg">{modeError}</Text>
+            </View>
+          ) : null}
+        </Section>
+
+        {/* Paid features, switched on at the store's request */}
+        <Section title={t('adminShop.features.title')}>
+          <View className="flex-row items-center gap-3">
+            <View className="flex-1 gap-0.5">
+              <Text className="font-onest-semibold text-[15px] text-ink">{t('adminShop.features.orderAssistant')}</Text>
+              <Text className="font-onest text-xs text-muted">{t('adminShop.features.orderAssistantDesc')}</Text>
+            </View>
+            <Switch
+              value={store.orderAssistantEnabled}
+              onValueChange={toggleAssistant}
+              disabled={updateAssistant.isPending}
+              accessibilityLabel={t('adminShop.features.orderAssistant')}
+            />
+          </View>
+          <View className="flex-row items-center gap-3 pt-3 border-t border-line">
+            <View className="flex-1 gap-0.5">
+              <Text className="font-onest-semibold text-[15px] text-ink">{t('adminShop.features.voiceData')}</Text>
+              <Text className="font-onest text-xs text-muted">{t('adminShop.features.voiceDataDesc')}</Text>
+            </View>
+            <Switch
+              value={store.voiceDataConsent}
+              onValueChange={toggleVoiceConsent}
+              disabled={updateAssistant.isPending || confirmVoiceOff}
+              accessibilityLabel={t('adminShop.features.voiceData')}
+            />
+          </View>
+          {confirmVoiceOff ? (
+            <View className="gap-2.5 bg-err-bg rounded-lg px-3 py-2.5" accessibilityRole="alert">
+              <Text className="font-onest-semibold text-[13px] leading-[18px] text-err-fg">
+                {t('adminShop.features.voiceDataOff')}
+              </Text>
+              <View className="flex-row gap-2">
+                <Button variant="danger" size="sm" className="flex-1" onPress={() => saveVoiceConsent(false)}>
+                  {t('adminShop.features.voiceDataOffConfirm')}
+                </Button>
+                <Button variant="secondary" size="sm" className="flex-1" onPress={() => setConfirmVoiceOff(false)}>
+                  {t('common.cancel')}
+                </Button>
+              </View>
+            </View>
+          ) : null}
+          {assistantError ? (
+            <View className="flex-row items-start gap-2 bg-err-bg rounded-lg px-3 py-2.5" accessibilityRole="alert">
+              <CircleAlert size={16} color={colors.errFg} strokeWidth={2} />
+              <Text className="flex-1 font-onest-semibold text-[13px] leading-[18px] text-err-fg">{assistantError}</Text>
             </View>
           ) : null}
         </Section>

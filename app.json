@@ -52,7 +52,7 @@
         "expo-camera",
         {
           "cameraPermission": "Камера нужна, чтобы сканировать штрихкоды товаров",
-          "microphonePermission": false,
+          "microphonePermission": "Микрофон нужен, чтобы надиктовать товары заказа",
           "recordAudioAndroid": false
         }
       ],
@@ -62,7 +62,14 @@
         {
           "photosPermission": "Доступ к фото нужен, чтобы добавить снимки товара",
           "cameraPermission": "Камера нужна, чтобы сканировать штрихкоды и снимать товары",
-          "microphonePermission": false
+          "microphonePermission": "Микрофон нужен, чтобы надиктовать товары заказа"
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Микрофон нужен, чтобы надиктовать товары заказа",
+          "enableBackgroundPlayback": false
         }
       ]
     ],
