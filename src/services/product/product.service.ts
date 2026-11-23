@@ -19,6 +19,7 @@ const ENDPOINTS = {
   BASE: '/',
   LIST: '/',
   BY_ID: (productId: string) => `/${productId}`,
+  RESTORE: (productId: string) => `/${productId}/restore`,
   SEARCH: (warehouseId: string) => `/search/${warehouseId}`,
   CANCEL: (productId: string) => `/${productId}/cancel`,
   VARIANTS: '/variants',
@@ -55,9 +56,9 @@ const getProductById = async (productId: string): Promise<Product> => {
   return response.data;
 }
 
-/** `GET /product`: the staff's products (non-archived) with search and filters. */
+/** `GET /product`: the staff's products with search and filters; archived ones only with `archived`. */
 const getProducts = async (params: ProductParams = {}): Promise<ProductListResponse> => {
-  const { currentPage = 1, pageSize = 10, search, categoryId, lowStock, warehouseId } = params;
+  const { currentPage = 1, pageSize = 10, search, categoryId, lowStock, archived, warehouseId } = params;
 
   const response = await productsApi.get<ProductListResponse>(ENDPOINTS.BASE, {
     params: {
@@ -66,6 +67,7 @@ const getProducts = async (params: ProductParams = {}): Promise<ProductListRespo
       ...(search ? { search } : {}),
       ...(categoryId ? { categoryId } : {}),
       ...(lowStock ? { lowStock: true } : {}),
+      ...(archived ? { archived: true } : {}),
       ...(warehouseId ? { warehouseId } : {}),
     },
   })
@@ -114,6 +116,12 @@ const archiveProduct = (productId: string) => {
   return productsApi.delete<{ message: string }>(ENDPOINTS.BY_ID(productId))
 }
 
+/** Brings an archived product back (`PATCH /product/:id/restore`); returns the product card. */
+const restoreProduct = async (productId: string): Promise<ProductDetail> => {
+  const response = await productsApi.patch<ProductDetail>(ENDPOINTS.RESTORE(productId))
+  return response.data
+}
+
 /** Stock receipt or write-off in the variant's warehouse. */
 const addInventory = (warehouseId: string, body: InventoryMovementPayload) => {
   return warehouseApi.post<{ message: string }>(ENDPOINTS.INVENTORY(warehouseId), body)
@@ -135,4 +143,5 @@ export const productService = {
   addInventory,
   updateProductVariant,
   archiveProduct,
+  restoreProduct,
 }

@@ -21,9 +21,10 @@ import { useAuth } from '@/provider/AuthProvider';
 import { cartStore } from '@/screens/order/cart/cart-store';
 import { useAddToOrder } from '@/services/order/order.queries';
 import type { Order, OrderProductVariant } from '@/services/order/order.type';
-import { useArchiveProduct } from '@/services/product/product.queries';
+import { useArchiveProduct, useRestoreProduct } from '@/services/product/product.queries';
+import { useTheme } from '@/hooks/use-theme';
 import { router } from 'expo-router';
-import { ChevronLeft, Pencil, Plus, Trash2 } from 'lucide-react-native';
+import { Archive, ChevronLeft, Pencil, Plus } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
@@ -73,6 +74,10 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
   const { rentalEnabled } = useStoreMode();
   const addToOrder = useAddToOrder();
   const archive = useArchiveProduct();
+  const restore = useRestoreProduct();
+  const colors = useTheme();
+  // Archived = read-only until restored (the backend rejects any change)
+  const archived = product.isArchived;
   const [addOpen, setAddOpen] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [movementTarget, setMovementTarget] = useState<StockMovementTarget | null>(null);
@@ -167,6 +172,21 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
     ]);
   };
 
+  const handleRestore = () => {
+    Alert.alert(t('product.restore.title'), t('product.restore.text', { name: product.name }), [
+      { text: t('product.cancel'), style: 'cancel' },
+      {
+        text: t('product.restore.confirm'),
+        // The returned card replaces the cached one: the screen switches to the normal mode
+        onPress: () =>
+          restore.mutate(product.id, {
+            onSuccess: () => toast.show(t('product.restore.done')),
+            onError: (err) => toast.show(getApiErrorMessage(err, t('product.restore.failed')), 'error'),
+          }),
+      },
+    ]);
+  };
+
   const openMovement = (variantId: string) => {
     const variant = product.variants.find((v) => v.id === variantId);
     if (!variant) return;
@@ -211,15 +231,37 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
           <>
             <IconButton icon={ChevronLeft} accessibilityLabel={t('common.back')} onPress={() => router.back()} />
             {/* Edit the product card (OWNER/MANAGER); rent settings stay in the rental card */}
-            <IconButton
-              icon={Pencil}
-              accessibilityLabel={t('productForm.editTitle')}
-              disabled={!canManage}
-              onPress={() => router.push({ pathname: '/(tabs)/(products)/edit/[id]', params: { id: product.id } })}
-            />
+            {archived ? null : (
+              <IconButton
+                icon={Pencil}
+                accessibilityLabel={t('productForm.editTitle')}
+                disabled={!canManage}
+                onPress={() => router.push({ pathname: '/(tabs)/(products)/edit/[id]', params: { id: product.id } })}
+              />
+            )}
           </>
         }
       />
+
+      {/* Archived: hidden from the list, search and orders; owner / manager can bring it back */}
+      {archived ? (
+        <View className="bg-warn-bg rounded-[24px] p-4 gap-3">
+          <View className="flex-row gap-3">
+            <View className="w-9 h-9 rounded-full bg-card items-center justify-center">
+              <Archive size={18} color={colors.warnFg} strokeWidth={2.2} />
+            </View>
+            <View className="flex-1 gap-1">
+              <Text className="font-onest-bold text-[15px] text-warn-fg">{t('product.archivedBadge')}</Text>
+              <Text className="font-onest text-[13px] leading-[18px] text-warn-fg">{t('product.archivedHint')}</Text>
+            </View>
+          </View>
+          {canManage ? (
+            <Button variant="primary" full onPress={handleRestore} disabled={restore.isPending}>
+              {t('product.restore.button')}
+            </Button>
+          ) : null}
+        </View>
+      ) : null}
 
       {/* Name, availability, price */}
       <View className="bg-hero rounded-2xl p-5 gap-3.5">
@@ -229,8 +271,10 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
             {subtitle ? <Text className="font-onest text-[13px] text-hero-muted">{subtitle}</Text> : null}
           </View>
           <StatusBadge
-            label={totalStock > 0 ? t('product.available') : t('product.notAvailable')}
-            tone={totalStock > 0 ? 'accent' : 'neutral'}
+            label={
+              archived ? t('product.archivedBadge') : totalStock > 0 ? t('product.available') : t('product.notAvailable')
+            }
+            tone={!archived && totalStock > 0 ? 'accent' : 'neutral'}
           />
         </View>
         <Money
@@ -243,8 +287,8 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
         />
       </View>
 
-      {/* Parameters and quantity for the sale */}
-      {product.variants.length > 0 && (
+      {/* Parameters and quantity for the sale (not for an archived product) */}
+      {!archived && product.variants.length > 0 && (
         <View className="bg-card rounded-xl p-4.5 gap-4">
           {attributeNames.map((attrName) => {
             const values = attributeMap[attrName];
@@ -302,7 +346,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
           <Text className="type-subhead text-ink">{t('product.staffPanel')}</Text>
           <Text className="font-onest text-[13px] text-muted">{t('product.adminAccess')}</Text>
         </View>
-        {canManage && (
+        {canManage && !archived && (
           <View className="flex-row gap-2">
             <IconButton
               icon={Plus}
@@ -310,7 +354,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
               onPress={() => router.push({ pathname: '/(tabs)/(products)/variants/[id]', params: { id: product.id } })}
             />
             <IconButton
-              icon={Trash2}
+              icon={Archive}
               variant="danger"
               accessibilityLabel={t('product.deleteProduct')}
               onPress={handleDelete}
@@ -326,8 +370,8 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
           variant={variant}
           canManage={canManage}
           onHistory={openHistory}
-          onMovement={openMovement}
-          onRental={openRental}
+          onMovement={archived ? undefined : openMovement}
+          onRental={archived ? undefined : openRental}
         />
       ))}
 

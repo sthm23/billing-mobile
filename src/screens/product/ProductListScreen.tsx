@@ -13,7 +13,7 @@ import { useStoreCategories } from '@/services/category';
 import { DEBOUNCE_TIME_MS, productQueryKeys, useProducts } from '@/services/product/product.queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { Package, Plus, SlidersHorizontal } from 'lucide-react-native';
+import { Archive, Package, Plus, SlidersHorizontal } from 'lucide-react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, ScrollView, View } from 'react-native';
@@ -31,6 +31,8 @@ export default function ProductListScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [lowStock, setLowStock] = useState(false);
+  // «Архив» (owner / manager): archived products instead of the active ones
+  const [archived, setArchived] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
 
@@ -46,13 +48,15 @@ export default function ProductListScreen() {
   });
 
   const working = useWorkingWarehouse();
+  const canManageArchive = canManageProducts(user);
   const { data, isLoading, isFetching, isPlaceholderData } = useProducts(
     {
       currentPage,
       pageSize: PAGE_SIZE,
       search: debouncedSearch.trim() || undefined,
       categoryId,
-      lowStock,
+      lowStock: lowStock && !archived,
+      archived: canManageArchive && archived,
       warehouseId: working.warehouseId,
     },
     working.isReady
@@ -62,7 +66,7 @@ export default function ProductListScreen() {
   useEffect(() => {
     setCurrentPage(1);
     setAllProducts([]);
-  }, [debouncedSearch, categoryId, lowStock, working.warehouseId]);
+  }, [debouncedSearch, categoryId, lowStock, archived, working.warehouseId]);
 
   // Accumulate fresh pages into the list
   useEffect(() => {
@@ -85,7 +89,8 @@ export default function ProductListScreen() {
   const handleProductPress = (productId: string) => {
     // A draft (card without variants) opens step 2 «Варианты» — only owner/manager see drafts
     const product = allProducts.find((p) => p.id === productId);
-    if (product?.isDraft && canManageProducts(user)) {
+    // An archived draft opens the read-only card, where it can be restored
+    if (product?.isDraft && !product.isArchived && canManageProducts(user)) {
       router.push({ pathname: '/(tabs)/(products)/variants/[id]', params: { id: productId } });
       return;
     }
@@ -97,6 +102,29 @@ export default function ProductListScreen() {
   const allLabel =
     !categoryId && data?.counts ? `${t('product.filters.all')} · ${data.counts.all}` : t('product.filters.all');
   const lowLabel = data?.counts ? `${t('product.filters.low')} · ${data.counts.lowStock}` : t('product.filters.low');
+  const archiveLabel = data?.counts
+    ? `${t('product.filters.archive')} · ${data.counts.archived}`
+    : t('product.filters.archive');
+
+  // «Все» returns to the full active list; «Мало» and «Архив» exclude each other
+  const selectAll = () => {
+    setCategoryId(undefined);
+    setArchived(false);
+  };
+  const toggleLowStock = () => {
+    setLowStock((v) => !v);
+    setArchived(false);
+  };
+  const toggleArchived = () => {
+    setArchived((v) => !v);
+    setLowStock(false);
+  };
+
+  const emptyMessage = archived
+    ? t('product.archivedEmpty')
+    : debouncedSearch || categoryId || lowStock
+      ? t('product.notFoundProducts')
+      : t('product.empty');
 
   return (
     <View className="flex-1 bg-bg">
@@ -119,16 +147,19 @@ export default function ProductListScreen() {
         <View className="px-4">
           <SearchField value={searchQuery} onChangeText={setSearchQuery} placeholder={t('product.searchPlaceholder')} />
         </View>
-        {/* Category is single-choice; «Мало» combines with it */}
+        {/* Category is single-choice; «Мало» / «Архив» combine with it */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerClassName="px-4 gap-2"
         >
-          <Chip label={allLabel} selected={!categoryId} onPress={() => setCategoryId(undefined)} />
-          {/* «Мало» goes before the subcategories: a direction can have many */}
-          <Chip label={lowLabel} tone="err" selected={lowStock} onPress={() => setLowStock((v) => !v)} />
+          <Chip label={allLabel} selected={!categoryId && !archived} onPress={selectAll} />
+          {/* «Мало» and «Архив» go before the subcategories: a direction can have many */}
+          <Chip label={lowLabel} tone="err" selected={lowStock && !archived} onPress={toggleLowStock} />
+          {canManageArchive ? (
+            <Chip label={archiveLabel} selected={archived} onPress={toggleArchived} />
+          ) : null}
           {subcategories.map((category) => (
             <Chip
               key={category.id}
@@ -155,10 +186,7 @@ export default function ProductListScreen() {
           )}
           ListEmptyComponent={
             !isFetching ? (
-              <EmptyState
-                icon={Package}
-                message={debouncedSearch || categoryId || lowStock ? t('product.notFoundProducts') : t('product.empty')}
-              />
+              <EmptyState icon={archived ? Archive : Package} message={emptyMessage} />
             ) : null
           }
           ListFooterComponent={

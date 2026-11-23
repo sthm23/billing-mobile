@@ -14,7 +14,8 @@ interface ProductCardProps {
 
 /**
  * Product row in the list: photo, name, category · brand · warehouse,
- * «от» price and stock badge; a draft (no variants yet) shows «Черновик».
+ * «от» price and stock badge; a draft (no variants yet) shows «Черновик»,
+ * an archived product «В архиве».
  */
 export function ProductCard({ product, lowStockThreshold, onPress }: ProductCardProps) {
   const { t, i18n } = useTranslation();
@@ -26,6 +27,11 @@ export function ProductCard({ product, lowStockThreshold, onPress }: ProductCard
 
   // A draft (card without variants) has no price or stock yet
   const draft = !!product.isDraft;
+  const badge: { label: string; tone: StatusTone } = product.isArchived
+    ? { label: t('product.archivedBadge'), tone: 'neutral' }
+    : draft
+      ? { label: t('productVariants.draft'), tone: 'warn' }
+      : { label: `${totalQuantity} ${t('product.unit')}`, tone: stockTone };
 
   return (
     <ListCard
@@ -35,11 +41,7 @@ export function ProductCard({ product, lowStockThreshold, onPress }: ProductCard
       amount={draft ? undefined : (product.priceRange?.min ?? 0)}
       amountPrefix={draft ? undefined : t('product.from')}
       amountCurrency={draft ? undefined : t('common.currency')}
-      badge={
-        draft
-          ? { label: t('productVariants.draft'), tone: 'warn' }
-          : { label: `${totalQuantity} ${t('product.unit')}`, tone: stockTone }
-      }
+      badge={badge}
       onPress={() => onPress(product.id)}
       className="pl-2.5"
     />

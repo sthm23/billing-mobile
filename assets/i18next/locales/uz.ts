@@ -719,7 +719,7 @@ const uz = {
     "signinText": "Accaountingiz bor bo'lsa?"
   },
   "product": {
-    "deleteProduct": "Mahsulotni o'chirish",
+    "deleteProduct": "Arxivga ko‘chirish",
     "noFound": "Tovar topilmadi.",
     "img": "Rasm",
     "detail": "Mahsulot tafsilotlari",
@@ -798,13 +798,17 @@ const uz = {
     "retailPriceLabel": "Sotish narxi",
     "inStockLabel": "Omborda",
     "notFoundProducts": "Tovarlar topilmadi",
+    "archivedEmpty": "Arxivda mahsulotlar yo‘q",
+    "archivedBadge": "Arxivda",
+    "archivedHint": "Mahsulot ro‘yxat, qidiruv va buyurtmalardan yashirilgan. Sotish va qoldiqni o‘zgartirish uchun uni qaytaring.",
     "errorLoadingProducts": "Tovarlarni yuklashda xato",
     "available": "Omborda bor",
     "notAvailable": "Omborda yo'q",
     "searchPlaceholder": "Nomi, artikul yoki shtrixkod",
     "filters": {
       "all": "Hammasi",
-      "low": "Kam"
+      "low": "Kam",
+      "archive": "Arxiv"
     },
     "toOrder": "Buyurtmaga · {{amount}} {{currency}}",
     "chooseVariant": "Variantni tanlang",
@@ -821,11 +825,19 @@ const uz = {
       "noStock": "Omborda yetarli mahsulot yo‘q"
     },
     "archive": {
-      "title": "Mahsulot o‘chirilsinmi?",
-      "text": "«{{name}}» ro‘yxat va qidiruvdan yo‘qoladi. Sotuv va harakatlar tarixi saqlanadi.",
-      "confirm": "O‘chirish",
-      "done": "Mahsulot o‘chirildi",
-      "failed": "Mahsulotni o‘chirib bo‘lmadi"
+      "title": "Mahsulot arxivga ko‘chirilsinmi?",
+      "text": "«{{name}}» ro‘yxat va qidiruvdan yo‘qoladi. Uni «Arxiv» bo‘limidan qaytarish mumkin. Sotuv va harakatlar tarixi saqlanadi.",
+      "confirm": "Arxivga",
+      "done": "Mahsulot arxivga ko‘chirildi",
+      "failed": "Mahsulotni arxivga ko‘chirib bo‘lmadi"
+    },
+    "restore": {
+      "button": "Arxivdan qaytarish",
+      "title": "Arxivdan qaytarilsinmi?",
+      "text": "«{{name}}» yana ro‘yxat, qidiruv va buyurtmalarda paydo bo‘ladi.",
+      "confirm": "Qaytarish",
+      "done": "Mahsulot qaytarildi",
+      "failed": "Mahsulotni qaytarib bo‘lmadi"
     },
     "movement": {
       "inStock": "Omborda",

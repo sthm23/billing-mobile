@@ -70,8 +70,9 @@ export function ProductVariantCard({ variant, canManage = false, onHistory, onMo
         <Button variant="secondary" className="flex-1" onPress={() => onHistory?.(variant.id)}>
           {t('product.history')}
         </Button>
-        {canManage && (
-          <Button variant="primary" className="flex-1" onPress={() => onMovement?.(variant.id)}>
+        {/* No handler = read-only (an archived product) */}
+        {canManage && onMovement && (
+          <Button variant="primary" className="flex-1" onPress={() => onMovement(variant.id)}>
             {t('product.stockMovementButton')}
           </Button>
         )}

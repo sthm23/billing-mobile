@@ -13,7 +13,8 @@ import { SafeAreaView } from '@/components/base/SafeAreaView';
 /**
  * Product card: the sale card, or in rental mode (bottom menu «Аренды» or a
  * rental-only store) the rental card; `?variantId&startDate&endDate` — what
- * the rental card shows first.
+ * the rental card shows first. An archived product always opens the read-only
+ * sale card (restore lives there).
  */
 export default function ProductDetailRoute() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export default function ProductDetailRoute() {
             {t('common.back')}
           </Button>
         </EmptyState>
-      ) : rentalEnabled && navMode === 'rent' ? (
+      ) : rentalEnabled && navMode === 'rent' && !product.isArchived ? (
         <RentalProductScreen
           product={product}
           onRefresh={refetch}

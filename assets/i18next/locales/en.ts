@@ -719,7 +719,7 @@ const en = {
     "signinText": "Already have an account?"
   },
   "product": {
-    "deleteProduct": "Delete product",
+    "deleteProduct": "Move to archive",
     "noFound": "No product found.",
     "img": "Image",
     "detail": "Product details",
@@ -798,13 +798,17 @@ const en = {
     "retailPriceLabel": "Retail price",
     "inStockLabel": "In stock",
     "notFoundProducts": "No products found",
+    "archivedEmpty": "No archived products",
+    "archivedBadge": "Archived",
+    "archivedHint": "The product is hidden from the list, search and orders. Restore it to sell it and change stock.",
     "errorLoadingProducts": "Error loading products",
     "available": "Available",
     "notAvailable": "Out of stock",
     "searchPlaceholder": "Name, SKU or barcode",
     "filters": {
       "all": "All",
-      "low": "Low"
+      "low": "Low",
+      "archive": "Archive"
     },
     "toOrder": "Add to order · {{amount}} {{currency}}",
     "chooseVariant": "Choose a variant",
@@ -821,11 +825,19 @@ const en = {
       "noStock": "Not enough stock"
     },
     "archive": {
-      "title": "Delete product?",
-      "text": "\"{{name}}\" will disappear from the list and search. Sales and stock history is kept.",
-      "confirm": "Delete",
-      "done": "Product deleted",
-      "failed": "Could not delete the product"
+      "title": "Move to archive?",
+      "text": "\"{{name}}\" will disappear from the list and search. You can bring it back from \"Archive\". Sales and stock history is kept.",
+      "confirm": "Archive",
+      "done": "Product moved to archive",
+      "failed": "Could not move the product to archive"
+    },
+    "restore": {
+      "button": "Restore from archive",
+      "title": "Restore from archive?",
+      "text": "\"{{name}}\" will be back in the list, search and orders.",
+      "confirm": "Restore",
+      "done": "Product restored",
+      "failed": "Could not restore the product"
     },
     "movement": {
       "inStock": "In stock",
