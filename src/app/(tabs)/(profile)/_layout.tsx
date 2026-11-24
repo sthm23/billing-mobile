@@ -16,6 +16,7 @@ export default function TabLayout() {
       <Stack.Screen name="staff/edit/[id]" />
       <Stack.Screen name="settings" />
       <Stack.Screen name="store-settings" />
+      <Stack.Screen name="dashboard" />
       <Stack.Screen name="debtors/index" />
       <Stack.Screen name="debtors/new" />
       <Stack.Screen name="debtors/[customerId]" />
