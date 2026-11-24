@@ -7,14 +7,14 @@ import { useWorkingWarehouse } from "@/hooks/use-working-warehouse";
 import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
-import { isAdmin } from "@/libs/roles";
+import { isAdmin, canSeeDashboard } from "@/libs/roles";
 import { useAdminStoreCounts } from "@/services/admin-store";
 import { useDebtors } from "@/services/debt";
 import { useStaffList } from "@/services/store";
 import Constants from "expo-constants";
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
-import { HandCoins, Store, UserRoundX, UsersRound } from "lucide-react-native";
+import { ChartColumn, HandCoins, Store, UserRoundX, UsersRound } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { useCallback } from "react";
 import { ScrollView, View } from "react-native";
@@ -92,6 +92,18 @@ const MobileProfilePage = () => {
       ) : (
         <WorkingWarehouseCard />
       )}
+      {canSeeDashboard(user) ? (
+        <ListCard
+          leading={
+            <View className="w-11 h-11 rounded-[14px] bg-accent items-center justify-center">
+              <ChartColumn size={20} color={colors.onAccent} strokeWidth={2} />
+            </View>
+          }
+          title={t('dashboard.title')}
+          subtitle={t('dashboard.entrySubtitle')}
+          onPress={() => router.push('/(tabs)/(profile)/dashboard')}
+        />
+      ) : null}
       {user.role === UserRole.OWNER ? (
         <ListCard
           leading={

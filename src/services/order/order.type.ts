@@ -241,6 +241,8 @@ export interface OrderAdditionalServicePayload {
     id?: string
     name: string
     price: number | string
+    /** Absolute discount on the service, ≤ price */
+    sale?: number | string
     description: string | null
 }
 

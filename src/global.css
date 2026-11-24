@@ -45,6 +45,8 @@
     --ph-bg: 237 237 232;
     --ph-fg: 138 138 131;
     --track: 230 230 224;
+    --chart: 94 122 69;
+    --chart-muted: 138 138 131;
     --seg: 255 255 255;
     --disabled-bg: 230 230 224;
     --disabled-fg: 138 138 131;
@@ -86,6 +88,8 @@
       --ph-bg: 38 38 36;
       --ph-fg: 119 119 111;
       --track: 27 27 25;
+      --chart: 183 201 160;
+      --chart-muted: 119 119 111;
       --seg: 58 58 55;
       --disabled-bg: 38 38 36;
       --disabled-fg: 107 107 102;
@@ -127,6 +131,8 @@
     --ph-bg: 38 38 36;
     --ph-fg: 119 119 111;
     --track: 27 27 25;
+    --chart: 183 201 160;
+    --chart-muted: 119 119 111;
     --seg: 58 58 55;
     --disabled-bg: 38 38 36;
     --disabled-fg: 107 107 102;
@@ -167,6 +173,8 @@
     --ph-bg: 237 237 232;
     --ph-fg: 138 138 131;
     --track: 230 230 224;
+    --chart: 94 122 69;
+    --chart-muted: 138 138 131;
     --seg: 255 255 255;
     --disabled-bg: 230 230 224;
     --disabled-fg: 138 138 131;
@@ -209,6 +217,8 @@
   --color-ph-bg: rgb(var(--ph-bg));
   --color-ph-fg: rgb(var(--ph-fg));
   --color-track: rgb(var(--track));
+  --color-chart: rgb(var(--chart));
+  --color-chart-muted: rgb(var(--chart-muted));
   --color-seg: rgb(var(--seg));
   --color-disabled-bg: rgb(var(--disabled-bg));
   --color-disabled-fg: rgb(var(--disabled-fg));

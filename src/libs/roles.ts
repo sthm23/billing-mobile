@@ -28,6 +28,14 @@ export const canManageProducts = canLowerPrice;
 export const canCreateDebt = canLowerPrice;
 
 /**
+ * Store owner (not the platform admin — no store): sees the dashboard.
+ * UX only — the backend checks it (`/dashboard/*`).
+ */
+export function canSeeDashboard(user: CurrentUserType | null | undefined): boolean {
+  return user?.role === UserRole.OWNER || user?.staff?.role === StaffRole.OWNER;
+}
+
+/**
  * Platform administrator: has no store (no Staff record) and only manages
  * stores — Profile → «Магазины». UX only — the backend checks `AdminGuard`.
  */

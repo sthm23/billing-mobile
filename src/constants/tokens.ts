@@ -46,6 +46,9 @@ export const palette = {
     phBg: '#EDEDE8',
     phFg: '#8A8A83',
     track: '#E6E6E0',
+    /** Chart bars (dashboard); light needs a darker green than `accent` for contrast on `card` */
+    chart: '#5E7A45',
+    chartMuted: '#8A8A83',
     seg: '#FFFFFF',
     disabledBg: '#E6E6E0',
     disabledFg: '#8A8A83',
@@ -85,6 +88,8 @@ export const palette = {
     phBg: '#262624',
     phFg: '#77776F',
     track: '#1B1B19',
+    chart: '#B7C9A0',
+    chartMuted: '#77776F',
     seg: '#3A3A37',
     disabledBg: '#262624',
     disabledFg: '#6B6B66',

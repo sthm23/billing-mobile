@@ -1,14 +1,26 @@
 import { Button, IconButton, Money, Pressable, Text, toast } from '@/components/base';
-import { CustomerPickerSheet, PriceSheet, SwipeableOrderItemCard } from '@/components/order';
+import { CustomerPickerSheet, OrderDiscountSheet, PriceSheet, SwipeableOrderItemCard } from '@/components/order';
 import { useTheme } from '@/hooks/use-theme';
 import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
 import { getApiErrorMessage } from '@/libs/api-error';
 import { canLowerPrice, hasOrderAssistant } from '@/libs/roles';
+import { cn } from '@/libs/utils';
 import { useAuth } from '@/provider/AuthProvider';
 import { useSaveOrder } from '@/services/order/order.queries';
 import { OrderChannel, type OrderDetail } from '@/services/order/order.type';
 import { router } from 'expo-router';
-import { ChevronLeft, CircleAlert, Mic, ScanBarcode, Search, ShoppingCart, UserRound, X } from 'lucide-react-native';
+import {
+  ChevronLeft,
+  CircleAlert,
+  Lock,
+  Mic,
+  Percent,
+  ScanBarcode,
+  Search,
+  ShoppingCart,
+  UserRound,
+  X,
+} from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
@@ -42,6 +54,7 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
   const [priceKey, setPriceKey] = useState<string | null>(null);
   const [customerOpen, setCustomerOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const [discountOpen, setDiscountOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scanOpened = useRef(false);
   const canLower = canLowerPrice(user);
@@ -274,7 +287,30 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
           <Money value={totals.sum} className="font-onest text-sm text-hero-muted" currencyClassName="text-hero-muted" />
         </View>
         <View className="flex-row items-center justify-between">
-          <Text className="font-onest text-sm text-hero-muted">{t('order.discount')}</Text>
+          <View className="flex-row items-center gap-2">
+            <Text className="font-onest text-sm text-hero-muted">{t('order.discount')}</Text>
+            {/* Order set discount: owner/manager; others see why it is locked */}
+            <Pressable
+              onPress={() => (canLower ? setDiscountOpen(true) : toast.show(t('sale.discount.byManager')))}
+              disabled={isEmpty}
+              accessibilityRole="button"
+              accessibilityLabel={t('sale.discount.action')}
+              accessibilityState={{ disabled: isEmpty || !canLower }}
+              className={cn(
+                'flex-row items-center gap-1 h-7 px-2.5 rounded-pill bg-hero-sub',
+                (isEmpty || !canLower) && 'opacity-50'
+              )}
+            >
+              {canLower ? (
+                <Percent size={13} color={colors.accent} strokeWidth={2.4} />
+              ) : (
+                <Lock size={13} color={colors.heroMuted} strokeWidth={2.2} />
+              )}
+              <Text className={cn('font-onest-semibold text-xs', canLower ? 'text-accent' : 'text-hero-muted')}>
+                {t('sale.discount.action')}
+              </Text>
+            </Pressable>
+          </View>
           <Money
             value={-totals.discount}
             className="font-onest-semibold text-sm text-hero-err"
@@ -321,6 +357,24 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
           cartStore.setPrice(key, { retailPrice: result.retailPrice, sale: result.sale });
           cartStore.setQuantity(key, result.quantity);
           setPriceKey(null);
+        }}
+      />
+
+      <OrderDiscountSheet
+        isOpen={discountOpen}
+        base={totals.base}
+        total={totals.total}
+        positions={cart.lines.length + cart.services.length}
+        hasDiscount={totals.discount > 0}
+        onClose={() => setDiscountOpen(false)}
+        onApply={(target) => {
+          const ok = cartStore.applySetDiscount(target);
+          if (ok) setDiscountOpen(false);
+          return ok;
+        }}
+        onRemove={() => {
+          cartStore.clearDiscount();
+          setDiscountOpen(false);
         }}
       />
 

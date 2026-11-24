@@ -1,3 +1,4 @@
+import { distributeSetDiscount } from '@/libs/set-discount';
 import type { OrderCustomer } from '@/services/customer';
 import type {
   CreateOrderItemPayload,
@@ -37,8 +38,13 @@ export interface CartState {
   warehouseId?: string;
   customer: OrderCustomer | null;
   lines: CartLine[];
-  /** Additional services of an order made on the web — sent back unchanged */
-  services: OrderAdditionalServicePayload[];
+  /** Additional services of an order made on the web — sent back unchanged (except the set discount) */
+  services: CartService[];
+}
+
+export interface CartService extends OrderAdditionalServicePayload {
+  price: number;
+  sale: number;
 }
 
 export type AddResult = 'added' | 'outOfStock' | 'maxReached';
@@ -96,6 +102,7 @@ export const cartStore = {
         id: s.id,
         name: s.name,
         price: Number(s.price),
+        sale: Number(s.sale ?? 0),
         description: s.description ?? null,
       })),
       lines: order.items.map((item) => ({
@@ -186,7 +193,45 @@ export const cartStore = {
   remove(key: string) {
     setState({ ...state, lines: state.lines.filter((l) => l.key !== key) });
   },
+
+  /**
+   * Order set discount (one-shot): spreads `base − target` over the items, then
+   * the services, with the rental algorithm (`libs/set-discount.ts`). The result
+   * replaces every line/service `sale`; the target itself is not kept.
+   * Returns false when the target is outside 0 … base.
+   */
+  applySetDiscount(target: number): boolean {
+    let sales: number[];
+    try {
+      sales = distributeSetDiscount(setDiscountLines(state), target);
+    } catch {
+      return false;
+    }
+    setState({
+      ...state,
+      lines: state.lines.map((l, i) => ({ ...l, sale: sales[i] })),
+      services: state.services.map((s, i) => ({ ...s, sale: sales[state.lines.length + i] })),
+    });
+    return true;
+  },
+
+  /** Removes every discount of the order (raised prices stay). */
+  clearDiscount() {
+    setState({
+      ...state,
+      lines: state.lines.map((l) => ({ ...l, sale: 0 })),
+      services: state.services.map((s) => ({ ...s, sale: 0 })),
+    });
+  },
 };
+
+/** Lines of the set discount in cart order: items (price before their discount), then services. */
+function setDiscountLines(cart: CartState) {
+  return [
+    ...cart.lines.map((l) => ({ unitPrice: l.retailPrice, quantity: l.quantity })),
+    ...cart.services.map((s) => ({ unitPrice: s.price, quantity: 1 })),
+  ];
+}
 
 export function useCart(): CartState {
   return useSyncExternalStore(cartStore.subscribe, cartStore.get, cartStore.get);
@@ -203,10 +248,12 @@ export function linePrice(line: CartLine): number {
  */
 export function cartTotals(cart: CartState) {
   const sum = cart.lines.reduce((acc, l) => acc + l.retailPrice * l.quantity, 0);
-  const discount = cart.lines.reduce((acc, l) => acc + l.sale * l.quantity, 0);
-  const services = cart.services.reduce((acc, s) => acc + Number(s.price), 0);
+  const services = cart.services.reduce((acc, s) => acc + s.price, 0);
+  const discount =
+    cart.lines.reduce((acc, l) => acc + l.sale * l.quantity, 0) + cart.services.reduce((acc, s) => acc + s.sale, 0);
   const quantity = cart.lines.reduce((acc, l) => acc + l.quantity, 0);
-  return { sum, discount, total: sum - discount + services, quantity };
+  // `base` — the total before any discount (what the set discount starts from)
+  return { sum, discount, base: sum + services, total: sum + services - discount, quantity };
 }
 
 /** Body of `POST /orders/items` (orderId is added by the caller). */
