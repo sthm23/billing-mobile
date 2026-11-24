@@ -3,11 +3,17 @@ import type {
   AdminStoreDetails,
   AdminStoreListParams,
   AdminStoreListResponse,
+  AdminStoreAttribute,
+  AdminStoreBrand,
   AdminStoreStaffItem,
   CatalogAttribute,
   CatalogBrand,
   CatalogCategory,
   CreateAdminStorePayload,
+  DictionaryAttribute,
+  DictionaryBrand,
+  DictionaryList,
+  NewStoreAttribute,
   StoreSuspendReason,
   UpdateAdminStorePayload,
 } from './admin-store.types';
@@ -80,6 +86,42 @@ export const adminStoreService = {
   /** POST /warehouse (ADMIN) — new warehouse of a store; the owner gets access */
   createWarehouse: async (storeId: string, name: string): Promise<void> => {
     await api.post('/warehouse', { storeId, name });
+  },
+
+  /** GET /admin/catalog/brands — dictionary, most connected first */
+  searchBrands: async (search: string): Promise<DictionaryList<DictionaryBrand>> => {
+    const response = await api.get<DictionaryList<DictionaryBrand>>('/admin/catalog/brands', {
+      params: search ? { search } : {},
+    });
+    return response.data;
+  },
+
+  /** GET /admin/catalog/attributes — dictionary (search by ru / uz / en name) */
+  searchAttributes: async (search: string): Promise<DictionaryList<DictionaryAttribute>> => {
+    const response = await api.get<DictionaryList<DictionaryAttribute>>('/admin/catalog/attributes', {
+      params: search ? { search } : {},
+    });
+    return response.data;
+  },
+
+  /** POST /admin/stores/:id/brands — by id, or by name (found or created) */
+  connectBrand: async (storeId: string, body: { brandId: string } | { name: string }): Promise<AdminStoreBrand> => {
+    const response = await api.post<AdminStoreBrand>(`${BASE_URL}/${storeId}/brands`, body);
+    return response.data;
+  },
+
+  /** POST /admin/stores/:id/attributes — by id, or a new one (409 ATTRIBUTE_EXISTS when the name is taken) */
+  connectAttribute: async (
+    storeId: string,
+    body: { attributeId: string } | { newAttribute: NewStoreAttribute },
+  ): Promise<AdminStoreAttribute> => {
+    const response = await api.post<AdminStoreAttribute>(`${BASE_URL}/${storeId}/attributes`, body);
+    return response.data;
+  },
+
+  /** DELETE /admin/stores/:id/brands|attributes/:itemId — 409 IN_USE `{ count }` when used in products */
+  disconnect: async (storeId: string, kind: 'brands' | 'attributes', itemId: string): Promise<void> => {
+    await api.delete(`${BASE_URL}/${storeId}/${kind}/${itemId}`);
   },
 
   /** POST /admin/stores/:id/resume — `paidUntil` (ISO date) makes it ACTIVE */

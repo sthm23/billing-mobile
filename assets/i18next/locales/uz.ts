@@ -144,6 +144,56 @@ const uz = {
     "support": "Yordam xizmatiga yozish",
     "logout": "Chiqish"
   },
+  "storeCatalog": {
+    "edit": "O'zgartirish",
+    "titleBrands": "Do'kon brendlari",
+    "titleAttributes": "Mahsulot atributlari",
+    "subtitle": "{{store}} · ulangan {{count}}",
+    "noteBrands": "O'zgarishlar darhol saqlanadi. Ega mahsulot yaratishda brendni faqat ulanganlardan tanlaydi.",
+    "noteAttributes": "O'zgarishlar darhol saqlanadi. Ega mahsulot variantlarini ulangan atributlar bo'yicha tuzadi.",
+    "connected": "Do'konga ulangan · {{count}}",
+    "connectedShort": "Ulangan · {{count}}",
+    "emptyBrands": "Hozircha brendlar yo'q. Quyidagi ma'lumotnomadan brend toping yoki nomi bo'yicha yangisini yarating.",
+    "emptyAttributes": "Hozircha atributlar yo'q. Ma'lumotnomadan ulang yoki yangisini yarating — masalan «O'lcham» yoki «Rang».",
+    "usedIn": "Mahsulotlar: {{count}}",
+    "notUsed": "ishlatilmaydi",
+    "disconnect": "Uzish",
+    "editAttributeHint": "Nomi va tarjimasini o'zgartirish",
+    "dictionary": "Ma'lumotnoma · {{count}}",
+    "searchBrands": "Brend topish yoki qo'shish",
+    "searchAttributes": "Atribut topish yoki yaratish",
+    "loading": "Ma'lumotnoma yuklanmoqda",
+    "popular": "Ko'p ulanadi",
+    "inStores": "Do'konlar: {{count}}",
+    "connect": "Ulash",
+    "connecting": "Ulanmoqda",
+    "connectedBadge": "Ulangan",
+    "alreadyConnected": "«{{name}}» do'konga allaqachon ulangan",
+    "notFound": "Hech narsa topilmadi",
+    "notFoundBrand": "Ma'lumotnomada «{{name}}» brendi yo'q. Uni yarating — u darhol do'konga ulanadi.",
+    "notFoundAttribute": "Ma'lumotnomada «{{name}}» atributi yo'q. Uni yarating: turi va birligini tanlang.",
+    "create": "«{{name}}» yaratish",
+    "newBrandRow": "+ Nomi bo'yicha yangi brend",
+    "newAttributeRow": "+ Yangi atribut",
+    "dictionaryFailed": "Ma'lumotnoma yuklanmadi",
+    "dictionaryFailedHint": "Yuqoridagi ulanganlar o'zgarmadi",
+    "savedBrand": "«{{name}}» brendi ulandi",
+    "savedAttribute": "«{{name}}» atributi ulandi",
+    "removed": "«{{name}}» do'kondan uzildi",
+    "connectFailed": "«{{name}}» ni ulab bo'lmadi. Internetni tekshiring",
+    "disconnectFailed": "«{{name}}» ni uzib bo'lmadi",
+    "newAttributeSubtitle": "Ma'lumotnomaga qo'shiladi va «{{store}}» ga ulanadi",
+    "newAttributeSubmit": "Yaratish va ulash",
+    "attributeExists": "«{{name}}» ma'lumotnomada bor — {{type}}",
+    "connectIt": "Uni ulash",
+    "inUse": {
+      "title": "«{{name}}» ni uzib bo'lmaydi",
+      "brand": "Avval shu mahsulotlarning brendini almashtiring (arxivdagilar ham hisoblanadi). Brend ma'lumotnomada qoladi — uni yana ulash mumkin.",
+      "attribute": "Bu atribut bo'yicha mahsulotlar va ularning variantlari tuzilgan (arxivdagilar ham hisoblanadi). Uzish ularning narxi va qoldiqlarini buzadi.",
+      "count": "Mahsulotlarda ishlatiladi",
+      "ok": "Tushunarli"
+    }
+  },
   "adminShopNew": {
     "title": "Yangi doʻkon",
     "subtitle": "Doʻkon, birinchi ombor va egasi",
@@ -573,7 +623,8 @@ const uz = {
     "scan": "Skanerlash",
     "decrease": "Kamaytirish",
     "increase": "Ko'paytirish",
-    "close": "Yopish"
+    "close": "Yopish",
+    "cancel": "Bekor qilish"
   },
   "tag": {
     "Material": "Material",
@@ -1247,6 +1298,13 @@ const uz = {
     "detail": "To'lov tafsilotlari.",
     "closeCashbox": "Kassani yopish",
     "openCashbox": "Kassani ochish",
+    "openCashboxSheet": {
+      "text": "Kassa sizning nomingizga 0 balans bilan ochiladi. Maydalikni «Daromad» bilan kiritish mumkin.",
+      "warehouse": "Ombor",
+      "confirm": "Ochish",
+      "done": "Kassa ochildi",
+      "failed": "Kassani ochib bo‘lmadi"
+    },
     "income": "Daromad",
     "expense": "Xarajat",
     "createOutgo": "Xarajat",
@@ -1308,7 +1366,8 @@ const uz = {
       "title": "Kassani yopish",
       "message": "Siz kassani yopishni xohlaysizmi? Bu amalni bekor qilib bo'lmaydi.",
       "confirmButton": "Ha",
-      "cancelButton": "Yo'q"
+      "cancelButton": "Yo'q",
+      "failed": "Kassani yopib bo‘lmadi"
     }
   },
   "notFound": {

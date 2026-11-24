@@ -216,7 +216,7 @@ Props: `value`, `signed`, `currency` (`'UZS'`; `null` hides), `className`, `curr
 
 Pill search (48px) with search icon, clear button (when there's text) and optional accent scan button.
 
-Props: `TextInput` props + `onScanPress?`, `variant: 'card' | 'sunken'` (default `card`).
+Props: `TextInput` props + `onScanPress?`, `variant: 'card' | 'sunken'` (default `card`), `ref?` (the inner `TextInput`, to focus it from outside; React 19 passes `ref` as a prop).
 
 ### TextArea
 

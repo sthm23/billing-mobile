@@ -1,4 +1,5 @@
 import { Button, Chip, IconButton, Money, StatusBadge, Stepper, Text, toast } from '@/components/base';
+import { ConfirmSheet } from '@/components/common';
 import { AddToOrderSheet } from '@/components/order';
 import { ImageCarousel } from '@/components/product/ImageCarousel';
 import { ProductVariantCard, RentalPriceRow } from '@/components/product/ProductVariantCard';
@@ -27,7 +28,7 @@ import { router } from 'expo-router';
 import { Archive, ChevronLeft, Pencil, Plus } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 
 interface ProductDetailScreenProps {
@@ -81,6 +82,11 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
   const [addOpen, setAddOpen] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [movementTarget, setMovementTarget] = useState<StockMovementTarget | null>(null);
+  // «В архив» / «Вернуть из архива» confirmation (ConfirmSheet: Alert.alert does nothing on web)
+  // The kind stays set while the sheet slides out, so its texts don't flip
+  const [confirmKind, setConfirmKind] = useState<'archive' | 'restore'>('archive');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
   const nameById = useMemo(
     () => buildNameById(product.attributes ?? [], i18n.language),
     [product.attributes, i18n.language]
@@ -154,37 +160,38 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
     );
   };
 
-  const handleDelete = () => {
-    Alert.alert(t('product.archive.title'), t('product.archive.text', { name: product.name }), [
-      { text: t('product.cancel'), style: 'cancel' },
-      {
-        text: t('product.archive.confirm'),
-        style: 'destructive',
-        onPress: () =>
-          archive.mutate(product.id, {
-            onSuccess: () => {
-              toast.show(t('product.archive.done'));
-              router.back();
-            },
-            onError: (err) => toast.show(getApiErrorMessage(err, t('product.archive.failed')), 'error'),
-          }),
-      },
-    ]);
+  const openConfirm = (kind: 'archive' | 'restore') => {
+    setConfirmError(null);
+    setConfirmKind(kind);
+    setConfirmOpen(true);
   };
 
-  const handleRestore = () => {
-    Alert.alert(t('product.restore.title'), t('product.restore.text', { name: product.name }), [
-      { text: t('product.cancel'), style: 'cancel' },
-      {
-        text: t('product.restore.confirm'),
-        // The returned card replaces the cached one: the screen switches to the normal mode
-        onPress: () =>
-          restore.mutate(product.id, {
-            onSuccess: () => toast.show(t('product.restore.done')),
-            onError: (err) => toast.show(getApiErrorMessage(err, t('product.restore.failed')), 'error'),
-          }),
-      },
-    ]);
+  const closeConfirm = () => {
+    if (archive.isPending || restore.isPending) return;
+    setConfirmOpen(false);
+  };
+
+  const handleConfirm = () => {
+    setConfirmError(null);
+    if (confirmKind === 'archive') {
+      archive.mutate(product.id, {
+        onSuccess: () => {
+          setConfirmOpen(false);
+          toast.show(t('product.archive.done'));
+          router.back();
+        },
+        onError: (err) => setConfirmError(getApiErrorMessage(err, t('product.archive.failed'))),
+      });
+    } else {
+      // The returned card replaces the cached one: the screen switches to the normal mode
+      restore.mutate(product.id, {
+        onSuccess: () => {
+          setConfirmOpen(false);
+          toast.show(t('product.restore.done'));
+        },
+        onError: (err) => setConfirmError(getApiErrorMessage(err, t('product.restore.failed'))),
+      });
+    }
   };
 
   const openMovement = (variantId: string) => {
@@ -256,7 +263,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
             </View>
           </View>
           {canManage ? (
-            <Button variant="primary" full onPress={handleRestore} disabled={restore.isPending}>
+            <Button variant="primary" full onPress={() => openConfirm('restore')} disabled={restore.isPending}>
               {t('product.restore.button')}
             </Button>
           ) : null}
@@ -357,7 +364,7 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
               icon={Archive}
               variant="danger"
               accessibilityLabel={t('product.deleteProduct')}
-              onPress={handleDelete}
+              onPress={() => openConfirm('archive')}
               disabled={archive.isPending}
             />
           </View>
@@ -386,6 +393,22 @@ export default function ProductDetailScreen({ product, onRefresh }: ProductDetai
       />
 
       <StockMovementSheet target={movementTarget} onClose={() => setMovementTarget(null)} />
+
+      <ConfirmSheet
+        isOpen={confirmOpen}
+        onClose={closeConfirm}
+        title={confirmKind === 'restore' ? t('product.restore.title') : t('product.archive.title')}
+        message={
+          confirmKind === 'restore'
+            ? t('product.restore.text', { name: product.name })
+            : t('product.archive.text', { name: product.name })
+        }
+        confirmLabel={confirmKind === 'restore' ? t('product.restore.confirm') : t('product.archive.confirm')}
+        tone={confirmKind === 'restore' ? 'primary' : 'danger'}
+        loading={archive.isPending || restore.isPending}
+        error={confirmError}
+        onConfirm={handleConfirm}
+      />
     </ScrollView>
   );
 }

@@ -1,4 +1,4 @@
-import { Button, IconButton, Money, Pressable, Text } from '@/components/base';
+import { Button, IconButton, Money, Pressable, Text, toast } from '@/components/base';
 import { CashboxPickerSheet } from '@/components/cashbox';
 import { useOpenCashboxes } from '@/services/cashbox';
 import { DatePickerSheet, EmptyState, LoadingState } from '@/components/common';
@@ -24,7 +24,7 @@ import { router } from 'expo-router';
 import { CalendarDays, ChevronDown, ChevronLeft, CircleAlert, Plus, UserRound, X } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { formatLocalDay, toLocalDate } from '@/screens/rental/rental-format';
 import { variantLabel } from '../cart/cart-store';
@@ -158,9 +158,11 @@ export function OrderPayScreen({ orderId }: OrderPayScreenProps) {
           cashboxId,
         },
       });
-      Alert.alert(
-        t('sale.pay.successTitle'),
-        change > 0 ? t('sale.pay.successChange', { amount: formatMoney(change) }) : t('sale.pay.successText')
+      // toast, not Alert.alert (a no-op on web): the cashier must see the change
+      toast.show(
+        change > 0
+          ? `${t('sale.pay.successTitle')} · ${t('sale.pay.successChange', { amount: formatMoney(change) })}`
+          : t('sale.pay.successText')
       );
       router.dismissAll();
       router.push({ pathname: '/(tabs)/(orders)/[id]', params: { id: order.id } });

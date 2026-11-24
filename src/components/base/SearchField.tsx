@@ -3,6 +3,7 @@ import { cn } from '@/libs/utils';
 import { ScanBarcode, Search, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
+import type { Ref } from 'react';
 
 export interface SearchFieldProps extends Omit<TextInputProps, 'className'> {
   /**
@@ -14,6 +15,8 @@ export interface SearchFieldProps extends Omit<TextInputProps, 'className'> {
    */
   variant?: 'card' | 'sunken';
   className?: string;
+  /** The inner TextInput (focus from outside); React 19 passes it as a prop */
+  ref?: Ref<TextInput>;
 }
 
 /**

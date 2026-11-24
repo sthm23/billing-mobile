@@ -88,7 +88,4 @@ export interface UpdateStoreModesPayload {
   rentalEnabled: boolean;
   /** Keep sellers' voice recordings; `false` deletes the saved ones (sent only when changed) */
   voiceDataConsent?: boolean;
-  /** Current ones: the endpoint replaces the lists */
-  attributeIds: string[];
-  brandIds: string[];
 }

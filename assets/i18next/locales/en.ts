@@ -144,6 +144,56 @@ const en = {
     "support": "Contact support",
     "logout": "Log out"
   },
+  "storeCatalog": {
+    "edit": "Edit",
+    "titleBrands": "Store brands",
+    "titleAttributes": "Product attributes",
+    "subtitle": "{{store}} · connected {{count}}",
+    "noteBrands": "Changes are saved at once. When creating a product the owner picks a brand only from the connected ones.",
+    "noteAttributes": "Changes are saved at once. The owner builds product variants from the connected attributes.",
+    "connected": "Connected to the store · {{count}}",
+    "connectedShort": "Connected · {{count}}",
+    "emptyBrands": "No brands yet. Find a brand in the dictionary below or create a new one by name.",
+    "emptyAttributes": "No attributes yet. Connect one from the dictionary or create a new one — e.g. «Size» or «Color».",
+    "usedIn": "Products: {{count}}",
+    "notUsed": "not used",
+    "disconnect": "Disconnect",
+    "editAttributeHint": "Edit the name and translations",
+    "dictionary": "Dictionary · {{count}}",
+    "searchBrands": "Find or add a brand",
+    "searchAttributes": "Find or create an attribute",
+    "loading": "Loading the dictionary",
+    "popular": "Often connected",
+    "inStores": "Stores: {{count}}",
+    "connect": "Connect",
+    "connecting": "Connecting",
+    "connectedBadge": "Connected",
+    "alreadyConnected": "«{{name}}» is already connected to the store",
+    "notFound": "Nothing found",
+    "notFoundBrand": "There is no brand «{{name}}» in the dictionary. Create it — it will be connected to the store at once.",
+    "notFoundAttribute": "There is no attribute «{{name}}» in the dictionary. Create it: choose the type and the unit.",
+    "create": "Create «{{name}}»",
+    "newBrandRow": "+ New brand by name",
+    "newAttributeRow": "+ New attribute",
+    "dictionaryFailed": "The dictionary did not load",
+    "dictionaryFailedHint": "The connected ones above have not changed",
+    "savedBrand": "Brand «{{name}}» connected",
+    "savedAttribute": "Attribute «{{name}}» connected",
+    "removed": "«{{name}}» disconnected from the store",
+    "connectFailed": "Could not connect «{{name}}». Check the internet",
+    "disconnectFailed": "Could not disconnect «{{name}}»",
+    "newAttributeSubtitle": "It will be added to the dictionary and connected to «{{store}}»",
+    "newAttributeSubmit": "Create and connect",
+    "attributeExists": "«{{name}}» already exists in the dictionary — {{type}}",
+    "connectIt": "Connect it",
+    "inUse": {
+      "title": "Can't disconnect «{{name}}»",
+      "brand": "First change the brand of these products (archived ones count too). The brand stays in the dictionary — it can be connected again.",
+      "attribute": "Products and their variants are built on this attribute (archived ones count too). Disconnecting it would break their prices and stock.",
+      "count": "Used in products",
+      "ok": "Got it"
+    }
+  },
   "adminShopNew": {
     "title": "New store",
     "subtitle": "Store, first warehouse and owner",
@@ -573,7 +623,8 @@ const en = {
     "scan": "Scan",
     "decrease": "Decrease",
     "increase": "Increase",
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel"
   },
   "tag": {
     "Material": "Material",
@@ -1247,6 +1298,13 @@ const en = {
     "detail": "Payment detail",
     "closeCashbox": "Close cashbox",
     "openCashbox": "Open cashbox",
+    "openCashboxSheet": {
+      "text": "The cashbox opens in your name with a balance of 0. Add change with «Income».",
+      "warehouse": "Warehouse",
+      "confirm": "Open",
+      "done": "Cashbox opened",
+      "failed": "Could not open the cashbox"
+    },
     "income": "Income",
     "expense": "Expense",
     "edit": "Edit",
@@ -1307,7 +1365,8 @@ const en = {
       "title": "Close cashbox",
       "message": "Are you sure you want to close the cashbox? This action cannot be undone.",
       "confirmButton": "Yes",
-      "cancelButton": "No"
+      "cancelButton": "No",
+      "failed": "Could not close the cashbox"
     }
   },
   "notFound": {

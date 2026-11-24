@@ -76,6 +76,39 @@ export interface AdminStoreAttribute extends AttributeNames {
   id: string;
   type: AttributeType;
   unit: string | null;
+  /** Store products using it, archived included; > 0 → can't be disconnected */
+  productCount: number;
+}
+
+export interface AdminStoreBrand {
+  id: string;
+  name: string;
+  /** Store products using it, archived included; > 0 → can't be disconnected */
+  productCount: number;
+}
+
+/** Store catalog editor: brands or attributes (billing/docs/store-catalog/PLAN.md) */
+export type StoreCatalogKind = 'brands' | 'attributes';
+
+/** GET /admin/catalog/brands — dictionary row; `storeCount` = stores using it */
+export interface DictionaryBrand {
+  id: string;
+  name: string;
+  storeCount: number;
+}
+
+/** GET /admin/catalog/attributes — dictionary row */
+export interface DictionaryAttribute extends AttributeNames {
+  id: string;
+  type: AttributeType;
+  unit: string | null;
+  storeCount: number;
+}
+
+export interface DictionaryList<T> {
+  data: T[];
+  /** All matching rows; `data` is the first page (most connected first) */
+  total: number;
 }
 
 export interface AdminStoreDetails extends AdminStoreListItem {
@@ -90,7 +123,7 @@ export interface AdminStoreDetails extends AdminStoreListItem {
   /** First employees, owner first */
   staff: AdminStoreStaffItem[];
   categories: { id: string; name: string }[];
-  brands: { id: string; name: string }[];
+  brands: AdminStoreBrand[];
   attributes: AdminStoreAttribute[];
 }
 
