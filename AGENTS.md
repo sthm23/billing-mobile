@@ -296,7 +296,7 @@ API errors: NestJS returns `{ message: string | string[] }` — show it with `ge
 
 ### Order flow (sale)
 
-- **Cart state** lives in `src/screens/order/cart/cart-store.ts` (`cartStore` + `useCart()`, a small `useSyncExternalStore` store) and is shared by the cart, search and scanner screens. One cart at a time; `OrderCartScreen` resets it on mount (`startNew` / `loadOrder`).
+- **Cart state** lives in `src/screens/order/cart/cart-store.ts` (`cartStore` + `useCart()`, a small `useSyncExternalStore` store) and is shared by the cart, search and scanner screens. One cart at a time; `OrderCartScreen` resets it on mount (`startNew` / `loadOrder`). Order-level discount: `cartStore.applySetDiscount(target)` / `clearDiscount()` via `OrderDiscountSheet`, using `src/libs/set-discount.ts` (same algorithm as rental; see `docs/features/orders.md` §16).
 - **Saving**: `useSaveOrder()` creates the order on the first save (`POST /orders`) and then replaces its content (`POST /orders/items`, which deletes lines left out). «Бронь» saves and goes back; «Оплатить» saves and opens `pay/[id]`.
 - **Prices**: lowering = `sale` (absolute per unit), raising = `retailPrice` (`PriceSheet`). Only owner/manager may lower (`canLowerPrice()` in `src/libs/roles.ts` — UX only, the backend enforces it).
 - **Totals** in the cart are a preview; `OrderPayScreen` uses the saved order. It never sends overpayment: cash is reduced by the change. A partial payment needs a customer (`CustomerPickerSheet`).
