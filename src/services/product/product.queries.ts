@@ -176,7 +176,29 @@ export const useUpdateVariant = (): UseMutationResult<
   })
 }
 
-/** Archives a product; refreshes the product list. */
+/**
+ * `PATCH /product/:id/restore` (OWNER/MANAGER) — brings an archived product
+ * back; puts the returned card into the cache and refreshes the lists
+ * (active and «Архив») and the order search.
+ */
+export const useRestoreProduct = (): UseMutationResult<
+  ProductDetail,
+  AxiosError<{ message?: string | string[] }>,
+  string
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (productId) => productService.restoreProduct(productId),
+    onSuccess: (product, productId): void => {
+      queryClient.setQueryData(productQueryKeys.byId(productId), product)
+      void queryClient.invalidateQueries({ queryKey: [...productQueryKeys.all(), 'list'] })
+      void queryClient.invalidateQueries({ queryKey: [...productQueryKeys.all(), 'search'] })
+    },
+  })
+}
+
+/** Archives a product; refreshes the product lists (active and «Архив»). */
 export const useArchiveProduct = (): UseMutationResult<
   unknown,
   AxiosError<{ message?: string | string[] }>,

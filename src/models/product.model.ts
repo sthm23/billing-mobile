@@ -268,7 +268,8 @@ export interface StockMovementHistoryItem {
 
 /** `GET /product` response: the page plus counts for the «Все» / «Мало» chips. */
 export interface ProductListResponse extends BaseListResponse<Product> {
-  counts: { all: number, lowStock: number }
+  /** `archived` — owner / manager / admin only, `0` for other staff */
+  counts: { all: number, lowStock: number, archived: number }
   /** Total stock at or below this is «Мало» */
   lowStockThreshold: number
 }
@@ -291,6 +292,8 @@ export interface ProductParams {
   categoryId?: string;
   /** Only «Мало» products */
   lowStock?: boolean;
+  /** Only archived products (owner / manager, else 403); `lowStock` is ignored */
+  archived?: boolean;
   /** The working warehouse */
   warehouseId?: string;
 }
