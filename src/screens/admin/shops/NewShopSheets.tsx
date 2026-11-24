@@ -94,18 +94,40 @@ export function BrandSheet({ isOpen, onClose, brands, selected, onAdd }: BrandSh
   );
 }
 
+/** Result of `onAdd`: error text, null → added (sheet closes), undefined → stays open, no error */
+type AddResult = string | null | undefined;
+
 interface AttributeSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Returns an error text or null when the attribute was added */
-  onAdd: (attr: NewStoreAttribute) => string | null;
+  /** Returns an error text or null when the attribute was added; may be async (button shows loading) */
+  onAdd: (attr: NewStoreAttribute) => AddResult | Promise<AddResult>;
+  /** Default: the create-store subtitle */
+  subtitle?: string;
+  /** Default: «Добавить атрибут» of the create form */
+  submitLabel?: string;
+  /** Name typed when the sheet opens (search text) */
+  initialName?: string;
+  /** «"Размер" уже есть в справочнике — Текст» + action (store catalog editor) */
+  conflict?: { text: string; actionLabel: string; onAction: () => void } | null;
+  /** The name was edited — the parent drops `conflict` */
+  onNameChange?: () => void;
 }
 
 /**
  * «Новый атрибут» (a group, e.g. «Материал»): name, value type Текст / Число /
  * Да-Нет, unit for numbers. Values (Хлопок, Шёлк) are added with products.
  */
-export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) {
+export function AttributeSheet({
+  isOpen,
+  onClose,
+  onAdd,
+  subtitle,
+  submitLabel,
+  initialName,
+  conflict,
+  onNameChange,
+}: AttributeSheetProps) {
   const { t } = useTranslation();
   const colors = useTheme();
   const [name, setName] = useState('');
@@ -115,37 +137,52 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
   const [unit, setUnit] = useState('');
   const [preview, setPreview] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
-    setName('');
+    setName(initialName ?? '');
+    setBusy(false);
     setNameUz('');
     setNameEn('');
     setType('STRING');
     setUnit('');
     setError(null);
+    // initialName is read only when the sheet opens
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const trimmed = name.trim();
-  const submit = () => {
-    const err = onAdd({
-      name: trimmed,
-      nameUz: nameUz.trim() || undefined,
-      nameEn: nameEn.trim() || undefined,
-      type,
-      unit: type === 'NUMBER' ? unit.trim() || undefined : undefined,
-    });
-    if (err) {
-      setError(err);
+  const submit = async () => {
+    setError(null);
+    setBusy(true);
+    let result: AddResult;
+    try {
+      result = await onAdd({
+        name: trimmed,
+        nameUz: nameUz.trim() || undefined,
+        nameEn: nameEn.trim() || undefined,
+        type,
+        unit: type === 'NUMBER' ? unit.trim() || undefined : undefined,
+      });
+    } finally {
+      setBusy(false);
+    }
+    if (result === null) {
+      onClose();
       return;
     }
-    onClose();
+    if (result) setError(result);
   };
 
   return (
     <Sheet isOpen={isOpen} onClose={onClose} size="auto">
       <View className="px-4 pt-1 pb-3 gap-3.5">
-        <Header title={t('adminShopNew.attr.title')} subtitle={t('adminShopNew.attr.subtitle')} onClose={onClose} />
+        <Header
+          title={t('adminShopNew.attr.title')}
+          subtitle={subtitle ?? t('adminShopNew.attr.subtitle')}
+          onClose={onClose}
+        />
         <View className="gap-1.5">
           <Text className="font-onest-semibold text-[13px] text-soft">{t('adminShopNew.attr.name')}</Text>
           <SheetTextInput
@@ -153,6 +190,7 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
             onChangeText={(v) => {
               setName(v);
               setError(null);
+              onNameChange?.();
             }}
             placeholder={t('adminShopNew.attr.namePlaceholder')}
             placeholderTextColor={colors.muted}
@@ -234,13 +272,28 @@ export function AttributeSheet({ isOpen, onClose, onAdd }: AttributeSheetProps) 
             <Switch value={preview} onValueChange={setPreview} accessibilityLabel={trimmed || t('adminShopNew.attr.name')} />
           </View>
         ) : null}
+        {conflict ? (
+          <View className="flex-row items-center gap-2.5 bg-err-bg rounded-lg pl-3.5 pr-2 py-2" accessibilityRole="alert">
+            <Text className="flex-1 font-onest-semibold text-[13px] leading-[18px] text-err-fg">{conflict.text}</Text>
+            <Button size="sm" variant="secondary" onPress={conflict.onAction}>
+              {conflict.actionLabel}
+            </Button>
+          </View>
+        ) : null}
         {error ? (
           <View className="bg-err-bg rounded-lg px-4 py-3" accessibilityRole="alert">
             <Text className="font-onest-semibold text-[13px] leading-[18px] text-err-fg">{error}</Text>
           </View>
         ) : null}
-        <Button variant="accent" size="lg" full disabled={!trimmed} onPress={submit}>
-          {t('adminShopNew.attr.submit')}
+        <Button
+          variant="accent"
+          size="lg"
+          full
+          disabled={!trimmed || !!conflict}
+          loading={busy}
+          onPress={() => void submit()}
+        >
+          {submitLabel ?? t('adminShopNew.attr.submit')}
         </Button>
       </View>
     </Sheet>

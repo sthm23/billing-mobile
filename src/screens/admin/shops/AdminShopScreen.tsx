@@ -77,6 +77,26 @@ function SmallChip({ label }: { label: string }) {
   );
 }
 
+/** «Бренды · 3   [Изменить]» — opens the store catalog editor */
+function CatalogGroupHeader({ label, onEdit }: { label: string; onEdit: () => void }) {
+  const { t } = useTranslation();
+
+  return (
+    <View className="flex-row items-center gap-2 min-h-[28px]">
+      <Text className="flex-1 font-onest text-[13px] text-soft">{label}</Text>
+      <Pressable
+        onPress={onEdit}
+        accessibilityRole="button"
+        accessibilityLabel={`${t('storeCatalog.edit')} · ${label}`}
+        hitSlop={8}
+        className="h-7 px-2.5 rounded-pill bg-sunken items-center justify-center"
+      >
+        <Text className="font-onest-semibold text-xs text-ink">{t('storeCatalog.edit')}</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 /** Subcategory chip of the catalog block: tap → rename / delete */
 function EditableChip({ label, onPress }: { label: string; onPress: () => void }) {
   return (
@@ -509,7 +529,10 @@ export function AdminShopScreen({ id }: { id: string }) {
             </View>
           ) : null}
           <View className="gap-2">
-            <Text className="font-onest text-[13px] text-soft">{t('adminShop.catalog.brands')}</Text>
+            <CatalogGroupHeader
+              label={`${t('adminShop.catalog.brands')} · ${store.brands.length}`}
+              onEdit={() => router.push({ pathname: '/(tabs)/(profile)/shops/[id]/brands', params: { id: store.id } })}
+            />
             {store.brands.length ? (
               <View className="flex-row flex-wrap gap-1.5">
                 {store.brands.map((b) => <SmallChip key={b.id} label={b.name} />)}
@@ -519,7 +542,12 @@ export function AdminShopScreen({ id }: { id: string }) {
             )}
           </View>
           <View className="gap-2">
-            <Text className="font-onest text-[13px] text-soft">{t('adminShop.catalog.attributes')}</Text>
+            <CatalogGroupHeader
+              label={`${t('adminShop.catalog.attributes')} · ${store.attributes.length}`}
+              onEdit={() =>
+                router.push({ pathname: '/(tabs)/(profile)/shops/[id]/attributes', params: { id: store.id } })
+              }
+            />
             {store.attributes.length ? (
               <>
                 <View className="flex-row flex-wrap gap-1.5">

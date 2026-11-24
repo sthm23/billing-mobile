@@ -24,6 +24,8 @@ export default function TabLayout() {
       <Stack.Screen name="shops/new" />
       <Stack.Screen name="shops/[id]/index" />
       <Stack.Screen name="shops/[id]/staff" />
+      <Stack.Screen name="shops/[id]/brands" />
+      <Stack.Screen name="shops/[id]/attributes" />
     </Stack>
   );
 }

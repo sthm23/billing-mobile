@@ -23,9 +23,8 @@ export const storeService = {
   },
 
   /**
-   * PUT /store/:id — OWNER only. Changes the store modes; `attributeIds` and
-   * `brandIds` are required by the endpoint, so the current ones are sent back.
-   * Both modes off → 400.
+   * PUT /store/:id — OWNER only. Changes the store modes; both off → 400.
+   * Brands / attributes of the store are changed by the platform admin only.
    */
   updateStoreModes: async (id: string, payload: UpdateStoreModesPayload): Promise<void> => {
     await api.put(`${STORE_BASE_URL}/${id}`, payload);

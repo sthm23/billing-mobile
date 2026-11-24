@@ -2,7 +2,7 @@ import { Button, HeroCard, IconButton, Text, toast } from "@/components/base";
 import { getApiErrorMessage } from "@/libs/api-error";
 import { cashboxRights } from "@/libs/roles";
 import { useAuth } from "@/provider/AuthProvider";
-import { EmptyState, LoadingState } from "@/components/common";
+import { ConfirmSheet, EmptyState, LoadingState } from "@/components/common";
 import { CashboxStatus, CashTransactionType } from "@/models/payment.model";
 import { useCashboxById, useCloseCashbox, useCreateTransaction } from "@/services/cashbox";
 import { CreateTransactionPayload } from "@/services/cashbox/cashbox.types";
@@ -10,7 +10,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowDownRight, ArrowUpRight, ChevronLeft, CircleAlert, Lock, Receipt } from "lucide-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { AddTransactionSheet } from "./AddTransactionSheet";
 import { AllTransactionsSheet } from "./AllTransactionsSheet";
 import { formatDayMonth, formatTime } from '@/libs/date';
@@ -29,6 +29,9 @@ export default function CashboxDetailsPage() {
   const [sheetVisible, setSheetVisible] = useState(false);
   const [transactionType, setTransactionType] = useState<CashTransactionType>(CashTransactionType.INCOME);
   const [allTransactionsVisible, setAllTransactionsVisible] = useState(false);
+  // «Закрыть кассу» confirmation (ConfirmSheet: Alert.alert does nothing on web)
+  const [closeOpen, setCloseOpen] = useState(false);
+  const [closeError, setCloseError] = useState<string | null>(null);
 
   const { data: cashbox, isLoading, isError, refetch } = useCashboxById(id, {
     // refetchInterval: 30000,
@@ -41,22 +44,20 @@ export default function CashboxDetailsPage() {
   // A seller works in someone else's open cashbox: income only, no closing
   const rights = cashboxRights(user, cashbox?.sellerId);
   const handleCloseCashbox = () => {
-    Alert.alert(
-      t('payment.closeCashboxConfirmation.title'),
-      t('payment.closeCashboxConfirmation.message'),
-      [
-        { text: t('payment.closeCashboxConfirmation.cancelButton'), style: 'cancel' },
-        {
-          text: t('payment.closeCashboxConfirmation.confirmButton'),
-          style: 'destructive',
-          onPress: () => {
-            closeCashboxMutation.mutate(id, {
-              onSuccess: () => router.back(),
-            });
-          },
-        },
-      ]
-    );
+    setCloseError(null);
+    setCloseOpen(true);
+  };
+
+  const confirmCloseCashbox = () => {
+    setCloseError(null);
+    closeCashboxMutation.mutate(id, {
+      onSuccess: () => {
+        setCloseOpen(false);
+        router.back();
+      },
+      // Shown in the sheet: before, a failed close was silent
+      onError: (err) => setCloseError(getApiErrorMessage(err, t('payment.closeCashboxConfirmation.failed'))),
+    });
   };
 
   const handleAddIncome = () => {
@@ -201,6 +202,21 @@ export default function CashboxDetailsPage() {
         isPresented={allTransactionsVisible}
         onDismiss={() => setAllTransactionsVisible(false)}
         transactions={sortedTransactions}
+      />
+
+      <ConfirmSheet
+        isOpen={closeOpen}
+        onClose={() => {
+          if (!closeCashboxMutation.isPending) setCloseOpen(false);
+        }}
+        title={t('payment.closeCashboxConfirmation.title')}
+        message={t('payment.closeCashboxConfirmation.message')}
+        confirmLabel={t('payment.closeCashboxConfirmation.confirmButton')}
+        cancelLabel={t('payment.closeCashboxConfirmation.cancelButton')}
+        tone="danger"
+        loading={closeCashboxMutation.isPending}
+        error={closeError}
+        onConfirm={confirmCloseCashbox}
       />
 
       {/* Add Transaction Sheet */}

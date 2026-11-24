@@ -79,8 +79,6 @@ export function StoreSettingsScreen() {
           salesEnabled: modes.sale,
           rentalEnabled: modes.rent,
           ...(consentChanged ? { voiceDataConsent: voiceConsent } : {}),
-          attributeIds: store.attributes.map((a) => a.attributeId),
-          brandIds: store.brands.map((b) => b.brandId),
         },
       },
       {

@@ -17,6 +17,8 @@ import type {
   CatalogBrand,
   CatalogCategory,
   CreateAdminStorePayload,
+  NewStoreAttribute,
+  StoreCatalogKind,
   StoreSuspendReason,
   UpdateAdminStorePayload,
 } from './admin-store.types';
@@ -32,6 +34,8 @@ export const adminStoreQueryKeys = {
   byId: (id: string) => [...adminStoreQueryKeys.all(), 'byId', id] as const,
   staff: (id: string) => [...adminStoreQueryKeys.all(), 'staff', id] as const,
   catalog: (kind: 'categories' | 'brands' | 'attributes') => [...adminStoreQueryKeys.all(), 'catalog', kind] as const,
+  dictionary: (kind: StoreCatalogKind, search: string) =>
+    [...adminStoreQueryKeys.all(), 'dictionary', kind, search] as const,
 };
 
 /** Store list pages (search / filters from the backend). */
@@ -153,3 +157,59 @@ export const useAllAttributes = (enabled = true): UseQueryResult<CatalogAttribut
     queryFn: adminStoreService.getAttributes,
     staleTime: 5 * 60_000,
   });
+
+/** Brand / attribute dictionary of the store catalog editor (server search, most connected first) */
+export const useCatalogDictionary = (kind: StoreCatalogKind, search: string, enabled = true) =>
+  useQuery({
+    enabled,
+    queryKey: adminStoreQueryKeys.dictionary(kind, search),
+    queryFn: () =>
+      kind === 'brands' ? adminStoreService.searchBrands(search) : adminStoreService.searchAttributes(search),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+export type ConnectCatalogVars =
+  | { kind: 'brands'; brandId: string }
+  | { kind: 'brands'; name: string }
+  | { kind: 'attributes'; attributeId: string }
+  | { kind: 'attributes'; newAttribute: NewStoreAttribute };
+
+/** Connect / disconnect one brand or attribute; reloads the store card and the dictionary (store counts) */
+function useCatalogInvalidation(storeId: string) {
+  const queryClient = useQueryClient();
+
+  return () => {
+    void queryClient.invalidateQueries({ queryKey: adminStoreQueryKeys.byId(storeId) });
+    void queryClient.invalidateQueries({ queryKey: [...adminStoreQueryKeys.all(), 'dictionary'] });
+    // The create form lists every brand / attribute — a new one may have been created
+    void queryClient.invalidateQueries({ queryKey: [...adminStoreQueryKeys.all(), 'catalog'] });
+  };
+}
+
+export const useConnectCatalogItem = (storeId: string) => {
+  const invalidate = useCatalogInvalidation(storeId);
+
+  return useMutation({
+    mutationFn: async (vars: ConnectCatalogVars): Promise<{ id: string; name: string }> => {
+      const { kind, ...body } = vars;
+      return kind === 'brands'
+        ? adminStoreService.connectBrand(storeId, body as { brandId: string } | { name: string })
+        : adminStoreService.connectAttribute(
+            storeId,
+            body as { attributeId: string } | { newAttribute: NewStoreAttribute },
+          );
+    },
+    onSuccess: invalidate,
+  });
+};
+
+export const useDisconnectCatalogItem = (storeId: string) => {
+  const invalidate = useCatalogInvalidation(storeId);
+
+  return useMutation({
+    mutationFn: ({ kind, id }: { kind: StoreCatalogKind; id: string }) =>
+      adminStoreService.disconnect(storeId, kind, id),
+    onSuccess: invalidate,
+  });
+};
