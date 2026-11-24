@@ -760,7 +760,32 @@ const ru = {
     "allDebtors": "Все должники",
     "debtIssued": "Выдано",
     "debtRepaid": "Погашено",
-    "debtNow": "Должны сейчас"
+    "debtNow": "Должны сейчас",
+    "more": {
+      "show": "Показать ещё отчёты",
+      "hintTeam": "Сотрудники и склады",
+      "hintActivity": "По часам, возвраты, аренда",
+      "step": "{{n}} из {{total}}",
+      "collapse": "Свернуть дополнительные отчёты",
+      "teamTitle": "Сотрудники и склады",
+      "activityTitle": "Время, возвраты, аренда",
+      "staffTitle": "Продажи по сотрудникам",
+      "byRevenue": "выручка",
+      "warehousesTitle": "Продажи по складам",
+      "avgPerDay": "в среднем за день",
+      "peak": "Пик — {{peak}}, тише всего — {{quiet}}",
+      "peakOnly": "Пик — {{peak}}",
+      "returnsTitle": "Возвраты",
+      "returnsSum": "Сумма",
+      "returnsCount": "Возвратов",
+      "returnsShare": "От продаж",
+      "rentalTitle": "Аренда",
+      "rentalIncome": "доход {{value}} UZS",
+      "rentalOut": "На руках",
+      "rentalToday": "Вернуть сегодня",
+      "rentalOverdue": "Просрочено",
+      "rentalNote": "Вещи — на сейчас. Залоги в выручку не входят"
+    }
   },
   "sidebar": {
     "home": "Главная",

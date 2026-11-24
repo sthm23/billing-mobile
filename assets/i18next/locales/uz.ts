@@ -760,7 +760,32 @@ const uz = {
     "allDebtors": "Barcha qarzdorlar",
     "debtIssued": "Berildi",
     "debtRepaid": "To‘landi",
-    "debtNow": "Hozirgi qarz"
+    "debtNow": "Hozirgi qarz",
+    "more": {
+      "show": "Yana hisobotlar",
+      "hintTeam": "Xodimlar va omborlar",
+      "hintActivity": "Soatlar, qaytarishlar, ijara",
+      "step": "{{n}} / {{total}}",
+      "collapse": "Qo‘shimcha hisobotlarni yopish",
+      "teamTitle": "Xodimlar va omborlar",
+      "activityTitle": "Vaqt, qaytarishlar, ijara",
+      "staffTitle": "Xodimlar bo‘yicha sotuv",
+      "byRevenue": "tushum",
+      "warehousesTitle": "Omborlar bo‘yicha sotuv",
+      "avgPerDay": "kuniga o‘rtacha",
+      "peak": "Eng ko‘p — {{peak}}, eng kam — {{quiet}}",
+      "peakOnly": "Eng ko‘p — {{peak}}",
+      "returnsTitle": "Qaytarishlar",
+      "returnsSum": "Summa",
+      "returnsCount": "Qaytarishlar",
+      "returnsShare": "Sotuvdan",
+      "rentalTitle": "Ijara",
+      "rentalIncome": "daromad {{value}} UZS",
+      "rentalOut": "Mijozda",
+      "rentalToday": "Bugun qaytariladi",
+      "rentalOverdue": "Muddati o‘tgan",
+      "rentalNote": "Narsalar — hozirgi holat. Garovlar tushumga kirmaydi"
+    }
   },
   "sidebar": {
     "home": "Asosiy",

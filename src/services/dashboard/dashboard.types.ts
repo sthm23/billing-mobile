@@ -70,3 +70,37 @@ export interface DashboardSummary {
     outstandingNow: number | null
   }
 }
+
+/** `GET /dashboard/team` — «Показать ещё» block 1. */
+export interface DashboardTeam {
+  period: DashboardPeriod
+  warehouseId: string | null
+  /** Everyone who sold in the period, largest first */
+  staff: { staffId: string; name: string; sales: number; orders: number }[]
+  /** null with a warehouse filter or a single warehouse */
+  warehouses: { warehouseId: string; name: string; sales: number; orders: number; share: number }[] | null
+}
+
+export type ReturnReason = 'DEFECT' | 'NOT_FIT' | 'EXTRA' | 'OTHER'
+
+/** `GET /dashboard/activity` — «Показать ещё» block 2. */
+export interface DashboardActivity {
+  period: DashboardPeriod
+  warehouseId: string | null
+  hours: {
+    days: number
+    /** Store-local hours 0–23: average sales per day, total orders */
+    points: { hour: number; avgSales: number; orders: number }[]
+    peakHour: number | null
+    quietHour: number | null
+  }
+  returns: {
+    amount: number
+    count: number
+    /** returns / sales (0..); null without sales */
+    share: number | null
+    byReason: { reason: ReturnReason; count: number; amount: number }[]
+  }
+  /** null when rental is off for the store; units are «now», income is for the period */
+  rental: { income: number; out: number; dueToday: number; overdue: number } | null
+}

@@ -31,6 +31,7 @@ import {
   type DashboardPeriod,
   type DashboardPeriodKey,
 } from './dashboard-period';
+import { DashboardMore } from './DashboardMore';
 import { SectionCard, ShareBar, StatTile, TotalRow } from './DashboardParts';
 import { DashboardWarehouseSheet } from './DashboardWarehouseSheet';
 
@@ -60,6 +61,8 @@ export function DashboardScreen() {
   const [warehouseId, setWarehouseId] = useState<string | null>(null);
   const [picker, setPicker] = useState<Picker>('none');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  // Open «Показать ещё» blocks stay open when the period or warehouse changes
+  const [moreOpened, setMoreOpened] = useState(0);
 
   const today = toLocalDate(new Date());
   const days = periodDays(period, today);
@@ -184,6 +187,7 @@ export function DashboardScreen() {
               selectedKey={selectedKey}
               onSelect={setSelectedKey}
             />
+            <DashboardMore params={params} opened={moreOpened} onOpen={setMoreOpened} />
           </View>
         ) : null}
       </ScrollView>

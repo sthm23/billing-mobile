@@ -760,7 +760,32 @@ const en = {
     "allDebtors": "All debtors",
     "debtIssued": "Issued",
     "debtRepaid": "Repaid",
-    "debtNow": "Owed now"
+    "debtNow": "Owed now",
+    "more": {
+      "show": "Show more reports",
+      "hintTeam": "Staff and warehouses",
+      "hintActivity": "By hour, returns, rental",
+      "step": "{{n}} of {{total}}",
+      "collapse": "Hide extra reports",
+      "teamTitle": "Staff and warehouses",
+      "activityTitle": "Time, returns, rental",
+      "staffTitle": "Sales by staff",
+      "byRevenue": "revenue",
+      "warehousesTitle": "Sales by warehouse",
+      "avgPerDay": "average per day",
+      "peak": "Peak — {{peak}}, quietest — {{quiet}}",
+      "peakOnly": "Peak — {{peak}}",
+      "returnsTitle": "Returns",
+      "returnsSum": "Amount",
+      "returnsCount": "Returns",
+      "returnsShare": "Of sales",
+      "rentalTitle": "Rental",
+      "rentalIncome": "income {{value}} UZS",
+      "rentalOut": "Out now",
+      "rentalToday": "Due today",
+      "rentalOverdue": "Overdue",
+      "rentalNote": "Items are as of now. Collateral is not revenue"
+    }
   },
   "sidebar": {
     "home": "Home",
