@@ -15,7 +15,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.sthm23.billingmobile"
+      "package": "uz.sthm23.app"
     },
     "web": {
       "bundler": "metro",
