@@ -36,7 +36,7 @@
 <main>
 <nav class="langs" aria-label="Язык / Til / Language"><a href="/privacy.html" hreflang="ru">Русский</a><a href="/privacy.uz.html" hreflang="uz" aria-current="page">Oʻzbekcha</a><a href="/privacy.en.html" hreflang="en">English</a></nav>
 <h1>STHM mobil ilovasining maxfiylik siyosati</h1>
-<p class="meta">Kuchga kirish sanasi: 05.11.2026 · Oxirgi yangilanish: 05.11.2026</p>
+<p class="meta">Kuchga kirish sanasi: 05.11.2026 · Oxirgi yangilanish: 24.11.2026</p>
 
 <p>Ushbu Maxfiylik siyosati (keyingi oʻrinlarda — «Siyosat») <strong>STHM</strong> mobil ilovasi (Android, paket <code>com.sthm23.billingmobile</code>, keyingi oʻrinlarda — «Ilova») qanday maʼlumotlarni yigʻishi va qayta ishlashi, ular nima maqsadda ishlatilishi, qanday saqlanishi va himoya qilinishi hamda foydalanuvchilarning huquqlarini tavsiflaydi.</p>
 <p>Ishlab chiquvchi va maʼlumotlar operatori: <strong>Sanjar Tuxtamishev</strong> (jismoniy shaxs), Toshkent shahri, Oʻzbekiston Respublikasi.<br>
@@ -70,7 +70,15 @@ Maxfiylik masalalari boʻyicha aloqa: <a href="mailto:sanjartukhtamishev@gmail.c
 <h3>2.3. Doʻkonning tijorat maʼlumotlari</h3>
 <p>Tovarlar, narxlar, qoldiqlar, buyurtmalar, toʻlovlar, kassa amallari. Bu maʼlumotlar shaxsga doir emas, lekin xuddi shunday darajada himoya qilinadi.</p>
 
-<h3>2.4. Qurilmadagi texnik maʼlumotlar</h3>
+<h3>2.4. Tovar suratlari va ovozli yozuvlar</h3>
+<p><strong>Tovar suratlari.</strong> Xodim tovarni kamera bilan suratga olishi yoki qurilma galereyasidan surat tanlashi mumkin. Tanlangan suratlar qurilmada siqiladi va tovar kartochkasida koʻrsatish uchun serverga yuklanadi. Suratlar toʻgʻridan-toʻgʻri havola orqali ochiladi, shuning uchun ularda odamlarni va shaxsiy maʼlumotlar yozilgan hujjatlarni suratga olmang.</p>
+<p><strong>Ovozli buyurtma</strong> (doʻkon uchun alohida yoqiladi). Xodim buyurtma tovarlarini ovoz bilan aytib berishi mumkin. Yozuv faqat tugma bosilganda boshlanadi, 60 soniyadan oshmaydi va tizim joylashgan serverning oʻzida ishlaydigan nutqni aniqlash xizmatimizga yuboriladi. Audio uchinchi tomon xizmatlariga berilmaydi.</p>
+<ul>
+<li>Odatda yozuv aniqlangandan keyin darhol oʻchiriladi — faqat buyurtma matni saqlanadi.</li>
+<li>Agar doʻkon egasi sozlamalarda yozuvlarni saqlashga ruxsat bergan boʻlsa, audio aniqlangan va tuzatilgan matn bilan birga nutqni aniqlashni yaxshilash uchun yopiq xotirada saqlanadi. Xodim bu haqda mikrofon tugmasi ostida eslatmani koʻradi. Yozuvlar eʼlon qilinmaydi va hech kimga berilmaydi.</li>
+</ul>
+
+<h3>2.5. Qurilmadagi texnik maʼlumotlar</h3>
 <p>Qurilmada Ilovaning lokal xotirasida quyidagilar saqlanadi:</p>
 <ul>
 <li>avtorizatsiya tokeni (har safar ishga tushirishda parol kiritmaslik uchun);</li>
@@ -79,12 +87,12 @@ Maxfiylik masalalari boʻyicha aloqa: <a href="mailto:sanjartukhtamishev@gmail.c
 </ul>
 <p>Bu maʼlumotlar hisob yozuvidan chiqilganda yoki Ilova oʻchirilganda oʻchiriladi.</p>
 
-<h3>2.5. Biz nimalarni yigʻmaymiz</h3>
+<h3>2.6. Biz nimalarni yigʻmaymiz</h3>
 <ul>
 <li>geolokatsiya;</li>
 <li>kontaktlar, SMS, qoʻngʻiroqlar jurnali;</li>
-<li>galereyadagi suratlar va fayllar (foydalanuvchi oʻzi yuklagan profil suratidan tashqari);</li>
-<li>audio (mikrofonga ruxsat soʻralmaydi);</li>
+<li>galereyadagi suratlar va fayllar, foydalanuvchi tovar yoki profil uchun oʻzi tanlagan suratlardan tashqari;</li>
+<li>fonda audio — mikrofon faqat foydalanuvchi oʻzi boshlagan ovozli buyurtma yozuvi vaqtida ishlaydi;</li>
 <li>reklama identifikatorlari;</li>
 <li>bank kartalari maʼlumotlari (Ilova faqat toʻlov fakti va summasini qayd etadi, karta raqamisiz).</li>
 </ul>
@@ -93,11 +101,13 @@ Maxfiylik masalalari boʻyicha aloqa: <a href="mailto:sanjartukhtamishev@gmail.c
 <h2>3. Ilova ruxsatlari</h2>
 <div class="table-wrap"><table>
 <tr><th>Ruxsat</th><th>Nima uchun ishlatiladi</th></tr>
-<tr><td><strong>Kamera</strong></td><td>Faqat tovarlar shtrix-kodini skanerlash uchun. Tasvir qurilmada real vaqtda qayta ishlanadi, <strong>saqlanmaydi va serverga yuborilmaydi</strong> — faqat aniqlangan tovar kodi yuboriladi</td></tr>
+<tr><td><strong>Kamera</strong></td><td>Tovarlar shtrix-kodini skanerlash: tasvir qurilmada real vaqtda qayta ishlanadi, <strong>saqlanmaydi va serverga yuborilmaydi</strong> — faqat aniqlangan kod yuboriladi. Tovarni suratga olish: serverga faqat foydalanuvchi tovar kartochkasida saqlagan surat yuklanadi</td></tr>
+<tr><td><strong>Suratlar va media fayllar</strong></td><td>Tovar suratini galereyadan tanlash. Ilova faqat foydalanuvchi tanlagan suratlarni oladi</td></tr>
+<tr><td><strong>Mikrofon</strong></td><td>Ovozli buyurtma — faqat foydalanuvchi yozib olayotgan vaqtda (2.4-bandga qarang)</td></tr>
 <tr><td><strong>Bildirishnomalar</strong></td><td>Ilova ishlashi davomida lokal bildirishnomalarni koʻrsatish (masalan, amal natijasi haqida). Push-xabarlar va marketing xabarlari yuborilmaydi</td></tr>
 <tr><td><strong>Internet</strong></td><td>Tizim serveri bilan maʼlumot almashish</td></tr>
 </table></div>
-<p>Kamera va bildirishnomalarga ruxsatni istalgan vaqtda qurilma sozlamalarida bekor qilish mumkin; Ilovaning qolgan funksiyalari ishlashda davom etadi.</p>
+<p>Kamera, suratlar, mikrofon va bildirishnomalarga ruxsatni istalgan vaqtda qurilma sozlamalarida bekor qilish mumkin; Ilovaning qolgan funksiyalari ishlashda davom etadi.</p>
 
 <h2>4. Qayta ishlash maqsadlari</h2>
 <p>Maʼlumotlar faqat quyidagi maqsadlarda qayta ishlanadi:</p>
@@ -115,6 +125,7 @@ Maxfiylik masalalari boʻyicha aloqa: <a href="mailto:sanjartukhtamishev@gmail.c
 <li>tizim joylashtirilgan serverlar egasi — <strong>xosting-provayder</strong> «Oʻzbektelekom» AK (serverlar Oʻzbekiston Respublikasi hududida joylashgan);</li>
 <li>qonunchilikda bevosita nazarda tutilgan hollar (vakolatli davlat organlarining qonuniy soʻrovi boʻyicha).</li>
 </ul>
+<p>Nutqni aniqlash oʻz serverimizda bajariladi; audio tashqi nutqni aniqlash yoki sunʼiy intellekt xizmatlariga yuborilmaydi.</p>
 <p>Bir doʻkon maʼlumotlari boshqa doʻkonlar xodimlariga koʻrinmaydi.</p>
 
 <h2>6. Maʼlumotlarni saqlash va himoya qilish</h2>
@@ -130,6 +141,8 @@ Maxfiylik masalalari boʻyicha aloqa: <a href="mailto:sanjartukhtamishev@gmail.c
 <li><strong>xodim hisob yozuvi</strong> — u faol boʻlgan davrda. Oʻchirilgandan soʻng shaxsga doir maʼlumotlar (F.I.Sh., telefon, login, surat) 30 kun ichida oʻchiriladi;</li>
 <li><strong>xaridorlar maʼlumotlari</strong> (F.I.Sh., telefon) — doʻkon tizimdan foydalanayotgan davrda yoki xaridor yoxud doʻkon oʻchirishni soʻraguncha; shundan soʻng 30 kun ichida oʻchiriladi;</li>
 <li><strong>savdo, toʻlovlar, qarzlar va kassa amallari yozuvlari</strong> — doʻkon tizimdan foydalanayotgan davrda. Doʻkon foydalanishni toʻxtatgandan soʻng maʼlumotlar yana 5 yil (Oʻzbekiston Respublikasi qonunchiligiga koʻra birlamchi hisob hujjatlarini saqlash muddati) doʻkon ularni soʻrab olishi uchun saqlanadi, soʻngra oʻchiriladi. Hisob yozuvi yoki xaridor oʻchirilgandan keyin qolgan yozuvlarda shaxsga doir maʼlumotlar anonimlashtiriladi;</li>
+<li><strong>tovar suratlari</strong> — doʻkon tizimdan foydalanayotgan davrda;</li>
+<li><strong>ovozli yozuvlar</strong> — doʻkon ruxsatisiz aniqlangandan keyin darhol oʻchiriladi. Ruxsat bilan 12 oydan ortiq saqlanmaydi; egasi ruxsatni oʻchirganda doʻkonning barcha yozuvlari oʻchiriladi;</li>
 <li><strong>qurilmadagi maʼlumotlar</strong> — hisob yozuvidan chiqilgunga yoki Ilova oʻchirilgunga qadar.</li>
 </ul>
 <p>Agar tizim ishi toʻxtatilsa, foydalanuvchilar kamida 30 kun oldin xabardor qilinadi va oʻz doʻkoni maʼlumotlarini eksport qilishni soʻrashlari mumkin boʻladi. Shundan soʻng barcha maʼlumotlar oʻchiriladi.</p>

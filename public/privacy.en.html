@@ -36,7 +36,7 @@
 <main>
 <nav class="langs" aria-label="Язык / Til / Language"><a href="/privacy.html" hreflang="ru">Русский</a><a href="/privacy.uz.html" hreflang="uz">Oʻzbekcha</a><a href="/privacy.en.html" hreflang="en" aria-current="page">English</a></nav>
 <h1>STHM Mobile App Privacy Policy</h1>
-<p class="meta">Effective date: 05.11.2026 · Last updated: 05.11.2026</p>
+<p class="meta">Effective date: 05.11.2026 · Last updated: 24.11.2026</p>
 
 <p>This Privacy Policy (the “Policy”) explains what data the <strong>STHM</strong> mobile app (Android, package <code>com.sthm23.billingmobile</code>, the “App”) collects and processes, why it is used, how it is stored and protected, and what rights users have.</p>
 <p>Developer and data controller: <strong>Sanjar Tukhtamishev</strong> (individual), Tashkent, Republic of Uzbekistan.<br>
@@ -70,7 +70,15 @@ Privacy contact: <a href="mailto:sanjartukhtamishev@gmail.com"><strong>sanjartuk
 <h3>2.3. Store business data</h3>
 <p>Products, prices, stock levels, orders, payments and cash operations. This data is not personal data, but it is protected to the same standard.</p>
 
-<h3>2.4. Technical data on the device</h3>
+<h3>2.4. Product photos and voice recordings</h3>
+<p><strong>Product photos.</strong> An employee can take a photo of a product with the camera or pick one from the device gallery. Selected photos are compressed on the device and uploaded to the server to be shown on the product card. Photos are accessible by a direct link, so do not photograph people or documents containing personal data.</p>
+<p><strong>Voice order</strong> (enabled for a store separately). An employee can dictate the products of an order. Recording starts only when the button is pressed, lasts no longer than 60 seconds and is sent to our own speech recognition service, which runs on the same server as the system. Audio is not shared with third-party services.</p>
+<ul>
+<li>By default the recording is deleted right after recognition; only the order text is kept.</li>
+<li>If the store owner has allowed recordings to be kept in the settings, the audio, together with the recognized and corrected text, is kept in private storage to improve speech recognition. The employee sees a note about this under the microphone button. Recordings are never published or shared.</li>
+</ul>
+
+<h3>2.5. Technical data on the device</h3>
 <p>The App stores the following in its local storage on the device:</p>
 <ul>
 <li>an authorization token (so that you do not have to enter your password on every launch);</li>
@@ -79,12 +87,12 @@ Privacy contact: <a href="mailto:sanjartukhtamishev@gmail.com"><strong>sanjartuk
 </ul>
 <p>This data is deleted when you sign out or uninstall the App.</p>
 
-<h3>2.5. What we do not collect</h3>
+<h3>2.6. What we do not collect</h3>
 <ul>
 <li>location;</li>
 <li>contacts, SMS, call logs;</li>
-<li>photos or files from the gallery (except a profile photo if you upload one yourself);</li>
-<li>audio (microphone access is not requested);</li>
+<li>photos or files from the gallery, except the images you pick yourself for a product or your profile;</li>
+<li>background audio — the microphone works only while you record a voice order yourself;</li>
 <li>advertising identifiers;</li>
 <li>bank card details (the App records only the fact and the amount of a payment, never the card number).</li>
 </ul>
@@ -93,11 +101,13 @@ Privacy contact: <a href="mailto:sanjartukhtamishev@gmail.com"><strong>sanjartuk
 <h2>3. App permissions</h2>
 <div class="table-wrap"><table>
 <tr><th>Permission</th><th>What it is used for</th></tr>
-<tr><td><strong>Camera</strong></td><td>Only for scanning product barcodes. The image is processed on the device in real time and is <strong>neither stored nor sent</strong> to the server; only the recognized product code is sent</td></tr>
+<tr><td><strong>Camera</strong></td><td>Scanning product barcodes: the image is processed on the device in real time and is <strong>neither stored nor sent</strong> to the server; only the recognized code is sent. Taking a product photo: only the photo you save on the product card is uploaded</td></tr>
+<tr><td><strong>Photos and media</strong></td><td>Picking a product photo from the gallery. The App receives only the images you pick</td></tr>
+<tr><td><strong>Microphone</strong></td><td>Voice order — only while you are recording (see 2.4)</td></tr>
 <tr><td><strong>Notifications</strong></td><td>Local notifications while you work in the App (for example, the result of an operation). No push campaigns or marketing messages are sent</td></tr>
 <tr><td><strong>Internet</strong></td><td>Exchanging data with the system’s server</td></tr>
 </table></div>
-<p>You can revoke the camera and notification permissions at any time in the device settings; the rest of the App will keep working.</p>
+<p>You can revoke the camera, photos, microphone and notification permissions at any time in the device settings; the rest of the App will keep working.</p>
 
 <h2>4. Purposes of processing</h2>
 <p>Data is processed solely to:</p>
@@ -115,6 +125,7 @@ Privacy contact: <a href="mailto:sanjartukhtamishev@gmail.com"><strong>sanjartuk
 <li>the <strong>hosting provider</strong> JSC “Uzbektelecom”, whose servers host the system (the servers are located in the Republic of Uzbekistan);</li>
 <li>where expressly required by law (upon a lawful request from authorized government bodies).</li>
 </ul>
+<p>Speech recognition runs on our own server; audio is not sent to external speech recognition or artificial intelligence services.</p>
 <p>One store’s data is not accessible to employees of other stores.</p>
 
 <h2>6. Storage and security</h2>
@@ -130,6 +141,8 @@ Privacy contact: <a href="mailto:sanjartukhtamishev@gmail.com"><strong>sanjartuk
 <li><strong>employee account</strong> — while it is active. After deletion, personal data (name, phone, login, photo) is erased within 30 days;</li>
 <li><strong>customer data</strong> (name, phone) — while the store uses the system or until the customer or the store requests deletion; then erased within 30 days;</li>
 <li><strong>records of sales, payments, debts and cash operations</strong> — while the store uses the system. After the store stops using it, the data is kept for another 5 years (the retention period for primary accounting documents under the laws of the Republic of Uzbekistan) so that the store can request it, and is then deleted. In records that remain after an account or customer is deleted, personal data is anonymized;</li>
+<li><strong>product photos</strong> — while the store uses the system;</li>
+<li><strong>voice recordings</strong> — without the store’s permission, deleted right after recognition. With permission, kept for no longer than 12 months; when the owner withdraws the permission, all of the store’s recordings are deleted;</li>
 <li><strong>data on the device</strong> — until you sign out or uninstall the App.</li>
 </ul>
 <p>If the service is discontinued, users will be notified at least 30 days in advance and will be able to request an export of their store’s data. After that, all data will be deleted.</p>
