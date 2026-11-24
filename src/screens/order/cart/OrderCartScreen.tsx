@@ -1,4 +1,4 @@
-import { Button, IconButton, Money, Pressable, Text } from '@/components/base';
+import { Button, IconButton, Money, Pressable, Text, toast } from '@/components/base';
 import { CustomerPickerSheet, PriceSheet, SwipeableOrderItemCard } from '@/components/order';
 import { useTheme } from '@/hooks/use-theme';
 import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
@@ -11,7 +11,7 @@ import { router } from 'expo-router';
 import { ChevronLeft, CircleAlert, Mic, ScanBarcode, Search, ShoppingCart, UserRound, X } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, FlatList, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { VoiceInputSheet } from '../voice/VoiceInputSheet';
 import { voiceStore } from '../voice/voice-store';
@@ -128,7 +128,8 @@ export function OrderCartScreen({ order, startScan, keepCart }: OrderCartScreenP
           if (next === 'pay') {
             router.push({ pathname: '/(tabs)/(orders)/pay/[id]', params: { id } });
           } else {
-            Alert.alert(t('sale.cart.heldTitle'), t('sale.cart.heldText'));
+            // toast, not Alert.alert (a no-op on web)
+            toast.show(t('sale.cart.heldTitle'));
             router.back();
           }
         },

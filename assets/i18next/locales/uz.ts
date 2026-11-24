@@ -1298,6 +1298,13 @@ const uz = {
     "detail": "To'lov tafsilotlari.",
     "closeCashbox": "Kassani yopish",
     "openCashbox": "Kassani ochish",
+    "openCashboxSheet": {
+      "text": "Kassa sizning nomingizga 0 balans bilan ochiladi. Maydalikni «Daromad» bilan kiritish mumkin.",
+      "warehouse": "Ombor",
+      "confirm": "Ochish",
+      "done": "Kassa ochildi",
+      "failed": "Kassani ochib bo‘lmadi"
+    },
     "income": "Daromad",
     "expense": "Xarajat",
     "createOutgo": "Xarajat",

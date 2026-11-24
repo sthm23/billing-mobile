@@ -1298,6 +1298,13 @@ const en = {
     "detail": "Payment detail",
     "closeCashbox": "Close cashbox",
     "openCashbox": "Open cashbox",
+    "openCashboxSheet": {
+      "text": "The cashbox opens in your name with a balance of 0. Add change with «Income».",
+      "warehouse": "Warehouse",
+      "confirm": "Open",
+      "done": "Cashbox opened",
+      "failed": "Could not open the cashbox"
+    },
     "income": "Income",
     "expense": "Expense",
     "edit": "Edit",

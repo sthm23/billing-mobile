@@ -11,6 +11,7 @@ import {
   InputField,
   Pressable,
   Text,
+  toast,
 } from '@/components/base';
 import { EmptyState, LoadingState } from '@/components/common';
 import { useTheme } from '@/hooks/use-theme';
@@ -36,7 +37,7 @@ import { formatNationalPhone, PHONE_DIGITS, PHONE_PREFIX, STAFF_LOGIN_PATTERN } 
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import * as z from 'zod';
 
 
@@ -116,11 +117,9 @@ export function CreateStaffScreen() {
       },
       {
         onSuccess: () => {
-          Alert.alert(
-            t('staffCreate.successTitle'),
-            t('staffCreate.successText', { name: values.fullName.trim(), login: values.login.trim() }),
-            [{ text: 'OK', onPress: () => router.back() }]
-          );
+          // toast + back right away, not Alert.alert (a no-op on web: the screen stayed on the filled form)
+          toast.show(t('staffCreate.successText', { name: values.fullName.trim(), login: values.login.trim() }));
+          router.back();
         },
         onError: (error) => setSubmitError(getApiErrorMessage(error, t('staffCreate.createFailed'))),
       }

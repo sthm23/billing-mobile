@@ -3,6 +3,7 @@ import { Sheet } from '@/components/base/Sheet';
 import { X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
+import type React from 'react';
 
 interface ConfirmSheetProps {
   isOpen: boolean;
@@ -21,6 +22,8 @@ interface ConfirmSheetProps {
   /** API error of the last attempt — shown inside the sheet, not as a toast behind it */
   error?: string | null;
   onConfirm: () => void;
+  /** Extra content between the message and the buttons (e.g. a warehouse choice) */
+  children?: React.ReactNode;
 }
 
 /**
@@ -52,6 +55,7 @@ export function ConfirmSheet({
   loading = false,
   error,
   onConfirm,
+  children,
 }: ConfirmSheetProps) {
   const { t } = useTranslation();
 
@@ -67,6 +71,8 @@ export function ConfirmSheet({
           </View>
           <IconButton icon={X} variant="sunken" accessibilityLabel={t('common.close')} onPress={onClose} />
         </View>
+
+        {children}
 
         {error ? (
           <View className="bg-err-bg rounded-lg px-4 py-3" accessibilityRole="alert">

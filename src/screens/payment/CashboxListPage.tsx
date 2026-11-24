@@ -1,11 +1,14 @@
 import { useWorkingWarehouse } from '@/hooks/use-working-warehouse';
-import { Button, IconButton, Segmented, Text } from '@/components/base';
+import { Button, Chip, IconButton, Segmented, Text, toast } from '@/components/base';
 import { type CashboxStatusFilter } from '@/components/cashbox';
 import { FilterSheet } from '@/components/cashbox/FilterSheet';
-import { EmptyState, LoadingState } from '@/components/common';
+import { ConfirmSheet, EmptyState, LoadingState } from '@/components/common';
 import { useBottomNavInset } from '@/components/navigation/BottomNav';
 import { CashboxStatus, Payment } from '@/models/payment.model';
-import { useCashboxList } from '@/services/cashbox';
+import { useCashboxList, useOpenCashbox } from '@/services/cashbox';
+import { getApiErrorMessage } from '@/libs/api-error';
+import { canOpenCashbox } from '@/libs/roles';
+import { useAuth } from '@/provider/AuthProvider';
 import { cashboxQueryKeys } from '@/services/cashbox/cashbox.queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { CashboxParams } from '@/services/cashbox/cashbox.types';
@@ -30,6 +33,13 @@ export default function CashboxListPage() {
   const pageSize = 10;
 
   const working = useWorkingWarehouse();
+  const { user } = useAuth();
+  // Owner / manager / cashier open their own cashbox; a seller uses an open one (UX only — the backend checks)
+  const canOpen = canOpenCashbox(user);
+  const openCashbox = useOpenCashbox();
+  const [openSheet, setOpenSheet] = useState(false);
+  const [openWarehouseId, setOpenWarehouseId] = useState<string | undefined>();
+  const [openError, setOpenError] = useState<string | null>(null);
   const listParams = useMemo<CashboxParams>(
     () => ({
       currentPage: page,
@@ -82,6 +92,33 @@ export default function CashboxListPage() {
     setPage((prev) => prev + 1);
   };
 
+  const startOpenCashbox = () => {
+    setOpenError(null);
+    setOpenWarehouseId(working.warehouseId);
+    setOpenSheet(true);
+  };
+
+  const closeOpenSheet = () => {
+    if (!openCashbox.isPending) setOpenSheet(false);
+  };
+
+  // Opens with balance 0; change is added later as «Приход» (stays in the history)
+  const confirmOpenCashbox = () => {
+    if (!openWarehouseId) return;
+    setOpenError(null);
+    openCashbox.mutate(
+      { warehouseId: openWarehouseId },
+      {
+        onSuccess: (cashbox) => {
+          setOpenSheet(false);
+          toast.show(t('payment.openCashboxSheet.done'));
+          router.push(`/(tabs)/(cashbox)/${cashbox.id}`);
+        },
+        onError: (err) => setOpenError(getApiErrorMessage(err, t('payment.openCashboxSheet.failed'))),
+      }
+    );
+  };
+
   const handleCashboxPress = (cashbox: Payment) => {
     router.push(`/(tabs)/(cashbox)/${cashbox.id}`);
   };
@@ -102,10 +139,11 @@ export default function CashboxListPage() {
             accessibilityLabel={t('common.filter')}
             onPress={() => setToggleFilter(prev => !prev)}
           />
-          {/* The open-cashbox screen doesn't exist yet */}
-          <Button variant="primary" icon={Plus} disabled>
-            {t('payment.openCashbox')}
-          </Button>
+          {canOpen ? (
+            <Button variant="primary" icon={Plus} onPress={startOpenCashbox} disabled={!working.warehouseId}>
+              {t('payment.openCashbox')}
+            </Button>
+          ) : null}
         </View>
         {data?.today && <CashboxTodayHero today={data.today} />}
         <Segmented options={filterOptions} value={statusFilter} onChange={setStatusFilter} />
@@ -138,6 +176,35 @@ export default function CashboxListPage() {
           }
         />
       )}
+      <ConfirmSheet
+        isOpen={openSheet}
+        onClose={closeOpenSheet}
+        title={t('payment.openCashbox')}
+        message={t('payment.openCashboxSheet.text')}
+        confirmLabel={t('payment.openCashboxSheet.confirm')}
+        loading={openCashbox.isPending}
+        error={openError}
+        onConfirm={confirmOpenCashbox}
+      >
+        {/* The working warehouse is preselected; another one of the user's warehouses can be chosen */}
+        {working.warehouses.length > 1 ? (
+          <View className="gap-2">
+            <Text className="font-onest-semibold text-[13px] text-soft">{t('payment.openCashboxSheet.warehouse')}</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {working.warehouses.map((w) => (
+                <Chip
+                  key={w.id}
+                  label={w.name}
+                  tone="sunken"
+                  selected={openWarehouseId === w.id}
+                  onPress={() => setOpenWarehouseId(w.id)}
+                />
+              ))}
+            </View>
+          </View>
+        ) : null}
+      </ConfirmSheet>
+
       {isOpenFilter && (
         <FilterSheet isOpen={isOpenFilter} isClose={() => setToggleFilter(false)} />
       )}
