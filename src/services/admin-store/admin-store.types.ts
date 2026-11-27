@@ -38,6 +38,8 @@ export interface AdminStoreListItem {
   rentalEnabled: boolean;
   /** Order assistant («Голос» in the cart), switched by the admin only */
   orderAssistantEnabled: boolean;
+  /** Paid service «Telegram-магазин», switched by the admin only */
+  telegramShopEnabled: boolean;
   /** Voice recordings are kept for training (owner or admin) */
   voiceDataConsent: boolean;
   owner: AdminStoreOwner | null;
@@ -158,6 +160,7 @@ export interface UpdateAdminStorePayload {
   salesEnabled?: boolean;
   rentalEnabled?: boolean;
   orderAssistantEnabled?: boolean;
+  telegramShopEnabled?: boolean;
   /** `false` deletes the store's saved recordings */
   voiceDataConsent?: boolean;
 }

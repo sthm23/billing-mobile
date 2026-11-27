@@ -332,6 +332,8 @@ const en = {
       "title": "Extra features",
       "orderAssistant": "Voice assistant",
       "orderAssistantDesc": "Order by voice or text in the cart · switched on at the store's request",
+      "telegramShop": "Telegram shop",
+      "telegramShopDesc": "Catalog and customer requests through the store's bot · paid service",
       "voiceData": "Keep voice recordings",
       "voiceDataDesc": "With the store's consent · to train recognition · 12 months",
       "voiceDataOff": "All of the store's voice recordings will be deleted permanently.",

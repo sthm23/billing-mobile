@@ -332,6 +332,8 @@ const uz = {
       "title": "Qoʻshimcha funksiyalar",
       "orderAssistant": "Ovozli yordamchi",
       "orderAssistantDesc": "Savatda ovoz yoki matn orqali buyurtma · doʻkon soʻrovi bilan yoqiladi",
+      "telegramShop": "Telegram-doʻkon",
+      "telegramShopDesc": "Doʻkon boti orqali katalog va mijoz buyurtmalari · pullik xizmat",
       "voiceData": "Ovoz yozuvlarini saqlash",
       "voiceDataDesc": "Doʻkon roziligi bilan · ovozni tanishni oʻrgatish uchun · 12 oy",
       "voiceDataOff": "Doʻkonning barcha ovoz yozuvlari qayta tiklab boʻlmaydigan tarzda oʻchiriladi.",
