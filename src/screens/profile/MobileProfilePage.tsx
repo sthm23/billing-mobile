@@ -7,14 +7,21 @@ import { useWorkingWarehouse } from "@/hooks/use-working-warehouse";
 import { useTheme } from "@/hooks/use-theme";
 import { UserRole } from "@/models/user.model";
 import { useAuth } from "@/provider/AuthProvider";
-import { isAdmin, canSeeDashboard } from "@/libs/roles";
+import {
+  isAdmin,
+  canSeeDashboard,
+  canConnectTelegramShop,
+  canHandleOnlineOrders,
+  hasTelegramShop,
+} from "@/libs/roles";
 import { useAdminStoreCounts } from "@/services/admin-store";
 import { useDebtors } from "@/services/debt";
 import { useStaffList } from "@/services/store";
+import { useOnlineOrderCounts, useTelegramShop } from "@/services/telegram-shop";
 import Constants from "expo-constants";
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
-import { ChartColumn, HandCoins, Store, UserRoundX, UsersRound } from "lucide-react-native";
+import { Bot, ChartColumn, HandCoins, ShoppingBag, Store, UserRoundX, UsersRound } from "lucide-react-native";
 import { useTranslation } from "react-i18next";
 import { useCallback } from "react";
 import { ScrollView, View } from "react-native";
@@ -48,9 +55,19 @@ const MobileProfilePage = () => {
     { enabled: user?.role === UserRole.OWNER && working.isReady }
   );
 
+  // Paid «Telegram-магазин»: requests (owner, manager, seller) and the bot (owner)
+  const telegramOn = hasTelegramShop(user);
+  const showOnlineOrders = telegramOn && canHandleOnlineOrders(user);
+  const showTelegramShop = telegramOn && canConnectTelegramShop(user);
+  const onlineCounts = useOnlineOrderCounts(showOnlineOrders);
+  const telegramShop = useTelegramShop(showTelegramShop);
+  const newRequests = onlineCounts.data?.NEW ?? 0;
+
   const { refetch: refetchDebtors } = debtors;
   const { refetch: refetchStoreCounts } = storeCounts;
   const { refetch: refetchStaff } = staffList;
+  const { refetch: refetchOnlineCounts } = onlineCounts;
+  const { refetch: refetchTelegramShop } = telegramShop;
   // Pull to refresh: the profile itself (GET /auth/me — also checks the session:
   // an expired one goes through /refresh or back to the login screen) plus the
   // counters on the cards of this role.
@@ -59,8 +76,22 @@ const MobileProfilePage = () => {
       refreshUser(),
       admin ? refetchStoreCounts() : refetchDebtors(),
       user?.role === UserRole.OWNER && working.isReady ? refetchStaff() : undefined,
+      showOnlineOrders ? refetchOnlineCounts() : undefined,
+      showTelegramShop ? refetchTelegramShop() : undefined,
     ]);
-  }, [refreshUser, admin, refetchStoreCounts, refetchDebtors, refetchStaff, user?.role, working.isReady]);
+  }, [
+    refreshUser,
+    admin,
+    refetchStoreCounts,
+    refetchDebtors,
+    refetchStaff,
+    user?.role,
+    working.isReady,
+    showOnlineOrders,
+    refetchOnlineCounts,
+    showTelegramShop,
+    refetchTelegramShop,
+  ]);
   const refreshControl = useRefreshControl(refresh);
 
   if (!user) {
@@ -92,6 +123,27 @@ const MobileProfilePage = () => {
       ) : (
         <WorkingWarehouseCard />
       )}
+      {/* Requests customers sent from the store's Telegram shop (paid service) */}
+      {showOnlineOrders ? (
+        <ListCard
+          leading={
+            <View className="w-11 h-11 rounded-[14px] bg-accent items-center justify-center">
+              <ShoppingBag size={20} color={colors.onAccent} strokeWidth={2} />
+            </View>
+          }
+          title={t('onlineOrders.title')}
+          subtitle={
+            onlineCounts.data
+              ? newRequests > 0
+                ? t('onlineOrders.entryNew', { count: newRequests })
+                : t('onlineOrders.entryNone')
+              : undefined
+          }
+          badge={newRequests > 0 ? { label: String(newRequests), tone: 'warn' } : undefined}
+          highlight={newRequests > 0}
+          onPress={() => router.push('/(tabs)/(profile)/online-orders')}
+        />
+      ) : null}
       {canSeeDashboard(user) ? (
         <ListCard
           leading={
@@ -126,6 +178,25 @@ const MobileProfilePage = () => {
           title={t('storeSettings.title')}
           subtitle={t('storeSettings.entrySubtitle')}
           onPress={() => router.push('/(tabs)/(profile)/store-settings')}
+        />
+      ) : null}
+      {/* Connecting the store's own bot (owner, paid service) */}
+      {showTelegramShop ? (
+        <ListCard
+          leading={
+            <View className="w-11 h-11 rounded-full bg-sunken items-center justify-center">
+              <Bot size={20} color={colors.ink} strokeWidth={2} />
+            </View>
+          }
+          title={t('telegramShop.title')}
+          subtitle={
+            telegramShop.data
+              ? telegramShop.data.bot
+                ? t('telegramShop.entryConnected', { username: telegramShop.data.bot.botUsername })
+                : t('telegramShop.entryNone')
+              : undefined
+          }
+          onPress={() => router.push('/(tabs)/(profile)/telegram-shop')}
         />
       ) : null}
       {/* Store with sales and rental: which one the bottom menu shows */}

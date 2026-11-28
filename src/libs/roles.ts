@@ -58,6 +58,34 @@ export function hasOrderAssistant(user: CurrentUserType | null | undefined): boo
 }
 
 /**
+ * The store has the paid «Telegram-магазин» service — switched on by a platform admin
+ * (`Store.telegramShopEnabled`). UX only: the backend checks it.
+ */
+export function hasTelegramShop(user: CurrentUserType | null | undefined): boolean {
+  return user?.staff?.store?.telegramShopEnabled === true;
+}
+
+/**
+ * Owner, manager or seller of a store: sees the requests from the Telegram shop and
+ * confirms / rejects them. A cashier and warehouse staff do not. UX only — the backend
+ * checks it (`/online-orders`).
+ */
+export function canHandleOnlineOrders(user: CurrentUserType | null | undefined): boolean {
+  if (!user || isAdmin(user)) return false;
+  return (
+    user.role === UserRole.OWNER ||
+    user.staff?.role === StaffRole.OWNER ||
+    user.staff?.role === StaffRole.MANAGER ||
+    user.staff?.role === StaffRole.SELLER
+  );
+}
+
+/** Store owner: connects the store's Telegram bot (`/telegram-shop/bot`). UX only. */
+export function canConnectTelegramShop(user: CurrentUserType | null | undefined): boolean {
+  return canSeeDashboard(user);
+}
+
+/**
  * The store agreed that voice recordings are kept to improve recognition
  * (`Store.voiceDataConsent`) — the voice tab tells the seller. Informational:
  * the backend decides whether a recording is kept.

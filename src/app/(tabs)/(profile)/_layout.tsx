@@ -21,6 +21,9 @@ export default function TabLayout() {
       <Stack.Screen name="debtors/new" />
       <Stack.Screen name="debtors/[customerId]" />
       <Stack.Screen name="debtors/pay" />
+      <Stack.Screen name="telegram-shop" />
+      <Stack.Screen name="online-orders/index" />
+      <Stack.Screen name="online-orders/[id]" />
       <Stack.Screen name="shops/index" />
       <Stack.Screen name="shops/new" />
       <Stack.Screen name="shops/[id]/index" />
