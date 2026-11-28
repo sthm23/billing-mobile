@@ -228,6 +228,14 @@ export function AdminShopScreen({ id }: { id: string }) {
     );
   };
 
+  const toggleTelegramShop = (on: boolean) => {
+    setAssistantError(null);
+    updateAssistant.mutate(
+      { id: store.id, telegramShopEnabled: on },
+      { onError: (e) => setAssistantError(getApiErrorMessage(e, t('adminShop.saveFailed'))) },
+    );
+  };
+
   // Withdrawing consent deletes every recording — asked first
   const saveVoiceConsent = (on: boolean) => {
     setAssistantError(null);
@@ -394,6 +402,18 @@ export function AdminShopScreen({ id }: { id: string }) {
               onValueChange={toggleAssistant}
               disabled={updateAssistant.isPending}
               accessibilityLabel={t('adminShop.features.orderAssistant')}
+            />
+          </View>
+          <View className="flex-row items-center gap-3 pt-3 border-t border-line">
+            <View className="flex-1 gap-0.5">
+              <Text className="font-onest-semibold text-[15px] text-ink">{t('adminShop.features.telegramShop')}</Text>
+              <Text className="font-onest text-xs text-muted">{t('adminShop.features.telegramShopDesc')}</Text>
+            </View>
+            <Switch
+              value={store.telegramShopEnabled}
+              onValueChange={toggleTelegramShop}
+              disabled={updateAssistant.isPending}
+              accessibilityLabel={t('adminShop.features.telegramShop')}
             />
           </View>
           <View className="flex-row items-center gap-3 pt-3 border-t border-line">
